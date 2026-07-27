@@ -1,0 +1,75 @@
+---
+description: Project-wide architecture, safety, quality, and delivery rules for AEGIS 3.0
+globs:
+alwaysApply: true
+---
+
+# AEGIS 3.0 project rules
+
+AEGIS is a self-hosted, production-quality market decision-support platform.
+Development occurs locally in this repository before verified deployment to a
+UGREEN NAS.
+
+## Delivery workflow
+
+- Build incrementally in explicit phases.
+- Complete, test, document, and review one phase before starting the next.
+- Do not enable trading or recommendation logic before its phase and evidence
+  gates are satisfied.
+- Keep changes small, modular, typed, and easy to review.
+- Before declaring a task complete, run the relevant tests, linters, type
+  checks, and builds, and report the exact results.
+- Treat a successful package upload as distinct from a verified live
+  deployment. Verify health, API routes, browser behavior, and logs on the NAS.
+
+## Product and data safety
+
+- AEGIS is decision-support software. It must never place or transmit live
+  orders.
+- Reject invalid, stale, zero, negative, closed-session, or otherwise unusable
+  market quotes before calculating derived metrics.
+- Preserve point-in-time knowledge. Market observations and evidence records
+  must be append-only, versioned, timestamped, provenance-aware, and
+  reproducible.
+- Never overwrite historical observations to make later data appear as though
+  it was known earlier.
+- Keep coverage confidence separate from probability confidence.
+- Keep research-only states clearly separate from actionable states.
+- Fail closed when data, evidence, validation, calibration, or quality gates
+  are incomplete.
+- Label simulated, delayed, fallback, or incomplete data clearly.
+
+## Architecture defaults
+
+- Backend: Python, FastAPI, SQLAlchemy, Alembic, PostgreSQL/TimescaleDB, Redis,
+  and Pydantic settings.
+- Frontend: Next.js, TypeScript, React, and Tailwind CSS.
+- Infrastructure: Docker Compose with health checks, persistent volumes,
+  environment-driven configuration, and reproducible NAS deployment scripts.
+- Keep domain logic independent of web frameworks and external providers.
+- Put provider integrations behind typed interfaces and preserve raw
+  provenance needed for audits.
+- Use UTC internally and explicit exchange calendars for market-session logic.
+
+## Engineering standards
+
+- Prefer readability over cleverness and small modules over large files.
+- Use type hints and strict type checking.
+- Add clear docstrings to public Python interfaces.
+- Validate external input at system boundaries.
+- Use structured logging and actionable error messages.
+- Never hardcode secrets, tokens, credentials, hostnames, or private IP
+  addresses. Use environment variables and committed example files.
+- Do not log secrets or sensitive configuration.
+- Add or update deterministic tests with each behavior change.
+- Update architecture, API, operational, and deployment documentation whenever
+  their contracts change.
+- Do not weaken tests, validation, security controls, or evidence gates merely
+  to make a check pass.
+
+## Greenfield boundary
+
+- This repository is the independent AEGIS 3.0 source of truth.
+- Do not copy code from older Aegis, AISTDE, SignalDesk, or scanner projects
+  unless the user explicitly requests a reviewed migration.
+- Do not deploy to the UGREEN NAS until the local phase acceptance checks pass.

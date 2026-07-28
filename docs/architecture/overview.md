@@ -8,9 +8,10 @@ transmits live orders, and it never implies certainty beyond what point-in-time 
 supports.
 
 This document describes the backend module boundaries established in Phase 0 and populated
-starting in Phase 1 (market data ingestion). No scoring, recommendation, prediction, or
-trading logic is implemented in either phase; the boundaries below exist so that future
-phases can add domain logic without restructuring the codebase.
+starting in Phase 1 (market data ingestion) and Phase 2 (scheduled ingestion and a
+database-backed watchlist). No scoring, recommendation, prediction, or trading logic is
+implemented in any phase so far; the boundaries below exist so that future phases can add
+domain logic without restructuring the codebase.
 
 ## System context
 
@@ -31,9 +32,17 @@ flowchart LR
 ```
 
 As of Phase 1, "External Market Data Providers" has one concrete integration: Alpha Vantage
-daily bars (`aegis.providers.alpha_vantage.AlphaVantageProvider`), reached only through the
-`POST /market-data/ingest` on-demand endpoint (no background scheduler yet; see
-[decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md)).
+daily bars (`aegis.providers.alpha_vantage.AlphaVantageProvider`). As of Phase 2, it is
+reached two ways: the `POST /market-data/ingest` on-demand endpoint, and an in-process
+APScheduler job (`aegis.api.scheduler.IngestionScheduler`) that runs on a cron schedule
+(`AEGIS_INGESTION_CRON`, default 22:00 UTC on weekdays). Both paths ingest the same
+database-backed watchlist (`GET/POST /watchlist`, `DELETE /watchlist/{symbol}`) and run
+through the same `MarketDataIngestionService`, so they can never disagree about which symbols
+are current or how a bar is validated. A Redis lock ensures only one process runs a scheduled
+cycle at a time. See
+[decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md)
+and
+[decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md).
 
 ## Backend module boundaries (`backend/src/aegis/`)
 
@@ -64,20 +73,30 @@ flowchart TB
 ```
 
 - **`api/`**: FastAPI routers, request/response Pydantic schemas, HTTP-specific error
-  mapping. Contains no business logic; delegates to `domain/`.
+  mapping, and infrastructure wiring that legitimately needs a concrete framework (FastAPI
+  `Depends`, APScheduler, a live database session). Contains no business logic; delegates to
+  `domain/`. As of Phase 2: `scheduler.py` wires the real Redis client, database session, and
+  APScheduler into the framework-free `domain.scheduled_ingestion.run_locked_ingestion_cycle`,
+  mirroring how `dependencies.py` wires the on-demand ingestion path.
 - **`domain/`**: framework-free business rules and orchestration. Must not import FastAPI,
-  SQLAlchemy sessions, or provider SDKs directly; depends on repository/adapter interfaces
-  only (`DailyBarRepository` and `DailyBarProvider` are Protocols, satisfied structurally by
-  `persistence/` and `providers/` without either importing `domain/`), so it can be tested and
-  reasoned about independently of infrastructure. As of Phase 1: an exchange-calendar wrapper,
-  daily-bar validation rules, and `MarketDataIngestionService`. Still empty of any
+  SQLAlchemy sessions, a concrete Redis client, or provider SDKs directly; depends on
+  repository/adapter interfaces only (`DailyBarRepository`, `DailyBarProvider`,
+  `DistributedLock`, `WatchlistSource`, and `IngestionRunner` are Protocols, satisfied
+  structurally by `persistence/`, `providers/`, and `api/scheduler.py` without any of them
+  importing `domain/`), so it can be tested and reasoned about independently of
+  infrastructure. As of Phase 1: an exchange-calendar wrapper, daily-bar validation rules, and
+  `MarketDataIngestionService`. As of Phase 2: watchlist symbol validation (`watchlist.py`) and
+  the lock-guarded scheduled-ingestion cycle (`scheduled_ingestion.py`). Still empty of any
   scoring/recommendation/prediction/trading logic (per project rules, not added before its
   phase and evidence gates are satisfied).
 - **`persistence/`**: SQLAlchemy 2.x models, repository classes, and Alembic migrations
   (`backend/alembic/`). Owns all direct database access. Enforces append-only, versioned,
   timestamped, provenance-aware storage for market observations (see
   [data-model.md](data-model.md)). As of Phase 1: `MarketDailyBarObservation` (a TimescaleDB
-  hypertable) and `MarketDailyBarRepository`.
+  hypertable) and `MarketDailyBarRepository`. As of Phase 2: `WatchlistSymbol` and
+  `WatchlistRepository` - a plain (non-hypertable), mutable, soft-deletable operational table
+  that intentionally does not follow the append-only observation conventions above, because it
+  holds current configuration, not a market observation (see ADR-0003).
 - **`providers/`**: typed interfaces (Protocols/ABCs) for external market data sources, plus
   adapter implementations behind those interfaces. Domain code depends on the interface, never
   on a concrete provider SDK, so providers can be swapped or faked in tests. Preserves raw
@@ -126,3 +145,5 @@ Deployment to the UGREEN NAS is out of scope for Phase 0. See
 - [decisions/0001-phase-0-tooling.md](decisions/0001-phase-0-tooling.md): Phase 0 tooling ADR.
 - [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md):
   Phase 1 market data ingestion ADR.
+- [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md):
+  Phase 2 scheduled ingestion and database-backed watchlist ADR.

@@ -28,10 +28,19 @@ non-functional development placeholder.
 | `AEGIS_ALPHA_VANTAGE_API_KEY` | Alpha Vantage API key. Optional at startup; ingestion returns a typed error if unset when invoked. Never logged. | unset |
 | `AEGIS_ALPHA_VANTAGE_BASE_URL` | Base URL for the Alpha Vantage REST API. | `https://www.alphavantage.co/query` |
 | `AEGIS_ALPHA_VANTAGE_REQUEST_INTERVAL_SECONDS` | Minimum delay between successive Alpha Vantage requests within one ingestion run, to stay within the provider's rate limit. | `12.0` |
-| `AEGIS_WATCHLIST_SYMBOLS` | Comma-separated instrument symbols ingested by `POST /market-data/ingest`. Not a database table in Phase 1; see [ADR-0002](../architecture/decisions/0002-phase-1-market-data-ingestion.md). | `AAPL,MSFT,SPY` |
+| `AEGIS_WATCHLIST_SYMBOLS` | Comma-separated **bootstrap seed** symbols. As of Phase 2, only used to seed the database-backed `watchlist_symbols` table the first time it is empty; the database is the source of truth afterward. See [ADR-0003](../architecture/decisions/0003-phase-2-scheduled-watchlist.md). | `AAPL,MSFT,SPY` |
 | `AEGIS_DAILY_BAR_OUTPUT_SIZE` | Alpha Vantage `outputsize` parameter: `compact` (latest ~100 daily bars) or `full` (full history). | `compact` |
 | `AEGIS_EXCHANGE_CALENDAR_NAME` | `pandas-market-calendars` calendar name used to validate that a bar's trading date is a real exchange session day. | `NYSE` |
 | `AEGIS_MAX_LATEST_BAR_STALENESS_TRADING_DAYS` | Maximum number of exchange trading days the most recent bar in a provider response may lag behind the current trading day before it is treated as stale. | `3` |
+
+## Backend: Phase 2 scheduled ingestion & watchlist (`aegis.config.settings.Settings`)
+
+| Variable | Description | Development default |
+| --- | --- | --- |
+| `AEGIS_INGESTION_SCHEDULE_ENABLED` | Whether the in-process APScheduler runs ingestion automatically. `false` leaves `POST /market-data/ingest` as the only trigger, matching Phase 1 behavior. | `true` |
+| `AEGIS_INGESTION_CRON` | Standard 5-field cron expression (minute hour day month day-of-week, UTC) for the scheduled ingestion job. | `0 22 * * 1-5` |
+| `AEGIS_INGESTION_SCHEDULE_LOCK_KEY` | Redis key used to ensure only one process runs a scheduled cycle at a time. | `aegis:ingestion:scheduler:lock` |
+| `AEGIS_INGESTION_SCHEDULE_LOCK_TTL_SECONDS` | Redis lock TTL for a scheduled cycle; bounds how long a crashed process can hold the lock. | `1800` |
 
 ## PostgreSQL / TimescaleDB container (`docker-compose.yml`)
 

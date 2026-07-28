@@ -7,6 +7,55 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 2 - Scheduled Ingestion & Database-Backed Watchlist
+
+Ingestion now runs automatically on a schedule, and the watchlist moves from a static
+environment variable to a database-backed list manageable via the API while the service is
+running. No scoring, recommendation, prediction, or order-placement logic exists anywhere in
+this phase; see
+[docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md](docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md)
+for the confirmed decisions (scheduler, coordination lock, watchlist storage, bootstrap,
+validation, auth) and their accepted limitations.
+
+#### Added
+
+- Domain layer (`backend/src/aegis/domain/`): `watchlist.py` (`normalize_symbol`, a
+  framework-free shape validator for user-submitted symbols) and `scheduled_ingestion.py`
+  (`run_locked_ingestion_cycle`, a framework-free, `Protocol`-based lock-guarded ingestion
+  cycle - independently unit-tested with fake Redis/watchlist/ingestion-service doubles, no
+  real I/O).
+- Persistence (`backend/src/aegis/persistence/`): `WatchlistSymbol` model and
+  `WatchlistRepository` (`list_active`, `list_active_rows`, `add`, `deactivate`,
+  `ensure_seeded`), plus an Alembic migration (`0003`) creating `watchlist_symbols` as a plain
+  (non-hypertable) table with a unique constraint on `symbol`. Unlike
+  `market_daily_bar_observations`, this table is a mutable, soft-deletable operational list,
+  not an append-only observation (see ADR-0003).
+- API (`backend/src/aegis/api/`): `GET /watchlist`, `POST /watchlist`, and
+  `DELETE /watchlist/{symbol}` for watchlist management; `POST /market-data/ingest` now reads
+  the active database-backed watchlist instead of `AEGIS_WATCHLIST_SYMBOLS` directly.
+  `scheduler.py` wires an APScheduler `AsyncIOScheduler` into the application lifespan, running
+  `run_locked_ingestion_cycle` on a cron schedule (`AEGIS_INGESTION_CRON`) guarded by a Redis
+  lock (`AEGIS_INGESTION_SCHEDULE_LOCK_KEY`/`_TTL_SECONDS`) so multiple backend replicas can
+  never run overlapping cycles; disabled entirely via `AEGIS_INGESTION_SCHEDULE_ENABLED=false`.
+- Configuration: `AEGIS_INGESTION_SCHEDULE_ENABLED`, `AEGIS_INGESTION_CRON`,
+  `AEGIS_INGESTION_SCHEDULE_LOCK_KEY`, `AEGIS_INGESTION_SCHEDULE_LOCK_TTL_SECONDS`, documented
+  in `.env.example` and `docs/operations/configuration.md`. `AEGIS_WATCHLIST_SYMBOLS`'s role
+  changes from "the watchlist" to "the one-time bootstrap seed" for the database table.
+- Unit tests for symbol validation, the locked scheduled-ingestion cycle (fake doubles, no real
+  I/O), the watchlist endpoints (dependency overrides), and scheduler lifespan wiring
+  (enabled/disabled); a new cross-service integration test
+  (`tests/integration/test_watchlist_repository_docker.py`) verifying the migration and the
+  repository's add/deactivate/reactivate/seed behavior against the real Compose Postgres
+  service.
+- `apscheduler` added as a new main runtime dependency.
+
+#### Explicitly out of scope
+
+Any scoring/probability/confidence/recommendation computation, order placement/transmission,
+frontend changes, authentication on any endpoint, a second data provider or intraday
+granularity, and a separate worker process or multi-replica-aware scheduling beyond the Redis
+lock - each is absent, not merely unimplemented, per the Phase 2 plan.
+
 ### Phase 1 - Market Data Ingestion (Alpha Vantage daily bars)
 
 The first real external data integration: a typed Alpha Vantage provider adapter, validated

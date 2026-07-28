@@ -11,6 +11,7 @@ from decimal import Decimal
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     Date,
     DateTime,
     Identity,
@@ -70,3 +71,30 @@ class MarketDailyBarObservation(Base):
     data_quality: Mapped[str] = mapped_column(String(32), nullable=False, default="primary")
     schema_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     raw_payload: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
+
+
+class WatchlistSymbol(Base):
+    """An operationally managed symbol that ingestion (on-demand or scheduled) processes.
+
+    Unlike :class:`MarketDailyBarObservation`, this is a mutable operational table, not an
+    append-only observation: a removed symbol is soft-deactivated (``is_active=False``), never
+    hard-deleted, and re-adding it reactivates the existing row. See ADR-0003 for why the
+    append-only, point-in-time conventions in ``docs/architecture/data-model.md`` intentionally
+    do not apply to this table (it is current configuration, not a market observation).
+    """
+
+    __tablename__ = "watchlist_symbols"
+    __table_args__ = (UniqueConstraint("symbol", name="uq_watchlist_symbols_symbol"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    symbol: Mapped[str] = mapped_column(String(32), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )

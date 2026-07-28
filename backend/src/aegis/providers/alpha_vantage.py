@@ -19,6 +19,9 @@ from aegis.config.settings import Settings
 from aegis.providers.errors import ProviderError, ProviderRateLimitError
 from aegis.providers.market_data import DailyBar
 
+MARKET_DATA_SOURCE = "alpha_vantage"
+"""The ``source`` value recorded against every bar this provider produces (see ADR-0002)."""
+
 _FUNCTION = "TIME_SERIES_DAILY"
 _TIME_SERIES_KEY = "Time Series (Daily)"
 

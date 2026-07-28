@@ -6,7 +6,11 @@ FastAPI service for the AEGIS 3.0 decision-support platform. See
 and command reference.
 
 Phase 0 established process liveness/readiness endpoints and infrastructure wiring. Phase 1
-adds on-demand market data ingestion (Alpha Vantage daily bars) with a validated, append-only
-TimescaleDB observation store; see
-[../docs/architecture/decisions/0002-phase-1-market-data-ingestion.md](../docs/architecture/decisions/0002-phase-1-market-data-ingestion.md).
+added on-demand market data ingestion (Alpha Vantage daily bars) with a validated, append-only
+TimescaleDB observation store. Phase 2 adds an in-process scheduler that runs ingestion
+automatically (guarded by a Redis lock) and a database-backed watchlist manageable via
+`GET/POST /watchlist` and `DELETE /watchlist/{symbol}`; see
+[../docs/architecture/decisions/0002-phase-1-market-data-ingestion.md](../docs/architecture/decisions/0002-phase-1-market-data-ingestion.md)
+and
+[../docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md](../docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md).
 No scoring, recommendation, prediction, or trading logic exists in this package.

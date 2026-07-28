@@ -17,9 +17,8 @@ from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.persistence.cache import check_redis
 from aegis.persistence.database import check_database
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
-from aegis.providers.alpha_vantage import AlphaVantageProvider
-
-MARKET_DATA_SOURCE = "alpha_vantage"
+from aegis.persistence.repositories.watchlist import WatchlistRepository
+from aegis.providers.alpha_vantage import MARKET_DATA_SOURCE, AlphaVantageProvider
 
 
 async def check_database_ready(request: Request) -> bool:
@@ -54,11 +53,27 @@ async def get_market_data_repository(
     return MarketDailyBarRepository(session)
 
 
-async def get_watchlist_symbols(request: Request) -> list[str]:
-    """The configured ingestion watchlist (``AEGIS_WATCHLIST_SYMBOLS``)."""
+async def get_watchlist_repository(
+    session: AsyncSession = Depends(get_db_session),
+) -> WatchlistRepository:
+    """A request-scoped repository for the database-backed watchlist."""
+
+    return WatchlistRepository(session)
+
+
+async def get_active_watchlist_symbols(
+    request: Request,
+    repository: WatchlistRepository = Depends(get_watchlist_repository),
+) -> list[str]:
+    """The current active watchlist, seeding it from ``AEGIS_WATCHLIST_SYMBOLS`` if empty.
+
+    Replaces the Phase 1 environment-only watchlist (ADR-0003): the database is now the
+    source of truth, and the environment variable is only a one-time bootstrap seed.
+    """
 
     settings = request.app.state.settings
-    return settings.watchlist
+    await repository.ensure_seeded(settings.watchlist_seed_symbols)
+    return await repository.list_active()
 
 
 async def get_ingestion_service(

@@ -71,7 +71,7 @@ Once every service reports `healthy`:
 
 These require the full Compose stack to already be up and healthy (see
 [../architecture/decisions/0001-phase-0-tooling.md](../architecture/decisions/0001-phase-0-tooling.md),
-decision 6) and, for the market data repository test, migrations applied
+decision 6) and, for the market data and watchlist repository tests, migrations applied
 (`uv run alembic upgrade head` from `backend/`). They reuse the backend's `uv`-managed
 environment rather than a separate toolchain:
 

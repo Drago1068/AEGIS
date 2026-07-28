@@ -66,7 +66,11 @@ class Settings(BaseSettings):
     )
     watchlist_symbols: str = Field(
         default="AAPL,MSFT,SPY",
-        description="Comma-separated instrument symbols to ingest.",
+        description=(
+            "Comma-separated bootstrap seed symbols. Only used to seed the database-backed "
+            "watchlist (`watchlist_symbols` table) the first time it is empty; once any row "
+            "exists, this value is never read again. See ADR-0003."
+        ),
     )
     daily_bar_output_size: Literal["compact", "full"] = Field(
         default="compact",
@@ -88,9 +92,34 @@ class Settings(BaseSettings):
         ),
     )
 
+    ingestion_schedule_enabled: bool = Field(
+        default=True,
+        description="Whether the in-process scheduler runs ingestion automatically. See ADR-0003.",
+    )
+    ingestion_cron: str = Field(
+        default="0 22 * * 1-5",
+        description=(
+            "Standard 5-field cron expression (minute hour day month day-of-week, UTC) for "
+            "the scheduled ingestion job. Default: 22:00 UTC on weekdays, after the US cash "
+            "session closes."
+        ),
+    )
+    ingestion_schedule_lock_key: str = Field(
+        default="aegis:ingestion:scheduler:lock",
+        description="Redis key used to ensure only one process runs a scheduled cycle at a time.",
+    )
+    ingestion_schedule_lock_ttl_seconds: int = Field(
+        default=1800,
+        gt=0,
+        description=(
+            "Redis lock TTL for a scheduled ingestion cycle. Bounds how long a crashed "
+            "process can hold the lock; must comfortably exceed a normal run's duration."
+        ),
+    )
+
     @property
-    def watchlist(self) -> list[str]:
-        """Parsed, upper-cased, order-preserving, de-duplicated watchlist symbols."""
+    def watchlist_seed_symbols(self) -> list[str]:
+        """Parsed, upper-cased, order-preserving, de-duplicated bootstrap seed symbols."""
 
         seen: dict[str, None] = {}
         for raw_symbol in self.watchlist_symbols.split(","):

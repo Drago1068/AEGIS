@@ -5,6 +5,10 @@ Phase 0 itself created no such tables; it only enabled and verified the Timescal
 (see the Phase 0 baseline migration described in [overview.md](overview.md)). Phase 1 adds the
 first table built to these conventions, `market_daily_bar_observations` (see
 [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md)).
+Phase 2 adds `watchlist_symbols`, which deliberately does **not** follow these conventions: it
+is current operational configuration (which symbols ingestion currently processes), not a
+market observation or evidence record, so it is a plain mutable/soft-deletable table instead
+(see [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md)).
 
 ## Append-only and versioned
 

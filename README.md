@@ -7,11 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 1 (market data ingestion - Alpha Vantage daily bars).** No scoring,
-recommendation, prediction, or trading logic exists yet; Phase 1 adds the first real provider
-integration and a validated, append-only observation store behind an on-demand ingestion
-endpoint. See
-[docs/architecture/decisions/0002-phase-1-market-data-ingestion.md](docs/architecture/decisions/0002-phase-1-market-data-ingestion.md)
+**Current phase: Phase 2 (scheduled ingestion and database-backed watchlist).** No scoring,
+recommendation, prediction, or trading logic exists yet; Phase 2 adds an in-process scheduler
+that runs ingestion automatically, and a database-backed watchlist that can be managed via the
+API while the service is running. See
+[docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md](docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

@@ -41,11 +41,13 @@ for the full NAS deployment boundary.
 ### `integration`
 
 Brings up the full Compose stack (`docker compose up -d --build`), waits for every service to
-report `healthy`, then runs `tests/integration/` against the real containers (the readiness
-healthy-path test). Depends on `backend`, `frontend`, and `compose-validate` passing first, so a
-broken unit test or a broken image build fails fast before the slower integration job starts.
-Logs are dumped on failure and the stack is always torn down (`docker compose down -v`) at the
-end of the job.
+report `healthy`, applies Alembic migrations (`uv run alembic upgrade head`), then runs
+`tests/integration/` against the real containers - the readiness healthy-path test, and (as of
+Phase 1/2) the market-data and watchlist repository tests, which need the migrated schema to
+exist. Depends on `backend`, `frontend`, and `compose-validate` passing first, so a broken unit
+test or a broken image build fails fast before the slower integration job starts. Logs are
+dumped on failure and the stack is always torn down (`docker compose down -v`) at the end of
+the job.
 
 ### `security`
 

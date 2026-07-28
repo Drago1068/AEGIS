@@ -10,9 +10,9 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from aegis.api.dependencies import (
+    get_active_watchlist_symbols,
     get_ingestion_service,
     get_market_data_repository,
-    get_watchlist_symbols,
 )
 from aegis.api.schemas.market_data import (
     DailyBarResponse,
@@ -28,9 +28,9 @@ router = APIRouter(prefix="/market-data", tags=["market-data"])
 @router.post("/ingest", response_model=IngestionRunResponse)
 async def ingest_market_data(
     service: MarketDataIngestionService = Depends(get_ingestion_service),
-    symbols: list[str] = Depends(get_watchlist_symbols),
+    symbols: list[str] = Depends(get_active_watchlist_symbols),
 ) -> IngestionRunResponse:
-    """Run one ingestion cycle over the configured watchlist (``AEGIS_WATCHLIST_SYMBOLS``)."""
+    """Run one ingestion cycle over the current active database-backed watchlist."""
 
     run_result = await service.run(symbols)
     return IngestionRunResponse(

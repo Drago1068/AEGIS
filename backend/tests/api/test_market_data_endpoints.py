@@ -12,9 +12,9 @@ from decimal import Decimal
 from httpx import ASGITransport, AsyncClient
 
 from aegis.api.dependencies import (
+    get_active_watchlist_symbols,
     get_ingestion_service,
     get_market_data_repository,
-    get_watchlist_symbols,
 )
 from aegis.api.main import create_app
 from aegis.config.settings import Settings
@@ -68,7 +68,7 @@ def _client_with_overrides(
     app = create_app(settings=Settings(environment="test"))
     if ingestion_service is not None:
         app.dependency_overrides[get_ingestion_service] = lambda: ingestion_service
-        app.dependency_overrides[get_watchlist_symbols] = lambda: ["AAPL"]
+        app.dependency_overrides[get_active_watchlist_symbols] = lambda: ["AAPL"]
     if repository is not None:
         app.dependency_overrides[get_market_data_repository] = lambda: repository
     transport = ASGITransport(app=app)

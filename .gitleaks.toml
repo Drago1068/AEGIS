@@ -1,0 +1,31 @@
+# Gitleaks configuration for AEGIS 3.0.
+#
+# Extends the default gitleaks rule set and adds an allowlist for vendored/build
+# directories. These directories are already excluded from version control by
+# .gitignore; they are never committed, so real secret-scanning coverage of them is
+# unnecessary - but they must also be excluded from the `--no-git` (raw filesystem)
+# scan used for local, pre-commit verification, since they otherwise produce large
+# numbers of false positives (license text, cryptography test fixtures/algorithm
+# names, etc. in third-party packages).
+#
+# See docs/operations/security-scanning.md for how this is run locally and in CI.
+title = "AEGIS 3.0 gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+paths = [
+  '''(^|/)\.venv/''',
+  '''(^|/)node_modules/''',
+  '''(^|/)\.next/''',
+  '''(^|/)\.git/''',
+  '''(^|/)\.pytest_cache/''',
+  '''(^|/)\.ruff_cache/''',
+  '''(^|/)__pycache__/''',
+  '''(^|/)coverage/''',
+  '''(^|/)dist/''',
+  '''(^|/)build/''',
+  '''pnpm-lock\.yaml$''',
+  '''uv\.lock$''',
+]

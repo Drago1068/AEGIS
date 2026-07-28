@@ -1,0 +1,233 @@
+# AEGIS 3.0 Phase 0 continuous integration.
+#
+# This workflow only runs once a GitHub remote exists and a push/PR triggers it (see
+# docs/operations/ci.md for the local-vs-remote gate distinction). Every job here is also
+# independently runnable from a local shell using the exact commands below; Phase 0
+# acceptance never depends on this workflow actually executing.
+#
+# Action versions are pinned to major-version tags (the common, actively-maintained
+# convention for first-party and widely used marketplace actions); see
+# docs/operations/ci.md for the rationale and for how to bump them.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_VERSION: "0.11.32"
+
+jobs:
+  backend:
+    name: Backend (lint, type-check, test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - name: Sync dependencies (locked, all groups)
+        run: uv sync --locked --all-groups
+
+      - name: Ruff lint
+        run: uv run ruff check .
+
+      - name: Pyright (strict)
+        run: uv run pyright
+
+      - name: Pytest (unit tests, incl. no-domain-logic check)
+        run: uv run pytest
+
+  frontend:
+    name: Frontend (lint, type-check, test, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.node-version
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type-check
+        run: pnpm exec tsc --noEmit
+
+      - name: No-domain-logic check
+        run: pnpm run check:no-domain-logic
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  compose-validate:
+    name: Compose config + NAS-architecture build validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate docker-compose.yml
+        run: docker compose config
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Build-only NAS-architecture validation (linux/amd64, matching UGREEN NAS
+      # DXP-series hardware). Never pushed, run, or deployed - see docker/nas/README.md.
+      - name: Build backend image for linux/amd64
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: docker/backend.Dockerfile
+          platforms: linux/amd64
+          push: false
+
+      - name: Build frontend image for linux/amd64
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          file: docker/frontend.Dockerfile
+          platforms: linux/amd64
+          push: false
+
+  integration:
+    name: Integration (Docker Compose readiness, healthy path)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend, compose-validate]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - name: Sync backend dependencies (test client only)
+        working-directory: backend
+        run: uv sync --locked --all-groups
+
+      - name: Bring up Docker Compose stack
+        run: docker compose up -d --build
+
+      - name: Wait for all services to report healthy
+        run: |
+          set -euo pipefail
+          for _ in $(seq 1 30); do
+            statuses="$(docker compose ps --format '{{.Health}}')"
+            if [ -n "$statuses" ] && ! echo "$statuses" | grep -qv '^healthy$'; then
+              echo "All services healthy."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Services did not become healthy in time:" >&2
+          docker compose ps >&2
+          exit 1
+
+      - name: Run cross-service integration tests
+        working-directory: backend
+        run: uv run pytest ../tests/integration -v
+
+      - name: Show service logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
+
+  security:
+    name: Security scanning (dependencies, secrets, images)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - name: Backend dependency scan (pip-audit, against the locked dependency set)
+        working-directory: backend
+        run: |
+          uv sync --locked --all-groups
+          uv export --locked --all-groups --no-emit-project --format requirements.txt -o pip-audit-requirements.txt
+          uv run pip-audit --strict --disable-pip -r pip-audit-requirements.txt
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.node-version
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Frontend dependency scan (pnpm audit)
+        working-directory: frontend
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm audit --prod
+
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image for scanning
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: docker/backend.Dockerfile
+          tags: aegis-backend:ci-scan
+          load: true
+
+      - name: Build frontend image for scanning
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          file: docker/frontend.Dockerfile
+          tags: aegis-frontend:ci-scan
+          load: true
+
+      - name: Scan backend image (trivy)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: aegis-backend:ci-scan
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
+
+      - name: Scan frontend image (trivy)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: aegis-frontend:ci-scan
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true

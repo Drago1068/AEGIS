@@ -1,0 +1,26 @@
+# The local development volume for this repository is exFAT-formatted, which does not
+# support symlinks. pnpm's default (isolated) linker relies on symlinks, so this project
+# uses the hoisted linker instead. This is a filesystem accommodation, not a security or
+# dependency-resolution downgrade decision; it can be removed if the repository is moved to
+# a filesystem that supports symlinks (NTFS, ext4, etc.). See
+# docs/architecture/decisions/0001-phase-0-tooling.md.
+nodeLinker: hoisted
+
+# Native build/install scripts explicitly reviewed and disallowed for Phase 0: none of them
+# are required for the placeholder page or its tests (sharp is for next/image optimization,
+# unused in Phase 0; esbuild and unrs-resolver ship usable platform binaries without their
+# install scripts).
+allowBuilds:
+  esbuild: false
+  sharp: false
+  unrs-resolver: false
+
+# Security-scan remediation (see docs/operations/security-scanning.md): forces transitive
+# dependencies pulled in by `next` to patched versions. Neither is a direct dependency, so
+# neither can be bumped in package.json; remove each override once `next` itself requires a
+# patched version by default.
+overrides:
+  # sharp: optional next/image dependency, unused in Phase 0 since no page uses next/image.
+  sharp: ">=0.35.0"
+  # postcss: GHSA-6g55-p6wh-862q, GHSA-r28c-9q8g-f849, GHSA-qx2v-qp2m-jg93.
+  postcss: ">=8.5.18"

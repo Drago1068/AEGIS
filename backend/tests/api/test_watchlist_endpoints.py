@@ -1,7 +1,8 @@
 """Unit tests for the watchlist management endpoints, via dependency overrides.
 
 No real database access: the endpoints are exercised entirely through a fake repository
-double substituted with ``app.dependency_overrides``.
+double substituted with ``app.dependency_overrides``. Operator auth is bypassed via an
+override of ``require_operator`` (see Phase 4 / ADR-0005).
 """
 
 from __future__ import annotations
@@ -10,10 +11,20 @@ from datetime import UTC, datetime
 
 from httpx import ASGITransport, AsyncClient
 
-from aegis.api.dependencies import get_watchlist_repository
+from aegis.api.dependencies import get_watchlist_repository, require_operator
 from aegis.api.main import create_app
 from aegis.config.settings import Settings
-from aegis.persistence.models import WatchlistSymbol
+from aegis.persistence.models import Operator, WatchlistSymbol
+
+
+def _operator() -> Operator:
+    return Operator(
+        id=1,
+        username="operator",
+        password_hash="unused-in-override",
+        created_at=datetime(2024, 1, 1, tzinfo=UTC),
+        updated_at=datetime(2024, 1, 1, tzinfo=UTC),
+    )
 
 
 def _row(symbol: str = "AAPL", *, is_active: bool = True) -> WatchlistSymbol:
@@ -55,8 +66,9 @@ class _FakeWatchlistRepository:
 
 
 def _client_with_repository(repository: _FakeWatchlistRepository) -> AsyncClient:
-    app = create_app(settings=Settings(environment="test"))
+    app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
     app.dependency_overrides[get_watchlist_repository] = lambda: repository
+    app.dependency_overrides[require_operator] = _operator
     transport = ASGITransport(app=app)
     return AsyncClient(transport=transport, base_url="http://testserver")
 
@@ -71,6 +83,38 @@ async def test_list_watchlist_returns_active_symbols_only() -> None:
     body = response.json()
     assert [entry["symbol"] for entry in body] == ["AAPL"]
     assert body[0]["is_active"] is True
+
+
+async def test_list_watchlist_returns_401_without_auth_override() -> None:
+    from aegis.api.dependencies import get_operator_repository, get_session_store
+
+    class _EmptyOperators:
+        async def ensure_seeded(self, username: str, password: str) -> None:
+            return None
+
+        async def get_by_username(self, username: str) -> None:
+            return None
+
+    class _EmptySessions:
+        async def get(self, session_id: str) -> None:
+            return None
+
+        async def create(self, operator_id: int, username: str) -> str:
+            return "unused"
+
+        async def delete(self, session_id: str) -> None:
+            return None
+
+    repository = _FakeWatchlistRepository([_row("AAPL")])
+    app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
+    app.dependency_overrides[get_watchlist_repository] = lambda: repository
+    app.dependency_overrides[get_operator_repository] = lambda: _EmptyOperators()
+    app.dependency_overrides[get_session_store] = lambda: _EmptySessions()
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/watchlist")
+
+    assert response.status_code == 401
 
 
 async def test_add_watchlist_symbol_normalizes_and_returns_201() -> None:

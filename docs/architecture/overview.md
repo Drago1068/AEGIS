@@ -9,10 +9,10 @@ supports.
 
 This document describes the backend module boundaries established in Phase 0 and populated
 starting in Phase 1 (market data ingestion), Phase 2 (scheduled ingestion and a
-database-backed watchlist), and Phase 3 (operator console over those APIs). No scoring,
-recommendation, prediction, or trading logic is implemented in any phase so far; the
-boundaries below exist so that future phases can add domain logic without restructuring the
-codebase.
+database-backed watchlist), Phase 3 (operator console over those APIs), and Phase 4
+(operator session authentication). No scoring, recommendation, prediction, or trading logic
+is implemented in any phase so far; the boundaries below exist so that future phases can add
+domain logic without restructuring the codebase.
 
 ## System context
 
@@ -40,10 +40,12 @@ APScheduler job (`aegis.api.scheduler.IngestionScheduler`) that runs on a cron s
 database-backed watchlist (`GET/POST /watchlist`, `DELETE /watchlist/{symbol}`) and run
 through the same `MarketDataIngestionService`, so they can never disagree about which symbols
 are current or how a bar is validated. A Redis lock ensures only one process runs a scheduled
-cycle at a time. See
-[decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md)
+cycle at a time. As of Phase 4, watchlist and market-data HTTP routes require an operator
+session cookie (login via `POST /auth/login`); `/health` and `/ready` stay public. See
+[decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md),
+[decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md),
 and
-[decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md).
+[decisions/0005-phase-4-operator-auth.md](decisions/0005-phase-4-operator-auth.md).
 
 ## Backend module boundaries (`backend/src/aegis/`)
 
@@ -78,7 +80,10 @@ flowchart TB
   `Depends`, APScheduler, a live database session). Contains no business logic; delegates to
   `domain/`. As of Phase 2: `scheduler.py` wires the real Redis client, database session, and
   APScheduler into the framework-free `domain.scheduled_ingestion.run_locked_ingestion_cycle`,
-  mirroring how `dependencies.py` wires the on-demand ingestion path.
+  mirroring how `dependencies.py` wires the on-demand ingestion path. As of Phase 4: auth
+  routes (`/auth/login`, `/auth/logout`, `/auth/me`) and a session dependency that requires a
+  valid Redis-backed cookie for `/watchlist*` and `/market-data*`; `/health` and `/ready`
+  stay public for Compose and CI.
 - **`domain/`**: framework-free business rules and orchestration. Must not import FastAPI,
   SQLAlchemy sessions, a concrete Redis client, or provider SDKs directly; depends on
   repository/adapter interfaces only (`DailyBarRepository`, `DailyBarProvider`,
@@ -97,7 +102,9 @@ flowchart TB
   hypertable) and `MarketDailyBarRepository`. As of Phase 2: `WatchlistSymbol` and
   `WatchlistRepository` - a plain (non-hypertable), mutable, soft-deletable operational table
   that intentionally does not follow the append-only observation conventions above, because it
-  holds current configuration, not a market observation (see ADR-0003).
+  holds current configuration, not a market observation (see ADR-0003). As of Phase 4:
+  `Operator` and `OperatorRepository` - another operational table (username + Argon2 hash)
+  with seed-once bootstrap from env credentials when empty (see ADR-0005).
 - **`providers/`**: typed interfaces (Protocols/ABCs) for external market data sources, plus
   adapter implementations behind those interfaces. Domain code depends on the interface, never
   on a concrete provider SDK, so providers can be swapped or faked in tests. Preserves raw
@@ -111,12 +118,15 @@ flowchart TB
 - `app/` (Next.js App Router): pages and layouts. Server components fetch through a typed API
   client; no direct database or provider access from the frontend. As of Phase 3: `/` is the
   operator console (watchlist + on-demand ingest) and `/symbols/[symbol]` shows a stored
-  daily-bar table. No chart, score, or recommendation components exist.
+  daily-bar table. As of Phase 4: `/login` collects credentials; protected routes use an SSR
+  `requireOperator` gate and redirect on HTTP 401. No chart, score, or recommendation
+  components exist.
 - `components/`: interactive console panels (`WatchlistPanel`, `IngestPanel`) and presentational
   tables (`DailyBarsTable`). Mutations stay in Client Components; initial reads use Server
   Components where practical.
 - `lib/`: typed HTTP client for the backend API, matching the backend's Pydantic schemas
-  (health/ready, watchlist, ingest, daily bars).
+  (health/ready, auth, watchlist, ingest, daily bars). Authenticated calls use
+  `credentials: "include"` so the httpOnly session cookie is sent cross-origin.
 
 ## Cross-cutting conventions
 
@@ -154,3 +164,5 @@ Deployment to the UGREEN NAS is out of scope for Phase 0. See
   Phase 2 scheduled ingestion and database-backed watchlist ADR.
 - [decisions/0004-phase-3-operator-console.md](decisions/0004-phase-3-operator-console.md):
   Phase 3 operator console ADR (CORS, table-not-charts, no-auth reaffirmed).
+- [decisions/0005-phase-4-operator-auth.md](decisions/0005-phase-4-operator-auth.md):
+  Phase 4 operator authentication ADR (httpOnly cookie, Redis sessions, seed-once bootstrap).

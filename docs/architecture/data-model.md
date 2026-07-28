@@ -9,6 +9,9 @@ Phase 2 adds `watchlist_symbols`, which deliberately does **not** follow these c
 is current operational configuration (which symbols ingestion currently processes), not a
 market observation or evidence record, so it is a plain mutable/soft-deletable table instead
 (see [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md)).
+Phase 4 adds `operators`, likewise an operational (not observation) table for the single
+operator role's username and Argon2 password hash
+(see [decisions/0005-phase-4-operator-auth.md](decisions/0005-phase-4-operator-auth.md)).
 
 ## Append-only and versioned
 

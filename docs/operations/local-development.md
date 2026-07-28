@@ -22,6 +22,19 @@ cp .env.example .env
 `.env` is gitignored. Edit it only if you need non-default local ports or credentials; the
 committed defaults work for `docker compose up` out of the box.
 
+### Bootstrap operator credentials (Phase 4)
+
+Set (or keep the `.env.example` defaults) before first login:
+
+- `AEGIS_OPERATOR_USERNAME` (default `operator`)
+- `AEGIS_OPERATOR_PASSWORD` (default `change-me-before-non-local-use`)
+
+On first use, when the `operators` table is empty, the backend hashes the password with
+Argon2 and inserts that single operator. After any row exists, env credentials are not
+re-applied (same seed-once pattern as the watchlist). Change the password before any
+non-local exposure. See
+[../architecture/decisions/0005-phase-4-operator-auth.md](../architecture/decisions/0005-phase-4-operator-auth.md).
+
 ## Backend (`backend/`)
 
 ```sh
@@ -33,6 +46,10 @@ uv run ruff check .           # lint
 uv run pyright                # strict type-check
 uv run alembic upgrade head   # apply migrations (requires AEGIS_DATABASE_URL to be reachable)
 ```
+
+Migration `0004` creates the `operators` table required for Phase 4 auth. Always run
+`alembic upgrade head` after pulling migrations (Compose Postgres must be reachable via
+`AEGIS_DATABASE_URL`).
 
 Running the API outside Docker requires a reachable PostgreSQL/TimescaleDB and Redis; the
 simplest way to get both is `docker compose up -d postgres redis` (see below) while running
@@ -61,13 +78,41 @@ docker compose logs -f backend
 docker compose down           # stop and remove containers (add -v to also drop volumes)
 ```
 
-Once every service reports `healthy`:
+Once every service reports `healthy` (and migrations are at head, including `0004`):
 
-- Backend liveness: `curl http://localhost:8000/health`
-- Backend readiness: `curl http://localhost:8000/ready`
-- Frontend operator console: <http://localhost:3000> (watchlist + ingest; open a symbol for
-  stored daily bars). Requires `AEGIS_CORS_ORIGINS` to include the browser origin
-  (default `http://localhost:3000`; see ADR-0004).
+- Backend liveness (public): `curl http://localhost:8000/health`
+- Backend readiness (public): `curl http://localhost:8000/ready`
+- Frontend login: <http://localhost:3000/login> with bootstrap credentials from `.env`.
+  After login, `/` is the watchlist + ingest console; open a symbol for stored daily bars.
+  Requires `AEGIS_CORS_ORIGINS` to include the browser origin (default `http://localhost:3000`;
+  see ADR-0004) and CORS credentials enabled (ADR-0005).
+
+### Operator login flow (Phase 4)
+
+Browser: open `/login`, submit username/password; the backend sets an httpOnly session cookie
+and Redis stores the session. Protected console routes use `credentials: "include"`; HTTP 401
+sends the operator back to login. Logout calls `POST /auth/logout` and clears the cookie.
+
+Cookie flow via curl (cookie jar file `cookies.txt`):
+
+```sh
+# Unauthenticated watchlist must fail closed
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8000/watchlist
+
+# Login (seeds bootstrap operator if operators table is empty)
+curl -s -c cookies.txt -H "Content-Type: application/json" \
+  -d "{\"username\":\"operator\",\"password\":\"change-me-before-non-local-use\"}" \
+  http://localhost:8000/auth/login
+
+# Authenticated watchlist
+curl -s -b cookies.txt http://localhost:8000/watchlist
+
+# Logout then watchlist again (expect 401)
+curl -s -c cookies.txt -b cookies.txt -X POST http://localhost:8000/auth/logout
+curl -s -o /dev/null -w "%{http_code}\n" -b cookies.txt http://localhost:8000/watchlist
+```
+
+Use the username/password from your `.env` if you changed the defaults.
 
 ## Cross-service integration tests (`tests/integration/`)
 

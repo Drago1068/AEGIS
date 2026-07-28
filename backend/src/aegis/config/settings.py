@@ -126,6 +126,37 @@ class Settings(BaseSettings):
         ),
     )
 
+    operator_username: str = Field(
+        default="operator",
+        description=(
+            "Bootstrap operator username. Used only to seed the `operators` table when it is "
+            "empty; see ADR-0005."
+        ),
+    )
+    operator_password: str = Field(
+        default="change-me-before-non-local-use",
+        description=(
+            "Bootstrap operator password (plaintext in env only for first seed). Hashed with "
+            "Argon2 before storage; never logged. Change before any non-local exposure."
+        ),
+    )
+    session_cookie_name: str = Field(
+        default="aegis_session",
+        description="Name of the httpOnly session cookie issued on login.",
+    )
+    session_ttl_seconds: int = Field(
+        default=86400,
+        gt=0,
+        description="Redis TTL and cookie max-age for an operator session (seconds).",
+    )
+    session_cookie_secure: bool = Field(
+        default=False,
+        description=(
+            "Whether the session cookie is marked Secure. Keep false for local http:// "
+            "development; set true behind HTTPS in production."
+        ),
+    )
+
     @property
     def watchlist_seed_symbols(self) -> list[str]:
         """Parsed, upper-cased, order-preserving, de-duplicated bootstrap seed symbols."""

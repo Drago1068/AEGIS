@@ -1,7 +1,10 @@
 import Link from "next/link";
 
 import { DailyBarsTable } from "@/components/DailyBarsTable";
+import { OperatorSessionBar } from "@/components/OperatorSessionBar";
 import { ApiClientError, getApiBaseUrl, listDailyBars } from "@/lib/api-client";
+import { requireOperator } from "@/lib/require-operator";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -10,14 +13,18 @@ type SymbolPageProps = {
 };
 
 export default async function SymbolPage({ params }: SymbolPageProps) {
+  const { username, cookie } = await requireOperator();
   const { symbol: rawSymbol } = await params;
   const symbol = decodeURIComponent(rawSymbol).toUpperCase();
 
   let bars: Awaited<ReturnType<typeof listDailyBars>> = [];
   let error: string | null = null;
   try {
-    bars = await listDailyBars(getApiBaseUrl(), symbol);
+    bars = await listDailyBars(getApiBaseUrl(), symbol, 100, { cookie });
   } catch (err) {
+    if (err instanceof ApiClientError && err.status === 401) {
+      redirect("/login");
+    }
     if (err instanceof ApiClientError && err.status === 404) {
       bars = [];
     } else {
@@ -38,6 +45,7 @@ export default async function SymbolPage({ params }: SymbolPageProps) {
           {symbol}
         </h1>
         <p className="text-base text-aegis-muted">Stored daily OHLCV observations (newest first)</p>
+        <OperatorSessionBar username={username} />
       </div>
 
       <section className="rounded-lg border border-aegis-line bg-aegis-panel p-5 shadow-sm">

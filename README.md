@@ -7,10 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 3 (operator console).** No scoring, recommendation, prediction, or
-trading logic exists yet; Phase 3 adds a Next.js console for watchlist management, on-demand
-ingest, and browsing stored daily bars. See
-[docs/architecture/decisions/0004-phase-3-operator-console.md](docs/architecture/decisions/0004-phase-3-operator-console.md)
+**Current phase: Phase 4 (operator authentication).** No scoring, recommendation, prediction, or
+trading logic exists yet. Phase 4 adds cookie-based operator sessions so watchlist and
+market-data APIs require login; `/health` and `/ready` stay public. See
+[docs/architecture/decisions/0005-phase-4-operator-auth.md](docs/architecture/decisions/0005-phase-4-operator-auth.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
@@ -25,10 +25,16 @@ docker compose up -d
 docker compose ps   # wait for all four services to report "healthy"
 ```
 
-Then visit <http://localhost:3000> (frontend) or `curl http://localhost:8000/ready` (backend).
+Apply migrations if the backend image does not already (from `backend/`, with Compose Postgres
+up): `uv run alembic upgrade head` (includes migration `0004` for `operators`).
+
+Then visit <http://localhost:3000/login> and sign in with the bootstrap credentials from
+`.env` (`AEGIS_OPERATOR_USERNAME` / `AEGIS_OPERATOR_PASSWORD`; defaults in `.env.example`).
+Those env values seed the first operator only when the `operators` table is empty. Or check
+liveness with `curl http://localhost:8000/ready` (no auth required).
 
 See [docs/operations/local-development.md](docs/operations/local-development.md) for the full
-day-to-day workflow, [docs/operations/configuration.md](docs/operations/configuration.md) for
+day-to-day workflow (including login and cookie flow), [docs/operations/configuration.md](docs/operations/configuration.md) for
 every environment variable, and [docs/architecture/overview.md](docs/architecture/overview.md)
 for the system architecture and module boundaries.
 

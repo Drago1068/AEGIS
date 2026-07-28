@@ -43,6 +43,16 @@ non-functional development placeholder.
 | `AEGIS_INGESTION_SCHEDULE_LOCK_KEY` | Redis key used to ensure only one process runs a scheduled cycle at a time. | `aegis:ingestion:scheduler:lock` |
 | `AEGIS_INGESTION_SCHEDULE_LOCK_TTL_SECONDS` | Redis lock TTL for a scheduled cycle; bounds how long a crashed process can hold the lock. | `1800` |
 
+## Backend: Phase 4 operator authentication (`aegis.config.settings.Settings`)
+
+| Variable | Description | Development default |
+| --- | --- | --- |
+| `AEGIS_OPERATOR_USERNAME` | Bootstrap operator username; seeds `operators` only when the table is empty. See [ADR-0005](../architecture/decisions/0005-phase-4-operator-auth.md). | `operator` |
+| `AEGIS_OPERATOR_PASSWORD` | Bootstrap operator password (hashed at seed time; never logged). Change before non-local use. | `change-me-before-non-local-use` |
+| `AEGIS_SESSION_COOKIE_NAME` | httpOnly session cookie name. | `aegis_session` |
+| `AEGIS_SESSION_TTL_SECONDS` | Redis TTL and cookie max-age for a session. | `86400` |
+| `AEGIS_SESSION_COOKIE_SECURE` | Mark the session cookie Secure (require HTTPS). | `false` |
+
 ## PostgreSQL / TimescaleDB container (`docker-compose.yml`)
 
 | Variable | Description | Development default |

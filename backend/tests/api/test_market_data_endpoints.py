@@ -1,7 +1,8 @@
 """Unit tests for the market data ingest/read endpoints, via dependency overrides.
 
 No real network or database access: both endpoints are exercised entirely through fake
-doubles substituted with ``app.dependency_overrides``.
+doubles substituted with ``app.dependency_overrides``. Operator auth is bypassed via an
+override of ``require_operator`` (see Phase 4 / ADR-0005).
 """
 
 from __future__ import annotations
@@ -15,12 +16,23 @@ from aegis.api.dependencies import (
     get_active_watchlist_symbols,
     get_ingestion_service,
     get_market_data_repository,
+    require_operator,
 )
 from aegis.api.main import create_app
 from aegis.config.settings import Settings
 from aegis.domain.market_data_ingestion import IngestionRunResult, SymbolIngestionResult
 from aegis.domain.market_data_validation import RejectionReason
-from aegis.persistence.models import MarketDailyBarObservation
+from aegis.persistence.models import MarketDailyBarObservation, Operator
+
+
+def _operator() -> Operator:
+    return Operator(
+        id=1,
+        username="operator",
+        password_hash="unused-in-override",
+        created_at=datetime(2024, 1, 1, tzinfo=UTC),
+        updated_at=datetime(2024, 1, 1, tzinfo=UTC),
+    )
 
 
 class _FakeIngestionService:
@@ -65,7 +77,8 @@ def _client_with_overrides(
     ingestion_service: _FakeIngestionService | None = None,
     repository: _FakeRepository | None = None,
 ) -> AsyncClient:
-    app = create_app(settings=Settings(environment="test"))
+    app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
+    app.dependency_overrides[require_operator] = _operator
     if ingestion_service is not None:
         app.dependency_overrides[get_ingestion_service] = lambda: ingestion_service
         app.dependency_overrides[get_active_watchlist_symbols] = lambda: ["AAPL"]
@@ -133,3 +146,35 @@ async def test_get_daily_bars_respects_limit_query_param() -> None:
 
     assert response.status_code == 200
     assert len(response.json()) == 2
+
+
+async def test_market_data_returns_401_without_auth_override() -> None:
+    from aegis.api.dependencies import get_operator_repository, get_session_store
+
+    class _EmptyOperators:
+        async def ensure_seeded(self, username: str, password: str) -> None:
+            return None
+
+        async def get_by_username(self, username: str) -> None:
+            return None
+
+    class _EmptySessions:
+        async def get(self, session_id: str) -> None:
+            return None
+
+        async def create(self, operator_id: int, username: str) -> str:
+            return "unused"
+
+        async def delete(self, session_id: str) -> None:
+            return None
+
+    repository = _FakeRepository([_bar()])
+    app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
+    app.dependency_overrides[get_market_data_repository] = lambda: repository
+    app.dependency_overrides[get_operator_repository] = lambda: _EmptyOperators()
+    app.dependency_overrides[get_session_store] = lambda: _EmptySessions()
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/market-data/AAPL/daily-bars")
+
+    assert response.status_code == 401

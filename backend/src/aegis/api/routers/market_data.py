@@ -1,8 +1,8 @@
 """On-demand market data ingestion and read endpoints.
 
-No authentication in Phase 1 (self-hosted, local/trusted-network only); see ADR-0002. No
-scoring, recommendation, prediction, or trading logic is computed here or anywhere in this
-router.
+Protected by operator session auth (Phase 4, ADR-0005). No scoring, recommendation,
+prediction, or trading logic is computed here or anywhere in this router. In-process
+scheduled ingestion does not use HTTP auth (same process; see ADR-0005).
 """
 
 from __future__ import annotations
@@ -13,6 +13,7 @@ from aegis.api.dependencies import (
     get_active_watchlist_symbols,
     get_ingestion_service,
     get_market_data_repository,
+    require_operator,
 )
 from aegis.api.schemas.market_data import (
     DailyBarResponse,
@@ -22,7 +23,11 @@ from aegis.api.schemas.market_data import (
 from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
 
-router = APIRouter(prefix="/market-data", tags=["market-data"])
+router = APIRouter(
+    prefix="/market-data",
+    tags=["market-data"],
+    dependencies=[Depends(require_operator)],
+)
 
 
 @router.post("/ingest", response_model=IngestionRunResponse)

@@ -2,7 +2,8 @@
  * Typed HTTP client for the AEGIS backend API.
  *
  * Types here must stay in sync with the backend's Pydantic response schemas under
- * `backend/src/aegis/api/schemas/`. See ADR-0004 for the Phase 3 operator console contract.
+ * `backend/src/aegis/api/schemas/`. See ADR-0004 for the Phase 3 operator console contract
+ * and ADR-0005 for Phase 4 operator authentication.
  */
 
 export interface HealthResponse {
@@ -58,6 +59,18 @@ export interface IngestionRunResponse {
   results: IngestionSymbolResult[];
 }
 
+export interface OperatorMe {
+  username: string;
+}
+
+/** Options for authenticated API calls (cookie forwarding for SSR, 401 redirect control). */
+export type ApiRequestOptions = {
+  /** Skip browser redirect to /login on HTTP 401 (login form and auth probes). */
+  skipAuthRedirect?: boolean;
+  /** Forward Cookie header for server-side fetches (browser cookies are not automatic). */
+  cookie?: string;
+};
+
 export class ApiClientError extends Error {
   readonly status: number;
   readonly body: unknown;
@@ -78,17 +91,46 @@ async function readJson(response: Response): Promise<unknown> {
   }
 }
 
+function redirectToLoginIfNeeded(status: number, options?: ApiRequestOptions): void {
+  if (status !== 401 || options?.skipAuthRedirect) {
+    return;
+  }
+  if (typeof window === "undefined") {
+    return;
+  }
+  if (window.location.pathname.startsWith("/login")) {
+    return;
+  }
+  window.location.assign("/login");
+}
+
 async function requestJson(
   url: string,
   init?: RequestInit,
+  options?: ApiRequestOptions,
 ): Promise<{ response: Response; body: unknown }> {
-  const response = await fetch(url, init);
+  const headers = new Headers(init?.headers);
+  if (options?.cookie) {
+    headers.set("Cookie", options.cookie);
+  }
+  if (!headers.has("Accept")) {
+    headers.set("Accept", "application/json");
+  }
+
+  const response = await fetch(url, {
+    ...init,
+    headers,
+    credentials: "include",
+  });
   const body = await readJson(response);
+  redirectToLoginIfNeeded(response.status, options);
   return { response, body };
 }
 
 export async function getHealth(baseUrl: string): Promise<HealthResponse> {
-  const { response, body } = await requestJson(`${baseUrl}/health`);
+  const { response, body } = await requestJson(`${baseUrl}/health`, undefined, {
+    skipAuthRedirect: true,
+  });
   if (!response.ok) {
     throw new ApiClientError(`Unexpected /health status: ${response.status}`, response.status, body);
   }
@@ -98,15 +140,71 @@ export async function getHealth(baseUrl: string): Promise<HealthResponse> {
 export async function getReady(
   baseUrl: string,
 ): Promise<{ ok: true; body: ReadyResponse } | { ok: false; body: NotReadyResponse }> {
-  const { response, body } = await requestJson(`${baseUrl}/ready`);
+  const { response, body } = await requestJson(`${baseUrl}/ready`, undefined, {
+    skipAuthRedirect: true,
+  });
   if (response.status === 200) {
     return { ok: true, body: body as ReadyResponse };
   }
   return { ok: false, body: body as NotReadyResponse };
 }
 
-export async function listWatchlist(baseUrl: string): Promise<WatchlistSymbol[]> {
-  const { response, body } = await requestJson(`${baseUrl}/watchlist`);
+export async function login(
+  baseUrl: string,
+  username: string,
+  password: string,
+): Promise<OperatorMe> {
+  const { response, body } = await requestJson(
+    `${baseUrl}/auth/login`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ username, password }),
+    },
+    { skipAuthRedirect: true },
+  );
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected POST /auth/login status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as OperatorMe;
+}
+
+export async function logout(baseUrl: string, options?: ApiRequestOptions): Promise<void> {
+  const { response, body } = await requestJson(
+    `${baseUrl}/auth/logout`,
+    { method: "POST" },
+    options,
+  );
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected POST /auth/logout status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+}
+
+export async function getMe(baseUrl: string, options?: ApiRequestOptions): Promise<OperatorMe> {
+  const { response, body } = await requestJson(`${baseUrl}/auth/me`, undefined, options);
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected GET /auth/me status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as OperatorMe;
+}
+
+export async function listWatchlist(
+  baseUrl: string,
+  options?: ApiRequestOptions,
+): Promise<WatchlistSymbol[]> {
+  const { response, body } = await requestJson(`${baseUrl}/watchlist`, undefined, options);
   if (!response.ok) {
     throw new ApiClientError(
       `Unexpected /watchlist status: ${response.status}`,
@@ -120,12 +218,17 @@ export async function listWatchlist(baseUrl: string): Promise<WatchlistSymbol[]>
 export async function addWatchlistSymbol(
   baseUrl: string,
   symbol: string,
+  options?: ApiRequestOptions,
 ): Promise<WatchlistSymbol> {
-  const { response, body } = await requestJson(`${baseUrl}/watchlist`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ symbol }),
-  });
+  const { response, body } = await requestJson(
+    `${baseUrl}/watchlist`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ symbol }),
+    },
+    options,
+  );
   if (!response.ok) {
     throw new ApiClientError(
       `Unexpected POST /watchlist status: ${response.status}`,
@@ -136,10 +239,15 @@ export async function addWatchlistSymbol(
   return body as WatchlistSymbol;
 }
 
-export async function removeWatchlistSymbol(baseUrl: string, symbol: string): Promise<void> {
+export async function removeWatchlistSymbol(
+  baseUrl: string,
+  symbol: string,
+  options?: ApiRequestOptions,
+): Promise<void> {
   const { response, body } = await requestJson(
     `${baseUrl}/watchlist/${encodeURIComponent(symbol)}`,
     { method: "DELETE" },
+    options,
   );
   if (!response.ok) {
     throw new ApiClientError(
@@ -154,9 +262,10 @@ export async function listDailyBars(
   baseUrl: string,
   symbol: string,
   limit = 100,
+  options?: ApiRequestOptions,
 ): Promise<DailyBar[]> {
   const url = `${baseUrl}/market-data/${encodeURIComponent(symbol)}/daily-bars?limit=${limit}`;
-  const { response, body } = await requestJson(url);
+  const { response, body } = await requestJson(url, undefined, options);
   if (response.status === 404) {
     throw new ApiClientError(`No stored daily bars for ${symbol}`, 404, body);
   }
@@ -170,11 +279,18 @@ export async function listDailyBars(
   return body as DailyBar[];
 }
 
-export async function ingestMarketData(baseUrl: string): Promise<IngestionRunResponse> {
-  const { response, body } = await requestJson(`${baseUrl}/market-data/ingest`, {
-    method: "POST",
-    headers: { Accept: "application/json" },
-  });
+export async function ingestMarketData(
+  baseUrl: string,
+  options?: ApiRequestOptions,
+): Promise<IngestionRunResponse> {
+  const { response, body } = await requestJson(
+    `${baseUrl}/market-data/ingest`,
+    {
+      method: "POST",
+      headers: { Accept: "application/json" },
+    },
+    options,
+  );
   if (!response.ok) {
     throw new ApiClientError(
       `Unexpected POST /market-data/ingest status: ${response.status}`,

@@ -98,3 +98,27 @@ class WatchlistSymbol(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+
+class Operator(Base):
+    """A single-role operator account for Phase 4 session authentication.
+
+    Mutable operational table (not an append-only observation): credentials may be updated in
+    place. Bootstrap seeding from env happens only when the table is empty; see ADR-0005.
+    """
+
+    __tablename__ = "operators"
+    __table_args__ = (UniqueConstraint("username", name="uq_operators_username"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(64), nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )

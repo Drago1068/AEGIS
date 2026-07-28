@@ -7,6 +7,34 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 4 - Operator Authentication
+
+Cookie-based operator sessions protect watchlist and market-data HTTP routes. No scoring,
+recommendation, prediction, chart libraries, OAuth/MFA, multi-role RBAC, or order-placement
+logic exists in this phase; see
+[docs/architecture/decisions/0005-phase-4-operator-auth.md](docs/architecture/decisions/0005-phase-4-operator-auth.md).
+
+#### Added
+
+- Backend auth: `operators` table (Alembic migration `0004`); Argon2 password hashes; Redis
+  session store with httpOnly cookie (`AEGIS_SESSION_*`); `POST /auth/login`,
+  `POST /auth/logout`, `GET /auth/me`; session dependency on `/watchlist*` and
+  `/market-data*`; seed-once bootstrap from `AEGIS_OPERATOR_USERNAME` /
+  `AEGIS_OPERATOR_PASSWORD` when the operators table is empty; CORS
+  `allow_credentials=True` with the existing origin allow-list. `/health` and `/ready` remain
+  public.
+- Frontend: `/login` page; API client `credentials: "include"`; 401 redirects to login;
+  `requireOperator` SSR gate on protected console routes; logout clears the session.
+- Configuration and docs: operator/session settings in `.env.example` and
+  [docs/operations/configuration.md](docs/operations/configuration.md); ADR-0005;
+  local-development login and migration notes.
+
+#### Explicitly out of scope
+
+OAuth/SSO, MFA, password-reset email, multi-role authorization, charts/scoring/recommendations,
+order placement, and NAS deployment - each is absent, not merely unimplemented, per the
+Phase 4 plan.
+
 ### Phase 3 - Operator Console (Frontend)
 
 A browser operator console for the existing Phase 1/2 APIs: manage the watchlist, trigger

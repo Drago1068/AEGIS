@@ -1,16 +1,22 @@
 # AEGIS 3.0 Frontend
 
 Next.js operator console for AEGIS 3.0. See
-[../docs/architecture/overview.md](../docs/architecture/overview.md) and
-[../docs/architecture/decisions/0004-phase-3-operator-console.md](../docs/architecture/decisions/0004-phase-3-operator-console.md).
+[../docs/architecture/overview.md](../docs/architecture/overview.md),
+[../docs/architecture/decisions/0004-phase-3-operator-console.md](../docs/architecture/decisions/0004-phase-3-operator-console.md),
+and
+[../docs/architecture/decisions/0005-phase-4-operator-auth.md](../docs/architecture/decisions/0005-phase-4-operator-auth.md).
 
-Phase 3 replaces the Phase 0 placeholder with:
+Phase 3 added the console surfaces; Phase 4 adds login:
 
-- `/` - watchlist management and on-demand ingest
-- `/symbols/[symbol]` - stored daily OHLCV table
+- `/login` - operator username/password; session cookie via the backend
+- `/` - watchlist management and on-demand ingest (requires a valid session)
+- `/symbols/[symbol]` - stored daily OHLCV table (requires a valid session)
 
 Set `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:8000`) so the browser can reach the
-backend. The backend must allow that origin via `AEGIS_CORS_ORIGINS`.
+backend. The backend must allow that origin via `AEGIS_CORS_ORIGINS` with credentials
+enabled. Sign in with the bootstrap operator credentials from `.env`
+(`AEGIS_OPERATOR_USERNAME` / `AEGIS_OPERATOR_PASSWORD`). Authenticated API calls use
+`credentials: "include"`; HTTP 401 redirects to `/login`.
 
 ## Commands
 

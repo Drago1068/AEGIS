@@ -1,13 +1,16 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   ApiClientError,
   addWatchlistSymbol,
   getHealth,
+  getMe,
   getReady,
   ingestMarketData,
   listDailyBars,
   listWatchlist,
+  login,
+  logout,
   removeWatchlistSymbol,
 } from "./api-client";
 
@@ -15,15 +18,14 @@ function mockFetch(payload: {
   ok?: boolean;
   status: number;
   json?: unknown;
-}): void {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn().mockResolvedValue({
-      ok: payload.ok ?? (payload.status >= 200 && payload.status < 300),
-      status: payload.status,
-      json: async () => payload.json ?? null,
-    }),
-  );
+}): ReturnType<typeof vi.fn> {
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: payload.ok ?? (payload.status >= 200 && payload.status < 300),
+    status: payload.status,
+    json: async () => payload.json ?? null,
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  return fetchMock;
 }
 
 describe("getHealth", () => {
@@ -73,6 +75,173 @@ describe("getReady", () => {
         checks: { database: "unavailable", redis: "ok" },
       },
     });
+  });
+});
+
+describe("auth client", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("logs in with credentials include and does not redirect on 401", async () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { pathname: "/", assign });
+    const fetchMock = mockFetch({ status: 401, json: { detail: "invalid username or password" } });
+
+    await expect(login("http://localhost:8000", "ops", "bad")).rejects.toMatchObject({
+      status: 401,
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/auth/login",
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include",
+      }),
+    );
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  it("returns the operator identity on successful login", async () => {
+    mockFetch({ status: 200, json: { username: "ops" } });
+    await expect(login("http://localhost:8000", "ops", "secret")).resolves.toEqual({
+      username: "ops",
+    });
+  });
+
+  it("calls logout with credentials include", async () => {
+    const fetchMock = mockFetch({ status: 204, json: null });
+    await expect(logout("http://localhost:8000")).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/auth/logout",
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include",
+      }),
+    );
+  });
+
+  it("calls getMe with credentials include", async () => {
+    const fetchMock = mockFetch({ status: 200, json: { username: "ops" } });
+    await expect(getMe("http://localhost:8000")).resolves.toEqual({ username: "ops" });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/auth/me",
+      expect.objectContaining({
+        credentials: "include",
+      }),
+    );
+  });
+});
+
+describe("401 handling", () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("redirects to /login on 401 for protected calls when not already on login", async () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { pathname: "/", assign });
+    mockFetch({ status: 401, json: { detail: "unauthorized" } });
+
+    await expect(listWatchlist("http://localhost:8000")).rejects.toMatchObject({ status: 401 });
+    expect(assign).toHaveBeenCalledWith("/login");
+  });
+
+  it("does not redirect on 401 when already on the login page", async () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { pathname: "/login", assign });
+    mockFetch({ status: 401, json: { detail: "unauthorized" } });
+
+    await expect(getMe("http://localhost:8000")).rejects.toMatchObject({ status: 401 });
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  it("does not redirect on 401 when skipAuthRedirect is set", async () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { pathname: "/", assign });
+    mockFetch({ status: 401, json: { detail: "unauthorized" } });
+
+    await expect(
+      getMe("http://localhost:8000", { skipAuthRedirect: true }),
+    ).rejects.toMatchObject({ status: 401 });
+    expect(assign).not.toHaveBeenCalled();
+  });
+});
+
+describe("credentials include", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("sends credentials include for watchlist and market-data calls", async () => {
+    const fetchMock = mockFetch({
+      status: 200,
+      json: [],
+    });
+
+    await listWatchlist("http://localhost:8000");
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      "http://localhost:8000/watchlist",
+      expect.objectContaining({ credentials: "include" }),
+    );
+
+    await addWatchlistSymbol("http://localhost:8000", "AAPL");
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      "http://localhost:8000/watchlist",
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include",
+      }),
+    );
+
+    mockFetch({ status: 204, json: null });
+    const deleteFetch = vi.mocked(fetch);
+    await removeWatchlistSymbol("http://localhost:8000", "AAPL");
+    expect(deleteFetch).toHaveBeenLastCalledWith(
+      "http://localhost:8000/watchlist/AAPL",
+      expect.objectContaining({
+        method: "DELETE",
+        credentials: "include",
+      }),
+    );
+
+    mockFetch({ status: 200, json: [] });
+    const barsFetch = vi.mocked(fetch);
+    await listDailyBars("http://localhost:8000", "AAPL");
+    expect(barsFetch).toHaveBeenLastCalledWith(
+      "http://localhost:8000/market-data/AAPL/daily-bars?limit=100",
+      expect.objectContaining({ credentials: "include" }),
+    );
+
+    mockFetch({
+      status: 200,
+      json: { results: [] },
+    });
+    const ingestFetch = vi.mocked(fetch);
+    await ingestMarketData("http://localhost:8000");
+    expect(ingestFetch).toHaveBeenLastCalledWith(
+      "http://localhost:8000/market-data/ingest",
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include",
+      }),
+    );
+  });
+
+  it("forwards a Cookie header when provided for SSR", async () => {
+    const fetchMock = mockFetch({ status: 200, json: { username: "ops" } });
+    await getMe("http://localhost:8000", {
+      cookie: "aegis_session=abc",
+      skipAuthRedirect: true,
+    });
+
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    const headers = new Headers(init.headers);
+    expect(headers.get("Cookie")).toBe("aegis_session=abc");
+    expect(init.credentials).toBe("include");
   });
 });
 

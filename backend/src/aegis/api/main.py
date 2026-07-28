@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 
 import httpx
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from aegis.api.routers.health import router as health_router
 from aegis.api.routers.market_data import router as market_data_router
@@ -53,11 +54,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         title="AEGIS 3.0 Backend",
         version="0.1.0",
         description=(
-            "Decision-support backend for AEGIS 3.0. Phase 2: scheduled market data "
-            "ingestion (Alpha Vantage daily bars) over a database-backed watchlist. This "
-            "service never places or transmits live orders."
+            "Decision-support backend for AEGIS 3.0. Phase 3: operator console APIs "
+            "(watchlist, on-demand ingest, daily bars) with CORS for the Next.js frontend. "
+            "This service never places or transmits live orders."
         ),
         lifespan=lifespan,
+    )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=resolved_settings.cors_origin_list,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+        allow_headers=["Content-Type", "Accept"],
     )
     app.include_router(health_router)
     app.include_router(market_data_router)

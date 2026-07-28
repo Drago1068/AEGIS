@@ -7,6 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 3 - Operator Console (Frontend)
+
+A browser operator console for the existing Phase 1/2 APIs: manage the watchlist, trigger
+on-demand ingest, and browse stored daily bars as a table. No scoring, recommendation,
+prediction, chart libraries, authentication, or order-placement logic exists in this phase;
+see
+[docs/architecture/decisions/0004-phase-3-operator-console.md](docs/architecture/decisions/0004-phase-3-operator-console.md).
+
+#### Added
+
+- Frontend console (`frontend/`): `/` watchlist + ingest panels; `/symbols/[symbol]` daily-bar
+  table; Source Sans 3 / IBM Plex Mono typography; typed API client extensions for watchlist,
+  ingest, and daily bars; Vitest coverage for the client and key components.
+- Backend CORS: `AEGIS_CORS_ORIGINS` setting and `CORSMiddleware` so the Next.js origin can call
+  the API from the browser; Compose passes the setting through; unit tests cover allow-listed
+  vs rejected preflight origins.
+
+#### Explicitly out of scope
+
+Authentication, chart libraries/indicators/scoring, schedule configuration UI, second
+providers, corrections, and NAS deployment - each is absent, not merely unimplemented, per the
+Phase 3 plan.
+
 ### Phase 2 - Scheduled Ingestion & Database-Backed Watchlist
 
 Ingestion now runs automatically on a schedule, and the watchlist moves from a static

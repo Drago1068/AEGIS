@@ -45,6 +45,15 @@ class Settings(BaseSettings):
     api_host: str = Field(default="0.0.0.0")
     api_port: int = Field(default=8000, gt=0, lt=65536)
 
+    cors_origins: str = Field(
+        default="http://localhost:3000",
+        description=(
+            "Comma-separated browser origins allowed by CORSMiddleware. Required so the "
+            "Phase 3 Next.js operator console can call the API from a different origin. "
+            "See ADR-0004."
+        ),
+    )
+
     alpha_vantage_api_key: str | None = Field(
         default=None,
         description=(
@@ -126,6 +135,17 @@ class Settings(BaseSettings):
             symbol = raw_symbol.strip().upper()
             if symbol:
                 seen[symbol] = None
+        return list(seen)
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        """Parsed, order-preserving, de-duplicated CORS allow-list origins."""
+
+        seen: dict[str, None] = {}
+        for raw_origin in self.cors_origins.split(","):
+            origin = raw_origin.strip()
+            if origin:
+                seen[origin] = None
         return list(seen)
 
 

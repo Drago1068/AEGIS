@@ -20,6 +20,7 @@ non-functional development placeholder.
 | `AEGIS_READINESS_TIMEOUT_SECONDS` | Max time to wait for a single dependency check in `/ready`. | `2.0` |
 | `AEGIS_API_HOST` | Host the FastAPI/uvicorn process binds to. | `0.0.0.0` |
 | `AEGIS_API_PORT` | Port the FastAPI/uvicorn process binds to. | `8000` |
+| `AEGIS_CORS_ORIGINS` | Comma-separated browser origins allowed by CORS (Phase 3 operator console). See [ADR-0004](../architecture/decisions/0004-phase-3-operator-console.md). | `http://localhost:3000` |
 
 ## Backend: Phase 1 market data ingestion (`aegis.config.settings.Settings`)
 

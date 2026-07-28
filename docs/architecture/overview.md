@@ -8,10 +8,11 @@ transmits live orders, and it never implies certainty beyond what point-in-time 
 supports.
 
 This document describes the backend module boundaries established in Phase 0 and populated
-starting in Phase 1 (market data ingestion) and Phase 2 (scheduled ingestion and a
-database-backed watchlist). No scoring, recommendation, prediction, or trading logic is
-implemented in any phase so far; the boundaries below exist so that future phases can add
-domain logic without restructuring the codebase.
+starting in Phase 1 (market data ingestion), Phase 2 (scheduled ingestion and a
+database-backed watchlist), and Phase 3 (operator console over those APIs). No scoring,
+recommendation, prediction, or trading logic is implemented in any phase so far; the
+boundaries below exist so that future phases can add domain logic without restructuring the
+codebase.
 
 ## System context
 
@@ -108,10 +109,14 @@ flowchart TB
 ## Frontend module boundaries (`frontend/`)
 
 - `app/` (Next.js App Router): pages and layouts. Server components fetch through a typed API
-  client; no direct database or provider access from the frontend. No chart, score, or
-  recommendation components exist in Phase 0.
-- `lib/`: typed HTTP client for the backend API, shared types generated from or matching the
-  backend's Pydantic schemas.
+  client; no direct database or provider access from the frontend. As of Phase 3: `/` is the
+  operator console (watchlist + on-demand ingest) and `/symbols/[symbol]` shows a stored
+  daily-bar table. No chart, score, or recommendation components exist.
+- `components/`: interactive console panels (`WatchlistPanel`, `IngestPanel`) and presentational
+  tables (`DailyBarsTable`). Mutations stay in Client Components; initial reads use Server
+  Components where practical.
+- `lib/`: typed HTTP client for the backend API, matching the backend's Pydantic schemas
+  (health/ready, watchlist, ingest, daily bars).
 
 ## Cross-cutting conventions
 
@@ -147,3 +152,5 @@ Deployment to the UGREEN NAS is out of scope for Phase 0. See
   Phase 1 market data ingestion ADR.
 - [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md):
   Phase 2 scheduled ingestion and database-backed watchlist ADR.
+- [decisions/0004-phase-3-operator-console.md](decisions/0004-phase-3-operator-console.md):
+  Phase 3 operator console ADR (CORS, table-not-charts, no-auth reaffirmed).

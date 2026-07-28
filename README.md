@@ -7,11 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 2 (scheduled ingestion and database-backed watchlist).** No scoring,
-recommendation, prediction, or trading logic exists yet; Phase 2 adds an in-process scheduler
-that runs ingestion automatically, and a database-backed watchlist that can be managed via the
-API while the service is running. See
-[docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md](docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md)
+**Current phase: Phase 3 (operator console).** No scoring, recommendation, prediction, or
+trading logic exists yet; Phase 3 adds a Next.js console for watchlist management, on-demand
+ingest, and browsing stored daily bars. See
+[docs/architecture/decisions/0004-phase-3-operator-console.md](docs/architecture/decisions/0004-phase-3-operator-console.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

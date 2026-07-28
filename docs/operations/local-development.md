@@ -65,7 +65,9 @@ Once every service reports `healthy`:
 
 - Backend liveness: `curl http://localhost:8000/health`
 - Backend readiness: `curl http://localhost:8000/ready`
-- Frontend: <http://localhost:3000>
+- Frontend operator console: <http://localhost:3000> (watchlist + ingest; open a symbol for
+  stored daily bars). Requires `AEGIS_CORS_ORIGINS` to include the browser origin
+  (default `http://localhost:3000`; see ADR-0004).
 
 ## Cross-service integration tests (`tests/integration/`)
 

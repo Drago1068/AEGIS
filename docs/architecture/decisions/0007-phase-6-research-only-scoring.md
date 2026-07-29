@@ -103,7 +103,7 @@ names use the `ResearchAssessment*` stem so `check:no-domain-logic` continues to
 - Order placement or transmission
 - Scheduled research runs
 - Chart signal overlays
-- Second provider, NAS packaging, OAuth/MFA/RBAC expansion
+- Second provider, OAuth/MFA/RBAC expansion (NAS packaging is Phase 7 / ADR-0008)
 
 ## Related documents
 

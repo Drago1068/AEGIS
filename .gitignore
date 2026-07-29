@@ -2,6 +2,11 @@
 .env
 .env.*
 !.env.example
+!.env.nas.example
+# `.env.nas` is covered by `.env.*` above; never commit NAS host/credential files.
+
+# NAS package build output (image tarballs and staged transfer dirs)
+docker/nas/dist/
 
 # Python
 .venv/

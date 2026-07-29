@@ -1,0 +1,56 @@
+# Overlay for UGREEN NAS deployment. Never use as a standalone Compose file.
+#
+# From the repository root (or an unpacked NAS package root that contains this tree):
+#
+#   docker compose -f docker-compose.yml -f docker/nas/docker-compose.nas.yml \
+#     --env-file .env.nas up -d
+#
+# All hostnames, credentials, and paths come from `.env.nas` (see `.env.nas.example`).
+# See docker/nas/README.md and docs/architecture/decisions/0008-phase-7-nas-deployment.md.
+
+name: ${AEGIS_NAS_COMPOSE_PROJECT_NAME:-aegis}
+
+services:
+  postgres:
+    platform: linux/amd64
+    restart: always
+    # Keep Postgres on the Compose network only; do not publish to the NAS host.
+    ports: !reset []
+
+  redis:
+    platform: linux/amd64
+    restart: always
+    ports: !reset []
+
+  backend:
+    platform: linux/amd64
+    image: aegis-backend:nas
+    restart: always
+    environment:
+      AEGIS_ENVIRONMENT: ${AEGIS_ENVIRONMENT:-production}
+      AEGIS_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aegis}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-aegis}
+      AEGIS_REDIS_URL: redis://redis:6379/0
+      AEGIS_CORS_ORIGINS: ${AEGIS_CORS_ORIGINS:?Set AEGIS_CORS_ORIGINS in .env.nas}
+      AEGIS_OPERATOR_USERNAME: ${AEGIS_OPERATOR_USERNAME:-operator}
+      AEGIS_OPERATOR_PASSWORD: ${AEGIS_OPERATOR_PASSWORD:?Set AEGIS_OPERATOR_PASSWORD in .env.nas}
+      AEGIS_SESSION_COOKIE_NAME: ${AEGIS_SESSION_COOKIE_NAME:-aegis_session}
+      AEGIS_SESSION_TTL_SECONDS: ${AEGIS_SESSION_TTL_SECONDS:-86400}
+      AEGIS_SESSION_COOKIE_SECURE: ${AEGIS_SESSION_COOKIE_SECURE:-true}
+      AEGIS_ALPHA_VANTAGE_API_KEY: ${AEGIS_ALPHA_VANTAGE_API_KEY:-}
+      AEGIS_WATCHLIST_SYMBOLS: ${AEGIS_WATCHLIST_SYMBOLS:-AAPL,MSFT,SPY}
+      AEGIS_INGESTION_SCHEDULE_ENABLED: ${AEGIS_INGESTION_SCHEDULE_ENABLED:-true}
+    ports:
+      - "${AEGIS_API_PORT:-8000}:8000"
+
+  frontend:
+    platform: linux/amd64
+    image: aegis-frontend:nas
+    restart: always
+    build:
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:?Set NEXT_PUBLIC_API_BASE_URL in .env.nas}
+    environment:
+      # Runtime echo only; the browser client uses the value baked at image build time.
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:?Set NEXT_PUBLIC_API_BASE_URL in .env.nas}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"

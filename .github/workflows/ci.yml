@@ -93,10 +93,20 @@ jobs:
       - name: Validate docker-compose.yml
         run: docker compose config
 
+      - name: Validate NAS Compose overlay
+        run: >
+          docker compose
+          -f docker-compose.yml
+          -f docker/nas/docker-compose.nas.yml
+          --env-file .env.nas.example
+          --project-directory .
+          config
+
       - uses: docker/setup-buildx-action@v3
 
       # Build-only NAS-architecture validation (linux/amd64, matching UGREEN NAS
-      # DXP-series hardware). Never pushed, run, or deployed - see docker/nas/README.md.
+      # DXP-series hardware). Never pushed, run, or deployed to a live NAS -
+      # see docker/nas/README.md (package/deploy/verify are separate operator steps).
       - name: Build backend image for linux/amd64
         uses: docker/build-push-action@v6
         with:
@@ -112,6 +122,8 @@ jobs:
           file: docker/frontend.Dockerfile
           platforms: linux/amd64
           push: false
+          build-args: |
+            NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 
   integration:
     name: Integration (Docker Compose readiness, healthy path)

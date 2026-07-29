@@ -7,12 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 6 (research-only scoring foundations).** Recommendation, prediction,
-actionable promotion, and trading logic do not exist. Phase 6 adds authenticated on-demand
-research assessments (`daily_bar_research_v1`) with fail-closed gates, append-only snapshots,
-separate coverage vs null probability confidence, and a labeled console panel. See
-[docs/architecture/decisions/0007-phase-6-research-only-scoring.md](docs/architecture/decisions/0007-phase-6-research-only-scoring.md)
-and [CHANGELOG.md](CHANGELOG.md).
+**Current phase: Phase 7 (UGREEN NAS deployment packaging).** Product capabilities remain
+research-only (Phase 6 assessments); Phase 7 adds a Compose overlay, env-sourced NAS config,
+and package/deploy/verify scripts. Upload is not a verified deployment. See
+[docs/architecture/decisions/0008-phase-7-nas-deployment.md](docs/architecture/decisions/0008-phase-7-nas-deployment.md),
+[docker/nas/README.md](docker/nas/README.md), and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
 
@@ -47,6 +46,7 @@ for the system architecture and module boundaries.
 | `backend/` | Python/FastAPI service (`uv`-managed). See [backend/README.md](backend/README.md). |
 | `frontend/` | Next.js/TypeScript application (`pnpm`-managed). |
 | `docker/`, `docker-compose.yml` | Local Compose topology and Dockerfiles. |
+| `docker/nas/` | NAS Compose overlay, runbook, and package/deploy/verify scripts (Phase 7). |
 | `tests/integration/` | Cross-service tests run against the real Compose stack. |
 | `docs/architecture/` | System design, data-model, and market-data contracts. |
 | `docs/operations/` | Configuration, local development, CI, and security-scanning docs. |

@@ -10,11 +10,15 @@ supports.
 This document describes the backend module boundaries established in Phase 0 and populated
 starting in Phase 1 (market data ingestion), Phase 2 (scheduled ingestion and a
 database-backed watchlist), Phase 3 (operator console over those APIs), Phase 4
-(operator session authentication), Phase 5 (daily-bar charts on the operator console), and
-Phase 6 (research-only assessments over stored daily bars). Recommendation, prediction,
-actionable promotion, and trading logic remain unimplemented; Phase 6 adds only labeled
-research-only heuristics with fail-closed gates (see
+(operator session authentication), Phase 5 (daily-bar charts on the operator console),
+Phase 6 (research-only assessments over stored daily bars), and Phase 7 (UGREEN NAS
+deployment packaging). Recommendation, prediction, actionable promotion, and trading logic
+remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
+gates (see
 [decisions/0007-phase-6-research-only-scoring.md](decisions/0007-phase-6-research-only-scoring.md)).
+Phase 7 does not expand product capabilities; it packages the existing stack for NAS
+deployment (see
+[decisions/0008-phase-7-nas-deployment.md](decisions/0008-phase-7-nas-deployment.md)).
 
 ## System context
 
@@ -155,15 +159,20 @@ flowchart TB
   explicit state flag distinguishing research-only material from actionable material. These
   states are never conflated.
 
-## Deployment topology (Phase 0)
+## Deployment topology
 
 Local development and CI use Docker Compose (`docker-compose.yml`) with four services:
 `postgres` (TimescaleDB image), `redis`, `backend`, `frontend`. Each has a health check and a
 named persistent volume. See [../operations/local-development.md](../operations/local-development.md)
 for exact commands.
 
-Deployment to the UGREEN NAS is out of scope for Phase 0. See
-[../../docker/nas/README.md](../../docker/nas/README.md) for the explicit deployment boundary.
+UGREEN NAS deployment (Phase 7) uses a Compose **overlay**
+(`docker/nas/docker-compose.nas.yml`) on top of the same root file, with all host-specific
+values sourced from gitignored `.env.nas`. Package, deploy, and verify are separate scripts;
+upload alone is not a verified deployment. See
+[../../docker/nas/README.md](../../docker/nas/README.md),
+[../operations/nas-deployment.md](../operations/nas-deployment.md), and
+[decisions/0008-phase-7-nas-deployment.md](decisions/0008-phase-7-nas-deployment.md).
 
 ## Related documents
 
@@ -183,3 +192,6 @@ Deployment to the UGREEN NAS is out of scope for Phase 0. See
 - [decisions/0007-phase-6-research-only-scoring.md](decisions/0007-phase-6-research-only-scoring.md):
   Phase 6 research-only scoring foundations ADR (method `daily_bar_research_v1`, fail-closed,
   coverage vs probability, append-only snapshots).
+- [decisions/0008-phase-7-nas-deployment.md](decisions/0008-phase-7-nas-deployment.md):
+  Phase 7 UGREEN NAS deployment packaging ADR (Compose overlay, env-sourced config,
+  package/deploy/verify, upload ≠ verified).

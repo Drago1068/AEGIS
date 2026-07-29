@@ -32,11 +32,16 @@ Mirrors the frontend quality gates: `pnpm install --frozen-lockfile`, `pnpm lint
 
 ### `compose-validate`
 
-Runs `docker compose config` to validate the Compose topology, then does a **build-only**
-`linux/amd64` build of both Dockerfiles (the UGREEN NAS DXP-series target architecture; see
-[../architecture/decisions/0001-phase-0-tooling.md](../architecture/decisions/0001-phase-0-tooling.md)).
-This never pushes, runs, or deploys anything; see [../../docker/nas/README.md](../../docker/nas/README.md)
-for the full NAS deployment boundary.
+Runs `docker compose config` to validate the local Compose topology, then validates the
+Phase 7 NAS overlay (`docker/nas/docker-compose.nas.yml` with `.env.nas.example`), then does
+a **build-only** `linux/amd64` build of both Dockerfiles (the UGREEN NAS DXP-series target
+architecture; see
+[../architecture/decisions/0001-phase-0-tooling.md](../architecture/decisions/0001-phase-0-tooling.md)
+and
+[../architecture/decisions/0008-phase-7-nas-deployment.md](../architecture/decisions/0008-phase-7-nas-deployment.md)).
+This never pushes, runs, or deploys to a live NAS; see
+[../../docker/nas/README.md](../../docker/nas/README.md) and
+[nas-deployment.md](nas-deployment.md) for package/deploy/verify.
 
 ### `integration`
 

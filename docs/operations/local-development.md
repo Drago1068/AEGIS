@@ -144,3 +144,10 @@ docker compose down
 See [ci.md](ci.md) for how these same commands are wired into `.github/workflows/ci.yml`, and
 [security-scanning.md](security-scanning.md) for how to run the Phase 0 security checks
 locally.
+
+## NAS packaging (Phase 7)
+
+Local day-to-day work continues to use `docker compose up` with `.env` as above. NAS
+deployment uses a separate gitignored `.env.nas` and the overlay/scripts under `docker/nas/`.
+See [nas-deployment.md](nas-deployment.md) and [../../docker/nas/README.md](../../docker/nas/README.md).
+Do not treat a successful package upload as a verified live deployment.

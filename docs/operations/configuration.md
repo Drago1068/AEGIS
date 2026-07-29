@@ -72,8 +72,29 @@ non-functional development placeholder.
 
 | Variable | Description | Development default |
 | --- | --- | --- |
-| `NEXT_PUBLIC_API_BASE_URL` | Base URL the frontend uses to reach the backend API. Exposed to the browser (`NEXT_PUBLIC_` prefix), so it must never carry a secret. | `http://localhost:8000` |
+| `NEXT_PUBLIC_API_BASE_URL` | Base URL the frontend uses to reach the backend API. Exposed to the browser (`NEXT_PUBLIC_` prefix), so it must never carry a secret. For Docker image builds this value is passed as a build arg and inlined at `pnpm build` time (required for NAS packaging). | `http://localhost:8000` |
 | `FRONTEND_PORT` | Host-side port mapping for the frontend container. | `3000` |
+
+## NAS deployment (Phase 7)
+
+NAS-specific variables live in gitignored `.env.nas` (template: [`.env.nas.example`](../../.env.nas.example)).
+They are not read by application Settings directly beyond the usual `AEGIS_*` / Compose vars;
+deploy/verify scripts also require connection and public-URL settings.
+
+| Variable | Used by | Description | Example placeholder |
+| --- | --- | --- | --- |
+| `AEGIS_NAS_SSH_HOST` | deploy/verify scripts | SSH hostname or address of the NAS. Never commit a real value. | `replace-with-nas-ssh-hostname-or-ip` |
+| `AEGIS_NAS_SSH_USER` | deploy/verify scripts | SSH username. | `replace-with-nas-ssh-username` |
+| `AEGIS_NAS_SSH_PORT` | deploy/verify scripts | SSH port. | `22` |
+| `AEGIS_NAS_SSH_IDENTITY_FILE` | deploy/verify scripts | Optional path to an SSH private key. | unset |
+| `AEGIS_NAS_REMOTE_DIR` | deploy/verify scripts | Absolute remote directory for the unpacked package. | `replace-with-absolute-remote-deploy-directory` |
+| `AEGIS_NAS_COMPOSE_PROJECT_NAME` | Compose overlay | Compose project name on the NAS. | `aegis` |
+| `AEGIS_NAS_API_BASE_URL` | verify scripts | Operator-facing API origin used for HTTP checks. | `https://replace-with-operator-facing-api-origin` |
+| `AEGIS_NAS_FRONTEND_BASE_URL` | verify scripts | Operator-facing frontend origin. | `https://replace-with-operator-facing-frontend-origin` |
+
+On NAS, set a **non-default** `AEGIS_OPERATOR_PASSWORD` and prefer
+`AEGIS_SESSION_COOKIE_SECURE=true` when HTTPS terminates in front of the console. See
+[nas-deployment.md](nas-deployment.md) and [../../docker/nas/README.md](../../docker/nas/README.md).
 
 ## Testing (`tests/integration/`)
 

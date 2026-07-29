@@ -7,6 +7,32 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 7 - UGREEN NAS Deployment Packaging
+
+Packages the existing research-only authenticated stack for UGREEN NAS DXP-series hardware
+(`linux/amd64`). Does not add actionable promotion, calibration, scheduled assessments, a
+second provider, orders, OAuth, MFA, or RBAC. See
+[docs/architecture/decisions/0008-phase-7-nas-deployment.md](docs/architecture/decisions/0008-phase-7-nas-deployment.md)
+and [docker/nas/README.md](docker/nas/README.md).
+
+#### Added
+
+- Compose overlay `docker/nas/docker-compose.nas.yml` (extends root compose; no fork): amd64
+  platform, always-restart, Postgres/Redis unpublished on the host, production-leaning
+  defaults, image tags for save/load.
+- `.env.nas.example` placeholders; `.env.nas` gitignored; frontend Dockerfile build-arg for
+  `NEXT_PUBLIC_API_BASE_URL` (baked at package time).
+- Scripts under `docker/nas/scripts/`: `package`, `deploy`, `verify`, `validate-local`
+  (PowerShell + shell). Fail closed on missing env; reject default/template NAS passwords.
+  Deploy applies Alembic through `0005`; verify checks health/ready/auth gate/key routes/
+  frontend and documents log inspection. Upload ≠ verified deployment.
+- Docs: ADR-0008; NAS runbook; `docs/operations/nas-deployment.md`; overview/README/CI notes.
+
+#### Explicitly out of scope
+
+Actionable promotion, calibration, scheduled assessments, second provider, order placement,
+OAuth/MFA/RBAC, and committed hostnames/IPs/credentials - each remains absent.
+
 ### Phase 6 - Research-Only Scoring Foundations
 
 On-demand research-only assessments over stored primary daily bars. Fail-closed when inputs

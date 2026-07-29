@@ -12,18 +12,18 @@ name: ${AEGIS_NAS_COMPOSE_PROJECT_NAME:-aegis}
 
 services:
   postgres:
-    platform: linux/amd64
+    platform: ${AEGIS_NAS_PLATFORM:-linux/amd64}
     restart: always
     # Keep Postgres on the Compose network only; do not publish to the NAS host.
     ports: !reset []
 
   redis:
-    platform: linux/amd64
+    platform: ${AEGIS_NAS_PLATFORM:-linux/amd64}
     restart: always
     ports: !reset []
 
   backend:
-    platform: linux/amd64
+    platform: ${AEGIS_NAS_PLATFORM:-linux/amd64}
     image: aegis-backend:nas
     restart: always
     environment:
@@ -43,7 +43,7 @@ services:
       - "${AEGIS_API_PORT:-8000}:8000"
 
   frontend:
-    platform: linux/amd64
+    platform: ${AEGIS_NAS_PLATFORM:-linux/amd64}
     image: aegis-frontend:nas
     restart: always
     build:

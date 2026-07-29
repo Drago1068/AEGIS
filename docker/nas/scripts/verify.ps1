@@ -143,11 +143,14 @@ Assert-Status -Label "GET $frontend" -Actual $feStatus -Expected @(200, 307, 308
 
 Write-Host "==> Operator login + authenticated research diagnostics"
 $cookieJar = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.cookies" -f [guid]::NewGuid().ToString("N"))
+$loginFile = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.login.json" -f [guid]::NewGuid().ToString("N"))
 try {
-    $loginBody = @{ username = $operatorUser; password = $operatorPassword } | ConvertTo-Json -Compress
+    # Write JSON to a file so PowerShell does not strip quotes when invoking curl.exe.
+    $loginBody = (@{ username = $operatorUser; password = $operatorPassword } | ConvertTo-Json -Compress)
+    [System.IO.File]::WriteAllText($loginFile, $loginBody, [System.Text.UTF8Encoding]::new($false))
     $loginCode = & curl.exe -sS @curlInsecure -o NUL -w "%{http_code}" --max-time 30 `
         -c $cookieJar -H "Content-Type: application/json" -H "Accept: application/json" `
-        -d $loginBody "$api/auth/login"
+        --data-binary "@$loginFile" "$api/auth/login"
     if ($LASTEXITCODE -ne 0) {
         throw "POST /auth/login request failed (curl exit $LASTEXITCODE)"
     }
@@ -162,6 +165,9 @@ try {
 finally {
     if (Test-Path -LiteralPath $cookieJar) {
         Remove-Item -LiteralPath $cookieJar -Force -ErrorAction SilentlyContinue
+    }
+    if (Test-Path -LiteralPath $loginFile) {
+        Remove-Item -LiteralPath $loginFile -Force -ErrorAction SilentlyContinue
     }
 }
 

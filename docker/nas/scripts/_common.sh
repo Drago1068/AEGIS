@@ -231,7 +231,7 @@ ssh_base_args() {
 
 scp_base_args() {
   local port="${AEGIS_NAS_SSH_PORT:-22}"
-  local args=(-P "${port}" -o BatchMode=yes -o StrictHostKeyChecking=accept-new)
+  local args=(-P "${port}" -O -o BatchMode=yes -o StrictHostKeyChecking=accept-new)
   if [[ -n "${AEGIS_NAS_SSH_IDENTITY_FILE:-}" ]]; then
     args+=(-i "${AEGIS_NAS_SSH_IDENTITY_FILE}")
   fi

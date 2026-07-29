@@ -26,7 +26,7 @@ services:
 
   caddy:
     image: caddy:2.8-alpine
-    platform: linux/amd64
+    platform: ${AEGIS_NAS_PLATFORM:-linux/amd64}
     restart: always
     ports:
       - "${AEGIS_TLS_HTTPS_PORT:-443}:443"

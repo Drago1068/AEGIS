@@ -219,6 +219,8 @@ function Get-ScpArgs {
     if (-not [string]::IsNullOrWhiteSpace($identity)) {
         $scpArgs += @("-i", $identity)
     }
-    $scpArgs += @("-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=accept-new")
+    # Legacy SCP (-O): OpenSSH's default SFTP backend fails on some UGREEN NAS paths
+    # with "dest open ... No such file or directory" even when the directory exists.
+    $scpArgs += @("-O", "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=accept-new")
     return $scpArgs
 }

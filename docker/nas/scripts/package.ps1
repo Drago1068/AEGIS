@@ -1,11 +1,12 @@
 <#
 .SYNOPSIS
-  Build linux/amd64 images and stage a transferrable NAS package (Phase 7 + optional Phase 9 TLS).
+  Build NAS-target images and stage a transferrable package (Phase 7 + optional Phase 9 TLS).
 
 .DESCRIPTION
   Requires a filled `.env.nas` at the repository root (copy from `.env.nas.example`).
   Does not connect to any NAS. Upload is a separate deploy step; verify is mandatory after deploy.
   When AEGIS_NAS_TLS_ENABLED=true, fails closed without TLS material and stages the Caddy overlay.
+  Image platform comes from AEGIS_NAS_PLATFORM (default linux/amd64; use linux/arm64 on aarch64 NAS).
 
 .EXAMPLE
   .\docker\nas\scripts\package.ps1
@@ -32,6 +33,9 @@ if (Test-NasTlsEnabled) {
 
 $DistDir = Join-Path $RepoRoot "docker\nas\dist"
 $PackageDir = Join-Path $DistDir "aegis-nas-package"
+$platform = [Environment]::GetEnvironmentVariable("AEGIS_NAS_PLATFORM")
+if ([string]::IsNullOrWhiteSpace($platform)) { $platform = "linux/amd64" }
+# Keep historical filename for deploy script compatibility; contents match AEGIS_NAS_PLATFORM.
 $ImagesTar = Join-Path $PackageDir "images\aegis-images-amd64.tar"
 
 if (Test-Path -LiteralPath $PackageDir) {
@@ -47,7 +51,8 @@ Write-Host "==> Validating NAS Compose overlay"
 & docker compose @composeArgs config --quiet
 if ($LASTEXITCODE -ne 0) { throw "docker compose config failed" }
 
-Write-Host "==> Building linux/amd64 images (backend + frontend)"
+Write-Host "==> Building $platform images (backend + frontend)"
+$env:DOCKER_DEFAULT_PLATFORM = $platform
 & docker compose @composeArgs build --pull
 if ($LASTEXITCODE -ne 0) { throw "docker compose build failed" }
 
@@ -77,16 +82,14 @@ Copy-Item (Join-Path $RepoRoot "docker\nas\proxy\README.md") (Join-Path $Package
 Copy-Item (Join-Path $RepoRoot "docker\nas\proxy\certs\README.md") (Join-Path $PackageDir "docker\nas\proxy\certs\README.md")
 Copy-Item (Join-Path $RepoRoot "docker\nas\proxy\certs\.gitkeep") (Join-Path $PackageDir "docker\nas\proxy\certs\.gitkeep")
 
-$ArchivePath = Join-Path $DistDir "aegis-nas-package.zip"
-if (Test-Path -LiteralPath $ArchivePath) {
-    Remove-Item -LiteralPath $ArchivePath -Force
-}
-Compress-Archive -Path (Join-Path $PackageDir "*") -DestinationPath $ArchivePath -Force
+# Skip Compress-Archive: large image tars routinely hang Windows Compress-Archive.
+# deploy.ps1 uses the package directory, not the zip.
 
 Write-Host ""
 Write-Host "Package ready:"
 Write-Host "  Directory: $PackageDir"
-Write-Host "  Archive:   $ArchivePath"
+Write-Host "  Platform:  $platform"
+Write-Host "  Images:    $ImagesTar"
 if (Test-NasTlsEnabled) {
     Write-Host "  TLS:       enabled (Caddy overlay included; ensure PEMs or ACME on the NAS)"
 }

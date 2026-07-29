@@ -7,7 +7,11 @@ from unittest.mock import AsyncMock, patch
 
 from httpx import ASGITransport, AsyncClient
 
-from aegis.api.dependencies import get_research_assessment_service, require_operator
+from aegis.api.dependencies import (
+    get_research_assessment_service,
+    get_research_calibration_repository,
+    require_operator,
+)
 from aegis.api.main import create_app
 from aegis.config.settings import Settings
 from aegis.domain.research_assessment import (
@@ -96,10 +100,16 @@ class _FakeResearchService:
         return self._latest
 
 
+class _FakeCalibrationRepository:
+    async def get_latest_for_assessment(self, assessment_snapshot_id: int) -> None:
+        return None
+
+
 def _client(
     service: _FakeResearchService,
     *,
     research_outcome_label_after_assessment_enabled: bool = False,
+    research_calibration_after_label_enabled: bool = False,
 ) -> AsyncClient:
     app = create_app(
         settings=Settings(
@@ -108,11 +118,15 @@ def _client(
             research_outcome_label_after_assessment_enabled=(
                 research_outcome_label_after_assessment_enabled
             ),
+            research_calibration_after_label_enabled=research_calibration_after_label_enabled,
         )
     )
     app.dependency_overrides[require_operator] = _operator
     app.dependency_overrides[get_research_assessment_service] = lambda: service
-    if research_outcome_label_after_assessment_enabled:
+    app.dependency_overrides[get_research_calibration_repository] = (
+        lambda: _FakeCalibrationRepository()
+    )
+    if research_outcome_label_after_assessment_enabled or research_calibration_after_label_enabled:
         app.state.db_session_factory = lambda: _FakeSessionContext()
     return AsyncClient(transport=ASGITransport(app=app), base_url="http://testserver")
 
@@ -143,7 +157,11 @@ async def test_post_assessment_triggers_outcome_labels_when_flag_enabled() -> No
     ), patch(
         "aegis.api.routers.research.try_label_assessment_after_create",
         new_callable=AsyncMock,
-    ) as mock_try:
+    ) as mock_try, patch(
+        "aegis.api.routers.research.enrich_assessment_with_calibration",
+        new_callable=AsyncMock,
+    ) as mock_enrich:
+        mock_enrich.side_effect = lambda snapshot, _repo: snapshot
         async with _client(
             research,
             research_outcome_label_after_assessment_enabled=True,
@@ -152,6 +170,31 @@ async def test_post_assessment_triggers_outcome_labels_when_flag_enabled() -> No
 
         assert response.status_code == 200
         mock_try.assert_awaited_once()
+
+
+async def test_post_assessment_triggers_calibration_when_flag_enabled() -> None:
+    snap = _snapshot()
+    research = _FakeResearchService(on_assess=snap)
+
+    with patch(
+        "aegis.api.routers.research.build_research_calibration_service",
+        return_value=object(),
+    ), patch(
+        "aegis.api.routers.research.try_calibrate_assessment_after_create",
+        new_callable=AsyncMock,
+    ) as mock_calibrate, patch(
+        "aegis.api.routers.research.enrich_assessment_with_calibration",
+        new_callable=AsyncMock,
+    ) as mock_enrich:
+        mock_enrich.side_effect = lambda snapshot, _repo: snapshot
+        async with _client(
+            research,
+            research_calibration_after_label_enabled=True,
+        ) as client:
+            response = await client.post("/research/aapl/assessments")
+
+        assert response.status_code == 200
+        mock_calibrate.assert_awaited_once()
 
 
 async def test_post_assessment_skips_outcome_labels_when_flag_disabled() -> None:

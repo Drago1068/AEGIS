@@ -17,7 +17,9 @@ method after successful locked scheduled ingest (and after on-demand ingest when
 `AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` is true), using stored bars only. Phase 13 adds
 on-demand forward-return outcome labels (`forward_total_return_v1`; ADR-0014). Phase 14 runs
 those labels automatically after successful assessments when
-`AEGIS_RESEARCH_OUTCOME_LABEL_AFTER_ASSESSMENT_ENABLED` is true (ADR-0015). Phase 10 adds
+`AEGIS_RESEARCH_OUTCOME_LABEL_AFTER_ASSESSMENT_ENABLED` is true (ADR-0015). Phase 15 adds
+optional `research_calibration_v1` empirical probability from labeled history (ADR-0016).
+Phase 10 adds
 Polygon.io daily aggregates and config-driven primary/failover (ADR-0011). Phase 11 extends
 research `coverage_confidence` with multi-source availability/agreement factors
 (`method_version` 2; no OHLCV blend; ADR-0012). See

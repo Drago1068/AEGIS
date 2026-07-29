@@ -16,6 +16,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from aegis.api.dependencies import (
     build_outcome_label_service,
+    build_research_calibration_service,
     get_active_watchlist_symbols,
     get_ingestion_service,
     get_market_data_repository,
@@ -29,11 +30,18 @@ from aegis.api.schemas.market_data import (
 )
 from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.domain.research_assessment import ResearchAssessmentService
+from aegis.domain.scheduled_calibration import (
+    run_calibrations_after_assessments,
+    run_calibrations_after_labels,
+)
 from aegis.domain.scheduled_outcome_labels import run_outcome_labels_after_research
 from aegis.domain.scheduled_research import run_research_after_ingest
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
 from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
 from aegis.persistence.repositories.research_outcome_labels import ResearchOutcomeLabelRepository
+from aegis.persistence.repositories.research_probability_calibration import (
+    ResearchProbabilityCalibrationRepository,
+)
 
 router = APIRouter(
     prefix="/market-data",
@@ -69,7 +77,31 @@ async def ingest_market_data(
                     ResearchOutcomeLabelRepository(session),
                     settings,
                 )
-                await run_outcome_labels_after_research(research_summary, outcome_label_service)
+                label_summary = await run_outcome_labels_after_research(
+                    research_summary,
+                    outcome_label_service,
+                )
+                if settings.research_calibration_after_label_enabled:
+                    calibration_service = build_research_calibration_service(
+                        assessment_repository,
+                        ResearchProbabilityCalibrationRepository(session),
+                        settings,
+                    )
+                    await run_calibrations_after_labels(label_summary, calibration_service)
+        elif settings.research_calibration_after_label_enabled:
+            async with request.app.state.db_session_factory() as session:
+                assessment_repository = ResearchAssessmentRepository(session)
+                calibration_service = build_research_calibration_service(
+                    assessment_repository,
+                    ResearchProbabilityCalibrationRepository(session),
+                    settings,
+                )
+                assessments = [
+                    (outcome.symbol, outcome.assessment_snapshot_id)
+                    for outcome in research_summary.outcomes
+                    if outcome.persisted and outcome.assessment_snapshot_id is not None
+                ]
+                await run_calibrations_after_assessments(assessments, calibration_service)
     return IngestionRunResponse(
         results=[IngestionSymbolResult.model_validate(result) for result in run_result.results]
     )

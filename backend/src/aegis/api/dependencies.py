@@ -18,10 +18,15 @@ from aegis.config.settings import Settings
 from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.domain.research_assessment import (
     ResearchAssessmentService,
+    ResearchAssessmentSnapshotData,
     ResearchBarInput,
     ResearchMultiSourceCoverageConfig,
 )
 from aegis.domain.research_outcome_labels import OutcomeLabelService
+from aegis.domain.research_probability_calibration import (
+    ResearchProbabilityCalibrationService,
+    apply_probability_calibration,
+)
 from aegis.persistence.cache import check_redis
 from aegis.persistence.database import check_database
 from aegis.persistence.models import MarketDailyBarObservation, Operator
@@ -29,6 +34,9 @@ from aegis.persistence.repositories.market_data import MarketDailyBarRepository
 from aegis.persistence.repositories.operators import OperatorRepository
 from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
 from aegis.persistence.repositories.research_outcome_labels import ResearchOutcomeLabelRepository
+from aegis.persistence.repositories.research_probability_calibration import (
+    ResearchProbabilityCalibrationRepository,
+)
 from aegis.persistence.repositories.watchlist import WatchlistRepository
 from aegis.persistence.sessions import RedisSessionStore, SessionStore
 
@@ -263,3 +271,58 @@ def build_outcome_label_service(
         label_repository,
         calendar_name=settings.exchange_calendar_name,
     )
+
+
+async def get_research_calibration_repository(
+    session: AsyncSession = Depends(get_db_session),
+) -> ResearchProbabilityCalibrationRepository:
+    """A request-scoped repository for labeled corpus reads and calibrations."""
+
+    return ResearchProbabilityCalibrationRepository(session)
+
+
+async def get_research_calibration_service(
+    request: Request,
+    assessment_repository: ResearchAssessmentRepository = Depends(
+        get_research_assessment_repository
+    ),
+    calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
+        get_research_calibration_repository
+    ),
+) -> ResearchProbabilityCalibrationService:
+    """Wire research probability calibration domain service."""
+
+    return build_research_calibration_service(
+        assessment_repository,
+        calibration_repository,
+        request.app.state.settings,
+    )
+
+
+def build_research_calibration_service(
+    assessment_repository: ResearchAssessmentRepository,
+    calibration_repository: ResearchProbabilityCalibrationRepository,
+    settings: Settings,
+) -> ResearchProbabilityCalibrationService:
+    """Wire calibration service for HTTP and scheduler paths."""
+
+    return ResearchProbabilityCalibrationService(
+        assessment_repository,
+        calibration_repository,
+        calibration_repository,
+        min_corpus=settings.research_calibration_min_corpus,
+        min_bucket=settings.research_calibration_min_bucket,
+        index_bucket_width=settings.research_calibration_index_bucket_width,
+    )
+
+
+async def enrich_assessment_with_calibration(
+    snapshot: ResearchAssessmentSnapshotData,
+    calibration_repository: ResearchProbabilityCalibrationRepository,
+) -> ResearchAssessmentSnapshotData:
+    """Overlay the latest append-only calibration row for API responses."""
+
+    if snapshot.id is None:
+        return snapshot
+    calibration = await calibration_repository.get_latest_for_assessment(snapshot.id)
+    return apply_probability_calibration(snapshot, calibration)

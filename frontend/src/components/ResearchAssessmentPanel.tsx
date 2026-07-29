@@ -179,7 +179,7 @@ export function ResearchAssessmentPanel({
               <dd className="font-mono">
                 {latest.probability_confidence === null
                   ? "null (not calibrated)"
-                  : latest.probability_confidence}
+                  : `${latest.probability_confidence.toFixed(4)} (calibrated research-only)`}
               </dd>
             </div>
             <div>

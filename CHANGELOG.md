@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 15 - Research Probability Calibration v1
+
+First research-only `research_calibration_v1` empirical probability from stored labeled
+historical corpus. Fail-closed when corpus gates fail; `state` remains `research_only`. See
+[docs/architecture/decisions/0016-phase-15-research-probability-calibration.md](docs/architecture/decisions/0016-phase-15-research-probability-calibration.md).
+
+#### Added
+
+- ADR-0016: append-only `research_assessment_probability_calibrations` (migration `0008`);
+  `AEGIS_RESEARCH_CALIBRATION_AFTER_LABEL_ENABLED` (default `false`); API overlay of latest
+  calibration onto `probability_confidence`; scheduled/on-demand wiring after assessments.
+- Operator console labels non-null probability as calibrated research-only.
+
+#### Explicitly out of scope
+
+Actionable promotion, orders, portfolio analytics, and NAS live deployment.
+
 ### Phase 14 - Scheduled Outcome Labels After Research Assessments
 
 Automatic Phase 13 `forward_total_return_v1` labeling after successful research assessments

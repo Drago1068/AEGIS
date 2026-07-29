@@ -24,6 +24,7 @@ from fastapi import FastAPI
 from aegis.api.dependencies import (
     build_outcome_label_service,
     build_research_assessment_service,
+    build_research_calibration_service,
 )
 from aegis.api.ingestion_wiring import build_market_data_ingestion_service
 from aegis.config.settings import Settings
@@ -31,6 +32,9 @@ from aegis.domain.scheduled_ingestion import run_locked_ingestion_cycle
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
 from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
 from aegis.persistence.repositories.research_outcome_labels import ResearchOutcomeLabelRepository
+from aegis.persistence.repositories.research_probability_calibration import (
+    ResearchProbabilityCalibrationRepository,
+)
 from aegis.persistence.repositories.watchlist import WatchlistRepository
 
 logger = logging.getLogger(__name__)
@@ -50,6 +54,8 @@ async def run_scheduled_ingestion_job(app: FastAPI) -> None:
         )
         research_service = None
         outcome_label_service = None
+        calibration_service = None
+        calibration_repository = ResearchProbabilityCalibrationRepository(session)
         assessment_repository = ResearchAssessmentRepository(session)
         if settings.research_schedule_after_ingest_enabled:
             research_service = build_research_assessment_service(
@@ -67,6 +73,15 @@ async def run_scheduled_ingestion_job(app: FastAPI) -> None:
                 ResearchOutcomeLabelRepository(session),
                 settings,
             )
+        if (
+            settings.research_calibration_after_label_enabled
+            and research_service is not None
+        ):
+            calibration_service = build_research_calibration_service(
+                assessment_repository,
+                calibration_repository,
+                settings,
+            )
         await run_locked_ingestion_cycle(
             redis_client=app.state.redis_client,
             lock_key=settings.ingestion_schedule_lock_key,
@@ -76,6 +91,7 @@ async def run_scheduled_ingestion_job(app: FastAPI) -> None:
             ingestion_service=ingestion_service,
             research_service=research_service,
             outcome_label_service=outcome_label_service,
+            calibration_service=calibration_service,
         )
 
 

@@ -11,9 +11,11 @@ from pydantic import BaseModel, ConfigDict, Field
 class ResearchAssessmentResponse(BaseModel):
     """A research-only assessment snapshot.
 
-    ``probability_confidence`` is always null (not calibrated). ``state`` is always
-    ``research_only``. See ADR-0007 and ADR-0012. ``components`` may include numeric
-    research metrics and (method_version 2) provenance / factor breakdown fields.
+    ``probability_confidence`` is null when no Phase 15 calibration row exists; when present
+    it is a bounded empirical value from ``research_calibration_v1`` (research-only, not
+    trade advice). ``state`` is always ``research_only``. See ADR-0007, ADR-0012, and
+    ADR-0016. ``components`` may include numeric research metrics and (method_version 2)
+    provenance / factor breakdown fields.
     """
 
     model_config = ConfigDict(from_attributes=True)

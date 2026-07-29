@@ -55,6 +55,10 @@ non-functional development placeholder.
 | --- | --- | --- |
 | `AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` | When `true`, after each successful locked scheduled ingest and after each successful on-demand `POST /market-data/ingest`, run Phase 6 `daily_bar_research_v1` for active watchlist symbols (stored bars only; fail-closed skips persist nothing). When `false`, Phase 6 on-demand `POST /research/{symbol}/assessments` is unchanged. Local and NAS example default `true`. See [ADR-0009](../architecture/decisions/0009-phase-8-scheduled-research.md). | `true` |
 | `AEGIS_RESEARCH_OUTCOME_LABEL_AFTER_ASSESSMENT_ENABLED` | When `true`, after each successful research assessment from post-ingest research (when enabled) or on-demand `POST /research/{symbol}/assessments`, attempt Phase 13 `forward_total_return_v1` outcome labels (stored bars only; fail-closed skips log and persist nothing). When `false`, Phase 13 on-demand `POST .../outcome-labels` is unchanged. Local and NAS example default `true`. See [ADR-0015](../architecture/decisions/0015-phase-14-scheduled-outcome-labels.md). | `true` |
+| `AEGIS_RESEARCH_CALIBRATION_AFTER_LABEL_ENABLED` | When `true`, after successful assessments (and after successful outcome labeling when that path runs), attempt Phase 15 `research_calibration_v1` using stored labeled historical corpus. Fail-closed skips log and persist nothing. When `false`, `probability_confidence` stays null unless prior calibration rows exist. Default `false`. See [ADR-0016](../architecture/decisions/0016-phase-15-research-probability-calibration.md). | `false` |
+| `AEGIS_RESEARCH_CALIBRATION_MIN_CORPUS` | Minimum labeled historical assessments (excluding target) for `research_calibration_v1`. | `10` |
+| `AEGIS_RESEARCH_CALIBRATION_MIN_BUCKET` | Minimum labeled examples in the research_index similarity bucket. | `5` |
+| `AEGIS_RESEARCH_CALIBRATION_INDEX_BUCKET_WIDTH` | Absolute research_index tolerance for the similarity bucket. | `0.15` |
 
 ## Backend: Phase 11 multi-source coverage weighting (`aegis.config.settings.Settings`)
 

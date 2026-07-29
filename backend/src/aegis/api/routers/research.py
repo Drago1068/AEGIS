@@ -10,8 +10,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from aegis.api.dependencies import (
     build_outcome_label_service,
+    build_research_calibration_service,
+    enrich_assessment_with_calibration,
     get_outcome_label_service,
     get_research_assessment_service,
+    get_research_calibration_repository,
     require_operator,
 )
 from aegis.api.schemas.research import ResearchAssessmentResponse
@@ -24,10 +27,14 @@ from aegis.domain.research_outcome_labels import (
     OutcomeLabelService,
     OutcomeLabelUnavailableError,
 )
+from aegis.domain.scheduled_calibration import try_calibrate_assessment_after_create
 from aegis.domain.scheduled_outcome_labels import try_label_assessment_after_create
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
 from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
 from aegis.persistence.repositories.research_outcome_labels import ResearchOutcomeLabelRepository
+from aegis.persistence.repositories.research_probability_calibration import (
+    ResearchProbabilityCalibrationRepository,
+)
 
 router = APIRouter(
     prefix="/research",
@@ -56,16 +63,32 @@ async def create_research_assessment(
             detail={"reason": exc.reason.value, "message": exc.detail},
         ) from exc
     settings = request.app.state.settings
-    if settings.research_outcome_label_after_assessment_enabled:
+    if settings.research_outcome_label_after_assessment_enabled or (
+        settings.research_calibration_after_label_enabled
+    ):
         async with request.app.state.db_session_factory() as session:
             market_data_repository = MarketDailyBarRepository(session)
-            outcome_label_service = build_outcome_label_service(
-                market_data_repository,
-                ResearchAssessmentRepository(session),
-                ResearchOutcomeLabelRepository(session),
-                settings,
+            assessment_repository = ResearchAssessmentRepository(session)
+            calibration_repository = ResearchProbabilityCalibrationRepository(session)
+            if settings.research_outcome_label_after_assessment_enabled:
+                outcome_label_service = build_outcome_label_service(
+                    market_data_repository,
+                    assessment_repository,
+                    ResearchOutcomeLabelRepository(session),
+                    settings,
+                )
+                await try_label_assessment_after_create(snapshot, outcome_label_service)
+            if settings.research_calibration_after_label_enabled:
+                calibration_service = build_research_calibration_service(
+                    assessment_repository,
+                    calibration_repository,
+                    settings,
+                )
+                await try_calibrate_assessment_after_create(snapshot, calibration_service)
+            snapshot = await enrich_assessment_with_calibration(
+                snapshot,
+                calibration_repository,
             )
-            await try_label_assessment_after_create(snapshot, outcome_label_service)
     return ResearchAssessmentResponse.model_validate(snapshot)
 
 
@@ -116,11 +139,18 @@ async def list_research_assessments(
     symbol: str,
     limit: int = Query(default=20, ge=1, le=100),
     service: ResearchAssessmentService = Depends(get_research_assessment_service),
+    calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
+        get_research_calibration_repository
+    ),
 ) -> list[ResearchAssessmentResponse]:
     """Return up to ``limit`` research assessments for ``symbol``, newest first."""
 
     snapshots = await service.list_assessments(symbol, limit)
-    return [ResearchAssessmentResponse.model_validate(item) for item in snapshots]
+    enriched = [
+        await enrich_assessment_with_calibration(snapshot, calibration_repository)
+        for snapshot in snapshots
+    ]
+    return [ResearchAssessmentResponse.model_validate(item) for item in enriched]
 
 
 @router.get(
@@ -130,6 +160,9 @@ async def list_research_assessments(
 async def get_latest_research_assessment(
     symbol: str,
     service: ResearchAssessmentService = Depends(get_research_assessment_service),
+    calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
+        get_research_calibration_repository
+    ),
 ) -> ResearchAssessmentResponse:
     """Return the latest research assessment for ``symbol``, or 404."""
 
@@ -139,4 +172,5 @@ async def get_latest_research_assessment(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"no research assessment for symbol {symbol!r}",
         )
+    snapshot = await enrich_assessment_with_calibration(snapshot, calibration_repository)
     return ResearchAssessmentResponse.model_validate(snapshot)

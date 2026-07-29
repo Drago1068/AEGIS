@@ -199,6 +199,41 @@ class Settings(BaseSettings):
         ),
     )
 
+    research_calibration_after_label_enabled: bool = Field(
+        default=False,
+        description=(
+            "When true, after each successful research assessment (and after successful "
+            "outcome labeling when that path is enabled), attempt Phase 15 "
+            "research_calibration_v1 using stored labeled historical corpus. Fail-closed "
+            "skips log and persist nothing. When false, assessments keep "
+            "probability_confidence=null in API responses. See ADR-0016."
+        ),
+    )
+    research_calibration_min_corpus: int = Field(
+        default=10,
+        ge=1,
+        description=(
+            "Minimum labeled historical assessments (excluding the target) required for "
+            "research_calibration_v1. See ADR-0016."
+        ),
+    )
+    research_calibration_min_bucket: int = Field(
+        default=5,
+        ge=1,
+        description=(
+            "Minimum labeled examples within the research_index similarity bucket required "
+            "for research_calibration_v1. See ADR-0016."
+        ),
+    )
+    research_calibration_index_bucket_width: float = Field(
+        default=0.15,
+        gt=0,
+        description=(
+            "Absolute research_index tolerance for the similarity bucket in "
+            "research_calibration_v1. See ADR-0016."
+        ),
+    )
+
     research_multi_source_coverage_enabled: bool = Field(
         default=True,
         description=(

@@ -99,7 +99,7 @@ Phase 6 stores each successful on-demand research assessment as a new row. Colum
 | `method_version` | Integer method version |
 | `state` | Always `research_only` in Phase 6 |
 | `coverage_confidence` | Input-quality confidence in `[0, 1]` |
-| `probability_confidence` | Always null in Phase 6 (not calibrated) |
+| `probability_confidence` | Null at insert; API may overlay latest Phase 15 calibration |
 | `components` | JSONB research components (`total_return_20`, `realized_vol_20`, `research_index`; Phase 11 `schema_version` 2 may also include provenance / coverage factor fields — see ADR-0012) |
 | `schema_version` | Snapshot payload schema version (`1` Phase 6; `2` Phase 11 multi-source provenance) |
 | `input_source` | Provenance: market-data source id used for the bars |
@@ -107,3 +107,15 @@ Phase 6 stores each successful on-demand research assessment as a new row. Colum
 | `bar_count` | Number of bars used in the assessment (20 on success) |
 
 Rows are insert-only. Fail-closed assessments persist nothing.
+
+## Research assessment outcome labels (Phase 13, ADR-0014)
+
+Append-only table `research_assessment_outcome_labels` stores forward-return labels linked to
+`research_assessment_snapshots.id`. Labels are evidence for calibration; not probabilities.
+
+## Research assessment probability calibrations (Phase 15, ADR-0016)
+
+Append-only table `research_assessment_probability_calibrations` stores
+`research_calibration_v1` rows linked to `research_assessment_snapshots.id`. Assessment rows
+keep `probability_confidence = null` at insert; API responses overlay the latest calibration
+row. Calibrated values remain research-only and separate from `coverage_confidence`.

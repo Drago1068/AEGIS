@@ -168,3 +168,25 @@ class ResearchAssessmentOutcomeLabel(Base):
     label_end_dates: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
     schema_version: Mapped[int] = mapped_column(Integer, nullable=False)
     bar_source: Mapped[str] = mapped_column(String(64), nullable=False)
+
+
+class ResearchAssessmentProbabilityCalibration(Base):
+    """Append-only probability calibration for a research assessment (Phase 15, ADR-0016).
+
+    Research-only calibrated confidence from labeled historical corpus; not merged with
+    coverage_confidence on the assessment row.
+    """
+
+    __tablename__ = "research_assessment_probability_calibrations"
+
+    id: Mapped[int] = mapped_column(Integer, Identity(), primary_key=True)
+    assessment_snapshot_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    computed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    symbol: Mapped[str] = mapped_column(String(32), nullable=False)
+    calibration_method_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    calibration_method_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    state: Mapped[str] = mapped_column(String(32), nullable=False)
+    probability_confidence: Mapped[float] = mapped_column(Float, nullable=False)
+    corpus_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    bucket_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    schema_version: Mapped[int] = mapped_column(Integer, nullable=False)

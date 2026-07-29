@@ -15,6 +15,11 @@ import logging
 from typing import Protocol
 
 from aegis.domain.market_data_ingestion import IngestionRunResult
+from aegis.domain.scheduled_calibration import (
+    ProbabilityCalibrator,
+    run_calibrations_after_assessments,
+    run_calibrations_after_labels,
+)
 from aegis.domain.scheduled_outcome_labels import OutcomeLabeler, run_outcome_labels_after_research
 from aegis.domain.scheduled_research import ResearchAssessor, run_research_after_ingest
 
@@ -66,6 +71,7 @@ async def run_locked_ingestion_cycle(
     ingestion_service: IngestionRunner,
     research_service: ResearchAssessor | None = None,
     outcome_label_service: OutcomeLabeler | None = None,
+    calibration_service: ProbabilityCalibrator | None = None,
 ) -> IngestionRunResult | None:
     """Run one ingestion cycle over the active watchlist, guarded by a distributed lock.
 
@@ -81,6 +87,10 @@ async def run_locked_ingestion_cycle(
     When ``outcome_label_service`` is also provided (Phase 14), outcome labels run immediately
     after each successful post-ingest assessment inside the same lock. Pass ``None`` when
     ``AEGIS_RESEARCH_OUTCOME_LABEL_AFTER_ASSESSMENT_ENABLED`` is false.
+
+    When ``calibration_service`` is also provided (Phase 15), probability calibration runs
+    after successful post-ingest labeling inside the same lock. Pass ``None`` when
+    ``AEGIS_RESEARCH_CALIBRATION_AFTER_LABEL_ENABLED`` is false.
     """
 
     acquired = await redis_client.set(lock_key, _LOCK_VALUE, nx=True, ex=lock_ttl_seconds)
@@ -105,8 +115,22 @@ async def run_locked_ingestion_cycle(
         )
         if research_service is not None:
             research_summary = await run_research_after_ingest(symbols, research_service)
+            label_summary = None
             if outcome_label_service is not None:
-                await run_outcome_labels_after_research(research_summary, outcome_label_service)
+                label_summary = await run_outcome_labels_after_research(
+                    research_summary,
+                    outcome_label_service,
+                )
+            if calibration_service is not None:
+                if label_summary is not None:
+                    await run_calibrations_after_labels(label_summary, calibration_service)
+                else:
+                    assessments = [
+                        (outcome.symbol, outcome.assessment_snapshot_id)
+                        for outcome in research_summary.outcomes
+                        if outcome.persisted and outcome.assessment_snapshot_id is not None
+                    ]
+                    await run_calibrations_after_assessments(assessments, calibration_service)
         return run_result
     finally:
         try:

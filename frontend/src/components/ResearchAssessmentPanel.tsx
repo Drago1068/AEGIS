@@ -6,12 +6,15 @@ import {
   ApiClientError,
   CalibrationReadiness,
   OutcomeLabel,
+  ProbabilityCalibration,
   ResearchAssessment,
   createOutcomeLabels,
+  createProbabilityCalibration,
   createResearchAssessment,
   getApiBaseUrl,
   getCalibrationReadiness,
   getLatestOutcomeLabels,
+  getLatestProbabilityCalibration,
   getLatestResearchAssessment,
 } from "@/lib/api-client";
 
@@ -44,6 +47,7 @@ export function ResearchAssessmentPanel({
   const [latest, setLatest] = useState<ResearchAssessment | null>(initialLatest);
   const [outcomeLabel, setOutcomeLabel] = useState<OutcomeLabel | null>(null);
   const [readiness, setReadiness] = useState<CalibrationReadiness | null>(null);
+  const [calibration, setCalibration] = useState<ProbabilityCalibration | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const baseUrl = getApiBaseUrl();
@@ -53,6 +57,24 @@ export function ResearchAssessmentPanel({
     setReadiness(next);
   }
 
+  async function loadLatestCalibration(assessmentId: number) {
+    try {
+      const next = await getLatestProbabilityCalibration(baseUrl, symbol, assessmentId);
+      setCalibration(next);
+      setLatest((current) =>
+        current == null
+          ? current
+          : { ...current, probability_confidence: next.probability_confidence },
+      );
+    } catch (err) {
+      if (err instanceof ApiClientError && err.status === 404) {
+        setCalibration(null);
+        return;
+      }
+      throw err;
+    }
+  }
+
   function onAssess() {
     startTransition(async () => {
       setError(null);
@@ -60,7 +82,11 @@ export function ResearchAssessmentPanel({
         const snapshot = await createResearchAssessment(baseUrl, symbol);
         setLatest(snapshot);
         setOutcomeLabel(null);
+        setCalibration(null);
         await loadReadiness();
+        if (snapshot.id != null) {
+          await loadLatestCalibration(snapshot.id);
+        }
       } catch (err) {
         setError(formatAssessmentError(err));
       }
@@ -74,6 +100,7 @@ export function ResearchAssessmentPanel({
         const snapshot = await getLatestResearchAssessment(baseUrl, symbol);
         setLatest(snapshot);
         setOutcomeLabel(null);
+        setCalibration(null);
         if (snapshot.id != null) {
           try {
             const label = await getLatestOutcomeLabels(baseUrl, symbol, snapshot.id);
@@ -85,6 +112,7 @@ export function ResearchAssessmentPanel({
               throw labelErr;
             }
           }
+          await loadLatestCalibration(snapshot.id);
         }
         await loadReadiness();
       } catch (err) {
@@ -92,6 +120,7 @@ export function ResearchAssessmentPanel({
           setLatest(null);
           setOutcomeLabel(null);
           setReadiness(null);
+          setCalibration(null);
           setError(null);
           return;
         }
@@ -109,6 +138,23 @@ export function ResearchAssessmentPanel({
       try {
         const label = await createOutcomeLabels(baseUrl, symbol, latest.id as number);
         setOutcomeLabel(label);
+        await loadReadiness();
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
+  function onComputeCalibration() {
+    if (latest?.id == null || readiness?.status !== "ready") {
+      return;
+    }
+    startTransition(async () => {
+      setError(null);
+      try {
+        const next = await createProbabilityCalibration(baseUrl, symbol, latest.id as number);
+        setCalibration(next);
+        setLatest({ ...latest, probability_confidence: next.probability_confidence });
         await loadReadiness();
       } catch (err) {
         setError(formatAssessmentError(err));
@@ -167,6 +213,14 @@ export function ResearchAssessmentPanel({
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Compute outcome labels
+          </button>
+          <button
+            type="button"
+            onClick={onComputeCalibration}
+            disabled={isPending || latest?.id == null || readiness?.status !== "ready"}
+            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
+          >
+            Compute calibration
           </button>
           <button
             type="button"
@@ -311,6 +365,35 @@ export function ResearchAssessmentPanel({
                 </div>
               </dl>
               <p className="mt-2 text-xs text-aegis-muted">{readiness.detail}</p>
+            </div>
+          ) : null}
+          {calibration ? (
+            <div className="rounded border border-aegis-line bg-white/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
+                Probability calibration (research-only — not advice)
+              </p>
+              <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                <div>
+                  <dt className="text-aegis-muted">probability_confidence</dt>
+                  <dd className="font-mono">{calibration.probability_confidence.toFixed(4)}</dd>
+                </div>
+                <div>
+                  <dt className="text-aegis-muted">Method</dt>
+                  <dd className="font-mono">
+                    {calibration.calibration_method_id} v{calibration.calibration_method_version}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-aegis-muted">Corpus / bucket</dt>
+                  <dd className="font-mono">
+                    {calibration.corpus_count} / {calibration.bucket_count}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-aegis-muted">Computed at</dt>
+                  <dd className="font-mono">{calibration.computed_at}</dd>
+                </div>
+              </dl>
             </div>
           ) : null}
         </div>

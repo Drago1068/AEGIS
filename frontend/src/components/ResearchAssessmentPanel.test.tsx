@@ -10,18 +10,26 @@ vi.mock("@/lib/api-client", async () => {
     getApiBaseUrl: () => "http://localhost:8000",
     createResearchAssessment: vi.fn(),
     getLatestResearchAssessment: vi.fn(),
+    createOutcomeLabels: vi.fn(),
+    getLatestOutcomeLabels: vi.fn(),
     getCalibrationReadiness: vi.fn(),
+    createProbabilityCalibration: vi.fn(),
+    getLatestProbabilityCalibration: vi.fn(),
   };
 });
 
 import {
   ApiClientError,
+  createProbabilityCalibration,
   createResearchAssessment,
   getCalibrationReadiness,
+  getLatestOutcomeLabels,
+  getLatestProbabilityCalibration,
   getLatestResearchAssessment,
 } from "@/lib/api-client";
 
 const sampleAssessment = {
+  id: 1,
   symbol: "AAPL",
   method_id: "daily_bar_research_v1",
   method_version: 1,
@@ -41,6 +49,20 @@ const sampleAssessment = {
   lookback_start_date: "2023-12-27",
   lookback_end_date: "2024-01-26",
   bar_count: 20,
+};
+
+const sampleCalibration = {
+  id: 10,
+  assessment_snapshot_id: 1,
+  symbol: "AAPL",
+  calibration_method_id: "research_calibration_v1",
+  calibration_method_version: 1,
+  state: "research_only",
+  computed_at: "2024-01-26T19:00:00Z",
+  probability_confidence: 0.62,
+  corpus_count: 12,
+  bucket_count: 6,
+  schema_version: 1,
 };
 
 describe("ResearchAssessmentPanel", () => {
@@ -64,6 +86,12 @@ describe("ResearchAssessmentPanel", () => {
       calibration_method_id: "research_calibration_v1",
       detail: "need at least 10 labeled historical examples, found 3",
     });
+    vi.mocked(getLatestOutcomeLabels).mockRejectedValue(
+      new ApiClientError("missing labels", 404, null),
+    );
+    vi.mocked(getLatestProbabilityCalibration).mockRejectedValue(
+      new ApiClientError("missing calibration", 404, null),
+    );
   });
 
   it("shows research-only labeling and empty state", () => {
@@ -71,6 +99,7 @@ describe("ResearchAssessmentPanel", () => {
 
     expect(screen.getAllByText(/research only/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/no research assessment stored yet/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /compute calibration/i })).toBeDisabled();
   });
 
   it("renders an initial latest assessment from the API payload", () => {
@@ -100,6 +129,60 @@ describe("ResearchAssessmentPanel", () => {
     await waitFor(() => {
       expect(screen.getByText(/calibration readiness/i)).toBeInTheDocument();
       expect(screen.getByText("insufficient_labeled_corpus")).toBeInTheDocument();
+    });
+    expect(screen.getByRole("button", { name: /compute calibration/i })).toBeDisabled();
+  });
+
+  it("computes calibration when readiness is ready", async () => {
+    vi.mocked(getCalibrationReadiness)
+      .mockResolvedValueOnce({
+        symbol: "AAPL",
+        status: "ready",
+        assessment_snapshot_id: 1,
+        research_index: 0.46,
+        corpus_count: 12,
+        bucket_count: 6,
+        min_corpus: 10,
+        min_bucket: 5,
+        index_bucket_width: 0.15,
+        calibration_method_id: "research_calibration_v1",
+        detail: "corpus and bucket gates pass",
+      })
+      .mockResolvedValue({
+        symbol: "AAPL",
+        status: "ready",
+        assessment_snapshot_id: 1,
+        research_index: 0.46,
+        corpus_count: 12,
+        bucket_count: 6,
+        min_corpus: 10,
+        min_bucket: 5,
+        index_bucket_width: 0.15,
+        calibration_method_id: "research_calibration_v1",
+        detail: "corpus and bucket gates pass",
+      });
+    vi.mocked(createProbabilityCalibration).mockResolvedValue(sampleCalibration);
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /refresh readiness/i }));
+
+    const compute = screen.getByRole("button", { name: /compute calibration/i });
+    await waitFor(() => {
+      expect(screen.getByText("ready")).toBeInTheDocument();
+      expect(compute).not.toBeDisabled();
+    });
+    fireEvent.click(compute);
+
+    await waitFor(() => {
+      expect(createProbabilityCalibration).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        1,
+      );
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/probability calibration \(research-only/i)).toBeInTheDocument();
+      expect(screen.getByText(/0\.6200 \(calibrated research-only\)/)).toBeInTheDocument();
     });
   });
 

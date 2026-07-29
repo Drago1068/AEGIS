@@ -7,10 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 17 (NAS live verification).** Hardened verify evidence gate after
-package/deploy (ADR-0018). Upload is not verification; dry-run is not live evidence. See
-[docs/architecture/decisions/0018-phase-17-nas-live-verification.md](docs/architecture/decisions/0018-phase-17-nas-live-verification.md),
-[docs/operations/nas-live-verification.md](docs/operations/nas-live-verification.md),
+**Current phase: Phase 18 (on-demand probability calibration).** Operators can POST
+`research_calibration_v1` when readiness is `ready` without enabling automatic calibration
+(ADR-0019). See
+[docs/architecture/decisions/0019-phase-18-on-demand-calibration.md](docs/architecture/decisions/0019-phase-18-on-demand-calibration.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

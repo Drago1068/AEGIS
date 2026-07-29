@@ -16,8 +16,8 @@ deployment packaging), Phase 8 (automatic research assessments after successful 
 Phase 10 (second daily-bar provider), and Phase 11 (multi-source coverage weighting),
 Phase 12 (provider historical corrections on daily-bar observations), Phase 13 (research
 outcome labels), Phase 14 (scheduled outcome labeling after assessments), Phase 15
-(research probability calibration v1), Phase 16 (calibration corpus readiness), and
-Phase 17 (NAS live verification evidence gate).
+(research probability calibration v1), Phase 16 (calibration corpus readiness),
+Phase 17 (NAS live verification evidence gate), and Phase 18 (on-demand calibration).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -42,6 +42,9 @@ Phase 16 adds read-only calibration corpus readiness diagnostics (see
 [decisions/0017-phase-16-calibration-readiness.md](decisions/0017-phase-16-calibration-readiness.md)).
 Phase 17 hardens NAS live verification as a distinct evidence gate after package/deploy (see
 [decisions/0018-phase-17-nas-live-verification.md](decisions/0018-phase-17-nas-live-verification.md)).
+Phase 18 adds on-demand POST/GET calibration routes and operator console compute when
+readiness is `ready`, without changing the automatic-calibration default (see
+[decisions/0019-phase-18-on-demand-calibration.md](decisions/0019-phase-18-on-demand-calibration.md)).
 
 ## System context
 
@@ -86,7 +89,9 @@ same scheduled ingest lock (ADR-0015). As of Phase 15, when
 `AEGIS_RESEARCH_CALIBRATION_AFTER_LABEL_ENABLED` is true, successful assessments also attempt
 empirical probability calibration from labeled history (ADR-0016). As of Phase 16,
 `GET /research/{symbol}/calibration-readiness` reports corpus-gate readiness without
-persisting rows (ADR-0017). As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
+persisting rows (ADR-0017). As of Phase 18, authenticated
+`POST/GET /research/{symbol}/assessments/{id}/calibrations` persist or fetch on-demand
+`research_calibration_v1` rows without requiring the automatic flag (ADR-0019). As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
 assessments use `method_version` 2 multi-source coverage weighting (ADR-0012). See
 [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md),
 [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md),

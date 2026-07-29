@@ -20,7 +20,8 @@ those labels automatically after successful assessments when
 `AEGIS_RESEARCH_OUTCOME_LABEL_AFTER_ASSESSMENT_ENABLED` is true (ADR-0015). Phase 15 adds
 optional `research_calibration_v1` empirical probability from labeled history (ADR-0016).
 Phase 16 adds read-only `GET /research/{symbol}/calibration-readiness` diagnostics
-(ADR-0017). Phase 10 adds
+(ADR-0017). Phase 18 adds on-demand
+`POST/GET /research/{symbol}/assessments/{id}/calibrations` (ADR-0019). Phase 10 adds
 Polygon.io daily aggregates and config-driven primary/failover (ADR-0011). Phase 11 extends
 research `coverage_confidence` with multi-source availability/agreement factors
 (`method_version` 2; no OHLCV blend; ADR-0012). See

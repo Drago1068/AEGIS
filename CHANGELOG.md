@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 18 - On-Demand Probability Calibration
+
+Authenticated on-demand `research_calibration_v1` when readiness is `ready`, without enabling
+global automatic calibration. See
+[docs/architecture/decisions/0019-phase-18-on-demand-calibration.md](docs/architecture/decisions/0019-phase-18-on-demand-calibration.md).
+
+#### Added
+
+- ADR-0019: `POST` / `GET .../calibrations` and `.../calibrations/latest`; operator console
+  “Compute calibration” when readiness status is `ready`.
+- Reuses Phase 15 math and corpus gates; fail-closed HTTP 422; flag default remains `false`.
+
+#### Explicitly out of scope
+
+Default-on calibration, multi-horizon methods, actionable promotion, orders, and NAS live
+deploy changes.
+
 ### Phase 17 - NAS Live Verification (Ops Evidence Gate)
 
 Hardens the package/deploy/**verify** boundary for the current research-only stack: auth

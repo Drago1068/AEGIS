@@ -214,7 +214,13 @@ async def test_post_assessment_triggers_outcome_labels_when_flag_enabled() -> No
         "aegis.api.routers.research.enrich_assessment_with_calibration",
         new_callable=AsyncMock,
     ) as mock_enrich:
-        mock_enrich.side_effect = lambda snapshot, _repo: snapshot
+        async def _passthrough(
+            snapshot: ResearchAssessmentSnapshotData,
+            _repo: object,
+        ) -> ResearchAssessmentSnapshotData:
+            return snapshot
+
+        mock_enrich.side_effect = _passthrough
         async with _client(
             research,
             research_outcome_label_after_assessment_enabled=True,
@@ -239,7 +245,13 @@ async def test_post_assessment_triggers_calibration_when_flag_enabled() -> None:
         "aegis.api.routers.research.enrich_assessment_with_calibration",
         new_callable=AsyncMock,
     ) as mock_enrich:
-        mock_enrich.side_effect = lambda snapshot, _repo: snapshot
+        async def _passthrough(
+            snapshot: ResearchAssessmentSnapshotData,
+            _repo: object,
+        ) -> ResearchAssessmentSnapshotData:
+            return snapshot
+
+        mock_enrich.side_effect = _passthrough
         async with _client(
             research,
             research_calibration_after_label_enabled=True,

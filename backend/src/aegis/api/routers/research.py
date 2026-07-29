@@ -21,6 +21,7 @@ from aegis.api.dependencies import (
 from aegis.api.schemas.research import ResearchAssessmentResponse
 from aegis.api.schemas.research_calibration_readiness import CalibrationReadinessResponse
 from aegis.api.schemas.research_outcome_labels import OutcomeLabelResponse
+from aegis.api.schemas.research_probability_calibration import ProbabilityCalibrationResponse
 from aegis.domain.research_assessment import (
     ResearchAssessmentService,
     ResearchAssessmentUnavailableError,
@@ -29,7 +30,10 @@ from aegis.domain.research_outcome_labels import (
     OutcomeLabelService,
     OutcomeLabelUnavailableError,
 )
-from aegis.domain.research_probability_calibration import ResearchProbabilityCalibrationService
+from aegis.domain.research_probability_calibration import (
+    CalibrationUnavailableError,
+    ResearchProbabilityCalibrationService,
+)
 from aegis.domain.scheduled_calibration import try_calibrate_assessment_after_create
 from aegis.domain.scheduled_outcome_labels import try_label_assessment_after_create
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
@@ -135,6 +139,48 @@ async def get_latest_outcome_labels(
             detail=f"no outcome labels for assessment {assessment_id}",
         )
     return OutcomeLabelResponse.model_validate(label)
+
+
+@router.post(
+    "/{symbol}/assessments/{assessment_id}/calibrations",
+    response_model=ProbabilityCalibrationResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def create_probability_calibration(
+    symbol: str,
+    assessment_id: int,
+    service: ResearchProbabilityCalibrationService = Depends(get_research_calibration_service),
+) -> ProbabilityCalibrationResponse:
+    """Compute and append research_calibration_v1 for ``assessment_id`` (fail-closed)."""
+
+    try:
+        calibration = await service.calibrate_assessment(symbol, assessment_id)
+    except CalibrationUnavailableError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail={"reason": exc.reason.value, "message": exc.detail},
+        ) from exc
+    return ProbabilityCalibrationResponse.model_validate(calibration)
+
+
+@router.get(
+    "/{symbol}/assessments/{assessment_id}/calibrations/latest",
+    response_model=ProbabilityCalibrationResponse,
+)
+async def get_latest_probability_calibration(
+    symbol: str,
+    assessment_id: int,
+    service: ResearchProbabilityCalibrationService = Depends(get_research_calibration_service),
+) -> ProbabilityCalibrationResponse:
+    """Return the latest calibration for ``assessment_id``, or 404."""
+
+    calibration = await service.latest_calibration_for_assessment(assessment_id)
+    if calibration is None or calibration.symbol.upper() != symbol.upper():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"no probability calibration for assessment {assessment_id}",
+        )
+    return ProbabilityCalibrationResponse.model_validate(calibration)
 
 
 @router.get(

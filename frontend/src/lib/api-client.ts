@@ -487,6 +487,74 @@ export async function getCalibrationReadiness(
   return body as CalibrationReadiness;
 }
 
+export interface ProbabilityCalibration {
+  id?: number | null;
+  assessment_snapshot_id: number;
+  symbol: string;
+  calibration_method_id: string;
+  calibration_method_version: number;
+  state: string;
+  computed_at: string;
+  probability_confidence: number;
+  corpus_count: number;
+  bucket_count: number;
+  schema_version: number;
+}
+
+export async function createProbabilityCalibration(
+  baseUrl: string,
+  symbol: string,
+  assessmentId: number,
+  options?: ApiRequestOptions,
+): Promise<ProbabilityCalibration> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/` +
+    `${assessmentId}/calibrations`;
+  const { response, body } = await requestJson(
+    url,
+    {
+      method: "POST",
+      headers: { Accept: "application/json" },
+    },
+    options,
+  );
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected POST calibrations status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as ProbabilityCalibration;
+}
+
+export async function getLatestProbabilityCalibration(
+  baseUrl: string,
+  symbol: string,
+  assessmentId: number,
+  options?: ApiRequestOptions,
+): Promise<ProbabilityCalibration> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/` +
+    `${assessmentId}/calibrations/latest`;
+  const { response, body } = await requestJson(url, undefined, options);
+  if (response.status === 404) {
+    throw new ApiClientError(
+      `No probability calibration for assessment ${assessmentId}`,
+      404,
+      body,
+    );
+  }
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected GET calibrations/latest status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as ProbabilityCalibration;
+}
+
 export function getApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 }

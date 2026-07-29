@@ -10,6 +10,7 @@ from httpx import ASGITransport, AsyncClient
 from aegis.api.dependencies import (
     get_research_assessment_service,
     get_research_calibration_repository,
+    get_research_calibration_service,
     require_operator,
 )
 from aegis.api.main import create_app
@@ -20,6 +21,11 @@ from aegis.domain.research_assessment import (
     ResearchAssessmentReason,
     ResearchAssessmentSnapshotData,
     ResearchAssessmentUnavailableError,
+)
+from aegis.domain.research_probability_calibration import (
+    CALIBRATION_METHOD_ID,
+    CalibrationReadinessData,
+    CalibrationReadinessStatus,
 )
 from aegis.persistence.models import Operator
 
@@ -105,11 +111,26 @@ class _FakeCalibrationRepository:
         return None
 
 
+class _FakeCalibrationService:
+    def __init__(self, readiness: CalibrationReadinessData) -> None:
+        self._readiness = readiness
+        self.evaluate_calls: list[str] = []
+
+    async def evaluate_readiness(
+        self,
+        symbol: str,
+        snapshot: ResearchAssessmentSnapshotData | None,
+    ) -> CalibrationReadinessData:
+        self.evaluate_calls.append(symbol.upper())
+        return self._readiness
+
+
 def _client(
     service: _FakeResearchService,
     *,
     research_outcome_label_after_assessment_enabled: bool = False,
     research_calibration_after_label_enabled: bool = False,
+    calibration_service: _FakeCalibrationService | None = None,
 ) -> AsyncClient:
     app = create_app(
         settings=Settings(
@@ -126,9 +147,41 @@ def _client(
     app.dependency_overrides[get_research_calibration_repository] = (
         lambda: _FakeCalibrationRepository()
     )
+    if calibration_service is not None:
+        app.dependency_overrides[get_research_calibration_service] = lambda: calibration_service
     if research_outcome_label_after_assessment_enabled or research_calibration_after_label_enabled:
         app.state.db_session_factory = lambda: _FakeSessionContext()
     return AsyncClient(transport=ASGITransport(app=app), base_url="http://testserver")
+
+
+async def test_get_calibration_readiness_returns_payload() -> None:
+    snap = _snapshot()
+    research = _FakeResearchService(latest=snap)
+    readiness = CalibrationReadinessData(
+        symbol="AAPL",
+        status=CalibrationReadinessStatus.INSUFFICIENT_LABELED_CORPUS,
+        assessment_snapshot_id=99,
+        research_index=0.46,
+        corpus_count=3,
+        bucket_count=2,
+        min_corpus=10,
+        min_bucket=5,
+        index_bucket_width=0.15,
+        calibration_method_id=CALIBRATION_METHOD_ID,
+        detail="need at least 10 labeled historical examples, found 3",
+    )
+    calibration = _FakeCalibrationService(readiness)
+
+    async with _client(research, calibration_service=calibration) as client:
+        response = await client.get("/research/aapl/calibration-readiness")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "insufficient_labeled_corpus"
+    assert body["corpus_count"] == 3
+    assert body["bucket_count"] == 2
+    assert body["calibration_method_id"] == CALIBRATION_METHOD_ID
+    assert calibration.evaluate_calls == ["AAPL"]
 
 
 async def test_post_assessment_returns_research_only_payload() -> None:

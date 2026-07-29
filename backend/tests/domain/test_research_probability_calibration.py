@@ -13,10 +13,12 @@ from aegis.domain.research_assessment import (
 )
 from aegis.domain.research_probability_calibration import (
     CALIBRATION_METHOD_ID,
+    CalibrationReadinessStatus,
     CalibrationReason,
     CalibrationUnavailableError,
     LabeledResearchExample,
     compute_research_calibration_v1,
+    evaluate_calibration_readiness,
 )
 
 
@@ -98,3 +100,48 @@ def test_compute_calibration_fail_closed_thin_bucket() -> None:
         )
 
     assert exc_info.value.reason == CalibrationReason.INSUFFICIENT_SIMILAR_EXAMPLES
+
+
+def test_evaluate_readiness_ready() -> None:
+    readiness = evaluate_calibration_readiness(
+        "aapl",
+        _snapshot(),
+        _corpus(12),
+        min_corpus=10,
+        min_bucket=5,
+        index_bucket_width=0.15,
+    )
+
+    assert readiness.status == CalibrationReadinessStatus.READY
+    assert readiness.symbol == "AAPL"
+    assert readiness.corpus_count == 12
+    assert readiness.bucket_count == 12
+    assert readiness.research_index == pytest.approx(0.46)
+
+
+def test_evaluate_readiness_no_assessment() -> None:
+    readiness = evaluate_calibration_readiness(
+        "MSFT",
+        None,
+        [],
+        min_corpus=10,
+        min_bucket=5,
+        index_bucket_width=0.15,
+    )
+
+    assert readiness.status == CalibrationReadinessStatus.NO_ASSESSMENT
+    assert readiness.symbol == "MSFT"
+
+
+def test_evaluate_readiness_insufficient_corpus() -> None:
+    readiness = evaluate_calibration_readiness(
+        "AAPL",
+        _snapshot(),
+        _corpus(4),
+        min_corpus=10,
+        min_bucket=5,
+        index_bucket_width=0.15,
+    )
+
+    assert readiness.status == CalibrationReadinessStatus.INSUFFICIENT_LABELED_CORPUS
+    assert readiness.corpus_count == 4

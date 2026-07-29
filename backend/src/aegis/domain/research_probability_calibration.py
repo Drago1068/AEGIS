@@ -30,6 +30,154 @@ OUTCOME_HORIZON_KEY = "forward_return_5"
 RESEARCH_INDEX_KEY = "research_index"
 
 
+class CalibrationReadinessStatus(StrEnum):
+    """Read-only readiness gate status for operator diagnostics (Phase 16)."""
+
+    READY = "ready"
+    NO_ASSESSMENT = "no_assessment"
+    MISSING_RESEARCH_INDEX = "missing_research_index"
+    INSUFFICIENT_LABELED_CORPUS = "insufficient_labeled_corpus"
+    INSUFFICIENT_SIMILAR_EXAMPLES = "insufficient_similar_examples"
+
+
+@dataclass(frozen=True, slots=True)
+class CalibrationReadinessData:
+    """Corpus-gate diagnostics for a symbol; never invents probability_confidence."""
+
+    symbol: str
+    status: CalibrationReadinessStatus
+    assessment_snapshot_id: int | None
+    research_index: float | None
+    corpus_count: int
+    bucket_count: int
+    min_corpus: int
+    min_bucket: int
+    index_bucket_width: float
+    calibration_method_id: str
+    detail: str
+
+
+def evaluate_calibration_readiness(
+    symbol: str,
+    snapshot: ResearchAssessmentSnapshotData | None,
+    corpus: list[LabeledResearchExample],
+    *,
+    min_corpus: int,
+    min_bucket: int,
+    index_bucket_width: float,
+) -> CalibrationReadinessData:
+    """Report whether research_calibration_v1 gates would pass; persists nothing."""
+
+    normalized = symbol.upper()
+    if snapshot is None:
+        return CalibrationReadinessData(
+            symbol=normalized,
+            status=CalibrationReadinessStatus.NO_ASSESSMENT,
+            assessment_snapshot_id=None,
+            research_index=None,
+            corpus_count=0,
+            bucket_count=0,
+            min_corpus=min_corpus,
+            min_bucket=min_bucket,
+            index_bucket_width=index_bucket_width,
+            calibration_method_id=CALIBRATION_METHOD_ID,
+            detail="no research assessment snapshot available",
+        )
+
+    if snapshot.id is None:
+        return CalibrationReadinessData(
+            symbol=normalized,
+            status=CalibrationReadinessStatus.NO_ASSESSMENT,
+            assessment_snapshot_id=None,
+            research_index=None,
+            corpus_count=0,
+            bucket_count=0,
+            min_corpus=min_corpus,
+            min_bucket=min_bucket,
+            index_bucket_width=index_bucket_width,
+            calibration_method_id=CALIBRATION_METHOD_ID,
+            detail="assessment snapshot id is required for calibration readiness",
+        )
+
+    research_index_raw = snapshot.components.get(RESEARCH_INDEX_KEY)
+    if not isinstance(research_index_raw, (int, float)):
+        return CalibrationReadinessData(
+            symbol=normalized,
+            status=CalibrationReadinessStatus.MISSING_RESEARCH_INDEX,
+            assessment_snapshot_id=snapshot.id,
+            research_index=None,
+            corpus_count=0,
+            bucket_count=0,
+            min_corpus=min_corpus,
+            min_bucket=min_bucket,
+            index_bucket_width=index_bucket_width,
+            calibration_method_id=CALIBRATION_METHOD_ID,
+            detail=f"component {RESEARCH_INDEX_KEY!r} is required for calibration",
+        )
+
+    research_index = float(research_index_raw)
+    historical = [
+        example
+        for example in corpus
+        if example.assessment_snapshot_id != snapshot.id
+    ]
+    bucket = [
+        example
+        for example in historical
+        if abs(example.research_index - research_index) <= index_bucket_width
+    ]
+
+    if len(historical) < min_corpus:
+        return CalibrationReadinessData(
+            symbol=normalized,
+            status=CalibrationReadinessStatus.INSUFFICIENT_LABELED_CORPUS,
+            assessment_snapshot_id=snapshot.id,
+            research_index=research_index,
+            corpus_count=len(historical),
+            bucket_count=len(bucket),
+            min_corpus=min_corpus,
+            min_bucket=min_bucket,
+            index_bucket_width=index_bucket_width,
+            calibration_method_id=CALIBRATION_METHOD_ID,
+            detail=(
+                f"need at least {min_corpus} labeled historical examples, "
+                f"found {len(historical)}"
+            ),
+        )
+
+    if len(bucket) < min_bucket:
+        return CalibrationReadinessData(
+            symbol=normalized,
+            status=CalibrationReadinessStatus.INSUFFICIENT_SIMILAR_EXAMPLES,
+            assessment_snapshot_id=snapshot.id,
+            research_index=research_index,
+            corpus_count=len(historical),
+            bucket_count=len(bucket),
+            min_corpus=min_corpus,
+            min_bucket=min_bucket,
+            index_bucket_width=index_bucket_width,
+            calibration_method_id=CALIBRATION_METHOD_ID,
+            detail=(
+                f"need at least {min_bucket} examples within research_index "
+                f"±{index_bucket_width}, found {len(bucket)}"
+            ),
+        )
+
+    return CalibrationReadinessData(
+        symbol=normalized,
+        status=CalibrationReadinessStatus.READY,
+        assessment_snapshot_id=snapshot.id,
+        research_index=research_index,
+        corpus_count=len(historical),
+        bucket_count=len(bucket),
+        min_corpus=min_corpus,
+        min_bucket=min_bucket,
+        index_bucket_width=index_bucket_width,
+        calibration_method_id=CALIBRATION_METHOD_ID,
+        detail="corpus and similarity bucket gates would pass for research_calibration_v1",
+    )
+
+
 class CalibrationReason(StrEnum):
     """Structured fail-closed reason codes."""
 
@@ -238,6 +386,36 @@ class ResearchProbabilityCalibrationService:
         self, assessment_snapshot_id: int
     ) -> ProbabilityCalibrationData | None:
         return await self._calibration_store.get_latest_for_assessment(assessment_snapshot_id)
+
+    async def evaluate_readiness(
+        self,
+        symbol: str,
+        snapshot: ResearchAssessmentSnapshotData | None,
+    ) -> CalibrationReadinessData:
+        """Return corpus-gate readiness for ``symbol`` without persisting anything."""
+
+        corpus = await self._corpus_reader.list_labeled_examples(
+            symbol.upper(),
+            self._corpus_limit,
+        )
+        readiness = evaluate_calibration_readiness(
+            symbol,
+            snapshot,
+            corpus,
+            min_corpus=self._min_corpus,
+            min_bucket=self._min_bucket,
+            index_bucket_width=self._index_bucket_width,
+        )
+        logger.info(
+            "research_calibration_readiness_evaluated",
+            extra={
+                "symbol": readiness.symbol,
+                "status": readiness.status.value,
+                "corpus_count": readiness.corpus_count,
+                "bucket_count": readiness.bucket_count,
+            },
+        )
+        return readiness
 
 
 def apply_probability_calibration(

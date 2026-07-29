@@ -15,9 +15,11 @@ from aegis.api.dependencies import (
     get_outcome_label_service,
     get_research_assessment_service,
     get_research_calibration_repository,
+    get_research_calibration_service,
     require_operator,
 )
 from aegis.api.schemas.research import ResearchAssessmentResponse
+from aegis.api.schemas.research_calibration_readiness import CalibrationReadinessResponse
 from aegis.api.schemas.research_outcome_labels import OutcomeLabelResponse
 from aegis.domain.research_assessment import (
     ResearchAssessmentService,
@@ -27,6 +29,7 @@ from aegis.domain.research_outcome_labels import (
     OutcomeLabelService,
     OutcomeLabelUnavailableError,
 )
+from aegis.domain.research_probability_calibration import ResearchProbabilityCalibrationService
 from aegis.domain.scheduled_calibration import try_calibrate_assessment_after_create
 from aegis.domain.scheduled_outcome_labels import try_label_assessment_after_create
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
@@ -132,6 +135,24 @@ async def get_latest_outcome_labels(
             detail=f"no outcome labels for assessment {assessment_id}",
         )
     return OutcomeLabelResponse.model_validate(label)
+
+
+@router.get(
+    "/{symbol}/calibration-readiness",
+    response_model=CalibrationReadinessResponse,
+)
+async def get_calibration_readiness(
+    symbol: str,
+    assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
+    calibration_service: ResearchProbabilityCalibrationService = Depends(
+        get_research_calibration_service
+    ),
+) -> CalibrationReadinessResponse:
+    """Return corpus-gate readiness for ``symbol`` without persisting calibration rows."""
+
+    snapshot = await assessment_service.latest_assessment(symbol)
+    readiness = await calibration_service.evaluate_readiness(symbol, snapshot)
+    return CalibrationReadinessResponse.model_validate(readiness)
 
 
 @router.get("/{symbol}/assessments", response_model=list[ResearchAssessmentResponse])

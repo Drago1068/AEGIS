@@ -4,11 +4,13 @@ import { useState, useTransition } from "react";
 
 import {
   ApiClientError,
+  CalibrationReadiness,
   OutcomeLabel,
   ResearchAssessment,
   createOutcomeLabels,
   createResearchAssessment,
   getApiBaseUrl,
+  getCalibrationReadiness,
   getLatestOutcomeLabels,
   getLatestResearchAssessment,
 } from "@/lib/api-client";
@@ -41,9 +43,15 @@ export function ResearchAssessmentPanel({
 }: ResearchAssessmentPanelProps) {
   const [latest, setLatest] = useState<ResearchAssessment | null>(initialLatest);
   const [outcomeLabel, setOutcomeLabel] = useState<OutcomeLabel | null>(null);
+  const [readiness, setReadiness] = useState<CalibrationReadiness | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const baseUrl = getApiBaseUrl();
+
+  async function loadReadiness() {
+    const next = await getCalibrationReadiness(baseUrl, symbol);
+    setReadiness(next);
+  }
 
   function onAssess() {
     startTransition(async () => {
@@ -52,6 +60,7 @@ export function ResearchAssessmentPanel({
         const snapshot = await createResearchAssessment(baseUrl, symbol);
         setLatest(snapshot);
         setOutcomeLabel(null);
+        await loadReadiness();
       } catch (err) {
         setError(formatAssessmentError(err));
       }
@@ -77,10 +86,12 @@ export function ResearchAssessmentPanel({
             }
           }
         }
+        await loadReadiness();
       } catch (err) {
         if (err instanceof ApiClientError && err.status === 404) {
           setLatest(null);
           setOutcomeLabel(null);
+          setReadiness(null);
           setError(null);
           return;
         }
@@ -98,6 +109,18 @@ export function ResearchAssessmentPanel({
       try {
         const label = await createOutcomeLabels(baseUrl, symbol, latest.id as number);
         setOutcomeLabel(label);
+        await loadReadiness();
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
+  function onRefreshReadiness() {
+    startTransition(async () => {
+      setError(null);
+      try {
+        await loadReadiness();
       } catch (err) {
         setError(formatAssessmentError(err));
       }
@@ -128,6 +151,14 @@ export function ResearchAssessmentPanel({
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Refresh latest
+          </button>
+          <button
+            type="button"
+            onClick={onRefreshReadiness}
+            disabled={isPending}
+            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
+          >
+            Refresh readiness
           </button>
           <button
             type="button"
@@ -249,6 +280,37 @@ export function ResearchAssessmentPanel({
                 Bar source {outcomeLabel.bar_source}. Label method{" "}
                 {outcomeLabel.label_method_id} v{outcomeLabel.label_method_version}.
               </p>
+            </div>
+          ) : null}
+          {readiness ? (
+            <div className="rounded border border-aegis-line bg-white/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
+                Calibration readiness (diagnostics only — not advice)
+              </p>
+              <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                <div>
+                  <dt className="text-aegis-muted">Status</dt>
+                  <dd className="font-mono">{readiness.status}</dd>
+                </div>
+                <div>
+                  <dt className="text-aegis-muted">Method</dt>
+                  <dd className="font-mono">{readiness.calibration_method_id}</dd>
+                </div>
+                <div>
+                  <dt className="text-aegis-muted">Labeled corpus</dt>
+                  <dd className="font-mono">
+                    {readiness.corpus_count} / min {readiness.min_corpus}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-aegis-muted">Similarity bucket</dt>
+                  <dd className="font-mono">
+                    {readiness.bucket_count} / min {readiness.min_bucket} (±
+                    {readiness.index_bucket_width})
+                  </dd>
+                </div>
+              </dl>
+              <p className="mt-2 text-xs text-aegis-muted">{readiness.detail}</p>
             </div>
           ) : null}
         </div>

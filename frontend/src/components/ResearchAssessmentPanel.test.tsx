@@ -10,12 +10,14 @@ vi.mock("@/lib/api-client", async () => {
     getApiBaseUrl: () => "http://localhost:8000",
     createResearchAssessment: vi.fn(),
     getLatestResearchAssessment: vi.fn(),
+    getCalibrationReadiness: vi.fn(),
   };
 });
 
 import {
   ApiClientError,
   createResearchAssessment,
+  getCalibrationReadiness,
   getLatestResearchAssessment,
 } from "@/lib/api-client";
 
@@ -49,6 +51,19 @@ describe("ResearchAssessmentPanel", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(getCalibrationReadiness).mockResolvedValue({
+      symbol: "AAPL",
+      status: "insufficient_labeled_corpus",
+      assessment_snapshot_id: 1,
+      research_index: 0.46,
+      corpus_count: 3,
+      bucket_count: 2,
+      min_corpus: 10,
+      min_bucket: 5,
+      index_bucket_width: 0.15,
+      calibration_method_id: "research_calibration_v1",
+      detail: "need at least 10 labeled historical examples, found 3",
+    });
   });
 
   it("shows research-only labeling and empty state", () => {
@@ -81,6 +96,10 @@ describe("ResearchAssessmentPanel", () => {
     });
     await waitFor(() => {
       expect(screen.getByText(/state: research only/i)).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/calibration readiness/i)).toBeInTheDocument();
+      expect(screen.getByText("insufficient_labeled_corpus")).toBeInTheDocument();
     });
   });
 

@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 16 - Calibration Corpus Readiness & Operator Diagnostics
+
+Read-only readiness diagnostics for Phase 15 corpus gates so operators can inspect whether
+`research_calibration_v1` would pass before enabling calibration. See
+[docs/architecture/decisions/0017-phase-16-calibration-readiness.md](docs/architecture/decisions/0017-phase-16-calibration-readiness.md).
+
+#### Added
+
+- ADR-0017: `GET /research/{symbol}/calibration-readiness`; domain
+  `evaluate_calibration_readiness`; operator console readiness section.
+- No new persistence; never invents `probability_confidence`.
+
+#### Explicitly out of scope
+
+Enabling calibration by default, actionable promotion, orders, and NAS live deployment.
+
 ### Phase 15 - Research Probability Calibration v1
 
 First research-only `research_calibration_v1` empirical probability from stored labeled

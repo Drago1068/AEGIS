@@ -7,10 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 15 (research probability calibration v1).** Empirical
-`research_calibration_v1` from labeled historical corpus when enabled; fail-closed when
-gates fail. See
-[docs/architecture/decisions/0016-phase-15-research-probability-calibration.md](docs/architecture/decisions/0016-phase-15-research-probability-calibration.md)
+**Current phase: Phase 16 (calibration corpus readiness).** Read-only diagnostics for Phase
+15 corpus gates via `GET /research/{symbol}/calibration-readiness`. See
+[docs/architecture/decisions/0017-phase-16-calibration-readiness.md](docs/architecture/decisions/0017-phase-16-calibration-readiness.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

@@ -70,7 +70,7 @@ export interface ResearchAssessment {
   event_time: string;
   computed_at: string;
   coverage_confidence: number;
-  /** Always null (not calibrated). Never merge with coverage_confidence. */
+  /** Always null when not calibrated. Never merge with coverage_confidence. */
   probability_confidence: number | null;
   /** Research metrics plus optional Phase 11 provenance / factor fields (schema_version 2). */
   components: {
@@ -454,6 +454,37 @@ export async function getLatestOutcomeLabels(
     );
   }
   return body as OutcomeLabel;
+}
+
+export interface CalibrationReadiness {
+  symbol: string;
+  status: string;
+  assessment_snapshot_id: number | null;
+  research_index: number | null;
+  corpus_count: number;
+  bucket_count: number;
+  min_corpus: number;
+  min_bucket: number;
+  index_bucket_width: number;
+  calibration_method_id: string;
+  detail: string;
+}
+
+export async function getCalibrationReadiness(
+  baseUrl: string,
+  symbol: string,
+  options?: ApiRequestOptions,
+): Promise<CalibrationReadiness> {
+  const url = `${baseUrl}/research/${encodeURIComponent(symbol)}/calibration-readiness`;
+  const { response, body } = await requestJson(url, undefined, options);
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected GET /research/{symbol}/calibration-readiness status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as CalibrationReadiness;
 }
 
 export function getApiBaseUrl(): string {

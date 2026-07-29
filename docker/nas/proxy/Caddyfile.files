@@ -1,0 +1,23 @@
+# Operator-supplied PEM certificates (AEGIS_TLS_MODE=files).
+# Placeholders only — replace hostnames via container env from .env.nas.
+# Expected PEMs mounted at /certs (never commit real certs/keys):
+#   frontend.crt, frontend.key, api.crt, api.key
+#
+# Caddy sets X-Forwarded-For / X-Forwarded-Proto / X-Forwarded-Host on reverse_proxy.
+# Application auth remains Phase 4 session cookies (no Basic Auth here).
+
+{$AEGIS_TLS_FRONTEND_HOST} {
+	tls /certs/frontend.crt /certs/frontend.key
+	encode gzip
+	reverse_proxy frontend:3000
+}
+
+{$AEGIS_TLS_API_HOST} {
+	tls /certs/api.crt /certs/api.key
+	encode gzip
+	reverse_proxy backend:8000
+}
+
+http://{$AEGIS_TLS_FRONTEND_HOST}, http://{$AEGIS_TLS_API_HOST} {
+	redir https://{host}{uri} permanent
+}

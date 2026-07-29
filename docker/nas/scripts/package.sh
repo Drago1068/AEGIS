@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build linux/amd64 images and stage a transferrable NAS package (Phase 7).
+# Build linux/amd64 images and stage a transferrable NAS package (Phase 7 + optional Phase 9 TLS).
 # Requires a filled `.env.nas` at the repository root. Does not connect to any NAS.
 set -euo pipefail
 
@@ -17,12 +17,16 @@ require_env_vars \
   POSTGRES_PASSWORD
 assert_nas_secrets_not_placeholders
 
+if nas_tls_enabled; then
+  assert_tls_profile_ready "${REPO_ROOT}"
+fi
+
 DIST_DIR="${REPO_ROOT}/docker/nas/dist"
 PACKAGE_DIR="${DIST_DIR}/aegis-nas-package"
 IMAGES_TAR="${PACKAGE_DIR}/images/aegis-images-amd64.tar"
 
 rm -rf "${PACKAGE_DIR}"
-mkdir -p "${PACKAGE_DIR}/images" "${PACKAGE_DIR}/docker/nas/scripts"
+mkdir -p "${PACKAGE_DIR}/images" "${PACKAGE_DIR}/docker/nas/scripts" "${PACKAGE_DIR}/docker/nas/proxy"
 
 mapfile -t COMPOSE_ARGS < <(compose_nas_args "${REPO_ROOT}")
 
@@ -45,9 +49,17 @@ docker save -o "${IMAGES_TAR}" "${IMAGES[@]}"
 echo "==> Staging package files"
 cp "${REPO_ROOT}/docker-compose.yml" "${PACKAGE_DIR}/docker-compose.yml"
 cp "${REPO_ROOT}/docker/nas/docker-compose.nas.yml" "${PACKAGE_DIR}/docker/nas/docker-compose.nas.yml"
+cp "${REPO_ROOT}/docker/nas/docker-compose.nas.tls.yml" "${PACKAGE_DIR}/docker/nas/docker-compose.nas.tls.yml"
 cp "${REPO_ROOT}/docker/nas/README.md" "${PACKAGE_DIR}/docker/nas/README.md"
 cp "${REPO_ROOT}/.env.nas.example" "${PACKAGE_DIR}/.env.nas.example"
 cp -R "${REPO_ROOT}/docker/nas/scripts/." "${PACKAGE_DIR}/docker/nas/scripts/"
+# Proxy templates only (never copy real PEMs from certs/).
+cp "${REPO_ROOT}/docker/nas/proxy/Caddyfile.files" "${PACKAGE_DIR}/docker/nas/proxy/Caddyfile.files"
+cp "${REPO_ROOT}/docker/nas/proxy/Caddyfile.acme" "${PACKAGE_DIR}/docker/nas/proxy/Caddyfile.acme"
+cp "${REPO_ROOT}/docker/nas/proxy/README.md" "${PACKAGE_DIR}/docker/nas/proxy/README.md"
+mkdir -p "${PACKAGE_DIR}/docker/nas/proxy/certs"
+cp "${REPO_ROOT}/docker/nas/proxy/certs/README.md" "${PACKAGE_DIR}/docker/nas/proxy/certs/README.md"
+cp "${REPO_ROOT}/docker/nas/proxy/certs/.gitkeep" "${PACKAGE_DIR}/docker/nas/proxy/certs/.gitkeep"
 
 ARCHIVE_PATH="${DIST_DIR}/aegis-nas-package.tar.gz"
 tar -C "${PACKAGE_DIR}" -czf "${ARCHIVE_PATH}" .
@@ -56,6 +68,9 @@ echo
 echo "Package ready:"
 echo "  Directory: ${PACKAGE_DIR}"
 echo "  Archive:   ${ARCHIVE_PATH}"
+if nas_tls_enabled; then
+  echo "  TLS:       enabled (Caddy overlay included; ensure PEMs or ACME on the NAS)"
+fi
 echo
 echo "Next: run deploy.sh (transfer + start). Upload alone is NOT a verified deployment;"
 echo "      run verify.sh after the stack is up."

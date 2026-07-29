@@ -183,10 +183,13 @@ for exact commands.
 UGREEN NAS deployment (Phase 7) uses a Compose **overlay**
 (`docker/nas/docker-compose.nas.yml`) on top of the same root file, with all host-specific
 values sourced from gitignored `.env.nas`. Package, deploy, and verify are separate scripts;
-upload alone is not a verified deployment. See
+upload alone is not a verified deployment. Optional Phase 9 TLS packaging
+(`docker/nas/docker-compose.nas.tls.yml`, Caddy) terminates HTTPS so Secure session cookies
+work on the NAS without changing Phase 4 application auth. See
 [../../docker/nas/README.md](../../docker/nas/README.md),
-[../operations/nas-deployment.md](../operations/nas-deployment.md), and
-[decisions/0008-phase-7-nas-deployment.md](decisions/0008-phase-7-nas-deployment.md).
+[../operations/nas-deployment.md](../operations/nas-deployment.md),
+[decisions/0008-phase-7-nas-deployment.md](decisions/0008-phase-7-nas-deployment.md), and
+[decisions/0010-phase-9-nas-tls-reverse-proxy.md](decisions/0010-phase-9-nas-tls-reverse-proxy.md).
 
 ## Related documents
 
@@ -212,3 +215,6 @@ upload alone is not a verified deployment. See
 - [decisions/0009-phase-8-scheduled-research.md](decisions/0009-phase-8-scheduled-research.md):
   Phase 8 post-ingest research assessments ADR (single flag, research inside ingest lock,
   stored bars only, fail-closed skips).
+- [decisions/0010-phase-9-nas-tls-reverse-proxy.md](decisions/0010-phase-9-nas-tls-reverse-proxy.md):
+  Phase 9 NAS TLS reverse-proxy packaging ADR (optional Caddy overlay, Secure cookies,
+  operator PEMs and/or ACME, no proxy Basic Auth).

@@ -7,10 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 8 (scheduled research assessments after ingest).** After successful
-locked scheduled ingest (and on-demand ingest when enabled), Phase 6 `daily_bar_research_v1`
-runs automatically for active watchlist symbols (stored bars only; fail-closed skips). See
-[docs/architecture/decisions/0009-phase-8-scheduled-research.md](docs/architecture/decisions/0009-phase-8-scheduled-research.md)
+**Current phase: Phase 9 (NAS TLS reverse-proxy packaging).** Optional Caddy overlay for
+HTTPS on UGREEN NAS so Secure session cookies work; Phase 8 scheduled research remains in
+effect. See
+[docs/architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md](docs/architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
@@ -46,7 +46,7 @@ for the system architecture and module boundaries.
 | `backend/` | Python/FastAPI service (`uv`-managed). See [backend/README.md](backend/README.md). |
 | `frontend/` | Next.js/TypeScript application (`pnpm`-managed). |
 | `docker/`, `docker-compose.yml` | Local Compose topology and Dockerfiles. |
-| `docker/nas/` | NAS Compose overlay, runbook, and package/deploy/verify scripts (Phase 7). |
+| `docker/nas/` | NAS Compose overlays, optional TLS proxy templates, runbook, and package/deploy/verify scripts (Phases 7–9). |
 | `tests/integration/` | Cross-service tests run against the real Compose stack. |
 | `docs/architecture/` | System design, data-model, and market-data contracts. |
 | `docs/operations/` | Configuration, local development, CI, and security-scanning docs. |

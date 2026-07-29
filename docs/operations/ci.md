@@ -33,12 +33,14 @@ Mirrors the frontend quality gates: `pnpm install --frozen-lockfile`, `pnpm lint
 ### `compose-validate`
 
 Runs `docker compose config` to validate the local Compose topology, then validates the
-Phase 7 NAS overlay (`docker/nas/docker-compose.nas.yml` with `.env.nas.example`), then does
-a **build-only** `linux/amd64` build of both Dockerfiles (the UGREEN NAS DXP-series target
-architecture; see
-[../architecture/decisions/0001-phase-0-tooling.md](../architecture/decisions/0001-phase-0-tooling.md)
+Phase 7 NAS overlay (`docker/nas/docker-compose.nas.yml` with `.env.nas.example`), then
+validates the optional Phase 9 TLS overlay (`docker/nas/docker-compose.nas.tls.yml`) with
+ACME-mode placeholders (no PEMs, no live NAS), then does a **build-only** `linux/amd64`
+build of both Dockerfiles (the UGREEN NAS DXP-series target architecture; see
+[../architecture/decisions/0001-phase-0-tooling.md](../architecture/decisions/0001-phase-0-tooling.md),
+[../architecture/decisions/0008-phase-7-nas-deployment.md](../architecture/decisions/0008-phase-7-nas-deployment.md),
 and
-[../architecture/decisions/0008-phase-7-nas-deployment.md](../architecture/decisions/0008-phase-7-nas-deployment.md)).
+[../architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md](../architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md)).
 This never pushes, runs, or deploys to a live NAS; see
 [../../docker/nas/README.md](../../docker/nas/README.md) and
 [nas-deployment.md](nas-deployment.md) for package/deploy/verify.

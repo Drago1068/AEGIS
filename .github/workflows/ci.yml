@@ -102,6 +102,25 @@ jobs:
           --project-directory .
           config
 
+      - name: Validate NAS TLS Compose overlay (Phase 9)
+        # Config dry-run only; uses ACME Caddyfile so no PEMs are required in CI.
+        # Live NAS deploy/verify remain operator steps (upload ≠ verified).
+        env:
+          AEGIS_NAS_TLS_ENABLED: "true"
+          AEGIS_TLS_MODE: acme
+          AEGIS_TLS_CADDYFILE: ./proxy/Caddyfile.acme
+          AEGIS_TLS_FRONTEND_HOST: ci-frontend.example.invalid
+          AEGIS_TLS_API_HOST: ci-api.example.invalid
+          AEGIS_TLS_ACME_EMAIL: ci-acme@example.invalid
+        run: >
+          docker compose
+          -f docker-compose.yml
+          -f docker/nas/docker-compose.nas.yml
+          -f docker/nas/docker-compose.nas.tls.yml
+          --env-file .env.nas.example
+          --project-directory .
+          config
+
       - uses: docker/setup-buildx-action@v3
 
       # Build-only NAS-architecture validation (linux/amd64, matching UGREEN NAS

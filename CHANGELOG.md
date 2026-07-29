@@ -7,6 +7,32 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 9 - NAS Reverse-Proxy / TLS Packaging for Secure Cookies
+
+Optional Caddy reverse-proxy + TLS termination for the UGREEN NAS Compose stack so operators
+can use HTTPS with `AEGIS_SESSION_COOKIE_SECURE=true`. Packaging and ops only; application
+session auth (Phase 4) remains the source of truth. Proxy is TLS + routing — not Basic Auth.
+No product scoring expansion. See
+[docs/architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md](docs/architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md).
+
+#### Added
+
+- ADR-0010: prefer Caddy; optional Compose overlay; operator PEMs and/or ACME; dual-host
+  routing; cookie/CORS fail-closed alignment; forwarded headers documented.
+- `docker/nas/docker-compose.nas.tls.yml` (unpublish API/frontend host ports; publish 443/80;
+  Caddy service).
+- Proxy templates under `docker/nas/proxy/` (`Caddyfile.files`, `Caddyfile.acme`); certs
+  directory placeholders only (no committed PEMs).
+- `.env.nas.example` TLS placeholders; package/deploy/verify/validate-local honor
+  `AEGIS_NAS_TLS_ENABLED` and fail closed without required TLS material.
+- Docs: NAS runbook, nas-deployment, configuration, overview, CI compose dry-run for TLS.
+
+#### Explicitly out of scope
+
+Live NAS deploy from CI, OAuth/MFA, calibration, actionable promotion, orders, second
+provider, and application auth changes - each remains absent. Local dev stays HTTP +
+Secure=false.
+
 ### Phase 8 - Scheduled Research Assessments After Ingest
 
 After each successful locked scheduled ingest cycle (and after successful on-demand

@@ -59,6 +59,11 @@ non-functional development placeholder.
 | `AEGIS_SESSION_TTL_SECONDS` | Redis TTL and cookie max-age for a session. | `86400` |
 | `AEGIS_SESSION_COOKIE_SECURE` | Mark the session cookie Secure (require HTTPS). | `false` |
 
+On NAS with the optional Phase 9 TLS profile, keep this `true` and publish only `https://`
+browser/API origins. Secure cookies are not sent over plain HTTP — a Secure+HTTP mismatch
+fails closed in packaging validation when TLS is enabled. Local development stays
+`false` with HTTP. See [ADR-0010](../architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md).
+
 ## PostgreSQL / TimescaleDB container (`docker-compose.yml`)
 
 | Variable | Description | Development default |
@@ -81,7 +86,7 @@ non-functional development placeholder.
 | `NEXT_PUBLIC_API_BASE_URL` | Base URL the frontend uses to reach the backend API. Exposed to the browser (`NEXT_PUBLIC_` prefix), so it must never carry a secret. For Docker image builds this value is passed as a build arg and inlined at `pnpm build` time (required for NAS packaging). | `http://localhost:8000` |
 | `FRONTEND_PORT` | Host-side port mapping for the frontend container. | `3000` |
 
-## NAS deployment (Phase 7)
+## NAS deployment (Phase 7 + optional Phase 9 TLS)
 
 NAS-specific variables live in gitignored `.env.nas` (template: [`.env.nas.example`](../../.env.nas.example)).
 They are not read by application Settings directly beyond the usual `AEGIS_*` / Compose vars;
@@ -95,12 +100,28 @@ deploy/verify scripts also require connection and public-URL settings.
 | `AEGIS_NAS_SSH_IDENTITY_FILE` | deploy/verify scripts | Optional path to an SSH private key. | unset |
 | `AEGIS_NAS_REMOTE_DIR` | deploy/verify scripts | Absolute remote directory for the unpacked package. | `replace-with-absolute-remote-deploy-directory` |
 | `AEGIS_NAS_COMPOSE_PROJECT_NAME` | Compose overlay | Compose project name on the NAS. | `aegis` |
-| `AEGIS_NAS_API_BASE_URL` | verify scripts | Operator-facing API origin used for HTTP checks. | `https://replace-with-operator-facing-api-origin` |
+| `AEGIS_NAS_API_BASE_URL` | verify scripts | Operator-facing API origin used for HTTP(S) checks. | `https://replace-with-operator-facing-api-origin` |
 | `AEGIS_NAS_FRONTEND_BASE_URL` | verify scripts | Operator-facing frontend origin. | `https://replace-with-operator-facing-frontend-origin` |
+| `AEGIS_NAS_TLS_ENABLED` | package/deploy/validate/verify | When `true`, include `docker-compose.nas.tls.yml` (Caddy). | `false` |
+| `AEGIS_TLS_MODE` | TLS scripts / Caddyfile choice | `files` (operator PEMs) or `acme` (public DNS). | `files` |
+| `AEGIS_TLS_FRONTEND_HOST` | Caddy | Console hostname (no scheme). Required when TLS enabled. | `replace-with-frontend-hostname` |
+| `AEGIS_TLS_API_HOST` | Caddy | API hostname (no scheme). Required when TLS enabled. | `replace-with-api-hostname` |
+| `AEGIS_TLS_HTTPS_PORT` | TLS Compose | Host port published for HTTPS. | `443` |
+| `AEGIS_TLS_HTTP_PORT` | TLS Compose | Host port for HTTP→HTTPS redirect. | `80` |
+| `AEGIS_TLS_CADDYFILE` | TLS Compose | Caddyfile path relative to `docker/nas/`. | `./proxy/Caddyfile.files` |
+| `AEGIS_TLS_CERTS_DIR` | TLS Compose / deploy | Host directory of PEMs (files mode). | `./proxy/certs` |
+| `AEGIS_TLS_ACME_EMAIL` | Caddy ACME | Contact email for certificate issuance (`acme` mode). | `replace-with-operator-acme-contact-email` |
+| `AEGIS_NAS_VERIFY_CURL_INSECURE` | verify scripts | Lab-only: pass `curl -k` for self-signed certs. | `false` |
 
 On NAS, set a **non-default** `AEGIS_OPERATOR_PASSWORD` and prefer
-`AEGIS_SESSION_COOKIE_SECURE=true` when HTTPS terminates in front of the console. See
-[nas-deployment.md](nas-deployment.md) and [../../docker/nas/README.md](../../docker/nas/README.md).
+`AEGIS_SESSION_COOKIE_SECURE=true` when HTTPS terminates in front of the console. Align
+`AEGIS_CORS_ORIGINS` and `NEXT_PUBLIC_API_BASE_URL` to the same `https://` origins. See
+[nas-deployment.md](nas-deployment.md), [../../docker/nas/README.md](../../docker/nas/README.md),
+and [ADR-0010](../architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md).
+
+Caddy sets `X-Forwarded-For` / `X-Forwarded-Proto` / `X-Forwarded-Host` toward the backend
+and frontend. Session `Secure` remains env-driven (`AEGIS_SESSION_COOKIE_SECURE`); the proxy
+does not replace Phase 4 application auth.
 
 ## Testing (`tests/integration/`)
 

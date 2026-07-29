@@ -1,0 +1,21 @@
+# ACME / automatic HTTPS (AEGIS_TLS_MODE=acme).
+# Requires public DNS for AEGIS_TLS_FRONTEND_HOST and AEGIS_TLS_API_HOST and a reachable
+# NAS on 80/443 for issuance. Set AEGIS_TLS_ACME_EMAIL in .env.nas.
+# Issued material lives in the caddy_data volume — never commit PEMs.
+#
+# Caddy sets X-Forwarded-For / X-Forwarded-Proto / X-Forwarded-Host on reverse_proxy.
+# Application auth remains Phase 4 session cookies (no Basic Auth here).
+
+{
+	email {$AEGIS_TLS_ACME_EMAIL}
+}
+
+{$AEGIS_TLS_FRONTEND_HOST} {
+	encode gzip
+	reverse_proxy frontend:3000
+}
+
+{$AEGIS_TLS_API_HOST} {
+	encode gzip
+	reverse_proxy backend:8000
+}

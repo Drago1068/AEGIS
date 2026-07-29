@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Verify a live AEGIS NAS deployment (Phase 7). Distinct from package upload / deploy start.
+# Verify a live AEGIS NAS deployment (Phase 7 + optional Phase 9 TLS).
+# Distinct from package upload / deploy start.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,9 +20,29 @@ if [[ "${API}" == *replace-with-* || "${FRONTEND}" == *replace-with-* ]]; then
   exit 1
 fi
 
+if nas_tls_enabled; then
+  if [[ "${API}" != https://* || "${FRONTEND}" != https://* ]]; then
+    echo "error: TLS profile requires https:// verify URLs (API=${API}, FRONTEND=${FRONTEND})." >&2
+    exit 1
+  fi
+  secure="$(printf '%s' "${AEGIS_SESSION_COOKIE_SECURE:-}" | tr '[:upper:]' '[:lower:]')"
+  if [[ "${secure}" != "true" && "${secure}" != "1" ]]; then
+    echo "error: TLS profile requires AEGIS_SESSION_COOKIE_SECURE=true." >&2
+    exit 1
+  fi
+  echo "==> TLS profile enabled — verifying over HTTPS"
+fi
+
+CURL_INSECURE=()
+insecure="$(printf '%s' "${AEGIS_NAS_VERIFY_CURL_INSECURE:-false}" | tr '[:upper:]' '[:lower:]')"
+if [[ "${insecure}" == "true" || "${insecure}" == "1" || "${insecure}" == "yes" ]]; then
+  echo "NOTE: AEGIS_NAS_VERIFY_CURL_INSECURE set — curl will skip TLS certificate verification (lab only)."
+  CURL_INSECURE=(-k)
+fi
+
 http_status() {
   local url="$1"
-  curl -sS -o /dev/null -w "%{http_code}" --max-time 30 "${url}"
+  curl -sS "${CURL_INSECURE[@]}" -o /dev/null -w "%{http_code}" --max-time 30 "${url}"
 }
 
 assert_status() {
@@ -57,6 +78,9 @@ echo "==> Frontend reachability"
 fe_status="$(http_status "${FRONTEND}")"
 assert_status "GET ${FRONTEND}" "${fe_status}" 200 307 308 302
 
+mapfile -t COMPOSE_FILES < <(compose_nas_file_flags "${REPO_ROOT}")
+COMPOSE_FILE_ARGS="${COMPOSE_FILES[*]}"
+
 if [[ -n "${AEGIS_NAS_SSH_HOST:-}" \
    && "${AEGIS_NAS_SSH_HOST}" != replace-with-* \
    && "${AEGIS_NAS_SSH_HOST}" != your-* \
@@ -69,7 +93,7 @@ if [[ -n "${AEGIS_NAS_SSH_HOST:-}" \
   out="$(ssh "${SSH_ARGS[@]}" "${REMOTE}" bash -s <<EOF
 set -euo pipefail
 cd '${REMOTE_DIR}'
-docker compose -f docker-compose.yml -f docker/nas/docker-compose.nas.yml --env-file .env.nas --project-directory . exec -T backend alembic current
+docker compose ${COMPOSE_FILE_ARGS} --env-file .env.nas --project-directory . exec -T backend alembic current
 EOF
 )"
   echo "${out}"
@@ -80,9 +104,12 @@ EOF
   echo "OK  alembic current includes 0005 / head"
   echo
   echo "Log inspection guidance (run on NAS or via SSH):"
-  echo "  docker compose -f docker-compose.yml -f docker/nas/docker-compose.nas.yml --env-file .env.nas logs --tail=200 backend"
-  echo "  docker compose -f docker-compose.yml -f docker/nas/docker-compose.nas.yml --env-file .env.nas logs --tail=200 frontend"
-  echo "  docker compose -f docker-compose.yml -f docker/nas/docker-compose.nas.yml --env-file .env.nas ps"
+  echo "  docker compose ${COMPOSE_FILE_ARGS} --env-file .env.nas logs --tail=200 backend"
+  echo "  docker compose ${COMPOSE_FILE_ARGS} --env-file .env.nas logs --tail=200 frontend"
+  if nas_tls_enabled; then
+    echo "  docker compose ${COMPOSE_FILE_ARGS} --env-file .env.nas logs --tail=200 caddy"
+  fi
+  echo "  docker compose ${COMPOSE_FILE_ARGS} --env-file .env.nas ps"
 else
   echo
   echo "NOTE: SSH vars not fully set; skipped remote Alembic check."
@@ -91,5 +118,5 @@ else
 fi
 
 echo
-echo "Verification passed for HTTP checks against ${API} and ${FRONTEND}."
+echo "Verification passed for HTTP(S) checks against ${API} and ${FRONTEND}."
 echo "Upload/start alone is never sufficient; this verify step is the acceptance evidence."

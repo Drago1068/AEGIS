@@ -8,6 +8,14 @@
 # NAS package build output (image tarballs and staged transfer dirs)
 docker/nas/dist/
 
+# Operator-supplied TLS material for Phase 9 NAS proxy (never commit PEMs)
+docker/nas/proxy/certs/*
+!docker/nas/proxy/certs/.gitkeep
+!docker/nas/proxy/certs/README.md
+*.pem
+*.crt
+*.key
+
 # Python
 .venv/
 __pycache__/

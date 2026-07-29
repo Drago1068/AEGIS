@@ -1,0 +1,50 @@
+# Optional TLS reverse-proxy overlay for UGREEN NAS (Phase 9 / ADR-0010).
+#
+# Never use alone. Combine with the root compose file and the Phase 7 NAS overlay:
+#
+#   docker compose \
+#     -f docker-compose.yml \
+#     -f docker/nas/docker-compose.nas.yml \
+#     -f docker/nas/docker-compose.nas.tls.yml \
+#     --env-file .env.nas \
+#     --project-directory . \
+#     up -d
+#
+# Enable via AEGIS_NAS_TLS_ENABLED=true in .env.nas (scripts append this file).
+# Proxy terminates TLS and routes only — application session auth remains Phase 4.
+# See docker/nas/proxy/ and docs/architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md.
+
+name: ${AEGIS_NAS_COMPOSE_PROJECT_NAME:-aegis}
+
+services:
+  # Reach API/console only through Caddy when the TLS profile is active.
+  backend:
+    ports: !reset []
+
+  frontend:
+    ports: !reset []
+
+  caddy:
+    image: caddy:2.8-alpine
+    platform: linux/amd64
+    restart: always
+    ports:
+      - "${AEGIS_TLS_HTTPS_PORT:-443}:443"
+      - "${AEGIS_TLS_HTTP_PORT:-80}:80"
+    environment:
+      AEGIS_TLS_FRONTEND_HOST: ${AEGIS_TLS_FRONTEND_HOST:?Set AEGIS_TLS_FRONTEND_HOST in .env.nas}
+      AEGIS_TLS_API_HOST: ${AEGIS_TLS_API_HOST:?Set AEGIS_TLS_API_HOST in .env.nas}
+      AEGIS_TLS_ACME_EMAIL: ${AEGIS_TLS_ACME_EMAIL:-}
+    volumes:
+      # Paths are relative to this compose file's directory (docker/nas/).
+      - ${AEGIS_TLS_CADDYFILE:-./proxy/Caddyfile.files}:/etc/caddy/Caddyfile:ro
+      - ${AEGIS_TLS_CERTS_DIR:-./proxy/certs}:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -1,17 +1,20 @@
 <#
 .SYNOPSIS
-  Local dry-run for NAS packaging without a live NAS (Phase 7).
+  Local dry-run for NAS packaging without a live NAS (Phase 7 + optional Phase 9 TLS).
 
 .DESCRIPTION
   Validates the Compose overlay with `.env.nas.example` (or `.env.nas` if present).
+  Pass -Tls to force the Phase 9 TLS overlay dry-run (or set AEGIS_NAS_TLS_ENABLED=true).
   Optionally builds linux/amd64 images when -BuildImages is passed.
 
 .EXAMPLE
   .\docker\nas\scripts\validate-local.ps1
+  .\docker\nas\scripts\validate-local.ps1 -Tls
   .\docker\nas\scripts\validate-local.ps1 -BuildImages
 #>
 param(
-    [switch]$BuildImages
+    [switch]$BuildImages,
+    [switch]$Tls
 )
 
 Set-StrictMode -Version Latest
@@ -29,9 +32,12 @@ if (-not (Test-Path -LiteralPath $EnvFile)) {
     Write-Host "NOTE: .env.nas not found; using .env.nas.example for config dry-run only."
 }
 
-# For config dry-run with the example file, Compose required-var interpolation still needs
-# values present; the example file supplies placeholders (sufficient for `config`, not deploy).
-$composeArgs = @(
+Import-DotEnvFile -Path $EnvFile
+if ($Tls) {
+    $env:AEGIS_NAS_TLS_ENABLED = "true"
+}
+
+$baseComposeArgs = @(
     "-f", (Join-Path $RepoRoot "docker-compose.yml"),
     "-f", (Join-Path $RepoRoot "docker\nas\docker-compose.nas.yml"),
     "--env-file", $EnvFile,
@@ -39,15 +45,35 @@ $composeArgs = @(
 )
 
 Write-Host "==> docker compose config (NAS overlay)"
-& docker compose @composeArgs config --quiet
+& docker compose @baseComposeArgs config --quiet
 if ($LASTEXITCODE -ne 0) { throw "NAS overlay compose config failed" }
-Write-Host "OK  compose config"
+Write-Host "OK  compose config (base NAS overlay)"
+
+if (Test-NasTlsEnabled) {
+    Write-Host "==> TLS profile selected - validating material and TLS overlay config"
+    if ($UsingExample) {
+        Assert-TlsProfileReady -RepoRoot $RepoRoot -AllowExamplePlaceholders
+    } else {
+        Assert-TlsProfileReady -RepoRoot $RepoRoot
+    }
+    $tlsComposeArgs = @(
+        "-f", (Join-Path $RepoRoot "docker-compose.yml"),
+        "-f", (Join-Path $RepoRoot "docker\nas\docker-compose.nas.yml"),
+        "-f", (Join-Path $RepoRoot "docker\nas\docker-compose.nas.tls.yml"),
+        "--env-file", $EnvFile,
+        "--project-directory", $RepoRoot
+    )
+    & docker compose @tlsComposeArgs config --quiet
+    if ($LASTEXITCODE -ne 0) { throw "NAS TLS overlay compose config failed" }
+    Write-Host "OK  compose config (NAS + TLS overlay)"
+} else {
+    Write-Host "Skipped TLS overlay (set AEGIS_NAS_TLS_ENABLED=true or pass -Tls to validate)."
+}
 
 if ($BuildImages) {
     if ($UsingExample) {
         throw "Refusing amd64 image build with .env.nas.example placeholders. Copy to .env.nas, set real non-default secrets and NEXT_PUBLIC_API_BASE_URL, then re-run with -BuildImages."
     }
-    Import-DotEnvFile -Path $EnvFile
     Require-EnvVars -Names @(
         "NEXT_PUBLIC_API_BASE_URL",
         "AEGIS_CORS_ORIGINS",
@@ -55,7 +81,11 @@ if ($BuildImages) {
         "POSTGRES_PASSWORD"
     )
     Assert-NasSecretsNotPlaceholders
+    if (Test-NasTlsEnabled) {
+        Assert-TlsProfileReady -RepoRoot $RepoRoot
+    }
     Write-Host "==> Building linux/amd64 images (no push, no deploy)"
+    $composeArgs = Get-ComposeNasArgs -RepoRoot $RepoRoot -EnvFile $EnvFile
     & docker compose @composeArgs build
     if ($LASTEXITCODE -ne 0) { throw "NAS overlay image build failed" }
     Write-Host "OK  amd64 build"

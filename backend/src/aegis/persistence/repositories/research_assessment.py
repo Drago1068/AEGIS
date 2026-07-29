@@ -64,12 +64,8 @@ class ResearchAssessmentRepository:
 
 
 def _to_data(row: ResearchAssessmentSnapshot) -> ResearchAssessmentSnapshotData:
-    components_raw = row.components
-    components: dict[str, float] = {}
-    for key, value in components_raw.items():
-        if isinstance(value, bool) or not isinstance(value, int | float):
-            raise TypeError(f"component {key!r} must be numeric, got {type(value)!r}")
-        components[str(key)] = float(value)
+    # schema_version 2+ may include string/list provenance alongside numeric metrics.
+    components = {str(key): value for key, value in row.components.items()}
     return ResearchAssessmentSnapshotData(
         symbol=row.symbol,
         method_id=row.method_id,

@@ -179,6 +179,40 @@ class Settings(BaseSettings):
         ),
     )
 
+    research_multi_source_coverage_enabled: bool = Field(
+        default=True,
+        description=(
+            "When true, research assessments use method_version 2 multi-source coverage "
+            "weighting (preferred-source components + availability/agreement factors). "
+            "When false, preserve Phase 6 method_version 1 behavior. See ADR-0012."
+        ),
+    )
+    research_multi_source_close_tolerance: float = Field(
+        default=0.002,
+        gt=0,
+        description=(
+            "Relative close tolerance for multi-source agreement: "
+            "(max(closes)-min(closes))/max(closes) must be <= this value. See ADR-0012."
+        ),
+    )
+    research_multi_source_disagreement_fail_closed: bool = Field(
+        default=False,
+        description=(
+            "When true, fail closed if comparable multi-source agreement falls below the "
+            "documented floor (0.80). When false, only the soft agreement factor applies. "
+            "See ADR-0012."
+        ),
+    )
+    research_allow_cross_source_component_fill: bool = Field(
+        default=False,
+        description=(
+            "When false (default), component return/vol/index series require 20 usable "
+            "primary-quality bars from AEGIS_DAILY_BAR_PRIMARY_SOURCE only. When true, "
+            "missing dates may be filled from the secondary source (no OHLCV blend). "
+            "See ADR-0012."
+        ),
+    )
+
     operator_username: str = Field(
         default="operator",
         description=(

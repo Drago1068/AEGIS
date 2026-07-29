@@ -19,6 +19,7 @@ from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.domain.research_assessment import (
     ResearchAssessmentService,
     ResearchBarInput,
+    ResearchMultiSourceCoverageConfig,
 )
 from aegis.persistence.cache import check_redis
 from aegis.persistence.database import check_database
@@ -181,11 +182,20 @@ def build_research_assessment_service(
 ) -> ResearchAssessmentService:
     """Wire research assessment domain service for HTTP and scheduler paths."""
 
+    multi_source = ResearchMultiSourceCoverageConfig(
+        enabled=settings.research_multi_source_coverage_enabled,
+        primary_source=settings.daily_bar_primary_source,
+        secondary_source=settings.daily_bar_secondary_source,
+        close_tolerance=settings.research_multi_source_close_tolerance,
+        disagreement_fail_closed=settings.research_multi_source_disagreement_fail_closed,
+        allow_cross_source_component_fill=settings.research_allow_cross_source_component_fill,
+    )
     return ResearchAssessmentService(
         ResearchBarReaderAdapter(market_data_repository),
         snapshot_repository,
         calendar_name=settings.exchange_calendar_name,
         max_latest_bar_staleness_trading_days=settings.max_latest_bar_staleness_trading_days,
+        multi_source=multi_source,
     )
 
 

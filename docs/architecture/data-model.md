@@ -97,8 +97,8 @@ Phase 6 stores each successful on-demand research assessment as a new row. Colum
 | `state` | Always `research_only` in Phase 6 |
 | `coverage_confidence` | Input-quality confidence in `[0, 1]` |
 | `probability_confidence` | Always null in Phase 6 (not calibrated) |
-| `components` | JSONB research components (`total_return_20`, `realized_vol_20`, `research_index`) |
-| `schema_version` | Snapshot payload schema version |
+| `components` | JSONB research components (`total_return_20`, `realized_vol_20`, `research_index`; Phase 11 `schema_version` 2 may also include provenance / coverage factor fields — see ADR-0012) |
+| `schema_version` | Snapshot payload schema version (`1` Phase 6; `2` Phase 11 multi-source provenance) |
 | `input_source` | Provenance: market-data source id used for the bars |
 | `lookback_start_date` / `lookback_end_date` | Inclusive trading-date window of the 20 bars |
 | `bar_count` | Number of bars used in the assessment (20 on success) |

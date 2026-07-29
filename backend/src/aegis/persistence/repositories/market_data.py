@@ -74,16 +74,24 @@ class MarketDailyBarRepository:
         return len(inserted_ids)
 
     async def list_recent(
-        self, symbol: str, limit: int
+        self,
+        symbol: str,
+        limit: int,
+        *,
+        sources: list[str] | None = None,
     ) -> list[MarketDailyBarObservation]:
-        """Return up to ``limit`` most recent stored bars for ``symbol``, newest first."""
+        """Return up to ``limit`` most recent stored bars for ``symbol``, newest first.
 
-        stmt = (
-            select(MarketDailyBarObservation)
-            .where(MarketDailyBarObservation.symbol == symbol)
-            .order_by(MarketDailyBarObservation.trading_date.desc())
-            .limit(limit)
+        When ``sources`` is provided, only rows whose ``source`` is in that list are
+        returned (Phase 11 research multi-source reads).
+        """
+
+        stmt = select(MarketDailyBarObservation).where(
+            MarketDailyBarObservation.symbol == symbol
         )
+        if sources is not None:
+            stmt = stmt.where(MarketDailyBarObservation.source.in_(sources))
+        stmt = stmt.order_by(MarketDailyBarObservation.trading_date.desc()).limit(limit)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

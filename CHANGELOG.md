@@ -7,6 +7,34 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 11 - Multi-Source Coverage Weighting (Research-Only)
+
+Extends research assessment `coverage_confidence` with multi-source availability and
+agreement factors when multiple daily-bar sources exist for a symbol's lookback window.
+Component return/vol/index series stay single preferred source (no OHLCV blend).
+`probability_confidence` remains null; `state` remains `research_only`. See
+[docs/architecture/decisions/0012-phase-11-multi-source-coverage-weighting.md](docs/architecture/decisions/0012-phase-11-multi-source-coverage-weighting.md).
+
+#### Added
+
+- ADR-0012: method_version 2, preferred-source components, coverage formula, disagreement
+  floor (`0.80`), feature flag, provenance fields, out of scope.
+- Domain: multi-source factors on `daily_bar_research_v1`; optional cross-source component
+  fill (default off); optional disagreement fail-closed; schema_version 2 components
+  provenance.
+- Settings / `.env.example` / `.env.nas.example`:
+  `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED`,
+  `AEGIS_RESEARCH_MULTI_SOURCE_CLOSE_TOLERANCE`,
+  `AEGIS_RESEARCH_MULTI_SOURCE_DISAGREEMENT_FAIL_CLOSED`,
+  `AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL`.
+- Operator console: presentation-only factor / component-source fields when present.
+- Tests for single-source agreement=1, soft disagreement penalty, hard reject, and fill.
+
+#### Explicitly out of scope
+
+Calibration, blended bars, corrections, actionable promotion, orders, and live NAS deploy
+from this phase.
+
 ### Phase 10 - Second Daily-Bar Market-Data Provider (Polygon + failover)
 
 Adds Polygon.io daily aggregates as a second typed `DailyBarProvider`, with configuration-

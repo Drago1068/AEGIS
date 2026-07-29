@@ -1,4 +1,4 @@
-"""Unit tests for Phase 6 research-only assessment domain logic."""
+"""Unit tests for Phase 6 / Phase 11 research-only assessment domain logic."""
 
 from __future__ import annotations
 
@@ -11,10 +11,16 @@ import pytest
 from aegis.domain.research_assessment import (
     LOOKBACK_SESSIONS,
     METHOD_ID,
+    METHOD_VERSION_V1,
+    METHOD_VERSION_V2,
+    MULTI_SOURCE_AGREEMENT_FLOOR,
+    SCHEMA_VERSION_V1,
+    SCHEMA_VERSION_V2,
     STATE_RESEARCH_ONLY,
     ResearchAssessmentReason,
     ResearchAssessmentUnavailableError,
     ResearchBarInput,
+    ResearchMultiSourceCoverageConfig,
     assess_from_bars,
     compute_coverage_confidence,
     compute_realized_vol_20,
@@ -38,7 +44,6 @@ def _closes_to_bars(
 ) -> list[ResearchBarInput]:
     """Build chronological primary bars ending on ``end_date`` (must be a session day)."""
 
-    # Walk backward over calendar days collecting NYSE sessions for bar dates.
     from aegis.domain.calendars import is_trading_day
 
     session_dates: list[date] = []
@@ -68,6 +73,19 @@ def _closes_to_bars(
 
 def _twenty_rising_closes() -> list[Decimal]:
     return [Decimal(100 + i) for i in range(LOOKBACK_SESSIONS)]
+
+
+def _multi_source_config(**overrides: object) -> ResearchMultiSourceCoverageConfig:
+    defaults: dict[str, object] = {
+        "enabled": True,
+        "primary_source": "alpha_vantage",
+        "secondary_source": "polygon",
+        "close_tolerance": 0.002,
+        "disagreement_fail_closed": False,
+        "allow_cross_source_component_fill": False,
+    }
+    defaults.update(overrides)
+    return ResearchMultiSourceCoverageConfig(**defaults)  # type: ignore[arg-type]
 
 
 def test_is_usable_ohlcv_rejects_non_positive_close() -> None:
@@ -142,6 +160,20 @@ def test_coverage_confidence_product_formula() -> None:
     assert coverage_lag == pytest.approx(0.75)
 
 
+def test_coverage_confidence_includes_multi_source_factors() -> None:
+    coverage = compute_coverage_confidence(
+        usable_primary_bars=20,
+        total_bars_in_lookback_window=20,
+        latest_trading_date=_AS_OF,
+        calendar_name=_CALENDAR,
+        as_of=_AS_OF,
+        max_staleness_trading_days=3,
+        source_availability_factor=0.5,
+        source_agreement_factor=0.8,
+    )
+    assert coverage == pytest.approx(0.4)
+
+
 def test_assess_from_bars_success_is_research_only() -> None:
     bars = _closes_to_bars(_twenty_rising_closes())
     # API/readers supply newest-first
@@ -157,6 +189,8 @@ def test_assess_from_bars_success_is_research_only() -> None:
 
     assert snapshot.symbol == "AAPL"
     assert snapshot.method_id == METHOD_ID
+    assert snapshot.method_version == METHOD_VERSION_V1
+    assert snapshot.schema_version == SCHEMA_VERSION_V1
     assert snapshot.state == STATE_RESEARCH_ONLY
     assert snapshot.probability_confidence is None
     assert 0.0 <= snapshot.coverage_confidence <= 1.0
@@ -220,3 +254,169 @@ def test_assess_fails_closed_on_stale_latest_bar() -> None:
             computed_at=_COMPUTED_AT,
         )
     assert exc_info.value.reason is ResearchAssessmentReason.STALE_LATEST_BAR
+
+
+def test_multi_source_disabled_preserves_v1() -> None:
+    bars = _closes_to_bars(_twenty_rising_closes())
+    snapshot = assess_from_bars(
+        "AAPL",
+        list(reversed(bars)),
+        calendar_name=_CALENDAR,
+        max_latest_bar_staleness_trading_days=3,
+        as_of=_AS_OF,
+        computed_at=_COMPUTED_AT,
+        multi_source=_multi_source_config(enabled=False),
+    )
+    assert snapshot.method_version == METHOD_VERSION_V1
+    assert snapshot.schema_version == SCHEMA_VERSION_V1
+    assert "source_agreement_factor" not in snapshot.components
+
+
+def test_multi_source_single_source_agreement_is_one() -> None:
+    """comparable_dates==0 must not tank agreement (single-source install)."""
+
+    bars = _closes_to_bars(_twenty_rising_closes(), source="alpha_vantage")
+    snapshot = assess_from_bars(
+        "AAPL",
+        list(reversed(bars)),
+        calendar_name=_CALENDAR,
+        max_latest_bar_staleness_trading_days=3,
+        as_of=_AS_OF,
+        computed_at=_COMPUTED_AT,
+        multi_source=_multi_source_config(secondary_source=None),
+    )
+    assert snapshot.method_version == METHOD_VERSION_V2
+    assert snapshot.schema_version == SCHEMA_VERSION_V2
+    assert snapshot.probability_confidence is None
+    assert snapshot.state == STATE_RESEARCH_ONLY
+    assert snapshot.components["source_agreement_factor"] == pytest.approx(1.0)
+    assert snapshot.components["comparable_dates"] == 0
+    assert snapshot.components["component_source"] == "alpha_vantage"
+    assert snapshot.coverage_confidence == pytest.approx(1.0)
+
+
+def test_multi_source_agreeing_closes_keep_high_coverage() -> None:
+    primary = _closes_to_bars(_twenty_rising_closes(), source="alpha_vantage")
+    # Secondary closes within 0.1% of primary (OHLC kept consistent).
+    secondary = [
+        ResearchBarInput(
+            trading_date=bar.trading_date,
+            open=bar.close * Decimal("1.001"),
+            high=bar.close * Decimal("1.001"),
+            low=bar.close * Decimal("1.001"),
+            close=bar.close * Decimal("1.001"),
+            volume=bar.volume,
+            data_quality="primary",
+            source="polygon",
+        )
+        for bar in primary
+    ]
+    combined = list(reversed(primary + secondary))
+    snapshot = assess_from_bars(
+        "AAPL",
+        combined,
+        calendar_name=_CALENDAR,
+        max_latest_bar_staleness_trading_days=3,
+        as_of=_AS_OF,
+        computed_at=_COMPUTED_AT,
+        multi_source=_multi_source_config(),
+    )
+    assert snapshot.method_version == METHOD_VERSION_V2
+    assert snapshot.components["comparable_dates"] == LOOKBACK_SESSIONS
+    assert snapshot.components["agreeing_dates"] == LOOKBACK_SESSIONS
+    assert snapshot.components["source_agreement_factor"] == pytest.approx(1.0)
+    assert snapshot.components["component_source"] == "alpha_vantage"
+    # Components use primary closes only (no blend).
+    assert snapshot.components["total_return_20"] == pytest.approx(0.19)
+
+
+def test_multi_source_disagreement_soft_penalty() -> None:
+    primary = _closes_to_bars(_twenty_rising_closes(), source="alpha_vantage")
+    secondary = [
+        ResearchBarInput(
+            trading_date=bar.trading_date,
+            open=bar.close * Decimal("1.05"),
+            high=bar.close * Decimal("1.05"),
+            low=bar.close * Decimal("1.05"),
+            close=bar.close * Decimal("1.05"),  # 5% off >> 0.2% tolerance
+            volume=bar.volume,
+            data_quality="primary",
+            source="polygon",
+        )
+        for bar in primary
+    ]
+    snapshot = assess_from_bars(
+        "AAPL",
+        list(reversed(primary + secondary)),
+        calendar_name=_CALENDAR,
+        max_latest_bar_staleness_trading_days=3,
+        as_of=_AS_OF,
+        computed_at=_COMPUTED_AT,
+        multi_source=_multi_source_config(disagreement_fail_closed=False),
+    )
+    assert snapshot.components["source_agreement_factor"] == pytest.approx(0.0)
+    assert snapshot.coverage_confidence == pytest.approx(0.0)
+
+
+def test_multi_source_disagreement_fail_closed() -> None:
+    primary = _closes_to_bars(_twenty_rising_closes(), source="alpha_vantage")
+    secondary = [
+        ResearchBarInput(
+            trading_date=bar.trading_date,
+            open=bar.close * Decimal("1.05"),
+            high=bar.close * Decimal("1.05"),
+            low=bar.close * Decimal("1.05"),
+            close=bar.close * Decimal("1.05"),
+            volume=bar.volume,
+            data_quality="primary",
+            source="polygon",
+        )
+        for bar in primary
+    ]
+    with pytest.raises(ResearchAssessmentUnavailableError) as exc_info:
+        assess_from_bars(
+            "AAPL",
+            list(reversed(primary + secondary)),
+            calendar_name=_CALENDAR,
+            max_latest_bar_staleness_trading_days=3,
+            as_of=_AS_OF,
+            computed_at=_COMPUTED_AT,
+            multi_source=_multi_source_config(disagreement_fail_closed=True),
+        )
+    assert exc_info.value.reason is ResearchAssessmentReason.MULTI_SOURCE_DISAGREEMENT
+    assert pytest.approx(0.80) == MULTI_SOURCE_AGREEMENT_FLOOR
+
+
+def test_multi_source_prefers_primary_rejects_secondary_only_without_fill() -> None:
+    secondary_only = _closes_to_bars(_twenty_rising_closes(), source="polygon")
+    with pytest.raises(ResearchAssessmentUnavailableError) as exc_info:
+        assess_from_bars(
+            "AAPL",
+            list(reversed(secondary_only)),
+            calendar_name=_CALENDAR,
+            max_latest_bar_staleness_trading_days=3,
+            as_of=_AS_OF,
+            computed_at=_COMPUTED_AT,
+            multi_source=_multi_source_config(allow_cross_source_component_fill=False),
+        )
+    assert exc_info.value.reason is ResearchAssessmentReason.INSUFFICIENT_PRIMARY_BARS
+
+
+def test_multi_source_cross_source_fill_when_enabled() -> None:
+    primary_partial = _closes_to_bars(
+        _twenty_rising_closes()[:10], source="alpha_vantage"
+    )
+    # Secondary covers full 20 sessions; fill uses secondary for missing primary dates.
+    secondary_full = _closes_to_bars(_twenty_rising_closes(), source="polygon")
+    snapshot = assess_from_bars(
+        "AAPL",
+        list(reversed(primary_partial + secondary_full)),
+        calendar_name=_CALENDAR,
+        max_latest_bar_staleness_trading_days=3,
+        as_of=_AS_OF,
+        computed_at=_COMPUTED_AT,
+        multi_source=_multi_source_config(allow_cross_source_component_fill=True),
+    )
+    assert snapshot.method_version == METHOD_VERSION_V2
+    assert snapshot.components["component_source"] == "mixed"
+    assert snapshot.probability_confidence is None

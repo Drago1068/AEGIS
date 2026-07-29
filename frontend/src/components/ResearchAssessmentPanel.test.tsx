@@ -117,4 +117,29 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/no research assessment stored yet/i)).toBeInTheDocument();
     });
   });
+
+  it("renders Phase 11 multi-source provenance fields from the API payload", () => {
+    const v2 = {
+      ...sampleAssessment,
+      method_version: 2,
+      schema_version: 2,
+      components: {
+        ...sampleAssessment.components,
+        component_source: "alpha_vantage",
+        coverage_sources: ["alpha_vantage", "polygon"],
+        comparable_dates: 20,
+        agreeing_dates: 18,
+        source_availability_factor: 1,
+        source_agreement_factor: 0.9,
+        bar_count_factor: 1,
+        freshness_factor: 1,
+        primary_fraction: 1,
+      },
+    };
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={v2} />);
+
+    expect(screen.getByText("daily_bar_research_v1 v2")).toBeInTheDocument();
+    expect(screen.getByText("alpha_vantage")).toBeInTheDocument();
+    expect(screen.getByText(/0\.9000 \(18\/20 comparable\)/)).toBeInTheDocument();
+  });
 });

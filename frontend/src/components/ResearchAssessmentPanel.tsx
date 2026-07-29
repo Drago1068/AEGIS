@@ -142,15 +142,15 @@ export function ResearchAssessmentPanel({
             </div>
             <div>
               <dt className="text-aegis-muted">total_return_20</dt>
-              <dd className="font-mono">{latest.components.total_return_20}</dd>
+              <dd className="font-mono">{String(latest.components.total_return_20)}</dd>
             </div>
             <div>
               <dt className="text-aegis-muted">realized_vol_20</dt>
-              <dd className="font-mono">{latest.components.realized_vol_20}</dd>
+              <dd className="font-mono">{String(latest.components.realized_vol_20)}</dd>
             </div>
             <div>
               <dt className="text-aegis-muted">research_index</dt>
-              <dd className="font-mono">{latest.components.research_index}</dd>
+              <dd className="font-mono">{String(latest.components.research_index)}</dd>
             </div>
             <div>
               <dt className="text-aegis-muted">Lookback</dt>
@@ -159,6 +159,32 @@ export function ResearchAssessmentPanel({
                 {latest.bar_count} bars)
               </dd>
             </div>
+            {typeof latest.components.component_source === "string" ? (
+              <div>
+                <dt className="text-aegis-muted">Component source</dt>
+                <dd className="font-mono">{latest.components.component_source}</dd>
+              </div>
+            ) : null}
+            {typeof latest.components.source_availability_factor === "number" ? (
+              <div>
+                <dt className="text-aegis-muted">Source availability factor</dt>
+                <dd className="font-mono">
+                  {latest.components.source_availability_factor.toFixed(4)}
+                </dd>
+              </div>
+            ) : null}
+            {typeof latest.components.source_agreement_factor === "number" ? (
+              <div>
+                <dt className="text-aegis-muted">Source agreement factor</dt>
+                <dd className="font-mono">
+                  {latest.components.source_agreement_factor.toFixed(4)}
+                  {typeof latest.components.agreeing_dates === "number" &&
+                  typeof latest.components.comparable_dates === "number"
+                    ? ` (${latest.components.agreeing_dates}/${latest.components.comparable_dates} comparable)`
+                    : null}
+                </dd>
+              </div>
+            ) : null}
           </dl>
           <p className="text-xs text-aegis-muted">
             Computed at {latest.computed_at} from source {latest.input_source}. Research

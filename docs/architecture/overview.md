@@ -12,7 +12,8 @@ starting in Phase 1 (market data ingestion), Phase 2 (scheduled ingestion and a
 database-backed watchlist), Phase 3 (operator console over those APIs), Phase 4
 (operator session authentication), Phase 5 (daily-bar charts on the operator console),
 Phase 6 (research-only assessments over stored daily bars), Phase 7 (UGREEN NAS
-deployment packaging), and Phase 8 (automatic research assessments after successful ingest).
+deployment packaging), Phase 8 (automatic research assessments after successful ingest),
+Phase 10 (second daily-bar provider), and Phase 11 (multi-source coverage weighting).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -22,6 +23,9 @@ deployment (see
 [decisions/0008-phase-7-nas-deployment.md](decisions/0008-phase-7-nas-deployment.md)).
 Phase 8 reuses Phase 6 method `daily_bar_research_v1` after ingest (see
 [decisions/0009-phase-8-scheduled-research.md](decisions/0009-phase-8-scheduled-research.md)).
+Phase 11 bumps that method to `method_version` 2 for multi-source coverage factors without
+blending OHLCV (see
+[decisions/0012-phase-11-multi-source-coverage-weighting.md](decisions/0012-phase-11-multi-source-coverage-weighting.md)).
 
 ## System context
 
@@ -60,14 +64,16 @@ compute and append research-only snapshots from stored primary daily bars. As of
 when `AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` is true, the same method also runs after
 each successful locked scheduled ingest (inside the ingest lock) and after successful
 on-demand `POST /market-data/ingest` (stored bars only; fail-closed skips log and persist
-nothing). See
+nothing). As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
+assessments use `method_version` 2 multi-source coverage weighting (ADR-0012). See
 [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md),
 [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md),
 [decisions/0005-phase-4-operator-auth.md](decisions/0005-phase-4-operator-auth.md),
 [decisions/0007-phase-6-research-only-scoring.md](decisions/0007-phase-6-research-only-scoring.md),
 [decisions/0009-phase-8-scheduled-research.md](decisions/0009-phase-8-scheduled-research.md),
+[decisions/0011-phase-10-second-market-data-provider.md](decisions/0011-phase-10-second-market-data-provider.md),
 and
-[decisions/0011-phase-10-second-market-data-provider.md](decisions/0011-phase-10-second-market-data-provider.md).
+[decisions/0012-phase-11-multi-source-coverage-weighting.md](decisions/0012-phase-11-multi-source-coverage-weighting.md).
 
 ## Backend module boundaries (`backend/src/aegis/`)
 
@@ -122,7 +128,9 @@ flowchart TB
   `research_assessment.py` implements method `daily_bar_research_v1` (research-only
   components + coverage confidence; never recommendations or actionable promotion). As of
   Phase 8: `scheduled_research.py` orchestrates per-symbol post-ingest assessments
-  (fail-closed skips; no new scoring method).
+  (fail-closed skips; no new scoring method). As of Phase 11: the same method gains
+  `method_version` 2 multi-source availability/agreement coverage factors (ADR-0012;
+  preferred-source components; no OHLCV blend).
 - **`persistence/`**: SQLAlchemy 2.x models, repository classes, and Alembic migrations
   (`backend/alembic/`). Owns all direct database access. Enforces append-only, versioned,
   timestamped, provenance-aware storage for market observations (see
@@ -155,7 +163,9 @@ flowchart TB
   fed only by authenticated `listDailyBars`. As of Phase 6: a `ResearchAssessmentPanel`
   requests and displays research-only API payloads (no client-side research math). As of
   Phase 8: the panel notes that snapshots may also appear after successful ingest when
-  configured. No recommendation or trading components exist.
+  configured. As of Phase 11: the panel surfaces multi-source coverage factor fields when
+  present in the API payload (presentation only). No recommendation or trading components
+  exist.
 - `components/`: interactive console panels (`WatchlistPanel`, `IngestPanel`,
   `ResearchAssessmentPanel`), presentational tables (`DailyBarsTable`), and chart
   presentation (`DailyBarsChart`). Mutations stay in Client Components; initial reads use
@@ -224,3 +234,7 @@ work on the NAS without changing Phase 4 application auth. See
 - [decisions/0010-phase-9-nas-tls-reverse-proxy.md](decisions/0010-phase-9-nas-tls-reverse-proxy.md):
   Phase 9 NAS TLS reverse-proxy packaging ADR (optional Caddy overlay, Secure cookies,
   operator PEMs and/or ACME, no proxy Basic Auth).
+- [decisions/0011-phase-10-second-market-data-provider.md](decisions/0011-phase-10-second-market-data-provider.md):
+  Phase 10 second daily-bar provider ADR (Polygon + primary/failover).
+- [decisions/0012-phase-11-multi-source-coverage-weighting.md](decisions/0012-phase-11-multi-source-coverage-weighting.md):
+  Phase 11 multi-source coverage weighting ADR (research-only; no blended bars).

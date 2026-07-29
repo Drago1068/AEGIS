@@ -54,6 +54,18 @@ non-functional development placeholder.
 | --- | --- | --- |
 | `AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` | When `true`, after each successful locked scheduled ingest and after each successful on-demand `POST /market-data/ingest`, run Phase 6 `daily_bar_research_v1` for active watchlist symbols (stored bars only; fail-closed skips persist nothing). When `false`, Phase 6 on-demand `POST /research/{symbol}/assessments` is unchanged. Local and NAS example default `true`. See [ADR-0009](../architecture/decisions/0009-phase-8-scheduled-research.md). | `true` |
 
+## Backend: Phase 11 multi-source coverage weighting (`aegis.config.settings.Settings`)
+
+Research-only. Does not blend OHLCV or set `probability_confidence`. See
+[ADR-0012](../architecture/decisions/0012-phase-11-multi-source-coverage-weighting.md).
+
+| Variable | Description | Development default |
+| --- | --- | --- |
+| `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` | When `true`, assessments use `method_version` 2 with source availability/agreement factors and preferred-source component series. When `false`, preserve Phase 6 `method_version` 1. | `true` |
+| `AEGIS_RESEARCH_MULTI_SOURCE_CLOSE_TOLERANCE` | Relative close tolerance for agreement: `(max-min)/max` of usable closes on a comparable date. | `0.002` |
+| `AEGIS_RESEARCH_MULTI_SOURCE_DISAGREEMENT_FAIL_CLOSED` | When `true`, fail closed if agreement factor is below the documented floor (`0.80`) when comparable dates exist. When `false`, only the soft product penalty applies. | `false` |
+| `AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL` | When `false`, component series require 20 usable primary-quality bars from `AEGIS_DAILY_BAR_PRIMARY_SOURCE` only. When `true`, missing dates may be filled from the secondary source (no OHLCV blend). | `false` |
+
 ## Backend: Phase 4 operator authentication (`aegis.config.settings.Settings`)
 
 | Variable | Description | Development default |

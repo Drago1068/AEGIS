@@ -69,13 +69,14 @@ export interface ResearchAssessment {
   event_time: string;
   computed_at: string;
   coverage_confidence: number;
-  /** Always null in Phase 6 (not calibrated). Never merge with coverage_confidence. */
+  /** Always null (not calibrated). Never merge with coverage_confidence. */
   probability_confidence: number | null;
+  /** Research metrics plus optional Phase 11 provenance / factor fields (schema_version 2). */
   components: {
     total_return_20: number;
     realized_vol_20: number;
     research_index: number;
-    [key: string]: number;
+    [key: string]: unknown;
   };
   schema_version: number;
   input_source: string;

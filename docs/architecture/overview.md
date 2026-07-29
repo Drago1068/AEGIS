@@ -14,7 +14,8 @@ database-backed watchlist), Phase 3 (operator console over those APIs), Phase 4
 Phase 6 (research-only assessments over stored daily bars), Phase 7 (UGREEN NAS
 deployment packaging), Phase 8 (automatic research assessments after successful ingest),
 Phase 10 (second daily-bar provider), and Phase 11 (multi-source coverage weighting),
-Phase 12 (provider historical corrections on daily-bar observations).
+Phase 12 (provider historical corrections on daily-bar observations), Phase 13 (research
+outcome labels), and Phase 14 (scheduled outcome labeling after assessments).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -29,6 +30,10 @@ blending OHLCV (see
 [decisions/0012-phase-11-multi-source-coverage-weighting.md](decisions/0012-phase-11-multi-source-coverage-weighting.md)).
 Phase 12 adds append-only provider correction rows and current-bar reads (see
 [decisions/0013-phase-12-provider-historical-corrections.md](decisions/0013-phase-12-provider-historical-corrections.md)).
+Phase 13 adds append-only forward-return outcome labels (see
+[decisions/0014-phase-13-research-outcome-labels.md](decisions/0014-phase-13-research-outcome-labels.md)).
+Phase 14 automates outcome labeling after successful assessments when enabled (see
+[decisions/0015-phase-14-scheduled-outcome-labels.md](decisions/0015-phase-14-scheduled-outcome-labels.md)).
 
 ## System context
 
@@ -67,7 +72,9 @@ compute and append research-only snapshots from stored primary daily bars. As of
 when `AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` is true, the same method also runs after
 each successful locked scheduled ingest (inside the ingest lock) and after successful
 on-demand `POST /market-data/ingest` (stored bars only; fail-closed skips log and persist
-nothing). As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
+nothing). As of Phase 14, when `AEGIS_RESEARCH_OUTCOME_LABEL_AFTER_ASSESSMENT_ENABLED` is
+true, successful assessments from those paths also attempt Phase 13 outcome labels inside the
+same scheduled ingest lock (ADR-0015). As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
 assessments use `method_version` 2 multi-source coverage weighting (ADR-0012). See
 [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md),
 [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md),

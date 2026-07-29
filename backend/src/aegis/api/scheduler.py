@@ -7,7 +7,8 @@ lock-and-run decision logic lives in ``aegis.domain.scheduled_ingestion``, which
 framework-free and independently unit tested; this module only wires real objects into it,
 mirroring ``aegis.api.dependencies``. See
 ``docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md`` and
-``docs/architecture/decisions/0009-phase-8-scheduled-research.md``.
+``docs/architecture/decisions/0009-phase-8-scheduled-research.md`` and
+``docs/architecture/decisions/0015-phase-14-scheduled-outcome-labels.md``.
 """
 
 from __future__ import annotations
@@ -20,12 +21,16 @@ from apscheduler.schedulers.asyncio import (  # pyright: ignore[reportMissingTyp
 from apscheduler.triggers.cron import CronTrigger  # pyright: ignore[reportMissingTypeStubs]
 from fastapi import FastAPI
 
-from aegis.api.dependencies import build_research_assessment_service
+from aegis.api.dependencies import (
+    build_outcome_label_service,
+    build_research_assessment_service,
+)
 from aegis.api.ingestion_wiring import build_market_data_ingestion_service
 from aegis.config.settings import Settings
 from aegis.domain.scheduled_ingestion import run_locked_ingestion_cycle
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
 from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
+from aegis.persistence.repositories.research_outcome_labels import ResearchOutcomeLabelRepository
 from aegis.persistence.repositories.watchlist import WatchlistRepository
 
 logger = logging.getLogger(__name__)
@@ -44,10 +49,22 @@ async def run_scheduled_ingestion_job(app: FastAPI) -> None:
             settings, app.state.http_client, market_data_repository
         )
         research_service = None
+        outcome_label_service = None
+        assessment_repository = ResearchAssessmentRepository(session)
         if settings.research_schedule_after_ingest_enabled:
             research_service = build_research_assessment_service(
                 market_data_repository,
-                ResearchAssessmentRepository(session),
+                assessment_repository,
+                settings,
+            )
+        if (
+            settings.research_outcome_label_after_assessment_enabled
+            and research_service is not None
+        ):
+            outcome_label_service = build_outcome_label_service(
+                market_data_repository,
+                assessment_repository,
+                ResearchOutcomeLabelRepository(session),
                 settings,
             )
         await run_locked_ingestion_cycle(
@@ -58,6 +75,7 @@ async def run_scheduled_ingestion_job(app: FastAPI) -> None:
             seed_symbols=settings.watchlist_seed_symbols,
             ingestion_service=ingestion_service,
             research_service=research_service,
+            outcome_label_service=outcome_label_service,
         )
 
 

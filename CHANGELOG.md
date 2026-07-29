@@ -7,6 +7,24 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 14 - Scheduled Outcome Labels After Research Assessments
+
+Automatic Phase 13 `forward_total_return_v1` labeling after successful research assessments
+from post-ingest research and on-demand assessment creation. Fail-closed skips log and persist
+nothing; `probability_confidence` remains null. See
+[docs/architecture/decisions/0015-phase-14-scheduled-outcome-labels.md](docs/architecture/decisions/0015-phase-14-scheduled-outcome-labels.md).
+
+#### Added
+
+- ADR-0015: `AEGIS_RESEARCH_OUTCOME_LABEL_AFTER_ASSESSMENT_ENABLED` (local and NAS example
+  default `true`); domain orchestration `scheduled_outcome_labels`; wiring in scheduled ingest
+  lock, on-demand ingest, and on-demand assessment paths.
+- Post-ingest research summary now carries persisted `assessment_snapshot_id` for labeling.
+
+#### Explicitly out of scope
+
+Probability calibration, actionable promotion, orders, and new label methods.
+
 ### Phase 13 - Research Outcome Labels (Calibration Evidence Prep)
 
 Append-only forward-return outcome labels linked to research assessment snapshots.
@@ -23,7 +41,8 @@ probabilities. See
 
 #### Explicitly out of scope
 
-Probability calibration, actionable promotion, orders, and automatic post-assessment labeling.
+Probability calibration, actionable promotion, orders. Automatic post-assessment labeling is
+added in Phase 14 (ADR-0015).
 
 ### Phase 12 - Provider Historical Corrections (Append-Only)
 

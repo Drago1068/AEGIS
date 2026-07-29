@@ -18,6 +18,7 @@ from aegis.domain.scheduled_research import run_research_after_ingest
 
 def _snapshot(symbol: str = "AAPL") -> ResearchAssessmentSnapshotData:
     return ResearchAssessmentSnapshotData(
+        id=1,
         symbol=symbol,
         method_id=METHOD_ID,
         method_version=1,
@@ -67,6 +68,7 @@ async def test_run_research_after_ingest_persists_per_symbol() -> None:
     assert summary.skipped_count == 0
     assert all(outcome.persisted for outcome in summary.outcomes)
     assert all(outcome.reason is None for outcome in summary.outcomes)
+    assert all(outcome.assessment_snapshot_id == 1 for outcome in summary.outcomes)
 
 
 @pytest.mark.asyncio

@@ -7,10 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 13 (research outcome labels).** Append-only forward-return labels
-linked to assessment snapshots for future calibration evidence; not calibrated probability.
+**Current phase: Phase 14 (scheduled outcome labels after research assessments).** Automatic
+Phase 13 labeling after successful assessments when enabled; fail-closed skips persist nothing.
 See
-[docs/architecture/decisions/0014-phase-13-research-outcome-labels.md](docs/architecture/decisions/0014-phase-13-research-outcome-labels.md)
+[docs/architecture/decisions/0015-phase-14-scheduled-outcome-labels.md](docs/architecture/decisions/0015-phase-14-scheduled-outcome-labels.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

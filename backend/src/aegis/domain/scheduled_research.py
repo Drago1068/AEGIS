@@ -36,6 +36,7 @@ class ResearchAfterIngestSymbolOutcome:
 
     symbol: str
     persisted: bool
+    assessment_snapshot_id: int | None = None
     reason: str | None = None
     detail: str | None = None
 
@@ -70,7 +71,7 @@ async def run_research_after_ingest(
     for symbol in symbols:
         normalized = symbol.upper()
         try:
-            await service.assess(normalized)
+            snapshot = await service.assess(normalized)
         except ResearchAssessmentUnavailableError as exc:
             logger.info(
                 "research_after_ingest_skipped",
@@ -104,7 +105,13 @@ async def run_research_after_ingest(
             )
             continue
 
-        outcomes.append(ResearchAfterIngestSymbolOutcome(symbol=normalized, persisted=True))
+        outcomes.append(
+            ResearchAfterIngestSymbolOutcome(
+                symbol=normalized,
+                persisted=True,
+                assessment_snapshot_id=snapshot.id,
+            )
+        )
 
     summary = ResearchAfterIngestSummary(outcomes=tuple(outcomes))
     logger.info(

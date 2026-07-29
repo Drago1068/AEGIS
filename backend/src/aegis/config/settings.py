@@ -188,6 +188,17 @@ class Settings(BaseSettings):
         ),
     )
 
+    research_outcome_label_after_assessment_enabled: bool = Field(
+        default=True,
+        description=(
+            "When true, after each successful research assessment from post-ingest research "
+            "(when enabled) or on-demand POST /research/{symbol}/assessments, attempt Phase "
+            "13 forward_total_return_v1 outcome labels (stored bars only). Fail-closed skips "
+            "log and persist nothing (e.g. insufficient forward bars). When false, Phase 13 "
+            "on-demand POST .../outcome-labels is unchanged. See ADR-0015."
+        ),
+    )
+
     research_multi_source_coverage_enabled: bool = Field(
         default=True,
         description=(

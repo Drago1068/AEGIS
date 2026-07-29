@@ -54,9 +54,12 @@ nothing**. Reasons include `assessment_not_found`, `no_as_of_bar`,
 
 ### 5. Trigger
 
-On-demand only: `POST /research/{symbol}/assessments/{assessment_id}/outcome-labels`.
-Read: `GET .../outcome-labels/latest` (newest label for that assessment id). No scheduler
-hook in Phase 13.
+On-demand: `POST /research/{symbol}/assessments/{assessment_id}/outcome-labels`.
+Read: `GET .../outcome-labels/latest` (newest label for that assessment id).
+
+Phase 14 (ADR-0015) adds optional automatic labeling after successful assessments when
+`AEGIS_RESEARCH_OUTCOME_LABEL_AFTER_ASSESSMENT_ENABLED` is true; fail-closed skips on that
+path log and persist nothing without failing the assessment response.
 
 ### 6. Auth
 
@@ -71,9 +74,10 @@ label math.
 
 - Non-null `probability_confidence` / calibration fitting
 - Actionable promotion, recommendations, orders
-- Automatic labeling after ingest or assessment
 - Portfolio or cross-symbol analytics
 - Live NAS deployment
+
+(Automatic post-assessment labeling is Phase 14; see ADR-0015.)
 
 ## Related documents
 

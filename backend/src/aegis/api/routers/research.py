@@ -6,9 +6,10 @@ placement. Assessments are fail-closed: gate failures return HTTP 422 and persis
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from aegis.api.dependencies import (
+    build_outcome_label_service,
     get_outcome_label_service,
     get_research_assessment_service,
     require_operator,
@@ -23,6 +24,10 @@ from aegis.domain.research_outcome_labels import (
     OutcomeLabelService,
     OutcomeLabelUnavailableError,
 )
+from aegis.domain.scheduled_outcome_labels import try_label_assessment_after_create
+from aegis.persistence.repositories.market_data import MarketDailyBarRepository
+from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
+from aegis.persistence.repositories.research_outcome_labels import ResearchOutcomeLabelRepository
 
 router = APIRouter(
     prefix="/research",
@@ -37,6 +42,7 @@ router = APIRouter(
     status_code=status.HTTP_200_OK,
 )
 async def create_research_assessment(
+    request: Request,
     symbol: str,
     service: ResearchAssessmentService = Depends(get_research_assessment_service),
 ) -> ResearchAssessmentResponse:
@@ -49,6 +55,17 @@ async def create_research_assessment(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail={"reason": exc.reason.value, "message": exc.detail},
         ) from exc
+    settings = request.app.state.settings
+    if settings.research_outcome_label_after_assessment_enabled:
+        async with request.app.state.db_session_factory() as session:
+            market_data_repository = MarketDailyBarRepository(session)
+            outcome_label_service = build_outcome_label_service(
+                market_data_repository,
+                ResearchAssessmentRepository(session),
+                ResearchOutcomeLabelRepository(session),
+                settings,
+            )
+            await try_label_assessment_after_create(snapshot, outcome_label_service)
     return ResearchAssessmentResponse.model_validate(snapshot)
 
 

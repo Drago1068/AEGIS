@@ -14,7 +14,10 @@ cookie sessions (Redis + httpOnly cookie); `/health` and `/ready` stay public. P
 authenticated research-only assessment routes under `/research/{symbol}/assessments` (method
 `daily_bar_research_v1`, append-only snapshots, fail-closed gates). Phase 8 runs that same
 method after successful locked scheduled ingest (and after on-demand ingest when
-`AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` is true), using stored bars only. Phase 10 adds
+`AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` is true), using stored bars only. Phase 13 adds
+on-demand forward-return outcome labels (`forward_total_return_v1`; ADR-0014). Phase 14 runs
+those labels automatically after successful assessments when
+`AEGIS_RESEARCH_OUTCOME_LABEL_AFTER_ASSESSMENT_ENABLED` is true (ADR-0015). Phase 10 adds
 Polygon.io daily aggregates and config-driven primary/failover (ADR-0011). Phase 11 extends
 research `coverage_confidence` with multi-source availability/agreement factors
 (`method_version` 2; no OHLCV blend; ADR-0012). See

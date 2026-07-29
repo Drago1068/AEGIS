@@ -241,7 +241,22 @@ async def get_outcome_label_service(
 ) -> OutcomeLabelService:
     """Wire outcome label service to assessment store, bars, and label persistence."""
 
-    settings = request.app.state.settings
+    return build_outcome_label_service(
+        market_data_repository,
+        assessment_repository,
+        label_repository,
+        request.app.state.settings,
+    )
+
+
+def build_outcome_label_service(
+    market_data_repository: MarketDailyBarRepository,
+    assessment_repository: ResearchAssessmentRepository,
+    label_repository: ResearchOutcomeLabelRepository,
+    settings: Settings,
+) -> OutcomeLabelService:
+    """Wire outcome label domain service for HTTP and scheduler paths."""
+
     return OutcomeLabelService(
         assessment_repository,
         ResearchBarReaderAdapter(market_data_repository),

@@ -15,6 +15,7 @@ import logging
 from typing import Protocol
 
 from aegis.domain.market_data_ingestion import IngestionRunResult
+from aegis.domain.scheduled_outcome_labels import OutcomeLabeler, run_outcome_labels_after_research
 from aegis.domain.scheduled_research import ResearchAssessor, run_research_after_ingest
 
 logger = logging.getLogger(__name__)
@@ -64,6 +65,7 @@ async def run_locked_ingestion_cycle(
     seed_symbols: list[str],
     ingestion_service: IngestionRunner,
     research_service: ResearchAssessor | None = None,
+    outcome_label_service: OutcomeLabeler | None = None,
 ) -> IngestionRunResult | None:
     """Run one ingestion cycle over the active watchlist, guarded by a distributed lock.
 
@@ -75,6 +77,10 @@ async def run_locked_ingestion_cycle(
     When ``research_service`` is provided (Phase 8), research assessments run **inside the
     same lock** after ingest succeeds and before release, using stored bars only. Pass
     ``None`` when ``AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED`` is false.
+
+    When ``outcome_label_service`` is also provided (Phase 14), outcome labels run immediately
+    after each successful post-ingest assessment inside the same lock. Pass ``None`` when
+    ``AEGIS_RESEARCH_OUTCOME_LABEL_AFTER_ASSESSMENT_ENABLED`` is false.
     """
 
     acquired = await redis_client.set(lock_key, _LOCK_VALUE, nx=True, ex=lock_ttl_seconds)
@@ -98,7 +104,9 @@ async def run_locked_ingestion_cycle(
             },
         )
         if research_service is not None:
-            await run_research_after_ingest(symbols, research_service)
+            research_summary = await run_research_after_ingest(symbols, research_service)
+            if outcome_label_service is not None:
+                await run_outcome_labels_after_research(research_summary, outcome_label_service)
         return run_result
     finally:
         try:

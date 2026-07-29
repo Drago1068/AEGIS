@@ -75,6 +75,7 @@ class FakeResearchService:
         if self._redis is not None:
             self.lock_held_during_assess = self._redis.is_locked
         return ResearchAssessmentSnapshotData(
+            id=1,
             symbol=symbol,
             method_id=METHOD_ID,
             method_version=1,
@@ -95,6 +96,22 @@ class FakeResearchService:
             lookback_end_date=date(2024, 1, 26),
             bar_count=20,
         )
+
+
+class FakeOutcomeLabelService:
+    def __init__(self) -> None:
+        self.label_calls: list[tuple[str, int]] = []
+        self.lock_held_during_label: bool | None = None
+        self._redis: FakeRedis | None = None
+
+    def bind_redis(self, redis_client: FakeRedis) -> None:
+        self._redis = redis_client
+
+    async def label_assessment(self, symbol: str, assessment_snapshot_id: int) -> object:
+        self.label_calls.append((symbol, assessment_snapshot_id))
+        if self._redis is not None:
+            self.lock_held_during_label = self._redis.is_locked
+        return {"id": 1}
 
 
 def _run_result(symbol: str = "AAPL") -> IngestionRunResult:
@@ -221,6 +238,34 @@ async def test_research_not_run_when_service_omitted() -> None:
     )
 
     assert result is not None
+    assert redis_client.delete_calls == [_LOCK_KEY]
+
+
+@pytest.mark.asyncio
+async def test_outcome_labels_run_inside_lock_after_research() -> None:
+    redis_client = FakeRedis()
+    watchlist = FakeWatchlist(["AAPL"])
+    service = FakeIngestionService(_run_result())
+    research = FakeResearchService()
+    research.bind_redis(redis_client)
+    labels = FakeOutcomeLabelService()
+    labels.bind_redis(redis_client)
+
+    result = await run_locked_ingestion_cycle(
+        redis_client=redis_client,
+        lock_key=_LOCK_KEY,
+        lock_ttl_seconds=_LOCK_TTL,
+        watchlist=watchlist,
+        seed_symbols=[],
+        ingestion_service=service,
+        research_service=research,
+        outcome_label_service=labels,
+    )
+
+    assert result is not None
+    assert research.assess_calls == ["AAPL"]
+    assert labels.label_calls == [("AAPL", 1)]
+    assert labels.lock_held_during_label is True
     assert redis_client.delete_calls == [_LOCK_KEY]
 
 

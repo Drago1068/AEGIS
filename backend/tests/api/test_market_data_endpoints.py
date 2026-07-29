@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from datetime import UTC, date, datetime
 from decimal import Decimal
+from unittest.mock import AsyncMock, patch
 
 from httpx import ASGITransport, AsyncClient
 
@@ -87,6 +88,7 @@ class _FakeResearchService:
     async def assess(self, symbol: str) -> ResearchAssessmentSnapshotData:
         self.assess_calls.append(symbol)
         return ResearchAssessmentSnapshotData(
+            id=7,
             symbol=symbol,
             method_id=METHOD_ID,
             method_version=1,
@@ -109,18 +111,30 @@ class _FakeResearchService:
         )
 
 
+class _FakeSessionContext:
+    async def __aenter__(self) -> object:
+        return object()
+
+    async def __aexit__(self, *args: object) -> None:
+        return None
+
+
 def _client_with_overrides(
     *,
     ingestion_service: _FakeIngestionService | None = None,
     repository: _FakeRepository | None = None,
     research_service: _FakeResearchService | None = None,
     research_schedule_after_ingest_enabled: bool = False,
+    research_outcome_label_after_assessment_enabled: bool = False,
 ) -> AsyncClient:
     app = create_app(
         settings=Settings(
             environment="test",
             ingestion_schedule_enabled=False,
             research_schedule_after_ingest_enabled=research_schedule_after_ingest_enabled,
+            research_outcome_label_after_assessment_enabled=(
+                research_outcome_label_after_assessment_enabled
+            ),
         )
     )
     app.dependency_overrides[require_operator] = _operator
@@ -131,6 +145,8 @@ def _client_with_overrides(
         app.dependency_overrides[get_market_data_repository] = lambda: repository
     if research_service is not None:
         app.dependency_overrides[get_research_assessment_service] = lambda: research_service
+    if research_outcome_label_after_assessment_enabled:
+        app.state.db_session_factory = lambda: _FakeSessionContext()
     transport = ASGITransport(app=app)
     return AsyncClient(transport=transport, base_url="http://testserver")
 
@@ -191,6 +207,41 @@ async def test_ingest_runs_research_when_flag_enabled() -> None:
 
     assert response.status_code == 200
     assert research.assess_calls == ["AAPL"]
+
+
+async def test_ingest_runs_outcome_labels_when_both_flags_enabled() -> None:
+    run_result = IngestionRunResult(
+        results=[
+            SymbolIngestionResult(
+                symbol="AAPL",
+                stored_count=1,
+                skipped_existing_count=0,
+                corrected_count=0,
+                rejected_count=0,
+            )
+        ]
+    )
+    service = _FakeIngestionService(run_result)
+    research = _FakeResearchService()
+
+    with patch(
+        "aegis.api.routers.market_data.build_outcome_label_service",
+        return_value=object(),
+    ), patch(
+        "aegis.api.routers.market_data.run_outcome_labels_after_research",
+        new_callable=AsyncMock,
+    ) as mock_labels:
+        async with _client_with_overrides(
+            ingestion_service=service,
+            research_service=research,
+            research_schedule_after_ingest_enabled=True,
+            research_outcome_label_after_assessment_enabled=True,
+        ) as client:
+            response = await client.post("/market-data/ingest")
+
+        assert response.status_code == 200
+        assert research.assess_calls == ["AAPL"]
+        mock_labels.assert_awaited_once()
 
 
 async def test_get_daily_bars_returns_stored_bars() -> None:

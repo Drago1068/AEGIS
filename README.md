@@ -7,10 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 9 (NAS TLS reverse-proxy packaging).** Optional Caddy overlay for
-HTTPS on UGREEN NAS so Secure session cookies work; Phase 8 scheduled research remains in
-effect. See
-[docs/architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md](docs/architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md)
+**Current phase: Phase 10 (second daily-bar market-data provider).** Polygon.io daily
+aggregates plus config-driven primary/failover alongside Alpha Vantage. See
+[docs/architecture/decisions/0011-phase-10-second-market-data-provider.md](docs/architecture/decisions/0011-phase-10-second-market-data-provider.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

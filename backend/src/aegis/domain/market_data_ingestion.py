@@ -5,6 +5,9 @@ Depends only on :class:`~aegis.providers.market_data.DailyBarProvider` and the
 in ``docs/architecture/overview.md``: no FastAPI or SQLAlchemy import belongs in this module.
 The concrete repository (``aegis.persistence.repositories.market_data``) satisfies this
 protocol structurally without either module importing the other.
+
+Optional secondary-provider failover (ADR-0011) stays in this service so each successful write
+uses the producing adapter's ``source`` without silent provenance swaps.
 """
 
 from __future__ import annotations
@@ -15,7 +18,11 @@ from datetime import date
 from typing import Protocol
 
 from aegis.domain.market_data_validation import RejectionReason, validate_daily_bar
-from aegis.providers.errors import ProviderError
+from aegis.providers.errors import (
+    ProviderError,
+    ProviderRateLimitError,
+    ProviderUnavailableError,
+)
 from aegis.providers.market_data import DailyBar, DailyBarProvider
 
 logger = logging.getLogger(__name__)
@@ -35,6 +42,12 @@ class DailyBarRepository(Protocol):
 
 def _empty_rejections() -> dict[RejectionReason, int]:
     return {}
+
+
+def _is_failover_trigger(exc: ProviderError) -> bool:
+    """Return whether ``exc`` should attempt a configured secondary provider (ADR-0011)."""
+
+    return isinstance(exc, (ProviderRateLimitError, ProviderUnavailableError))
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,7 +73,9 @@ class MarketDataIngestionService:
     """Fetches, validates, and persists daily bars for a configured watchlist.
 
     A single symbol's provider failure is isolated (recorded on that symbol's result) and does
-    not abort the run for the remaining symbols.
+    not abort the run for the remaining symbols. When a secondary provider is configured,
+    rate-limit and unavailable errors from the primary trigger one secondary attempt per
+    symbol; successful writes always use that adapter's ``source`` (ADR-0011).
     """
 
     def __init__(
@@ -72,6 +87,8 @@ class MarketDataIngestionService:
         calendar_name: str,
         max_latest_bar_staleness_trading_days: int,
         as_of: date | None = None,
+        secondary_provider: DailyBarProvider | None = None,
+        secondary_source: str | None = None,
     ) -> None:
         self._provider = provider
         self._repository = repository
@@ -79,6 +96,8 @@ class MarketDataIngestionService:
         self._calendar_name = calendar_name
         self._max_staleness = max_latest_bar_staleness_trading_days
         self._as_of = as_of
+        self._secondary_provider = secondary_provider
+        self._secondary_source = secondary_source
 
     async def run(self, symbols: list[str]) -> IngestionRunResult:
         """Ingest daily bars for every symbol in ``symbols``, in order."""
@@ -87,21 +106,18 @@ class MarketDataIngestionService:
         return IngestionRunResult(results=results)
 
     async def _ingest_symbol(self, symbol: str) -> SymbolIngestionResult:
-        try:
-            bars = await self._provider.fetch_daily_bars(symbol)
-        except ProviderError as exc:
-            logger.warning(
-                "market_data_ingestion_provider_error",
-                extra={"symbol": symbol, "error": str(exc)},
-            )
+        fetch = await self._fetch_bars_with_optional_failover(symbol)
+        if fetch.error is not None:
             return SymbolIngestionResult(
                 symbol=symbol,
                 stored_count=0,
                 skipped_existing_count=0,
                 rejected_count=0,
-                error=str(exc),
+                error=fetch.error,
             )
 
+        bars = fetch.bars
+        source = fetch.source
         if not bars:
             return SymbolIngestionResult(
                 symbol=symbol, stored_count=0, skipped_existing_count=0, rejected_count=0
@@ -109,7 +125,7 @@ class MarketDataIngestionService:
 
         as_of = self._as_of if self._as_of is not None else date.today()
         latest_trading_date = max(bar.trading_date for bar in bars)
-        existing_dates = await self._repository.existing_trading_dates(self._source, symbol)
+        existing_dates = await self._repository.existing_trading_dates(source, symbol)
 
         valid_bars: list[DailyBar] = []
         rejections: dict[RejectionReason, int] = {}
@@ -141,12 +157,13 @@ class MarketDataIngestionService:
                     "trading_date": bar.trading_date.isoformat(),
                     "reason": reason.value if reason is not None else None,
                     "detail": result.detail,
+                    "source": source,
                 },
             )
 
         stored_count = 0
         if valid_bars:
-            stored_count = await self._repository.save_many(self._source, valid_bars)
+            stored_count = await self._repository.save_many(source, valid_bars)
 
         return SymbolIngestionResult(
             symbol=symbol,
@@ -155,3 +172,65 @@ class MarketDataIngestionService:
             rejected_count=sum(rejections.values()),
             rejections=rejections,
         )
+
+    async def _fetch_bars_with_optional_failover(
+        self, symbol: str
+    ) -> _FetchedBars:
+        try:
+            bars = await self._provider.fetch_daily_bars(symbol)
+        except ProviderError as primary_exc:
+            if (
+                self._secondary_provider is None
+                or self._secondary_source is None
+                or not _is_failover_trigger(primary_exc)
+            ):
+                logger.warning(
+                    "market_data_ingestion_provider_error",
+                    extra={
+                        "symbol": symbol,
+                        "source": self._source,
+                        "error": str(primary_exc),
+                    },
+                )
+                return _FetchedBars(bars=[], source=self._source, error=str(primary_exc))
+
+            logger.warning(
+                "market_data_ingestion_failover",
+                extra={
+                    "symbol": symbol,
+                    "primary_source": self._source,
+                    "secondary_source": self._secondary_source,
+                    "primary_error": str(primary_exc),
+                },
+            )
+            try:
+                bars = await self._secondary_provider.fetch_daily_bars(symbol)
+            except ProviderError as secondary_exc:
+                logger.warning(
+                    "market_data_ingestion_provider_error",
+                    extra={
+                        "symbol": symbol,
+                        "source": self._secondary_source,
+                        "error": str(secondary_exc),
+                        "primary_source": self._source,
+                        "primary_error": str(primary_exc),
+                    },
+                )
+                return _FetchedBars(
+                    bars=[],
+                    source=self._secondary_source,
+                    error=(
+                        f"primary ({self._source}): {primary_exc}; "
+                        f"secondary ({self._secondary_source}): {secondary_exc}"
+                    ),
+                )
+            return _FetchedBars(bars=bars, source=self._secondary_source, error=None)
+
+        return _FetchedBars(bars=bars, source=self._source, error=None)
+
+
+@dataclass(frozen=True, slots=True)
+class _FetchedBars:
+    bars: list[DailyBar]
+    source: str
+    error: str | None

@@ -6,6 +6,8 @@ providers but established this contract so `providers/` adapters would be built 
 from the start. Phase 1 is the first concrete implementation: `aegis.providers.alpha_vantage`
 detects and rejects malformed/error provider responses (see rule "Otherwise unusable" below),
 and `aegis.domain.market_data_validation` implements every other rule below for daily bars.
+Phase 10 adds `aegis.providers.polygon` behind the same contract and failover policy in
+[decisions/0011-phase-10-second-market-data-provider.md](decisions/0011-phase-10-second-market-data-provider.md).
 See [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md)
 for how each rule maps to daily-bar granularity specifically.
 

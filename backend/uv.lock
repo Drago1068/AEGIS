@@ -23,6 +23,7 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "redis" },
     { name = "sqlalchemy" },
+    { name = "tzdata" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -49,6 +50,7 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.5,<3.0" },
     { name = "redis", specifier = ">=5.0,<6.0" },
     { name = "sqlalchemy", specifier = ">=2.0,<3.0" },
+    { name = "tzdata", specifier = ">=2024.1" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.32,<1.0" },
 ]
 

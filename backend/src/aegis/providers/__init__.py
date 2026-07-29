@@ -6,6 +6,6 @@ audits and must reject invalid, stale, zero, negative, closed-session, or otherw
 quotes before any derived metric is computed (see
 ``docs/architecture/market-data-contracts.md``).
 
-Phase 0 note: no provider adapters are implemented yet; this package is an intentionally
-empty placeholder for the module boundary.
+Concrete adapters: Alpha Vantage (``alpha_vantage``) and Polygon.io (``polygon``). Selection
+and optional failover are configuration-driven (ADR-0011).
 """

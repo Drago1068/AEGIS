@@ -21,13 +21,12 @@ from apscheduler.triggers.cron import CronTrigger  # pyright: ignore[reportMissi
 from fastapi import FastAPI
 
 from aegis.api.dependencies import build_research_assessment_service
+from aegis.api.ingestion_wiring import build_market_data_ingestion_service
 from aegis.config.settings import Settings
-from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.domain.scheduled_ingestion import run_locked_ingestion_cycle
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
 from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
 from aegis.persistence.repositories.watchlist import WatchlistRepository
-from aegis.providers.alpha_vantage import MARKET_DATA_SOURCE, AlphaVantageProvider
 
 logger = logging.getLogger(__name__)
 
@@ -41,13 +40,8 @@ async def run_scheduled_ingestion_job(app: FastAPI) -> None:
     async with app.state.db_session_factory() as session:
         watchlist_repository = WatchlistRepository(session)
         market_data_repository = MarketDailyBarRepository(session)
-        provider = AlphaVantageProvider(settings, app.state.http_client)
-        ingestion_service = MarketDataIngestionService(
-            provider,
-            market_data_repository,
-            source=MARKET_DATA_SOURCE,
-            calendar_name=settings.exchange_calendar_name,
-            max_latest_bar_staleness_trading_days=settings.max_latest_bar_staleness_trading_days,
+        ingestion_service = build_market_data_ingestion_service(
+            settings, app.state.http_client, market_data_repository
         )
         research_service = None
         if settings.research_schedule_after_ingest_enabled:

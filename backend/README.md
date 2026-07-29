@@ -14,12 +14,14 @@ cookie sessions (Redis + httpOnly cookie); `/health` and `/ready` stay public. P
 authenticated research-only assessment routes under `/research/{symbol}/assessments` (method
 `daily_bar_research_v1`, append-only snapshots, fail-closed gates). Phase 8 runs that same
 method after successful locked scheduled ingest (and after on-demand ingest when
-`AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` is true), using stored bars only. See
+`AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` is true), using stored bars only. Phase 10 adds
+Polygon.io daily aggregates and config-driven primary/failover (ADR-0011). See
 [../docs/architecture/decisions/0002-phase-1-market-data-ingestion.md](../docs/architecture/decisions/0002-phase-1-market-data-ingestion.md),
 [../docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md](../docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md),
 [../docs/architecture/decisions/0005-phase-4-operator-auth.md](../docs/architecture/decisions/0005-phase-4-operator-auth.md),
 [../docs/architecture/decisions/0007-phase-6-research-only-scoring.md](../docs/architecture/decisions/0007-phase-6-research-only-scoring.md),
+[../docs/architecture/decisions/0009-phase-8-scheduled-research.md](../docs/architecture/decisions/0009-phase-8-scheduled-research.md),
 and
-[../docs/architecture/decisions/0009-phase-8-scheduled-research.md](../docs/architecture/decisions/0009-phase-8-scheduled-research.md).
+[../docs/architecture/decisions/0011-phase-10-second-market-data-provider.md](../docs/architecture/decisions/0011-phase-10-second-market-data-provider.md).
 Recommendation, prediction, actionable promotion, and trading logic do not exist in this
 package.

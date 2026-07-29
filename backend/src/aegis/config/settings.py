@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Literal
+from typing import Final, Literal, Self
 
-from pydantic import Field
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+DailyBarSourceId = Literal["alpha_vantage", "polygon"]
+DAILY_BAR_SOURCE_IDS: Final[tuple[DailyBarSourceId, ...]] = ("alpha_vantage", "polygon")
 
 
 class Settings(BaseSettings):
@@ -54,6 +57,21 @@ class Settings(BaseSettings):
         ),
     )
 
+    daily_bar_primary_source: DailyBarSourceId = Field(
+        default="alpha_vantage",
+        description=(
+            "Primary daily-bar provider source id (`alpha_vantage` or `polygon`). "
+            "See ADR-0011."
+        ),
+    )
+    daily_bar_secondary_source: DailyBarSourceId | None = Field(
+        default=None,
+        description=(
+            "Optional secondary daily-bar provider for failover on rate-limit or "
+            "unavailable errors. Must differ from the primary when set. See ADR-0011."
+        ),
+    )
+
     alpha_vantage_api_key: str | None = Field(
         default=None,
         description=(
@@ -73,6 +91,28 @@ class Settings(BaseSettings):
             "run, to stay within the provider's rate limit."
         ),
     )
+
+    polygon_api_key: str | None = Field(
+        default=None,
+        description=(
+            "API key for Polygon.io. Optional so the service can start without it; "
+            "ingestion fails with a clear error if it is unset when that provider is "
+            "invoked. Never logged."
+        ),
+    )
+    polygon_base_url: str = Field(
+        default="https://api.polygon.io",
+        description="Base URL for the Polygon.io REST API (no trailing path).",
+    )
+    polygon_request_interval_seconds: float = Field(
+        default=12.0,
+        ge=0,
+        description=(
+            "Minimum delay between successive Polygon requests within one ingestion run "
+            "(reserved for pacing; adapters do not sleep internally)."
+        ),
+    )
+
     watchlist_symbols: str = Field(
         default="AAPL,MSFT,SPY",
         description=(
@@ -84,8 +124,9 @@ class Settings(BaseSettings):
     daily_bar_output_size: Literal["compact", "full"] = Field(
         default="compact",
         description=(
-            "Alpha Vantage 'outputsize' parameter: 'compact' returns the latest ~100 daily "
-            "bars, 'full' returns the full available history."
+            "Daily-bar lookback hint: for Alpha Vantage, the `outputsize` parameter "
+            "(`compact` ≈ 100 bars, `full` = full history); for Polygon, calendar-day "
+            "lookback windows documented in ADR-0011."
         ),
     )
     exchange_calendar_name: str = Field(
@@ -168,6 +209,27 @@ class Settings(BaseSettings):
             "development; set true behind HTTPS in production."
         ),
     )
+
+    @field_validator("daily_bar_secondary_source", mode="before")
+    @classmethod
+    def _empty_secondary_source_to_none(cls, value: object) -> object:
+        if value is None:
+            return None
+        if isinstance(value, str) and value.strip() == "":
+            return None
+        return value
+
+    @model_validator(mode="after")
+    def _secondary_differs_from_primary(self) -> Self:
+        if (
+            self.daily_bar_secondary_source is not None
+            and self.daily_bar_secondary_source == self.daily_bar_primary_source
+        ):
+            raise ValueError(
+                "AEGIS_DAILY_BAR_SECONDARY_SOURCE must differ from "
+                "AEGIS_DAILY_BAR_PRIMARY_SOURCE when set"
+            )
+        return self
 
     @property
     def watchlist_seed_symbols(self) -> list[str]:

@@ -9,11 +9,16 @@ import pytest
 
 from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.domain.market_data_validation import RejectionReason
-from aegis.providers.errors import ProviderError
+from aegis.providers.errors import (
+    ProviderError,
+    ProviderRateLimitError,
+    ProviderUnavailableError,
+)
 from aegis.providers.market_data import DailyBar
 
 _CALENDAR = "NYSE"
 _SOURCE = "alpha_vantage"
+_SECONDARY_SOURCE = "polygon"
 # A normal NYSE trading day, used as both a bar date and the "as_of" run date.
 _AS_OF = date(2024, 1, 2)
 
@@ -34,40 +39,60 @@ def _bar(symbol: str, trading_date: date, **overrides: object) -> DailyBar:
 
 
 class FakeProvider:
-    def __init__(self, bars_by_symbol: dict[str, list[DailyBar]]) -> None:
-        self._bars_by_symbol = bars_by_symbol
+    def __init__(
+        self,
+        bars_by_symbol: dict[str, list[DailyBar]] | None = None,
+        *,
+        errors_by_symbol: dict[str, Exception] | None = None,
+    ) -> None:
+        self._bars_by_symbol = bars_by_symbol or {}
+        self._errors_by_symbol = errors_by_symbol or {}
         self.requested_symbols: list[str] = []
 
     async def fetch_daily_bars(self, symbol: str) -> list[DailyBar]:
         self.requested_symbols.append(symbol)
+        if symbol in self._errors_by_symbol:
+            raise self._errors_by_symbol[symbol]
         if symbol not in self._bars_by_symbol:
             raise ProviderError(f"no fixture bars for {symbol!r}")
         return self._bars_by_symbol[symbol]
 
 
 class FakeRepository:
-    def __init__(self, existing: dict[str, set[date]] | None = None) -> None:
-        self._existing: dict[str, set[date]] = existing or {}
-        self.saved_bars: list[DailyBar] = []
+    def __init__(self, existing: dict[tuple[str, str], set[date]] | None = None) -> None:
+        self._existing: dict[tuple[str, str], set[date]] = existing or {}
+        self.saved: list[tuple[str, DailyBar]] = []
 
     async def existing_trading_dates(self, source: str, symbol: str) -> set[date]:
-        return self._existing.get(symbol, set())
+        return self._existing.get((source, symbol), set())
 
     async def save_many(self, source: str, bars: list[DailyBar]) -> int:
-        self.saved_bars.extend(bars)
+        self.saved.extend((source, bar) for bar in bars)
         return len(bars)
+
+    @property
+    def saved_bars(self) -> list[DailyBar]:
+        return [bar for _, bar in self.saved]
 
 
 def _service(
-    provider: FakeProvider, repository: FakeRepository, *, as_of: date = _AS_OF
+    provider: FakeProvider,
+    repository: FakeRepository,
+    *,
+    as_of: date = _AS_OF,
+    source: str = _SOURCE,
+    secondary_provider: FakeProvider | None = None,
+    secondary_source: str | None = None,
 ) -> MarketDataIngestionService:
     return MarketDataIngestionService(
         provider,
         repository,
-        source=_SOURCE,
+        source=source,
         calendar_name=_CALENDAR,
         max_latest_bar_staleness_trading_days=3,
         as_of=as_of,
+        secondary_provider=secondary_provider,
+        secondary_source=secondary_source,
     )
 
 
@@ -107,7 +132,7 @@ async def test_invalid_bars_are_rejected_and_counted_not_stored() -> None:
 async def test_already_stored_dates_are_skipped_idempotently() -> None:
     bars = [_bar("AAPL", date(2023, 12, 29)), _bar("AAPL", _AS_OF)]
     provider = FakeProvider({"AAPL": bars})
-    repository = FakeRepository(existing={"AAPL": {date(2023, 12, 29)}})
+    repository = FakeRepository(existing={(_SOURCE, "AAPL"): {date(2023, 12, 29)}})
 
     run_result = await _service(provider, repository).run(["AAPL"])
 
@@ -160,3 +185,110 @@ async def test_stale_latest_bar_is_rejected_but_older_bars_in_same_run_are_not()
     result = run_result.results[0]
     assert result.rejections == {RejectionReason.STALE: 1}
     assert result.stored_count == 0
+
+
+@pytest.mark.asyncio
+async def test_primary_success_does_not_call_secondary() -> None:
+    bars = [_bar("AAPL", _AS_OF)]
+    primary = FakeProvider({"AAPL": bars})
+    secondary = FakeProvider({"AAPL": [_bar("AAPL", _AS_OF, close=Decimal("999"))]})
+    repository = FakeRepository()
+
+    run_result = await _service(
+        primary,
+        repository,
+        secondary_provider=secondary,
+        secondary_source=_SECONDARY_SOURCE,
+    ).run(["AAPL"])
+
+    assert secondary.requested_symbols == []
+    assert run_result.results[0].stored_count == 1
+    assert repository.saved == [(_SOURCE, bars[0])]
+
+
+@pytest.mark.asyncio
+async def test_rate_limit_on_primary_fails_over_to_secondary_source() -> None:
+    secondary_bars = [_bar("AAPL", _AS_OF)]
+    primary = FakeProvider(
+        errors_by_symbol={"AAPL": ProviderRateLimitError("rate limited")}
+    )
+    secondary = FakeProvider({"AAPL": secondary_bars})
+    repository = FakeRepository()
+
+    run_result = await _service(
+        primary,
+        repository,
+        secondary_provider=secondary,
+        secondary_source=_SECONDARY_SOURCE,
+    ).run(["AAPL"])
+
+    assert primary.requested_symbols == ["AAPL"]
+    assert secondary.requested_symbols == ["AAPL"]
+    assert run_result.results[0].error is None
+    assert run_result.results[0].stored_count == 1
+    assert repository.saved == [(_SECONDARY_SOURCE, secondary_bars[0])]
+
+
+@pytest.mark.asyncio
+async def test_unavailable_on_primary_fails_over_to_secondary() -> None:
+    secondary_bars = [_bar("AAPL", _AS_OF)]
+    primary = FakeProvider(
+        errors_by_symbol={"AAPL": ProviderUnavailableError("transport down")}
+    )
+    secondary = FakeProvider({"AAPL": secondary_bars})
+    repository = FakeRepository()
+
+    run_result = await _service(
+        primary,
+        repository,
+        secondary_provider=secondary,
+        secondary_source=_SECONDARY_SOURCE,
+    ).run(["AAPL"])
+
+    assert repository.saved == [(_SECONDARY_SOURCE, secondary_bars[0])]
+    assert run_result.results[0].stored_count == 1
+
+
+@pytest.mark.asyncio
+async def test_hard_provider_error_does_not_failover() -> None:
+    primary = FakeProvider(
+        errors_by_symbol={"AAPL": ProviderError("invalid symbol")}
+    )
+    secondary = FakeProvider({"AAPL": [_bar("AAPL", _AS_OF)]})
+    repository = FakeRepository()
+
+    run_result = await _service(
+        primary,
+        repository,
+        secondary_provider=secondary,
+        secondary_source=_SECONDARY_SOURCE,
+    ).run(["AAPL"])
+
+    assert secondary.requested_symbols == []
+    assert run_result.results[0].error is not None
+    assert "invalid symbol" in run_result.results[0].error
+    assert repository.saved == []
+
+
+@pytest.mark.asyncio
+async def test_both_providers_fail_records_combined_error() -> None:
+    primary = FakeProvider(
+        errors_by_symbol={"AAPL": ProviderRateLimitError("primary limited")}
+    )
+    secondary = FakeProvider(
+        errors_by_symbol={"AAPL": ProviderUnavailableError("secondary down")}
+    )
+    repository = FakeRepository()
+
+    run_result = await _service(
+        primary,
+        repository,
+        secondary_provider=secondary,
+        secondary_source=_SECONDARY_SOURCE,
+    ).run(["AAPL"])
+
+    error = run_result.results[0].error
+    assert error is not None
+    assert "primary limited" in error
+    assert "secondary down" in error
+    assert repository.saved == []

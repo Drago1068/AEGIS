@@ -41,10 +41,14 @@ flowchart LR
     api -->|typed provider adapters, Phase 1+| providers
 ```
 
-As of Phase 1, "External Market Data Providers" has one concrete integration: Alpha Vantage
-daily bars (`aegis.providers.alpha_vantage.AlphaVantageProvider`). As of Phase 2, it is
-reached two ways: the `POST /market-data/ingest` on-demand endpoint, and an in-process
-APScheduler job (`aegis.api.scheduler.IngestionScheduler`) that runs on a cron schedule
+As of Phase 1, "External Market Data Providers" includes Alpha Vantage daily bars
+(`aegis.providers.alpha_vantage.AlphaVantageProvider`). As of Phase 10, Polygon.io daily
+aggregates (`aegis.providers.polygon.PolygonProvider`) are also available; operators choose
+primary and optional secondary via `AEGIS_DAILY_BAR_PRIMARY_SOURCE` /
+`AEGIS_DAILY_BAR_SECONDARY_SOURCE`, with per-symbol failover on rate-limit and unavailable
+errors (ADR-0011). As of Phase 2, ingestion is reached two ways: the
+`POST /market-data/ingest` on-demand endpoint, and an in-process APScheduler job
+(`aegis.api.scheduler.IngestionScheduler`) that runs on a cron schedule
 (`AEGIS_INGESTION_CRON`, default 22:00 UTC on weekdays). Both paths ingest the same
 database-backed watchlist (`GET/POST /watchlist`, `DELETE /watchlist/{symbol}`) and run
 through the same `MarketDataIngestionService`, so they can never disagree about which symbols
@@ -61,8 +65,9 @@ nothing). See
 [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md),
 [decisions/0005-phase-4-operator-auth.md](decisions/0005-phase-4-operator-auth.md),
 [decisions/0007-phase-6-research-only-scoring.md](decisions/0007-phase-6-research-only-scoring.md),
+[decisions/0009-phase-8-scheduled-research.md](decisions/0009-phase-8-scheduled-research.md),
 and
-[decisions/0009-phase-8-scheduled-research.md](decisions/0009-phase-8-scheduled-research.md).
+[decisions/0011-phase-10-second-market-data-provider.md](decisions/0011-phase-10-second-market-data-provider.md).
 
 ## Backend module boundaries (`backend/src/aegis/`)
 
@@ -133,8 +138,9 @@ flowchart TB
 - **`providers/`**: typed interfaces (Protocols/ABCs) for external market data sources, plus
   adapter implementations behind those interfaces. Domain code depends on the interface, never
   on a concrete provider SDK, so providers can be swapped or faked in tests. Preserves raw
-  provenance for audits. As of Phase 1: `DailyBarProvider` and the first concrete adapter,
-  `AlphaVantageProvider`.
+  provenance for audits. As of Phase 1: `DailyBarProvider` and `AlphaVantageProvider`. As of
+  Phase 10: also `PolygonProvider`, with config-driven primary/secondary selection
+  (ADR-0011).
 - **`config/`**: Pydantic `BaseSettings` reading exclusively from environment variables. No
   secrets, hostnames, or credentials are hardcoded anywhere in the codebase.
 

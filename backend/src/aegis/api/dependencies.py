@@ -13,6 +13,7 @@ from collections.abc import AsyncIterator
 from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aegis.api.ingestion_wiring import build_market_data_ingestion_service
 from aegis.config.settings import Settings
 from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.domain.research_assessment import (
@@ -27,7 +28,6 @@ from aegis.persistence.repositories.operators import OperatorRepository
 from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
 from aegis.persistence.repositories.watchlist import WatchlistRepository
 from aegis.persistence.sessions import RedisSessionStore, SessionStore
-from aegis.providers.alpha_vantage import MARKET_DATA_SOURCE, AlphaVantageProvider
 
 
 async def check_database_ready(request: Request) -> bool:
@@ -142,16 +142,11 @@ async def get_ingestion_service(
     request: Request,
     repository: MarketDailyBarRepository = Depends(get_market_data_repository),
 ) -> MarketDataIngestionService:
-    """A request-scoped ingestion service wired to the configured provider and repository."""
+    """A request-scoped ingestion service wired to configured primary/secondary providers."""
 
     settings = request.app.state.settings
-    provider = AlphaVantageProvider(settings, request.app.state.http_client)
-    return MarketDataIngestionService(
-        provider,
-        repository,
-        source=MARKET_DATA_SOURCE,
-        calendar_name=settings.exchange_calendar_name,
-        max_latest_bar_staleness_trading_days=settings.max_latest_bar_staleness_trading_days,
+    return build_market_data_ingestion_service(
+        settings, request.app.state.http_client, repository
     )
 
 

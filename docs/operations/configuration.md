@@ -22,15 +22,20 @@ non-functional development placeholder.
 | `AEGIS_API_PORT` | Port the FastAPI/uvicorn process binds to. | `8000` |
 | `AEGIS_CORS_ORIGINS` | Comma-separated browser origins allowed by CORS (Phase 3 operator console). See [ADR-0004](../architecture/decisions/0004-phase-3-operator-console.md). | `http://localhost:3000` |
 
-## Backend: Phase 1 market data ingestion (`aegis.config.settings.Settings`)
+## Backend: Phase 1 / Phase 10 market data ingestion (`aegis.config.settings.Settings`)
 
 | Variable | Description | Development default |
 | --- | --- | --- |
-| `AEGIS_ALPHA_VANTAGE_API_KEY` | Alpha Vantage API key. Optional at startup; ingestion returns a typed error if unset when invoked. Never logged. | unset |
+| `AEGIS_DAILY_BAR_PRIMARY_SOURCE` | Primary daily-bar provider source id: `alpha_vantage` or `polygon`. See [ADR-0011](../architecture/decisions/0011-phase-10-second-market-data-provider.md). | `alpha_vantage` |
+| `AEGIS_DAILY_BAR_SECONDARY_SOURCE` | Optional secondary source for failover on rate-limit / unavailable errors. Empty/unset disables failover. Must differ from primary when set. | unset |
+| `AEGIS_ALPHA_VANTAGE_API_KEY` | Alpha Vantage API key. Optional at startup; ingestion returns a typed error if unset when that provider is invoked. Never logged. | unset |
 | `AEGIS_ALPHA_VANTAGE_BASE_URL` | Base URL for the Alpha Vantage REST API. | `https://www.alphavantage.co/query` |
 | `AEGIS_ALPHA_VANTAGE_REQUEST_INTERVAL_SECONDS` | Minimum delay between successive Alpha Vantage requests within one ingestion run, to stay within the provider's rate limit. | `12.0` |
+| `AEGIS_POLYGON_API_KEY` | Polygon.io API key. Optional at startup; fails closed when that provider is invoked without a key. Never logged. | unset |
+| `AEGIS_POLYGON_BASE_URL` | Base URL for the Polygon.io REST API (no trailing path). | `https://api.polygon.io` |
+| `AEGIS_POLYGON_REQUEST_INTERVAL_SECONDS` | Configured pacing hint between Polygon requests within one ingestion run. | `12.0` |
 | `AEGIS_WATCHLIST_SYMBOLS` | Comma-separated **bootstrap seed** symbols. As of Phase 2, only used to seed the database-backed `watchlist_symbols` table the first time it is empty; the database is the source of truth afterward. See [ADR-0003](../architecture/decisions/0003-phase-2-scheduled-watchlist.md). | `AAPL,MSFT,SPY` |
-| `AEGIS_DAILY_BAR_OUTPUT_SIZE` | Alpha Vantage `outputsize` parameter: `compact` (latest ~100 daily bars) or `full` (full history). | `compact` |
+| `AEGIS_DAILY_BAR_OUTPUT_SIZE` | Lookback hint: Alpha Vantage `outputsize` (`compact` / `full`); Polygon calendar-day windows per ADR-0011. | `compact` |
 | `AEGIS_EXCHANGE_CALENDAR_NAME` | `pandas-market-calendars` calendar name used to validate that a bar's trading date is a real exchange session day. | `NYSE` |
 | `AEGIS_MAX_LATEST_BAR_STALENESS_TRADING_DAYS` | Maximum number of exchange trading days the most recent bar in a provider response may lag behind the current trading day before it is treated as stale. | `3` |
 
@@ -136,9 +141,10 @@ does not replace Phase 4 application auth.
 - No secret, token, credential, hostname, or private IP address may be hardcoded in source
   code, Dockerfiles, or committed configuration. Production values are supplied at deploy
   time via the runtime environment, never committed.
-- `AEGIS_DATABASE_URL`, `AEGIS_REDIS_URL`, `AEGIS_ALPHA_VANTAGE_API_KEY` (and any future
-  secret-bearing variable) must never appear in logs or in API error responses; see the
-  `/ready` contract in [../architecture/overview.md](../architecture/overview.md), which
-  reports dependency status without echoing connection strings, and the provider adapter in
-  `aegis.providers.alpha_vantage`, which never logs the API key or the full request URL with
-  the key attached.
+- `AEGIS_DATABASE_URL`, `AEGIS_REDIS_URL`, `AEGIS_ALPHA_VANTAGE_API_KEY`,
+  `AEGIS_POLYGON_API_KEY` (and any future secret-bearing variable) must never appear in logs
+  or in API error responses; see the `/ready` contract in
+  [../architecture/overview.md](../architecture/overview.md), which reports dependency status
+  without echoing connection strings, and the provider adapters in
+  `aegis.providers.alpha_vantage` / `aegis.providers.polygon`, which never log API keys
+  (Polygon uses Bearer auth so the key is not placed in query strings).

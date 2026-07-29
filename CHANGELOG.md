@@ -7,6 +7,31 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 10 - Second Daily-Bar Market-Data Provider (Polygon + failover)
+
+Adds Polygon.io daily aggregates as a second typed `DailyBarProvider`, with configuration-
+driven primary selection and optional per-symbol failover on rate-limit / unavailable
+errors. Alpha Vantage remains selectable as primary or secondary. Research method
+unchanged (`research_only`, `probability_confidence=null`). See
+[docs/architecture/decisions/0011-phase-10-second-market-data-provider.md](docs/architecture/decisions/0011-phase-10-second-market-data-provider.md).
+
+#### Added
+
+- ADR-0011: provider pick, source ids (`alpha_vantage`, `polygon`), failover matrix, out of
+  scope.
+- `aegis.providers.polygon.PolygonProvider` (unadjusted daily aggs; Bearer auth; typed
+  errors); `ProviderUnavailableError`; settings for primary/secondary and Polygon keys.
+- Shared ingest wiring for on-demand and scheduled paths; successful writes use the producing
+  adapter's `source` (no silent provenance swap).
+- Tests: Polygon httpx mocks; failover orchestration; settings validation. No live network
+  in CI.
+- Docs / `.env.example` / `.env.nas.example` placeholders.
+
+#### Explicitly out of scope
+
+Calibration, actionable promotion, orders, corrections, intraday, multi-source consensus /
+blended bars, auth changes, and live NAS deploy from this phase.
+
 ### Phase 9 - NAS Reverse-Proxy / TLS Packaging for Secure Cookies
 
 Optional Caddy reverse-proxy + TLS termination for the UGREEN NAS Compose stack so operators

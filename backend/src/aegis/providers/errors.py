@@ -22,5 +22,14 @@ class ProviderRateLimitError(ProviderError):
 
     Kept distinct from :class:`ProviderError` so callers can choose to back off, skip the
     remaining watchlist for this run, or surface a more specific message, without parsing
-    exception text.
+    exception text. Eligible for configured secondary failover (see ADR-0011).
+    """
+
+
+class ProviderUnavailableError(ProviderError):
+    """The provider could not be reached or returned a transient infrastructure failure.
+
+    Covers missing credentials at call time, transport failures, and HTTP 5xx responses.
+    Kept distinct so ingestion can fail over to a secondary adapter without treating
+    malformed payloads or invalid-symbol answers as failover triggers (ADR-0011).
     """

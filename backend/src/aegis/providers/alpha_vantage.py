@@ -16,7 +16,11 @@ from typing import Any, cast
 import httpx
 
 from aegis.config.settings import Settings
-from aegis.providers.errors import ProviderError, ProviderRateLimitError
+from aegis.providers.errors import (
+    ProviderError,
+    ProviderRateLimitError,
+    ProviderUnavailableError,
+)
 from aegis.providers.market_data import DailyBar
 
 MARKET_DATA_SOURCE = "alpha_vantage"
@@ -47,13 +51,16 @@ class AlphaVantageProvider:
         """Fetch and parse daily bars for ``symbol``, oldest first.
 
         Raises:
-            ProviderError: the API key is unset, the HTTP request failed, the response body
-                could not be parsed, or Alpha Vantage reported a non-rate-limit error.
-            ProviderRateLimitError: Alpha Vantage reported a rate limit or premium-tier gate.
+            ProviderUnavailableError: the API key is unset, the HTTP request failed, or the
+                provider returned HTTP 5xx / 429.
+            ProviderError: the response body could not be parsed, or Alpha Vantage reported a
+                non-rate-limit error.
+            ProviderRateLimitError: Alpha Vantage reported a rate limit or premium-tier gate
+                in the JSON body (or via HTTP 429).
         """
 
         if not self._settings.alpha_vantage_api_key:
-            raise ProviderError("Alpha Vantage API key is not configured")
+            raise ProviderUnavailableError("Alpha Vantage API key is not configured")
 
         try:
             response = await self._client.get(
@@ -66,8 +73,18 @@ class AlphaVantageProvider:
                 },
             )
         except httpx.HTTPError as exc:
-            raise ProviderError(f"Alpha Vantage request failed for {symbol!r}: {exc}") from exc
+            raise ProviderUnavailableError(
+                f"Alpha Vantage request failed for {symbol!r}: {exc}"
+            ) from exc
 
+        if response.status_code == 429:
+            raise ProviderRateLimitError(
+                f"Alpha Vantage rate limit for {symbol!r}: HTTP 429"
+            )
+        if response.status_code >= 500:
+            raise ProviderUnavailableError(
+                f"Alpha Vantage returned HTTP {response.status_code} for {symbol!r}"
+            )
         if response.status_code != 200:
             raise ProviderError(
                 f"Alpha Vantage returned HTTP {response.status_code} for {symbol!r}"

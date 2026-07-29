@@ -6,6 +6,8 @@ selection cannot diverge (ADR-0011).
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 import httpx
 
 from aegis.config.settings import Settings
@@ -34,4 +36,5 @@ def build_market_data_ingestion_service(
         secondary_source=secondary_source,
         calendar_name=settings.exchange_calendar_name,
         max_latest_bar_staleness_trading_days=settings.max_latest_bar_staleness_trading_days,
+        correction_price_epsilon=Decimal(str(settings.market_data_correction_price_epsilon)),
     )

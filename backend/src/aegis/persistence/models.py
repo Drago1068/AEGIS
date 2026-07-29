@@ -35,13 +35,10 @@ class MarketDailyBarObservation(Base):
     """A single validated, stored daily OHLCV observation.
 
     Append-only per ``docs/architecture/data-model.md``: rows are inserted, never updated in
-    place. The unique constraint on ``(source, symbol, event_time)`` makes re-ingestion of an
-    already-stored day a no-op (``ON CONFLICT DO NOTHING`` in the repository), not a
-    correction; see ADR-0002 for why this is distinct from a provider-revision correction.
-    ``event_time`` (rather than ``trading_date``) is in the constraint because TimescaleDB
-    requires every unique constraint on a hypertable to include its partitioning column;
-    ``event_time`` is derived deterministically (1:1) from ``trading_date``, so this is
-    equivalent for our purposes.
+    place. Phase 12 (ADR-0013) allows multiple rows per ``(source, symbol, event_time)`` when a
+    provider revises history: a ``correction`` row supersedes the prior current observation via
+    ``supersedes_observation_id`` while preserving the initial row for audit. Reads use the
+    latest ``ingested_at`` per ``(source, symbol, trading_date)``.
 
     ``id`` is paired with ``event_time`` in the primary key (rather than being a standalone
     primary key) because TimescaleDB requires every unique index on a hypertable, including
@@ -51,9 +48,6 @@ class MarketDailyBarObservation(Base):
     __tablename__ = "market_daily_bar_observations"
     __table_args__ = (
         PrimaryKeyConstraint("id", "event_time", name="pk_market_daily_bar_id_event_time"),
-        UniqueConstraint(
-            "source", "symbol", "event_time", name="uq_market_daily_bar_source_symbol_event_time"
-        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, Identity(), nullable=False)
@@ -72,6 +66,8 @@ class MarketDailyBarObservation(Base):
     data_quality: Mapped[str] = mapped_column(String(32), nullable=False, default="primary")
     schema_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     raw_payload: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
+    observation_kind: Mapped[str] = mapped_column(String(32), nullable=False, default="initial")
+    supersedes_observation_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
 
 class WatchlistSymbol(Base):

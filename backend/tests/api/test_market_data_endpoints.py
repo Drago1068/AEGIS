@@ -75,6 +75,8 @@ def _bar(symbol: str = "AAPL") -> MarketDailyBarObservation:
         data_quality="primary",
         schema_version=1,
         raw_payload={},
+        observation_kind="initial",
+        supersedes_observation_id=None,
     )
 
 
@@ -140,6 +142,7 @@ async def test_ingest_returns_run_summary() -> None:
                 symbol="AAPL",
                 stored_count=1,
                 skipped_existing_count=0,
+                corrected_count=0,
                 rejected_count=1,
                 rejections={RejectionReason.STALE: 1},
             )
@@ -171,6 +174,7 @@ async def test_ingest_runs_research_when_flag_enabled() -> None:
                 symbol="AAPL",
                 stored_count=1,
                 skipped_existing_count=0,
+                corrected_count=0,
                 rejected_count=0,
             )
         ]

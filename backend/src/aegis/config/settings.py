@@ -141,6 +141,15 @@ class Settings(BaseSettings):
             "response may lag behind the current trading day before it is treated as stale."
         ),
     )
+    market_data_correction_price_epsilon: float = Field(
+        default=1e-6,
+        gt=0,
+        description=(
+            "Relative price tolerance for provider revision detection (ADR-0013). Incoming "
+            "OHLC differing beyond this epsilon from the current stored bar triggers a "
+            "correction row instead of a silent skip."
+        ),
+    )
 
     ingestion_schedule_enabled: bool = Field(
         default=True,

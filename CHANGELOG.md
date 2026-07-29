@@ -7,6 +7,28 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 12 - Provider Historical Corrections (Append-Only)
+
+When a provider revises a historical daily bar, AEGIS inserts a new `correction` observation
+row with provenance instead of silently skipping or overwriting the prior row. Reads return
+the latest `ingested_at` per `(source, symbol, trading_date)`. See
+[docs/architecture/decisions/0013-phase-12-provider-historical-corrections.md](docs/architecture/decisions/0013-phase-12-provider-historical-corrections.md).
+
+#### Added
+
+- ADR-0013: material change detection, `observation_kind`, `supersedes_observation_id`,
+  current-bar read policy, out of scope.
+- Alembic `0006`: drop unique constraint on `(source, symbol, event_time)`; add correction
+  columns and index for current-bar queries.
+- Domain `bars_materially_differ`; ingestion inserts corrections with structured logging;
+  `corrected_count` on ingest results.
+- Setting `AEGIS_MARKET_DATA_CORRECTION_PRICE_EPSILON` (default `1e-6`).
+
+#### Explicitly out of scope
+
+Calibration, blended bars, actionable promotion, orders, correction history API, and live NAS
+deploy from this phase.
+
 ### Phase 11 - Multi-Source Coverage Weighting (Research-Only)
 
 Extends research assessment `coverage_confidence` with multi-source availability and

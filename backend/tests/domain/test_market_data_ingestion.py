@@ -7,6 +7,7 @@ from decimal import Decimal
 
 import pytest
 
+from aegis.domain.market_data_corrections import StoredBarSnapshot
 from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.domain.market_data_validation import RejectionReason
 from aegis.providers.errors import (
@@ -38,6 +39,25 @@ def _bar(symbol: str, trading_date: date, **overrides: object) -> DailyBar:
     return DailyBar(**defaults)  # type: ignore[arg-type]
 
 
+def _snapshot(
+    trading_date: date,
+    *,
+    observation_id: int = 1,
+    close: Decimal = Decimal("105"),
+    volume: int = 1000,
+) -> StoredBarSnapshot:
+    return StoredBarSnapshot(
+        id=observation_id,
+        trading_date=trading_date,
+        open=Decimal("100"),
+        high=Decimal("110"),
+        low=Decimal("90"),
+        close=close,
+        volume=volume,
+        data_quality="primary",
+    )
+
+
 class FakeProvider:
     def __init__(
         self,
@@ -59,16 +79,35 @@ class FakeProvider:
 
 
 class FakeRepository:
-    def __init__(self, existing: dict[tuple[str, str], set[date]] | None = None) -> None:
-        self._existing: dict[tuple[str, str], set[date]] = existing or {}
+    def __init__(
+        self,
+        current: dict[tuple[str, str], dict[date, StoredBarSnapshot]] | None = None,
+    ) -> None:
+        self._current = current or {}
         self.saved: list[tuple[str, DailyBar]] = []
+        self.corrections: list[tuple[str, DailyBar, int]] = []
 
-    async def existing_trading_dates(self, source: str, symbol: str) -> set[date]:
-        return self._existing.get((source, symbol), set())
+    async def get_current_by_trading_dates(
+        self,
+        source: str,
+        symbol: str,
+        trading_dates: set[date],
+    ) -> dict[date, StoredBarSnapshot]:
+        stored = self._current.get((source, symbol), {})
+        return {d: stored[d] for d in trading_dates if d in stored}
 
     async def save_many(self, source: str, bars: list[DailyBar]) -> int:
         self.saved.extend((source, bar) for bar in bars)
         return len(bars)
+
+    async def save_corrections(
+        self,
+        source: str,
+        corrections: list[tuple[DailyBar, int]],
+    ) -> int:
+        for bar, supersedes_id in corrections:
+            self.corrections.append((source, bar, supersedes_id))
+        return len(corrections)
 
     @property
     def saved_bars(self) -> list[DailyBar]:
@@ -108,6 +147,7 @@ async def test_valid_bars_are_stored() -> None:
     result = run_result.results[0]
     assert result.symbol == "AAPL"
     assert result.stored_count == 1
+    assert result.corrected_count == 0
     assert result.rejected_count == 0
     assert result.error is None
     assert repository.saved_bars == bars
@@ -123,6 +163,7 @@ async def test_invalid_bars_are_rejected_and_counted_not_stored() -> None:
 
     result = run_result.results[0]
     assert result.stored_count == 0
+    assert result.corrected_count == 0
     assert result.rejected_count == 1
     assert result.rejections == {RejectionReason.NON_POSITIVE: 1}
     assert repository.saved_bars == []
@@ -132,14 +173,42 @@ async def test_invalid_bars_are_rejected_and_counted_not_stored() -> None:
 async def test_already_stored_dates_are_skipped_idempotently() -> None:
     bars = [_bar("AAPL", date(2023, 12, 29)), _bar("AAPL", _AS_OF)]
     provider = FakeProvider({"AAPL": bars})
-    repository = FakeRepository(existing={(_SOURCE, "AAPL"): {date(2023, 12, 29)}})
+    repository = FakeRepository(
+        current={
+            (_SOURCE, "AAPL"): {
+                date(2023, 12, 29): _snapshot(date(2023, 12, 29), observation_id=10),
+            }
+        }
+    )
 
     run_result = await _service(provider, repository).run(["AAPL"])
 
     result = run_result.results[0]
     assert result.skipped_existing_count == 1
     assert result.stored_count == 1
+    assert result.corrected_count == 0
     assert [bar.trading_date for bar in repository.saved_bars] == [_AS_OF]
+
+
+@pytest.mark.asyncio
+async def test_material_revision_inserts_correction_row() -> None:
+    revised = _bar("AAPL", _AS_OF, close=Decimal("110"))
+    provider = FakeProvider({"AAPL": [revised]})
+    repository = FakeRepository(
+        current={
+            (_SOURCE, "AAPL"): {
+                _AS_OF: _snapshot(_AS_OF, observation_id=42, close=Decimal("105")),
+            }
+        }
+    )
+
+    run_result = await _service(provider, repository).run(["AAPL"])
+
+    result = run_result.results[0]
+    assert result.stored_count == 0
+    assert result.corrected_count == 1
+    assert result.skipped_existing_count == 0
+    assert repository.corrections == [(_SOURCE, revised, 42)]
 
 
 @pytest.mark.asyncio
@@ -169,6 +238,7 @@ async def test_empty_provider_response_stores_nothing() -> None:
 
     result = run_result.results[0]
     assert result.stored_count == 0
+    assert result.corrected_count == 0
     assert result.rejected_count == 0
     assert result.skipped_existing_count == 0
     assert repository.saved_bars == []

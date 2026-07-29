@@ -36,6 +36,7 @@ class IngestionSymbolResult(BaseModel):
     symbol: str
     stored_count: int
     skipped_existing_count: int
+    corrected_count: int
     rejected_count: int
     rejections: dict[RejectionReason, int]
     error: str | None = None

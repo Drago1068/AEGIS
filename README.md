@@ -7,10 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 11 (multi-source coverage weighting, research-only).** Extends
-`coverage_confidence` with availability/agreement factors across configured daily-bar
-sources; no OHLCV blend; `probability_confidence` remains null. See
-[docs/architecture/decisions/0012-phase-11-multi-source-coverage-weighting.md](docs/architecture/decisions/0012-phase-11-multi-source-coverage-weighting.md)
+**Current phase: Phase 12 (provider historical corrections).** Re-ingest with materially
+different OHLCV inserts append-only `correction` rows; reads use the latest `ingested_at` per
+source/day. See
+[docs/architecture/decisions/0013-phase-12-provider-historical-corrections.md](docs/architecture/decisions/0013-phase-12-provider-historical-corrections.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

@@ -13,7 +13,8 @@ database-backed watchlist), Phase 3 (operator console over those APIs), Phase 4
 (operator session authentication), Phase 5 (daily-bar charts on the operator console),
 Phase 6 (research-only assessments over stored daily bars), Phase 7 (UGREEN NAS
 deployment packaging), Phase 8 (automatic research assessments after successful ingest),
-Phase 10 (second daily-bar provider), and Phase 11 (multi-source coverage weighting).
+Phase 10 (second daily-bar provider), and Phase 11 (multi-source coverage weighting),
+Phase 12 (provider historical corrections on daily-bar observations).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -26,6 +27,8 @@ Phase 8 reuses Phase 6 method `daily_bar_research_v1` after ingest (see
 Phase 11 bumps that method to `method_version` 2 for multi-source coverage factors without
 blending OHLCV (see
 [decisions/0012-phase-11-multi-source-coverage-weighting.md](decisions/0012-phase-11-multi-source-coverage-weighting.md)).
+Phase 12 adds append-only provider correction rows and current-bar reads (see
+[decisions/0013-phase-12-provider-historical-corrections.md](decisions/0013-phase-12-provider-historical-corrections.md)).
 
 ## System context
 
@@ -238,3 +241,5 @@ work on the NAS without changing Phase 4 application auth. See
   Phase 10 second daily-bar provider ADR (Polygon + primary/failover).
 - [decisions/0012-phase-11-multi-source-coverage-weighting.md](decisions/0012-phase-11-multi-source-coverage-weighting.md):
   Phase 11 multi-source coverage weighting ADR (research-only; no blended bars).
+- [decisions/0013-phase-12-provider-historical-corrections.md](decisions/0013-phase-12-provider-historical-corrections.md):
+  Phase 12 provider historical corrections ADR (append-only correction rows; current-bar reads).

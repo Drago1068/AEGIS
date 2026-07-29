@@ -101,7 +101,11 @@ def _run_result(symbol: str = "AAPL") -> IngestionRunResult:
     return IngestionRunResult(
         results=[
             SymbolIngestionResult(
-                symbol=symbol, stored_count=1, skipped_existing_count=0, rejected_count=0
+                symbol=symbol,
+                stored_count=1,
+                skipped_existing_count=0,
+                corrected_count=0,
+                rejected_count=0,
             )
         ]
     )

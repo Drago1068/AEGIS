@@ -8,6 +8,9 @@ protocol structurally without either module importing the other.
 
 Optional secondary-provider failover (ADR-0011) stays in this service so each successful write
 uses the producing adapter's ``source`` without silent provenance swaps.
+
+Provider historical corrections (ADR-0013) insert append-only ``correction`` rows when a
+re-ingest materially differs from the current stored bar for the same trading date.
 """
 
 from __future__ import annotations
@@ -15,8 +18,10 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from datetime import date
+from decimal import Decimal
 from typing import Protocol
 
+from aegis.domain.market_data_corrections import StoredBarSnapshot, bars_materially_differ
 from aegis.domain.market_data_validation import RejectionReason, validate_daily_bar
 from aegis.providers.errors import (
     ProviderError,
@@ -31,12 +36,25 @@ logger = logging.getLogger(__name__)
 class DailyBarRepository(Protocol):
     """Persistence boundary required by :class:`MarketDataIngestionService`."""
 
-    async def existing_trading_dates(self, source: str, symbol: str) -> set[date]:
-        """Return the set of trading dates already stored for ``(source, symbol)``."""
+    async def get_current_by_trading_dates(
+        self,
+        source: str,
+        symbol: str,
+        trading_dates: set[date],
+    ) -> dict[date, StoredBarSnapshot]:
+        """Return current stored observations keyed by trading date."""
         ...
 
     async def save_many(self, source: str, bars: list[DailyBar]) -> int:
-        """Persist ``bars`` for ``source``, skipping any already stored. Returns rows inserted."""
+        """Persist ``initial`` observations. Returns rows inserted."""
+        ...
+
+    async def save_corrections(
+        self,
+        source: str,
+        corrections: list[tuple[DailyBar, int]],
+    ) -> int:
+        """Persist ``correction`` rows superseding prior observations. Returns rows inserted."""
         ...
 
 
@@ -57,6 +75,7 @@ class SymbolIngestionResult:
     symbol: str
     stored_count: int
     skipped_existing_count: int
+    corrected_count: int
     rejected_count: int
     rejections: dict[RejectionReason, int] = field(default_factory=_empty_rejections)
     error: str | None = None
@@ -76,6 +95,9 @@ class MarketDataIngestionService:
     not abort the run for the remaining symbols. When a secondary provider is configured,
     rate-limit and unavailable errors from the primary trigger one secondary attempt per
     symbol; successful writes always use that adapter's ``source`` (ADR-0011).
+
+    Re-ingest of an identical stored bar is a silent skip; material provider revisions insert
+  a new ``correction`` row (ADR-0013).
     """
 
     def __init__(
@@ -89,6 +111,7 @@ class MarketDataIngestionService:
         as_of: date | None = None,
         secondary_provider: DailyBarProvider | None = None,
         secondary_source: str | None = None,
+        correction_price_epsilon: Decimal = Decimal("1e-6"),
     ) -> None:
         self._provider = provider
         self._repository = repository
@@ -98,6 +121,7 @@ class MarketDataIngestionService:
         self._as_of = as_of
         self._secondary_provider = secondary_provider
         self._secondary_source = secondary_source
+        self._correction_price_epsilon = correction_price_epsilon
 
     async def run(self, symbols: list[str]) -> IngestionRunResult:
         """Ingest daily bars for every symbol in ``symbols``, in order."""
@@ -112,6 +136,7 @@ class MarketDataIngestionService:
                 symbol=symbol,
                 stored_count=0,
                 skipped_existing_count=0,
+                corrected_count=0,
                 rejected_count=0,
                 error=fetch.error,
             )
@@ -120,55 +145,97 @@ class MarketDataIngestionService:
         source = fetch.source
         if not bars:
             return SymbolIngestionResult(
-                symbol=symbol, stored_count=0, skipped_existing_count=0, rejected_count=0
+                symbol=symbol,
+                stored_count=0,
+                skipped_existing_count=0,
+                corrected_count=0,
+                rejected_count=0,
             )
 
         as_of = self._as_of if self._as_of is not None else date.today()
         latest_trading_date = max(bar.trading_date for bar in bars)
-        existing_dates = await self._repository.existing_trading_dates(source, symbol)
+        trading_dates = {bar.trading_date for bar in bars}
+        current_by_date = await self._repository.get_current_by_trading_dates(
+            source, symbol, trading_dates
+        )
 
-        valid_bars: list[DailyBar] = []
+        valid_initial: list[DailyBar] = []
+        valid_corrections: list[tuple[DailyBar, int]] = []
         rejections: dict[RejectionReason, int] = {}
         skipped_existing = 0
 
         for bar in bars:
-            if bar.trading_date in existing_dates:
+            current = current_by_date.get(bar.trading_date)
+            if current is None:
+                outcome = _validate_bar(
+                    bar,
+                    calendar_name=self._calendar_name,
+                    as_of=as_of,
+                    max_staleness=self._max_staleness,
+                    is_latest_bar=bar.trading_date == latest_trading_date,
+                )
+                if outcome.is_valid:
+                    valid_initial.append(bar)
+                else:
+                    _record_rejection(
+                        rejections,
+                        outcome.reason,
+                        symbol=symbol,
+                        trading_date=bar.trading_date,
+                        source=source,
+                        detail=outcome.detail,
+                    )
+                continue
+
+            if not bars_materially_differ(
+                current,
+                bar,
+                price_epsilon=self._correction_price_epsilon,
+            ):
                 skipped_existing += 1
                 continue
 
-            result = validate_daily_bar(
+            outcome = _validate_bar(
                 bar,
                 calendar_name=self._calendar_name,
                 as_of=as_of,
-                max_staleness_trading_days=self._max_staleness,
+                max_staleness=self._max_staleness,
                 is_latest_bar=bar.trading_date == latest_trading_date,
             )
-            if result.is_valid:
-                valid_bars.append(bar)
-                continue
-
-            reason = result.reason
-            if reason is not None:
-                rejections[reason] = rejections.get(reason, 0) + 1
-            logger.info(
-                "market_data_bar_rejected",
-                extra={
-                    "symbol": symbol,
-                    "trading_date": bar.trading_date.isoformat(),
-                    "reason": reason.value if reason is not None else None,
-                    "detail": result.detail,
-                    "source": source,
-                },
-            )
+            if outcome.is_valid:
+                valid_corrections.append((bar, current.id))
+                logger.info(
+                    "market_data_correction_applied",
+                    extra={
+                        "symbol": symbol,
+                        "trading_date": bar.trading_date.isoformat(),
+                        "source": source,
+                        "supersedes_observation_id": current.id,
+                    },
+                )
+            else:
+                _record_rejection(
+                    rejections,
+                    outcome.reason,
+                    symbol=symbol,
+                    trading_date=bar.trading_date,
+                    source=source,
+                    detail=outcome.detail,
+                )
 
         stored_count = 0
-        if valid_bars:
-            stored_count = await self._repository.save_many(source, valid_bars)
+        if valid_initial:
+            stored_count = await self._repository.save_many(source, valid_initial)
+
+        corrected_count = 0
+        if valid_corrections:
+            corrected_count = await self._repository.save_corrections(source, valid_corrections)
 
         return SymbolIngestionResult(
             symbol=symbol,
             stored_count=stored_count,
             skipped_existing_count=skipped_existing,
+            corrected_count=corrected_count,
             rejected_count=sum(rejections.values()),
             rejections=rejections,
         )
@@ -227,6 +294,58 @@ class MarketDataIngestionService:
             return _FetchedBars(bars=bars, source=self._secondary_source, error=None)
 
         return _FetchedBars(bars=bars, source=self._source, error=None)
+
+
+@dataclass(frozen=True, slots=True)
+class _ValidationOutcome:
+    is_valid: bool
+    reason: RejectionReason | None = None
+    detail: str | None = None
+
+
+def _validate_bar(
+    bar: DailyBar,
+    *,
+    calendar_name: str,
+    as_of: date,
+    max_staleness: int,
+    is_latest_bar: bool,
+) -> _ValidationOutcome:
+    result = validate_daily_bar(
+        bar,
+        calendar_name=calendar_name,
+        as_of=as_of,
+        max_staleness_trading_days=max_staleness,
+        is_latest_bar=is_latest_bar,
+    )
+    return _ValidationOutcome(
+        is_valid=result.is_valid,
+        reason=result.reason,
+        detail=result.detail,
+    )
+
+
+def _record_rejection(
+    rejections: dict[RejectionReason, int],
+    reason: RejectionReason | None,
+    *,
+    symbol: str,
+    trading_date: date,
+    source: str,
+    detail: str | None,
+) -> None:
+    if reason is not None:
+        rejections[reason] = rejections.get(reason, 0) + 1
+    logger.info(
+        "market_data_bar_rejected",
+        extra={
+            "symbol": symbol,
+            "trading_date": trading_date.isoformat(),
+            "reason": reason.value if reason is not None else None,
+            "detail": detail,
+            "source": source,
+        },
+    )
 
 
 @dataclass(frozen=True, slots=True)

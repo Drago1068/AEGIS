@@ -15,6 +15,9 @@ operator role's username and Argon2 password hash
 Phase 6 adds `research_assessment_snapshots`, an append-only evidence table (plain Postgres,
 not a Timescale hypertable) for research-only assessments derived from stored daily bars
 (see [decisions/0007-phase-6-research-only-scoring.md](decisions/0007-phase-6-research-only-scoring.md)).
+Phase 12 (ADR-0013) implements provider historical corrections on `market_daily_bar_observations`:
+revision rows with `observation_kind=correction` and `supersedes_observation_id`; current reads
+use the latest `ingested_at` per `(source, symbol, trading_date)`.
 
 ## Append-only and versioned
 

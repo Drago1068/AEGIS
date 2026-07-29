@@ -38,6 +38,7 @@ non-functional development placeholder.
 | `AEGIS_DAILY_BAR_OUTPUT_SIZE` | Lookback hint: Alpha Vantage `outputsize` (`compact` / `full`); Polygon calendar-day windows per ADR-0011. | `compact` |
 | `AEGIS_EXCHANGE_CALENDAR_NAME` | `pandas-market-calendars` calendar name used to validate that a bar's trading date is a real exchange session day. | `NYSE` |
 | `AEGIS_MAX_LATEST_BAR_STALENESS_TRADING_DAYS` | Maximum number of exchange trading days the most recent bar in a provider response may lag behind the current trading day before it is treated as stale. | `3` |
+| `AEGIS_MARKET_DATA_CORRECTION_PRICE_EPSILON` | Relative OHLC tolerance for provider revision detection (ADR-0013). Incoming bars differing beyond this epsilon from the current stored bar trigger a correction row. | `0.000001` (`1e-6`) |
 
 ## Backend: Phase 2 scheduled ingestion & watchlist (`aegis.config.settings.Settings`)
 

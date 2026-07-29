@@ -3,14 +3,16 @@
 Next.js operator console for AEGIS 3.0. See
 [../docs/architecture/overview.md](../docs/architecture/overview.md),
 [../docs/architecture/decisions/0004-phase-3-operator-console.md](../docs/architecture/decisions/0004-phase-3-operator-console.md),
+[../docs/architecture/decisions/0005-phase-4-operator-auth.md](../docs/architecture/decisions/0005-phase-4-operator-auth.md),
 and
-[../docs/architecture/decisions/0005-phase-4-operator-auth.md](../docs/architecture/decisions/0005-phase-4-operator-auth.md).
+[../docs/architecture/decisions/0006-phase-5-daily-bar-charts.md](../docs/architecture/decisions/0006-phase-5-daily-bar-charts.md).
 
-Phase 3 added the console surfaces; Phase 4 adds login:
+Phase 3 added the console surfaces; Phase 4 adds login; Phase 5 adds daily-bar charts:
 
 - `/login` - operator username/password; session cookie via the backend
 - `/` - watchlist management and on-demand ingest (requires a valid session)
-- `/symbols/[symbol]` - stored daily OHLCV table (requires a valid session)
+- `/symbols/[symbol]` - daily OHLC candlestick + volume chart above the stored OHLCV table
+  (requires a valid session; same authenticated `listDailyBars` payload)
 
 Set `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:8000`) so the browser can reach the
 backend. The backend must allow that origin via `AEGIS_CORS_ORIGINS` with credentials

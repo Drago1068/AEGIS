@@ -9,10 +9,11 @@ supports.
 
 This document describes the backend module boundaries established in Phase 0 and populated
 starting in Phase 1 (market data ingestion), Phase 2 (scheduled ingestion and a
-database-backed watchlist), Phase 3 (operator console over those APIs), and Phase 4
-(operator session authentication). No scoring, recommendation, prediction, or trading logic
-is implemented in any phase so far; the boundaries below exist so that future phases can add
-domain logic without restructuring the codebase.
+database-backed watchlist), Phase 3 (operator console over those APIs), Phase 4
+(operator session authentication), and Phase 5 (daily-bar charts on the operator console).
+No scoring, recommendation, prediction, or trading logic is implemented in any phase so far;
+the boundaries below exist so that future phases can add domain logic without restructuring
+the codebase.
 
 ## System context
 
@@ -119,11 +120,12 @@ flowchart TB
   client; no direct database or provider access from the frontend. As of Phase 3: `/` is the
   operator console (watchlist + on-demand ingest) and `/symbols/[symbol]` shows a stored
   daily-bar table. As of Phase 4: `/login` collects credentials; protected routes use an SSR
-  `requireOperator` gate and redirect on HTTP 401. No chart, score, or recommendation
-  components exist.
-- `components/`: interactive console panels (`WatchlistPanel`, `IngestPanel`) and presentational
-  tables (`DailyBarsTable`). Mutations stay in Client Components; initial reads use Server
-  Components where practical.
+  `requireOperator` gate and redirect on HTTP 401. As of Phase 5: `/symbols/[symbol]` also
+  renders a TradingView Lightweight Charts candlestick + volume view above the table, still
+  fed only by authenticated `listDailyBars`. No score or recommendation components exist.
+- `components/`: interactive console panels (`WatchlistPanel`, `IngestPanel`), presentational
+  tables (`DailyBarsTable`), and chart presentation (`DailyBarsChart`). Mutations stay in
+  Client Components; initial reads use Server Components where practical.
 - `lib/`: typed HTTP client for the backend API, matching the backend's Pydantic schemas
   (health/ready, auth, watchlist, ingest, daily bars). Authenticated calls use
   `credentials: "include"` so the httpOnly session cookie is sent cross-origin.
@@ -166,3 +168,5 @@ Deployment to the UGREEN NAS is out of scope for Phase 0. See
   Phase 3 operator console ADR (CORS, table-not-charts, no-auth reaffirmed).
 - [decisions/0005-phase-4-operator-auth.md](decisions/0005-phase-4-operator-auth.md):
   Phase 4 operator authentication ADR (httpOnly cookie, Redis sessions, seed-once bootstrap).
+- [decisions/0006-phase-5-daily-bar-charts.md](decisions/0006-phase-5-daily-bar-charts.md):
+  Phase 5 daily-bar charts ADR (Lightweight Charts, table retained, no backend API changes).

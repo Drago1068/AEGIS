@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DailyBarsChart } from "@/components/DailyBarsChart";
 import { DailyBarsTable } from "@/components/DailyBarsTable";
 import { OperatorSessionBar } from "@/components/OperatorSessionBar";
 import { ApiClientError, getApiBaseUrl, listDailyBars } from "@/lib/api-client";
@@ -54,7 +55,10 @@ export default async function SymbolPage({ params }: SymbolPageProps) {
             {error}
           </p>
         ) : (
-          <DailyBarsTable symbol={symbol} bars={bars} />
+          <div className="flex flex-col gap-6">
+            <DailyBarsChart symbol={symbol} bars={bars} />
+            <DailyBarsTable symbol={symbol} bars={bars} />
+          </div>
         )}
       </section>
     </main>

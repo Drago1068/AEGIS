@@ -7,6 +7,27 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 5 - Daily Bar Charts
+
+Candlestick OHLC + volume charts on the authenticated symbol page, using the existing
+daily-bars API and TradingView Lightweight Charts. No scoring, recommendation, prediction,
+indicators, signals, or order-placement logic exists in this phase; see
+[docs/architecture/decisions/0006-phase-5-daily-bar-charts.md](docs/architecture/decisions/0006-phase-5-daily-bar-charts.md).
+
+#### Added
+
+- Frontend: `lightweight-charts` dependency; `DailyBarsChart` Client Component (candlestick +
+  volume histogram, dispose on unmount, empty/error-safe); adapter mapping newest-first API
+  bars to chronological series; chart above `DailyBarsTable` on `/symbols/[symbol]` with
+  accessible name `{symbol} daily OHLC chart`.
+- Docs: ADR-0006; architecture overview and frontend README updates for Phase 5.
+
+#### Explicitly out of scope
+
+Backend API/schema changes, technical indicators, scoring/recommendations/signals, auth
+changes, order placement, and NAS deployment - each is absent, not merely unimplemented, per
+the Phase 5 plan.
+
 ### Phase 4 - Operator Authentication
 
 Cookie-based operator sessions protect watchlist and market-data HTTP routes. No scoring,

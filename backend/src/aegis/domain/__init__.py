@@ -5,7 +5,7 @@ depends only on repository and provider interfaces defined in ``persistence`` an
 ``providers``, so domain rules can be tested and reasoned about independently of
 infrastructure.
 
-Phase 0 note: this package contains no domain logic. Scoring, recommendation, prediction, and
-trading logic are added only in later phases once their evidence gates are satisfied, per the
-project rules.
+Phase 6 adds research-only assessment foundations (``research_assessment``). Recommendation,
+prediction, actionable promotion, and trading/order logic remain out of scope until their
+evidence gates are satisfied.
 """

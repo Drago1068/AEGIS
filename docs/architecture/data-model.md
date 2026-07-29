@@ -12,6 +12,9 @@ market observation or evidence record, so it is a plain mutable/soft-deletable t
 Phase 4 adds `operators`, likewise an operational (not observation) table for the single
 operator role's username and Argon2 password hash
 (see [decisions/0005-phase-4-operator-auth.md](decisions/0005-phase-4-operator-auth.md)).
+Phase 6 adds `research_assessment_snapshots`, an append-only evidence table (plain Postgres,
+not a Timescale hypertable) for research-only assessments derived from stored daily bars
+(see [decisions/0007-phase-6-research-only-scoring.md](decisions/0007-phase-6-research-only-scoring.md)).
 
 ## Append-only and versioned
 
@@ -77,3 +80,27 @@ gate.
   given record, the system fails closed: the record stays research-only (or is rejected
   outright per [market-data-contracts.md](market-data-contracts.md)), rather than defaulting
   to an optimistic or actionable state.
+
+## Research assessment snapshots (`research_assessment_snapshots`)
+
+Phase 6 stores each successful on-demand research assessment as a new row. Columns:
+
+| Column | Role |
+| --- | --- |
+| `id` | Identity primary key |
+| `computed_at` | When AEGIS computed the snapshot (UTC) |
+| `as_of_trading_date` | Trading date of the latest bar in the lookback window |
+| `event_time` | Point-in-time key for the as-of session (UTC) |
+| `symbol` | Uppercase symbol |
+| `method_id` | e.g. `daily_bar_research_v1` |
+| `method_version` | Integer method version |
+| `state` | Always `research_only` in Phase 6 |
+| `coverage_confidence` | Input-quality confidence in `[0, 1]` |
+| `probability_confidence` | Always null in Phase 6 (not calibrated) |
+| `components` | JSONB research components (`total_return_20`, `realized_vol_20`, `research_index`) |
+| `schema_version` | Snapshot payload schema version |
+| `input_source` | Provenance: market-data source id used for the bars |
+| `lookback_start_date` / `lookback_end_date` | Inclusive trading-date window of the 20 bars |
+| `bar_count` | Number of bars used in the assessment (20 on success) |
+
+Rows are insert-only. Fail-closed assessments persist nothing.

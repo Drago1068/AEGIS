@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /**
- * Phase 0 must contain no scoring, recommendation, prediction, or trading logic.
+ * Frontend must not contain recommendation, prediction, trading, or order-placement logic,
+ * and must not compute research/assessment math client-side.
  *
- * This is a structural check (file names and exported declaration names under `src/`), not
- * a naive whole-repository text grep, so documentation/comments cannot cause a false
- * failure. Test files are excluded from the scan. See
- * docs/architecture/decisions/0001-phase-0-tooling.md.
+ * Presentation modules such as `ResearchAssessmentPanel` (API-payload display only) are
+ * allowed. This is a structural check (file names and exported declaration names under
+ * `src/`), not a naive whole-repository text grep, so documentation/comments cannot cause a
+ * false failure. Test files are excluded from the scan. Forbidden stems remain
+ * `score*`, `recommend*`, `predict*`, `trade*`, `order*` (see ADR-0001 / ADR-0007).
  */
 
 import { readdirSync, readFileSync, statSync } from "node:fs";

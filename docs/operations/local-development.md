@@ -47,9 +47,9 @@ uv run pyright                # strict type-check
 uv run alembic upgrade head   # apply migrations (requires AEGIS_DATABASE_URL to be reachable)
 ```
 
-Migration `0004` creates the `operators` table required for Phase 4 auth. Always run
-`alembic upgrade head` after pulling migrations (Compose Postgres must be reachable via
-`AEGIS_DATABASE_URL`).
+Migration `0005` creates the `research_assessment_snapshots` table required for Phase 6
+research assessments (after `0004` for `operators`). Always run `alembic upgrade head` after
+pulling migrations (Compose Postgres must be reachable via `AEGIS_DATABASE_URL`).
 
 Running the API outside Docker requires a reachable PostgreSQL/TimescaleDB and Redis; the
 simplest way to get both is `docker compose up -d postgres redis` (see below) while running

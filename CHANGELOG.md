@@ -7,6 +7,31 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 6 - Research-Only Scoring Foundations
+
+On-demand research-only assessments over stored primary daily bars. Fail-closed when inputs
+are incomplete; every success payload is `state=research_only` with non-null
+`coverage_confidence` and null `probability_confidence`. No recommendations, actionable
+promotion, calibration, or order placement; see
+[docs/architecture/decisions/0007-phase-6-research-only-scoring.md](docs/architecture/decisions/0007-phase-6-research-only-scoring.md).
+
+#### Added
+
+- Backend: domain method `daily_bar_research_v1` (20-session return, annualized realized vol,
+  `research_index`); append-only `research_assessment_snapshots` (Alembic `0005`);
+  authenticated `POST/GET /research/{symbol}/assessments` and
+  `GET /research/{symbol}/assessments/latest`; HTTP 422 structured `detail.reason` on gate
+  failures with no persistence.
+- Frontend: `ResearchAssessmentPanel` on `/symbols/[symbol]` with RESEARCH ONLY labeling;
+  typed API client methods; presentation-only (no client-side research math).
+- Docs: ADR-0007; architecture overview and data-model updates for research snapshots.
+
+#### Explicitly out of scope
+
+Actionable promotion, calibration / non-null probability confidence, scheduled assessments,
+chart signal overlays, second provider, OAuth/MFA, order placement, and NAS deployment -
+each is absent, not merely unimplemented, per the Phase 6 plan.
+
 ### Phase 5 - Daily Bar Charts
 
 Candlestick OHLC + volume charts on the authenticated symbol page, using the existing

@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from aegis.api.routers.auth import router as auth_router
 from aegis.api.routers.health import router as health_router
 from aegis.api.routers.market_data import router as market_data_router
+from aegis.api.routers.research import router as research_router
 from aegis.api.routers.watchlist import router as watchlist_router
 from aegis.api.scheduler import IngestionScheduler
 from aegis.config.settings import Settings, get_settings
@@ -55,9 +56,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         title="AEGIS 3.0 Backend",
         version="0.1.0",
         description=(
-            "Decision-support backend for AEGIS 3.0. Phase 4: operator session "
-            "authentication (httpOnly cookie + Redis) protecting watchlist and market-data "
-            "APIs. This service never places or transmits live orders."
+            "Decision-support backend for AEGIS 3.0. Phase 6: research-only assessments "
+            "over stored daily bars (authenticated /research routes). Never places or "
+            "transmits live orders; assessments are research-only, not actionable advice."
         ),
         lifespan=lifespan,
     )
@@ -72,6 +73,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(auth_router)
     app.include_router(market_data_router)
     app.include_router(watchlist_router)
+    app.include_router(research_router)
     # Available before lifespan runs so unit tests (and cookie helpers) can read settings
     # without starting Redis/Postgres.
     app.state.settings = resolved_settings

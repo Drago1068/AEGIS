@@ -10,10 +10,11 @@ supports.
 This document describes the backend module boundaries established in Phase 0 and populated
 starting in Phase 1 (market data ingestion), Phase 2 (scheduled ingestion and a
 database-backed watchlist), Phase 3 (operator console over those APIs), Phase 4
-(operator session authentication), and Phase 5 (daily-bar charts on the operator console).
-No scoring, recommendation, prediction, or trading logic is implemented in any phase so far;
-the boundaries below exist so that future phases can add domain logic without restructuring
-the codebase.
+(operator session authentication), Phase 5 (daily-bar charts on the operator console), and
+Phase 6 (research-only assessments over stored daily bars). Recommendation, prediction,
+actionable promotion, and trading logic remain unimplemented; Phase 6 adds only labeled
+research-only heuristics with fail-closed gates (see
+[decisions/0007-phase-6-research-only-scoring.md](decisions/0007-phase-6-research-only-scoring.md)).
 
 ## System context
 
@@ -42,11 +43,14 @@ database-backed watchlist (`GET/POST /watchlist`, `DELETE /watchlist/{symbol}`) 
 through the same `MarketDataIngestionService`, so they can never disagree about which symbols
 are current or how a bar is validated. A Redis lock ensures only one process runs a scheduled
 cycle at a time. As of Phase 4, watchlist and market-data HTTP routes require an operator
-session cookie (login via `POST /auth/login`); `/health` and `/ready` stay public. See
+session cookie (login via `POST /auth/login`); `/health` and `/ready` stay public. As of
+Phase 6, authenticated on-demand research assessment routes under `/research/{symbol}/assessments`
+compute and append research-only snapshots from stored primary daily bars (no scheduler hook).
+See
 [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md),
 [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md),
-and
-[decisions/0005-phase-4-operator-auth.md](decisions/0005-phase-4-operator-auth.md).
+[decisions/0005-phase-4-operator-auth.md](decisions/0005-phase-4-operator-auth.md), and
+[decisions/0007-phase-6-research-only-scoring.md](decisions/0007-phase-6-research-only-scoring.md).
 
 ## Backend module boundaries (`backend/src/aegis/`)
 
@@ -83,19 +87,20 @@ flowchart TB
   APScheduler into the framework-free `domain.scheduled_ingestion.run_locked_ingestion_cycle`,
   mirroring how `dependencies.py` wires the on-demand ingestion path. As of Phase 4: auth
   routes (`/auth/login`, `/auth/logout`, `/auth/me`) and a session dependency that requires a
-  valid Redis-backed cookie for `/watchlist*` and `/market-data*`; `/health` and `/ready`
-  stay public for Compose and CI.
+  valid Redis-backed cookie for `/watchlist*`, `/market-data*`, and `/research*`; `/health`
+  and `/ready` stay public for Compose and CI.
 - **`domain/`**: framework-free business rules and orchestration. Must not import FastAPI,
   SQLAlchemy sessions, a concrete Redis client, or provider SDKs directly; depends on
   repository/adapter interfaces only (`DailyBarRepository`, `DailyBarProvider`,
-  `DistributedLock`, `WatchlistSource`, and `IngestionRunner` are Protocols, satisfied
-  structurally by `persistence/`, `providers/`, and `api/scheduler.py` without any of them
-  importing `domain/`), so it can be tested and reasoned about independently of
-  infrastructure. As of Phase 1: an exchange-calendar wrapper, daily-bar validation rules, and
-  `MarketDataIngestionService`. As of Phase 2: watchlist symbol validation (`watchlist.py`) and
-  the lock-guarded scheduled-ingestion cycle (`scheduled_ingestion.py`). Still empty of any
-  scoring/recommendation/prediction/trading logic (per project rules, not added before its
-  phase and evidence gates are satisfied).
+  `DistributedLock`, `WatchlistSource`, `IngestionRunner`, and Phase 6 research assessment
+  reader/store Protocols are satisfied structurally by `persistence/`, `providers/`, and
+  `api/scheduler.py` without any of them importing `domain/`), so it can be tested and
+  reasoned about independently of infrastructure. As of Phase 1: an exchange-calendar wrapper,
+  daily-bar validation rules, and `MarketDataIngestionService`. As of Phase 2: watchlist
+  symbol validation (`watchlist.py`) and the lock-guarded scheduled-ingestion cycle
+  (`scheduled_ingestion.py`). As of Phase 6: `research_assessment.py` implements method
+  `daily_bar_research_v1` (research-only components + coverage confidence; never recommendations
+  or actionable promotion).
 - **`persistence/`**: SQLAlchemy 2.x models, repository classes, and Alembic migrations
   (`backend/alembic/`). Owns all direct database access. Enforces append-only, versioned,
   timestamped, provenance-aware storage for market observations (see
@@ -105,7 +110,9 @@ flowchart TB
   that intentionally does not follow the append-only observation conventions above, because it
   holds current configuration, not a market observation (see ADR-0003). As of Phase 4:
   `Operator` and `OperatorRepository` - another operational table (username + Argon2 hash)
-  with seed-once bootstrap from env credentials when empty (see ADR-0005).
+  with seed-once bootstrap from env credentials when empty (see ADR-0005). As of Phase 6:
+  `ResearchAssessmentSnapshot` and `ResearchAssessmentRepository` - append-only plain table
+  for research-only assessment snapshots (see ADR-0007).
 - **`providers/`**: typed interfaces (Protocols/ABCs) for external market data sources, plus
   adapter implementations behind those interfaces. Domain code depends on the interface, never
   on a concrete provider SDK, so providers can be swapped or faked in tests. Preserves raw
@@ -122,13 +129,16 @@ flowchart TB
   daily-bar table. As of Phase 4: `/login` collects credentials; protected routes use an SSR
   `requireOperator` gate and redirect on HTTP 401. As of Phase 5: `/symbols/[symbol]` also
   renders a TradingView Lightweight Charts candlestick + volume view above the table, still
-  fed only by authenticated `listDailyBars`. No score or recommendation components exist.
-- `components/`: interactive console panels (`WatchlistPanel`, `IngestPanel`), presentational
-  tables (`DailyBarsTable`), and chart presentation (`DailyBarsChart`). Mutations stay in
-  Client Components; initial reads use Server Components where practical.
+  fed only by authenticated `listDailyBars`. As of Phase 6: a `ResearchAssessmentPanel`
+  requests and displays research-only API payloads (no client-side research math). No
+  recommendation or trading components exist.
+- `components/`: interactive console panels (`WatchlistPanel`, `IngestPanel`,
+  `ResearchAssessmentPanel`), presentational tables (`DailyBarsTable`), and chart
+  presentation (`DailyBarsChart`). Mutations stay in Client Components; initial reads use
+  Server Components where practical.
 - `lib/`: typed HTTP client for the backend API, matching the backend's Pydantic schemas
-  (health/ready, auth, watchlist, ingest, daily bars). Authenticated calls use
-  `credentials: "include"` so the httpOnly session cookie is sent cross-origin.
+  (health/ready, auth, watchlist, ingest, daily bars, research assessments). Authenticated
+  calls use `credentials: "include"` so the httpOnly session cookie is sent cross-origin.
 
 ## Cross-cutting conventions
 
@@ -170,3 +180,6 @@ Deployment to the UGREEN NAS is out of scope for Phase 0. See
   Phase 4 operator authentication ADR (httpOnly cookie, Redis sessions, seed-once bootstrap).
 - [decisions/0006-phase-5-daily-bar-charts.md](decisions/0006-phase-5-daily-bar-charts.md):
   Phase 5 daily-bar charts ADR (Lightweight Charts, table retained, no backend API changes).
+- [decisions/0007-phase-6-research-only-scoring.md](decisions/0007-phase-6-research-only-scoring.md):
+  Phase 6 research-only scoring foundations ADR (method `daily_bar_research_v1`, fail-closed,
+  coverage vs probability, append-only snapshots).

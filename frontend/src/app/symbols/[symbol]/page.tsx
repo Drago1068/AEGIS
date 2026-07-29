@@ -3,7 +3,13 @@ import Link from "next/link";
 import { DailyBarsChart } from "@/components/DailyBarsChart";
 import { DailyBarsTable } from "@/components/DailyBarsTable";
 import { OperatorSessionBar } from "@/components/OperatorSessionBar";
-import { ApiClientError, getApiBaseUrl, listDailyBars } from "@/lib/api-client";
+import { ResearchAssessmentPanel } from "@/components/ResearchAssessmentPanel";
+import {
+  ApiClientError,
+  getApiBaseUrl,
+  getLatestResearchAssessment,
+  listDailyBars,
+} from "@/lib/api-client";
 import { requireOperator } from "@/lib/require-operator";
 import { redirect } from "next/navigation";
 
@@ -36,6 +42,22 @@ export default async function SymbolPage({ params }: SymbolPageProps) {
     }
   }
 
+  let latestAssessment: Awaited<ReturnType<typeof getLatestResearchAssessment>> | null =
+    null;
+  try {
+    latestAssessment = await getLatestResearchAssessment(getApiBaseUrl(), symbol, {
+      cookie,
+    });
+  } catch (err) {
+    if (err instanceof ApiClientError && err.status === 401) {
+      redirect("/login");
+    }
+    if (!(err instanceof ApiClientError && err.status === 404)) {
+      // Non-404 load failures leave the panel empty; the panel can still run on demand.
+      latestAssessment = null;
+    }
+  }
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 px-6 py-10">
       <div className="space-y-2">
@@ -61,6 +83,8 @@ export default async function SymbolPage({ params }: SymbolPageProps) {
           </div>
         )}
       </section>
+
+      <ResearchAssessmentPanel symbol={symbol} initialLatest={latestAssessment} />
     </main>
   );
 }

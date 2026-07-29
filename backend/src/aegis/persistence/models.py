@@ -14,6 +14,7 @@ from sqlalchemy import (
     Boolean,
     Date,
     DateTime,
+    Float,
     Identity,
     Integer,
     Numeric,
@@ -122,3 +123,30 @@ class Operator(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+
+class ResearchAssessmentSnapshot(Base):
+    """An append-only research-only assessment snapshot (Phase 6, ADR-0007).
+
+    Insert-only: never updated in place. ``state`` is always ``research_only`` in Phase 6;
+    ``probability_confidence`` remains null (not calibrated). Not a Timescale hypertable.
+    """
+
+    __tablename__ = "research_assessment_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, Identity(), primary_key=True)
+    computed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    as_of_trading_date: Mapped[date] = mapped_column(Date, nullable=False)
+    event_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    symbol: Mapped[str] = mapped_column(String(32), nullable=False)
+    method_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    method_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    state: Mapped[str] = mapped_column(String(32), nullable=False)
+    coverage_confidence: Mapped[float] = mapped_column(Float, nullable=False)
+    probability_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    components: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
+    schema_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    input_source: Mapped[str] = mapped_column(String(64), nullable=False)
+    lookback_start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    lookback_end_date: Mapped[date] = mapped_column(Date, nullable=False)
+    bar_count: Mapped[int] = mapped_column(Integer, nullable=False)

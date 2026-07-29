@@ -2,8 +2,9 @@
  * Typed HTTP client for the AEGIS backend API.
  *
  * Types here must stay in sync with the backend's Pydantic response schemas under
- * `backend/src/aegis/api/schemas/`. See ADR-0004 for the Phase 3 operator console contract
- * and ADR-0005 for Phase 4 operator authentication.
+ * `backend/src/aegis/api/schemas/`. See ADR-0004 for the Phase 3 operator console contract,
+ * ADR-0005 for Phase 4 operator authentication, and ADR-0007 for Phase 6 research
+ * assessments.
  */
 
 export interface HealthResponse {
@@ -57,6 +58,30 @@ export interface IngestionSymbolResult {
 
 export interface IngestionRunResponse {
   results: IngestionSymbolResult[];
+}
+
+export interface ResearchAssessment {
+  symbol: string;
+  method_id: string;
+  method_version: number;
+  state: string;
+  as_of_trading_date: string;
+  event_time: string;
+  computed_at: string;
+  coverage_confidence: number;
+  /** Always null in Phase 6 (not calibrated). Never merge with coverage_confidence. */
+  probability_confidence: number | null;
+  components: {
+    total_return_20: number;
+    realized_vol_20: number;
+    research_index: number;
+    [key: string]: number;
+  };
+  schema_version: number;
+  input_source: string;
+  lookback_start_date: string;
+  lookback_end_date: string;
+  bar_count: number;
 }
 
 export interface OperatorMe {
@@ -299,6 +324,69 @@ export async function ingestMarketData(
     );
   }
   return body as IngestionRunResponse;
+}
+
+export async function createResearchAssessment(
+  baseUrl: string,
+  symbol: string,
+  options?: ApiRequestOptions,
+): Promise<ResearchAssessment> {
+  const { response, body } = await requestJson(
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments`,
+    {
+      method: "POST",
+      headers: { Accept: "application/json" },
+    },
+    options,
+  );
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected POST /research/{symbol}/assessments status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as ResearchAssessment;
+}
+
+export async function listResearchAssessments(
+  baseUrl: string,
+  symbol: string,
+  limit = 20,
+  options?: ApiRequestOptions,
+): Promise<ResearchAssessment[]> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments` +
+    `?limit=${limit}`;
+  const { response, body } = await requestJson(url, undefined, options);
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected GET /research/{symbol}/assessments status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as ResearchAssessment[];
+}
+
+export async function getLatestResearchAssessment(
+  baseUrl: string,
+  symbol: string,
+  options?: ApiRequestOptions,
+): Promise<ResearchAssessment> {
+  const url = `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/latest`;
+  const { response, body } = await requestJson(url, undefined, options);
+  if (response.status === 404) {
+    throw new ApiClientError(`No research assessment for ${symbol}`, 404, body);
+  }
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected GET /research/{symbol}/assessments/latest status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as ResearchAssessment;
 }
 
 export function getApiBaseUrl(): string {

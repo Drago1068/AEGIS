@@ -14,11 +14,16 @@ from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aegis.domain.market_data_ingestion import MarketDataIngestionService
+from aegis.domain.research_assessment import (
+    ResearchAssessmentService,
+    ResearchBarInput,
+)
 from aegis.persistence.cache import check_redis
 from aegis.persistence.database import check_database
-from aegis.persistence.models import Operator
+from aegis.persistence.models import MarketDailyBarObservation, Operator
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
 from aegis.persistence.repositories.operators import OperatorRepository
+from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
 from aegis.persistence.repositories.watchlist import WatchlistRepository
 from aegis.persistence.sessions import RedisSessionStore, SessionStore
 from aegis.providers.alpha_vantage import MARKET_DATA_SOURCE, AlphaVantageProvider
@@ -144,6 +149,56 @@ async def get_ingestion_service(
         provider,
         repository,
         source=MARKET_DATA_SOURCE,
+        calendar_name=settings.exchange_calendar_name,
+        max_latest_bar_staleness_trading_days=settings.max_latest_bar_staleness_trading_days,
+    )
+
+
+class _ResearchBarReaderAdapter:
+    """Maps stored daily bar ORM rows to domain :class:`ResearchBarInput` values."""
+
+    def __init__(self, repository: MarketDailyBarRepository) -> None:
+        self._repository = repository
+
+    async def list_recent_bars(self, symbol: str, limit: int) -> list[ResearchBarInput]:
+        rows = await self._repository.list_recent(symbol, limit)
+        return [_bar_to_research_input(row) for row in rows]
+
+
+def _bar_to_research_input(row: MarketDailyBarObservation) -> ResearchBarInput:
+    return ResearchBarInput(
+        trading_date=row.trading_date,
+        open=row.open,
+        high=row.high,
+        low=row.low,
+        close=row.close,
+        volume=row.volume,
+        data_quality=row.data_quality,
+        source=row.source,
+    )
+
+
+async def get_research_assessment_repository(
+    session: AsyncSession = Depends(get_db_session),
+) -> ResearchAssessmentRepository:
+    """A request-scoped repository for research assessment snapshots."""
+
+    return ResearchAssessmentRepository(session)
+
+
+async def get_research_assessment_service(
+    request: Request,
+    market_data_repository: MarketDailyBarRepository = Depends(get_market_data_repository),
+    snapshot_repository: ResearchAssessmentRepository = Depends(
+        get_research_assessment_repository
+    ),
+) -> ResearchAssessmentService:
+    """Wire research assessment domain service to bar reader and snapshot store."""
+
+    settings = request.app.state.settings
+    return ResearchAssessmentService(
+        _ResearchBarReaderAdapter(market_data_repository),
+        snapshot_repository,
         calendar_name=settings.exchange_calendar_name,
         max_latest_bar_staleness_trading_days=settings.max_latest_bar_staleness_trading_days,
     )

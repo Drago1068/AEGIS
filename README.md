@@ -7,11 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 5 (daily-bar charts).** No scoring, recommendation, prediction, or
-trading logic exists yet. Phase 5 adds TradingView Lightweight Charts candlestick + volume
-views on `/symbols/[symbol]` over the existing authenticated daily-bars API; the HTML table
-remains. See
-[docs/architecture/decisions/0006-phase-5-daily-bar-charts.md](docs/architecture/decisions/0006-phase-5-daily-bar-charts.md)
+**Current phase: Phase 6 (research-only scoring foundations).** Recommendation, prediction,
+actionable promotion, and trading logic do not exist. Phase 6 adds authenticated on-demand
+research assessments (`daily_bar_research_v1`) with fail-closed gates, append-only snapshots,
+separate coverage vs null probability confidence, and a labeled console panel. See
+[docs/architecture/decisions/0007-phase-6-research-only-scoring.md](docs/architecture/decisions/0007-phase-6-research-only-scoring.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
@@ -27,7 +27,8 @@ docker compose ps   # wait for all four services to report "healthy"
 ```
 
 Apply migrations if the backend image does not already (from `backend/`, with Compose Postgres
-up): `uv run alembic upgrade head` (includes migration `0004` for `operators`).
+up): `uv run alembic upgrade head` (includes migration `0005` for
+`research_assessment_snapshots`).
 
 Then visit <http://localhost:3000/login> and sign in with the bootstrap credentials from
 `.env` (`AEGIS_OPERATOR_USERNAME` / `AEGIS_OPERATOR_PASSWORD`; defaults in `.env.example`).

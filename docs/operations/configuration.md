@@ -41,7 +41,13 @@ non-functional development placeholder.
 | `AEGIS_INGESTION_SCHEDULE_ENABLED` | Whether the in-process APScheduler runs ingestion automatically. `false` leaves `POST /market-data/ingest` as the only trigger, matching Phase 1 behavior. | `true` |
 | `AEGIS_INGESTION_CRON` | Standard 5-field cron expression (minute hour day month day-of-week, UTC) for the scheduled ingestion job. | `0 22 * * 1-5` |
 | `AEGIS_INGESTION_SCHEDULE_LOCK_KEY` | Redis key used to ensure only one process runs a scheduled cycle at a time. | `aegis:ingestion:scheduler:lock` |
-| `AEGIS_INGESTION_SCHEDULE_LOCK_TTL_SECONDS` | Redis lock TTL for a scheduled cycle; bounds how long a crashed process can hold the lock. | `1800` |
+| `AEGIS_INGESTION_SCHEDULE_LOCK_TTL_SECONDS` | Redis lock TTL for a scheduled cycle; bounds how long a crashed process can hold the lock. Must cover ingest plus optional post-ingest research when enabled. | `1800` |
+
+## Backend: Phase 8 post-ingest research (`aegis.config.settings.Settings`)
+
+| Variable | Description | Development default |
+| --- | --- | --- |
+| `AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` | When `true`, after each successful locked scheduled ingest and after each successful on-demand `POST /market-data/ingest`, run Phase 6 `daily_bar_research_v1` for active watchlist symbols (stored bars only; fail-closed skips persist nothing). When `false`, Phase 6 on-demand `POST /research/{symbol}/assessments` is unchanged. Local and NAS example default `true`. See [ADR-0009](../architecture/decisions/0009-phase-8-scheduled-research.md). | `true` |
 
 ## Backend: Phase 4 operator authentication (`aegis.config.settings.Settings`)
 

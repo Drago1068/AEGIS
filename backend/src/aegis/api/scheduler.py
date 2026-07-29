@@ -6,7 +6,8 @@ directly (see the module boundary in ``docs/architecture/overview.md``). The act
 lock-and-run decision logic lives in ``aegis.domain.scheduled_ingestion``, which is
 framework-free and independently unit tested; this module only wires real objects into it,
 mirroring ``aegis.api.dependencies``. See
-``docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md``.
+``docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md`` and
+``docs/architecture/decisions/0009-phase-8-scheduled-research.md``.
 """
 
 from __future__ import annotations
@@ -19,10 +20,12 @@ from apscheduler.schedulers.asyncio import (  # pyright: ignore[reportMissingTyp
 from apscheduler.triggers.cron import CronTrigger  # pyright: ignore[reportMissingTypeStubs]
 from fastapi import FastAPI
 
+from aegis.api.dependencies import build_research_assessment_service
 from aegis.config.settings import Settings
 from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.domain.scheduled_ingestion import run_locked_ingestion_cycle
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
+from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
 from aegis.persistence.repositories.watchlist import WatchlistRepository
 from aegis.providers.alpha_vantage import MARKET_DATA_SOURCE, AlphaVantageProvider
 
@@ -46,6 +49,13 @@ async def run_scheduled_ingestion_job(app: FastAPI) -> None:
             calendar_name=settings.exchange_calendar_name,
             max_latest_bar_staleness_trading_days=settings.max_latest_bar_staleness_trading_days,
         )
+        research_service = None
+        if settings.research_schedule_after_ingest_enabled:
+            research_service = build_research_assessment_service(
+                market_data_repository,
+                ResearchAssessmentRepository(session),
+                settings,
+            )
         await run_locked_ingestion_cycle(
             redis_client=app.state.redis_client,
             lock_key=settings.ingestion_schedule_lock_key,
@@ -53,6 +63,7 @@ async def run_scheduled_ingestion_job(app: FastAPI) -> None:
             watchlist=watchlist_repository,
             seed_symbols=settings.watchlist_seed_symbols,
             ingestion_service=ingestion_service,
+            research_service=research_service,
         )
 
 

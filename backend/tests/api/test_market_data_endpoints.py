@@ -16,12 +16,18 @@ from aegis.api.dependencies import (
     get_active_watchlist_symbols,
     get_ingestion_service,
     get_market_data_repository,
+    get_research_assessment_service,
     require_operator,
 )
 from aegis.api.main import create_app
 from aegis.config.settings import Settings
 from aegis.domain.market_data_ingestion import IngestionRunResult, SymbolIngestionResult
 from aegis.domain.market_data_validation import RejectionReason
+from aegis.domain.research_assessment import (
+    METHOD_ID,
+    STATE_RESEARCH_ONLY,
+    ResearchAssessmentSnapshotData,
+)
 from aegis.persistence.models import MarketDailyBarObservation, Operator
 
 
@@ -72,18 +78,57 @@ def _bar(symbol: str = "AAPL") -> MarketDailyBarObservation:
     )
 
 
+class _FakeResearchService:
+    def __init__(self) -> None:
+        self.assess_calls: list[str] = []
+
+    async def assess(self, symbol: str) -> ResearchAssessmentSnapshotData:
+        self.assess_calls.append(symbol)
+        return ResearchAssessmentSnapshotData(
+            symbol=symbol,
+            method_id=METHOD_ID,
+            method_version=1,
+            state=STATE_RESEARCH_ONLY,
+            as_of_trading_date=date(2024, 1, 26),
+            event_time=datetime(2024, 1, 26, 23, 59, 59, tzinfo=UTC),
+            computed_at=datetime(2024, 1, 26, 18, 0, tzinfo=UTC),
+            coverage_confidence=0.9,
+            probability_confidence=None,
+            components={
+                "total_return_20": 0.1,
+                "realized_vol_20": 0.2,
+                "research_index": 0.46,
+            },
+            schema_version=1,
+            input_source="alpha_vantage",
+            lookback_start_date=date(2023, 12, 27),
+            lookback_end_date=date(2024, 1, 26),
+            bar_count=20,
+        )
+
+
 def _client_with_overrides(
     *,
     ingestion_service: _FakeIngestionService | None = None,
     repository: _FakeRepository | None = None,
+    research_service: _FakeResearchService | None = None,
+    research_schedule_after_ingest_enabled: bool = False,
 ) -> AsyncClient:
-    app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
+    app = create_app(
+        settings=Settings(
+            environment="test",
+            ingestion_schedule_enabled=False,
+            research_schedule_after_ingest_enabled=research_schedule_after_ingest_enabled,
+        )
+    )
     app.dependency_overrides[require_operator] = _operator
     if ingestion_service is not None:
         app.dependency_overrides[get_ingestion_service] = lambda: ingestion_service
         app.dependency_overrides[get_active_watchlist_symbols] = lambda: ["AAPL"]
     if repository is not None:
         app.dependency_overrides[get_market_data_repository] = lambda: repository
+    if research_service is not None:
+        app.dependency_overrides[get_research_assessment_service] = lambda: research_service
     transport = ASGITransport(app=app)
     return AsyncClient(transport=transport, base_url="http://testserver")
 
@@ -101,8 +146,11 @@ async def test_ingest_returns_run_summary() -> None:
         ]
     )
     service = _FakeIngestionService(run_result)
+    research = _FakeResearchService()
 
-    async with _client_with_overrides(ingestion_service=service) as client:
+    async with _client_with_overrides(
+        ingestion_service=service, research_service=research
+    ) as client:
         response = await client.post("/market-data/ingest")
 
     assert response.status_code == 200
@@ -113,6 +161,32 @@ async def test_ingest_returns_run_summary() -> None:
     assert body["results"][0]["rejections"] == {"stale": 1}
     assert body["results"][0]["error"] is None
     assert service.requested_symbols == ["AAPL"]
+    assert research.assess_calls == []
+
+
+async def test_ingest_runs_research_when_flag_enabled() -> None:
+    run_result = IngestionRunResult(
+        results=[
+            SymbolIngestionResult(
+                symbol="AAPL",
+                stored_count=1,
+                skipped_existing_count=0,
+                rejected_count=0,
+            )
+        ]
+    )
+    service = _FakeIngestionService(run_result)
+    research = _FakeResearchService()
+
+    async with _client_with_overrides(
+        ingestion_service=service,
+        research_service=research,
+        research_schedule_after_ingest_enabled=True,
+    ) as client:
+        response = await client.post("/market-data/ingest")
+
+    assert response.status_code == 200
+    assert research.assess_calls == ["AAPL"]
 
 
 async def test_get_daily_bars_returns_stored_bars() -> None:

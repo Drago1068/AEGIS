@@ -4,7 +4,9 @@ Framework-free per the domain module boundary in ``docs/architecture/overview.md
 module depends only on the ``Protocol`` interfaces below, never on a concrete Redis client,
 database session, or scheduler library. ``aegis.api.scheduler`` wires the real objects into
 it, mirroring how ``aegis.api.dependencies`` wires ``MarketDataIngestionService`` for the
-on-demand path. See ``docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md``.
+on-demand path. See ``docs/architecture/decisions/0003-phase-2-scheduled-watchlist.md`` and
+``docs/architecture/decisions/0009-phase-8-scheduled-research.md`` (optional post-ingest
+research inside the same lock).
 """
 
 from __future__ import annotations
@@ -13,6 +15,7 @@ import logging
 from typing import Protocol
 
 from aegis.domain.market_data_ingestion import IngestionRunResult
+from aegis.domain.scheduled_research import ResearchAssessor, run_research_after_ingest
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +63,7 @@ async def run_locked_ingestion_cycle(
     watchlist: WatchlistSource,
     seed_symbols: list[str],
     ingestion_service: IngestionRunner,
+    research_service: ResearchAssessor | None = None,
 ) -> IngestionRunResult | None:
     """Run one ingestion cycle over the active watchlist, guarded by a distributed lock.
 
@@ -67,6 +71,10 @@ async def run_locked_ingestion_cycle(
     backend replicas can never run overlapping ingestion cycles. The lock is always released
     afterward, even if ingestion raises; in the worst case (a crash before release), ``ex``
     still bounds how long the lock can be held.
+
+    When ``research_service`` is provided (Phase 8), research assessments run **inside the
+    same lock** after ingest succeeds and before release, using stored bars only. Pass
+    ``None`` when ``AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED`` is false.
     """
 
     acquired = await redis_client.set(lock_key, _LOCK_VALUE, nx=True, ex=lock_ttl_seconds)
@@ -89,11 +97,11 @@ async def run_locked_ingestion_cycle(
                 ],
             },
         )
+        if research_service is not None:
+            await run_research_after_ingest(symbols, research_service)
         return run_result
     finally:
         try:
             await redis_client.delete(lock_key)
         except Exception:  # noqa: BLE001 - best-effort release; `ex` still bounds the lock.
-            logger.warning(
-                "scheduled_ingestion_lock_release_failed", extra={"lock_key": lock_key}
-            )
+            logger.warning("scheduled_ingestion_lock_release_failed", extra={"lock_key": lock_key})

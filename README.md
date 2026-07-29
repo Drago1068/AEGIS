@@ -7,11 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 7 (UGREEN NAS deployment packaging).** Product capabilities remain
-research-only (Phase 6 assessments); Phase 7 adds a Compose overlay, env-sourced NAS config,
-and package/deploy/verify scripts. Upload is not a verified deployment. See
-[docs/architecture/decisions/0008-phase-7-nas-deployment.md](docs/architecture/decisions/0008-phase-7-nas-deployment.md),
-[docker/nas/README.md](docker/nas/README.md), and [CHANGELOG.md](CHANGELOG.md).
+**Current phase: Phase 8 (scheduled research assessments after ingest).** After successful
+locked scheduled ingest (and on-demand ingest when enabled), Phase 6 `daily_bar_research_v1`
+runs automatically for active watchlist symbols (stored bars only; fail-closed skips). See
+[docs/architecture/decisions/0009-phase-8-scheduled-research.md](docs/architecture/decisions/0009-phase-8-scheduled-research.md)
+and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
 

@@ -81,8 +81,9 @@ export function ResearchAssessmentPanel({
             Research assessment
           </h2>
           <p className="text-sm text-aegis-muted">
-            On-demand research heuristic from stored primary daily bars. Not a probability,
-            signal, or recommendation. Values come from the API only.
+            Research heuristic from stored primary daily bars (on-demand or after a successful
+            ingest when configured). Not a probability, signal, or recommendation. Values come
+            from the API only — refresh latest to see post-ingest snapshots.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

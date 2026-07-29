@@ -13,6 +13,7 @@ from collections.abc import AsyncIterator
 from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aegis.config.settings import Settings
 from aegis.domain.market_data_ingestion import MarketDataIngestionService
 from aegis.domain.research_assessment import (
     ResearchAssessmentService,
@@ -154,7 +155,7 @@ async def get_ingestion_service(
     )
 
 
-class _ResearchBarReaderAdapter:
+class ResearchBarReaderAdapter:
     """Maps stored daily bar ORM rows to domain :class:`ResearchBarInput` values."""
 
     def __init__(self, repository: MarketDailyBarRepository) -> None:
@@ -178,6 +179,21 @@ def _bar_to_research_input(row: MarketDailyBarObservation) -> ResearchBarInput:
     )
 
 
+def build_research_assessment_service(
+    market_data_repository: MarketDailyBarRepository,
+    snapshot_repository: ResearchAssessmentRepository,
+    settings: Settings,
+) -> ResearchAssessmentService:
+    """Wire research assessment domain service for HTTP and scheduler paths."""
+
+    return ResearchAssessmentService(
+        ResearchBarReaderAdapter(market_data_repository),
+        snapshot_repository,
+        calendar_name=settings.exchange_calendar_name,
+        max_latest_bar_staleness_trading_days=settings.max_latest_bar_staleness_trading_days,
+    )
+
+
 async def get_research_assessment_repository(
     session: AsyncSession = Depends(get_db_session),
 ) -> ResearchAssessmentRepository:
@@ -189,16 +205,12 @@ async def get_research_assessment_repository(
 async def get_research_assessment_service(
     request: Request,
     market_data_repository: MarketDailyBarRepository = Depends(get_market_data_repository),
-    snapshot_repository: ResearchAssessmentRepository = Depends(
-        get_research_assessment_repository
-    ),
+    snapshot_repository: ResearchAssessmentRepository = Depends(get_research_assessment_repository),
 ) -> ResearchAssessmentService:
     """Wire research assessment domain service to bar reader and snapshot store."""
 
-    settings = request.app.state.settings
-    return ResearchAssessmentService(
-        _ResearchBarReaderAdapter(market_data_repository),
+    return build_research_assessment_service(
+        market_data_repository,
         snapshot_repository,
-        calendar_name=settings.exchange_calendar_name,
-        max_latest_bar_staleness_trading_days=settings.max_latest_bar_staleness_trading_days,
+        request.app.state.settings,
     )

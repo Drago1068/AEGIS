@@ -7,6 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 8 - Scheduled Research Assessments After Ingest
+
+After each successful locked scheduled ingest cycle (and after successful on-demand
+`POST /market-data/ingest` when configured), automatically run Phase 6
+`daily_bar_research_v1` for active watchlist symbols using stored bars only. Persist
+append-only snapshots on success; skip with structured logs on fail-closed (no row). Keep
+`state=research_only`, coverage set, `probability_confidence=null`. See
+[docs/architecture/decisions/0009-phase-8-scheduled-research.md](docs/architecture/decisions/0009-phase-8-scheduled-research.md).
+
+#### Added
+
+- Backend: `domain.scheduled_research.run_research_after_ingest` (Protocol-based, per-symbol
+  fail-closed); optional research inside `run_locked_ingestion_cycle` before lock release;
+  scheduler and on-demand ingest wiring; setting
+  `AEGIS_RESEARCH_SCHEDULE_AFTER_INGEST_ENABLED` (local and NAS example default `true`).
+- Frontend: research panel copy notes post-ingest snapshots may appear after ingest
+  (presentation only; RESEARCH ONLY labels unchanged).
+- Docs: ADR-0009; overview and configuration updates; `.env.example` / `.env.nas.example`.
+
+#### Explicitly out of scope
+
+Calibration, actionable promotion, recommendations, chart signals, orders, TLS changes, and
+NAS live verify - each remains absent.
+
 ### Phase 7 - UGREEN NAS Deployment Packaging
 
 Packages the existing research-only authenticated stack for UGREEN NAS DXP-series hardware

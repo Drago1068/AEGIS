@@ -122,7 +122,19 @@ class Settings(BaseSettings):
         gt=0,
         description=(
             "Redis lock TTL for a scheduled ingestion cycle. Bounds how long a crashed "
-            "process can hold the lock; must comfortably exceed a normal run's duration."
+            "process can hold the lock; must comfortably exceed a normal run's duration "
+            "(including optional post-ingest research when enabled; see ADR-0009)."
+        ),
+    )
+
+    research_schedule_after_ingest_enabled: bool = Field(
+        default=True,
+        description=(
+            "When true, after each successful locked scheduled ingest cycle and after each "
+            "successful on-demand POST /market-data/ingest, run Phase 6 "
+            "daily_bar_research_v1 for active watchlist symbols (stored bars only). When "
+            "false, Phase 6 on-demand POST /research/{symbol}/assessments is unchanged. "
+            "See ADR-0009."
         ),
     )
 

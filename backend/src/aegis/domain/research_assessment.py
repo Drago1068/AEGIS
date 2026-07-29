@@ -116,6 +116,7 @@ class ResearchAssessmentSnapshotData:
     lookback_start_date: date
     lookback_end_date: date
     bar_count: int
+    id: int | None = None
 
 
 class ResearchDailyBarReader(Protocol):
@@ -143,6 +144,12 @@ class ResearchAssessmentStore(Protocol):
 
     async def get_latest(self, symbol: str) -> ResearchAssessmentSnapshotData | None:
         """Return the newest snapshot for ``symbol``, or ``None``."""
+        ...
+
+    async def get_by_id(
+        self, assessment_snapshot_id: int
+    ) -> ResearchAssessmentSnapshotData | None:
+        """Return the snapshot with ``assessment_snapshot_id``, or ``None``."""
         ...
 
 

@@ -4,9 +4,12 @@ import { useState, useTransition } from "react";
 
 import {
   ApiClientError,
+  OutcomeLabel,
   ResearchAssessment,
+  createOutcomeLabels,
   createResearchAssessment,
   getApiBaseUrl,
+  getLatestOutcomeLabels,
   getLatestResearchAssessment,
 } from "@/lib/api-client";
 
@@ -37,6 +40,7 @@ export function ResearchAssessmentPanel({
   initialLatest,
 }: ResearchAssessmentPanelProps) {
   const [latest, setLatest] = useState<ResearchAssessment | null>(initialLatest);
+  const [outcomeLabel, setOutcomeLabel] = useState<OutcomeLabel | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const baseUrl = getApiBaseUrl();
@@ -47,6 +51,7 @@ export function ResearchAssessmentPanel({
       try {
         const snapshot = await createResearchAssessment(baseUrl, symbol);
         setLatest(snapshot);
+        setOutcomeLabel(null);
       } catch (err) {
         setError(formatAssessmentError(err));
       }
@@ -59,12 +64,41 @@ export function ResearchAssessmentPanel({
       try {
         const snapshot = await getLatestResearchAssessment(baseUrl, symbol);
         setLatest(snapshot);
+        setOutcomeLabel(null);
+        if (snapshot.id != null) {
+          try {
+            const label = await getLatestOutcomeLabels(baseUrl, symbol, snapshot.id);
+            setOutcomeLabel(label);
+          } catch (labelErr) {
+            if (labelErr instanceof ApiClientError && labelErr.status === 404) {
+              setOutcomeLabel(null);
+            } else {
+              throw labelErr;
+            }
+          }
+        }
       } catch (err) {
         if (err instanceof ApiClientError && err.status === 404) {
           setLatest(null);
+          setOutcomeLabel(null);
           setError(null);
           return;
         }
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
+  function onComputeOutcomeLabels() {
+    if (latest?.id == null) {
+      return;
+    }
+    startTransition(async () => {
+      setError(null);
+      try {
+        const label = await createOutcomeLabels(baseUrl, symbol, latest.id as number);
+        setOutcomeLabel(label);
+      } catch (err) {
         setError(formatAssessmentError(err));
       }
     });
@@ -94,6 +128,14 @@ export function ResearchAssessmentPanel({
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Refresh latest
+          </button>
+          <button
+            type="button"
+            onClick={onComputeOutcomeLabels}
+            disabled={isPending || latest?.id == null}
+            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
+          >
+            Compute outcome labels
           </button>
           <button
             type="button"
@@ -190,6 +232,25 @@ export function ResearchAssessmentPanel({
             Computed at {latest.computed_at} from source {latest.input_source}. Research
             only — not actionable.
           </p>
+          {outcomeLabel ? (
+            <div className="rounded border border-aegis-line bg-white/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
+                Outcome labels (evidence only — not calibrated probability)
+              </p>
+              <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                {Object.entries(outcomeLabel.labels).map(([key, value]) => (
+                  <div key={key}>
+                    <dt className="text-aegis-muted">{key}</dt>
+                    <dd className="font-mono">{value.toFixed(6)}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-2 text-xs text-aegis-muted">
+                Bar source {outcomeLabel.bar_source}. Label method{" "}
+                {outcomeLabel.label_method_id} v{outcomeLabel.label_method_version}.
+              </p>
+            </div>
+          ) : null}
         </div>
       ) : !error ? (
         <p className="text-sm text-aegis-muted">

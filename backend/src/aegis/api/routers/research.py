@@ -8,11 +8,20 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from aegis.api.dependencies import get_research_assessment_service, require_operator
+from aegis.api.dependencies import (
+    get_outcome_label_service,
+    get_research_assessment_service,
+    require_operator,
+)
 from aegis.api.schemas.research import ResearchAssessmentResponse
+from aegis.api.schemas.research_outcome_labels import OutcomeLabelResponse
 from aegis.domain.research_assessment import (
     ResearchAssessmentService,
     ResearchAssessmentUnavailableError,
+)
+from aegis.domain.research_outcome_labels import (
+    OutcomeLabelService,
+    OutcomeLabelUnavailableError,
 )
 
 router = APIRouter(
@@ -41,6 +50,48 @@ async def create_research_assessment(
             detail={"reason": exc.reason.value, "message": exc.detail},
         ) from exc
     return ResearchAssessmentResponse.model_validate(snapshot)
+
+
+@router.post(
+    "/{symbol}/assessments/{assessment_id}/outcome-labels",
+    response_model=OutcomeLabelResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def create_outcome_labels(
+    symbol: str,
+    assessment_id: int,
+    service: OutcomeLabelService = Depends(get_outcome_label_service),
+) -> OutcomeLabelResponse:
+    """Compute and append forward-return outcome labels for an assessment snapshot."""
+
+    try:
+        label = await service.label_assessment(symbol, assessment_id)
+    except OutcomeLabelUnavailableError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail={"reason": exc.reason.value, "message": exc.detail},
+        ) from exc
+    return OutcomeLabelResponse.model_validate(label)
+
+
+@router.get(
+    "/{symbol}/assessments/{assessment_id}/outcome-labels/latest",
+    response_model=OutcomeLabelResponse,
+)
+async def get_latest_outcome_labels(
+    symbol: str,
+    assessment_id: int,
+    service: OutcomeLabelService = Depends(get_outcome_label_service),
+) -> OutcomeLabelResponse:
+    """Return the latest outcome labels for ``assessment_id``, or 404."""
+
+    label = await service.latest_label_for_assessment(assessment_id)
+    if label is None or label.symbol.upper() != symbol.upper():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"no outcome labels for assessment {assessment_id}",
+        )
+    return OutcomeLabelResponse.model_validate(label)
 
 
 @router.get("/{symbol}/assessments", response_model=list[ResearchAssessmentResponse])

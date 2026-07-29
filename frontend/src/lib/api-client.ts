@@ -61,6 +61,7 @@ export interface IngestionRunResponse {
 }
 
 export interface ResearchAssessment {
+  id?: number | null;
   symbol: string;
   method_id: string;
   method_version: number;
@@ -388,6 +389,71 @@ export async function getLatestResearchAssessment(
     );
   }
   return body as ResearchAssessment;
+}
+
+export interface OutcomeLabel {
+  id?: number | null;
+  assessment_snapshot_id: number;
+  symbol: string;
+  label_method_id: string;
+  label_method_version: number;
+  state: string;
+  as_of_trading_date: string;
+  computed_at: string;
+  labels: Record<string, number>;
+  label_end_dates: Record<string, string>;
+  schema_version: number;
+  bar_source: string;
+}
+
+export async function createOutcomeLabels(
+  baseUrl: string,
+  symbol: string,
+  assessmentId: number,
+  options?: ApiRequestOptions,
+): Promise<OutcomeLabel> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/` +
+    `${assessmentId}/outcome-labels`;
+  const { response, body } = await requestJson(
+    url,
+    {
+      method: "POST",
+      headers: { Accept: "application/json" },
+    },
+    options,
+  );
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected POST outcome-labels status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as OutcomeLabel;
+}
+
+export async function getLatestOutcomeLabels(
+  baseUrl: string,
+  symbol: string,
+  assessmentId: number,
+  options?: ApiRequestOptions,
+): Promise<OutcomeLabel> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/` +
+    `${assessmentId}/outcome-labels/latest`;
+  const { response, body } = await requestJson(url, undefined, options);
+  if (response.status === 404) {
+    throw new ApiClientError(`No outcome labels for assessment ${assessmentId}`, 404, body);
+  }
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected GET outcome-labels/latest status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as OutcomeLabel;
 }
 
 export function getApiBaseUrl(): string {

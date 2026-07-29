@@ -146,3 +146,25 @@ class ResearchAssessmentSnapshot(Base):
     lookback_start_date: Mapped[date] = mapped_column(Date, nullable=False)
     lookback_end_date: Mapped[date] = mapped_column(Date, nullable=False)
     bar_count: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
+class ResearchAssessmentOutcomeLabel(Base):
+    """Append-only forward-return outcome label for a research assessment (Phase 13, ADR-0014).
+
+    Evidence for a future calibration phase; not a probability or recommendation.
+    """
+
+    __tablename__ = "research_assessment_outcome_labels"
+
+    id: Mapped[int] = mapped_column(Integer, Identity(), primary_key=True)
+    assessment_snapshot_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    computed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    symbol: Mapped[str] = mapped_column(String(32), nullable=False)
+    label_method_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    label_method_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    state: Mapped[str] = mapped_column(String(32), nullable=False)
+    as_of_trading_date: Mapped[date] = mapped_column(Date, nullable=False)
+    labels: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
+    label_end_dates: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
+    schema_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    bar_source: Mapped[str] = mapped_column(String(64), nullable=False)

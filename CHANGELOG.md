@@ -7,6 +7,24 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 13 - Research Outcome Labels (Calibration Evidence Prep)
+
+Append-only forward-return outcome labels linked to research assessment snapshots.
+`probability_confidence` remains null; labels are evidence only, not calibrated
+probabilities. See
+[docs/architecture/decisions/0014-phase-13-research-outcome-labels.md](docs/architecture/decisions/0014-phase-13-research-outcome-labels.md).
+
+#### Added
+
+- ADR-0014: `forward_total_return_v1` horizons 5 and 20 trading sessions; fail-closed;
+  on-demand POST/GET under `/research/{symbol}/assessments/{id}/outcome-labels`.
+- Table `research_assessment_outcome_labels` (migration `0007`).
+- Operator console presentation of outcome labels when available.
+
+#### Explicitly out of scope
+
+Probability calibration, actionable promotion, orders, and automatic post-assessment labeling.
+
 ### Phase 12 - Provider Historical Corrections (Append-Only)
 
 When a provider revises a historical daily bar, AEGIS inserts a new `correction` observation

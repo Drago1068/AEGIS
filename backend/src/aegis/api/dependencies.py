@@ -21,12 +21,14 @@ from aegis.domain.research_assessment import (
     ResearchBarInput,
     ResearchMultiSourceCoverageConfig,
 )
+from aegis.domain.research_outcome_labels import OutcomeLabelService
 from aegis.persistence.cache import check_redis
 from aegis.persistence.database import check_database
 from aegis.persistence.models import MarketDailyBarObservation, Operator
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
 from aegis.persistence.repositories.operators import OperatorRepository
 from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
+from aegis.persistence.repositories.research_outcome_labels import ResearchOutcomeLabelRepository
 from aegis.persistence.repositories.watchlist import WatchlistRepository
 from aegis.persistence.sessions import RedisSessionStore, SessionStore
 
@@ -218,4 +220,31 @@ async def get_research_assessment_service(
         market_data_repository,
         snapshot_repository,
         request.app.state.settings,
+    )
+
+
+async def get_outcome_label_repository(
+    session: AsyncSession = Depends(get_db_session),
+) -> ResearchOutcomeLabelRepository:
+    """A request-scoped repository for research outcome labels."""
+
+    return ResearchOutcomeLabelRepository(session)
+
+
+async def get_outcome_label_service(
+    request: Request,
+    market_data_repository: MarketDailyBarRepository = Depends(get_market_data_repository),
+    assessment_repository: ResearchAssessmentRepository = Depends(
+        get_research_assessment_repository
+    ),
+    label_repository: ResearchOutcomeLabelRepository = Depends(get_outcome_label_repository),
+) -> OutcomeLabelService:
+    """Wire outcome label service to assessment store, bars, and label persistence."""
+
+    settings = request.app.state.settings
+    return OutcomeLabelService(
+        assessment_repository,
+        ResearchBarReaderAdapter(market_data_repository),
+        label_repository,
+        calendar_name=settings.exchange_calendar_name,
     )

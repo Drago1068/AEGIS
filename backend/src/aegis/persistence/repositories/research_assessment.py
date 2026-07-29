@@ -62,11 +62,22 @@ class ResearchAssessmentRepository:
         rows = await self.list_recent(symbol, 1)
         return rows[0] if rows else None
 
+    async def get_by_id(
+        self, assessment_snapshot_id: int
+    ) -> ResearchAssessmentSnapshotData | None:
+        stmt = select(ResearchAssessmentSnapshot).where(
+            ResearchAssessmentSnapshot.id == assessment_snapshot_id
+        )
+        result = await self._session.execute(stmt)
+        row = result.scalar_one_or_none()
+        return _to_data(row) if row is not None else None
+
 
 def _to_data(row: ResearchAssessmentSnapshot) -> ResearchAssessmentSnapshotData:
     # schema_version 2+ may include string/list provenance alongside numeric metrics.
     components = {str(key): value for key, value in row.components.items()}
     return ResearchAssessmentSnapshotData(
+        id=row.id,
         symbol=row.symbol,
         method_id=row.method_id,
         method_version=row.method_version,

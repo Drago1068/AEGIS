@@ -1,9 +1,11 @@
-# NAS Deployment (Phase 7 + optional Phase 9 TLS)
+# NAS Deployment (Phase 7 + optional Phase 9 TLS + Phase 17 live verify)
 
 Operator-facing summary of UGREEN NAS packaging. The authoritative runbook is
-[../../docker/nas/README.md](../../docker/nas/README.md). Architecture decisions:
+[../../docker/nas/README.md](../../docker/nas/README.md). Live verify checklist:
+[nas-live-verification.md](nas-live-verification.md). Architecture decisions:
 [../architecture/decisions/0008-phase-7-nas-deployment.md](../architecture/decisions/0008-phase-7-nas-deployment.md),
-[../architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md](../architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md).
+[../architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md](../architecture/decisions/0010-phase-9-nas-tls-reverse-proxy.md),
+[../architecture/decisions/0018-phase-17-nas-live-verification.md](../architecture/decisions/0018-phase-17-nas-live-verification.md).
 
 ## Boundary
 
@@ -14,8 +16,8 @@ Operator-facing summary of UGREEN NAS packaging. The authoritative runbook is
 - All NAS-specific values live in gitignored `.env.nas` (template: `.env.nas.example`).
 - Scripts: `docker/nas/scripts/package|deploy|verify` (PowerShell primary on Windows; `.sh`
   for Git Bash/WSL/NAS).
-- **Upload ≠ verified deployment.** Always run verify after deploy. Live NAS deploy is an
-  operator step; this repository documents packaging only.
+- **Upload ≠ verified deployment.** Always run verify after deploy (ADR-0018). Dry-run is
+  checklist-only and is not acceptance evidence.
 
 ## Quick commands (Windows)
 
@@ -26,6 +28,7 @@ cp .env.nas.example .env.nas   # then edit placeholders
 .\docker\nas\scripts\package.ps1
 .\docker\nas\scripts\deploy.ps1
 .\docker\nas\scripts\verify.ps1
+.\docker\nas\scripts\verify.ps1 -DryRun   # planning only; not live evidence
 ```
 
 ## Auth on NAS
@@ -48,11 +51,14 @@ will not send Secure cookies on plain HTTP.
 ## Migrations
 
 First start (via deploy script) runs `alembic upgrade head` in the backend container,
-including revision `0005` (`research_assessment_snapshots`). Verify confirms current
-revision when SSH is configured.
+through revision `0008` (`research_assessment_probability_calibrations`). Verify confirms
+current revision when SSH is configured.
 
 ## Local dry-run without a NAS
 
 `validate-local` runs `docker compose ... config` for the overlay. Pass `-Tls` / `--tls` to
 include the TLS overlay. Optional `-BuildImages` / `--build-images` builds `linux/amd64`
 images only when a real `.env.nas` is present.
+
+`verify -DryRun` / `--dry-run` prints the live-verify checklist without contacting the NAS
+and is **not** evidence of a verified deployment.

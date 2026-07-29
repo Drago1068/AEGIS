@@ -107,7 +107,7 @@ for i in `$(seq 1 60); do
   fi
   sleep 2
 done
-echo '==> Applying Alembic migrations (through 0005 / head)'
+echo '==> Applying Alembic migrations (through 0008 / head)'
 docker compose $composeFileArgs --env-file .env.nas --project-directory . exec -T backend alembic upgrade head
 echo '==> Migration current revision'
 docker compose $composeFileArgs --env-file .env.nas --project-directory . exec -T backend alembic current

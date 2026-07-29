@@ -16,7 +16,8 @@ deployment packaging), Phase 8 (automatic research assessments after successful 
 Phase 10 (second daily-bar provider), and Phase 11 (multi-source coverage weighting),
 Phase 12 (provider historical corrections on daily-bar observations), Phase 13 (research
 outcome labels), Phase 14 (scheduled outcome labeling after assessments), Phase 15
-(research probability calibration v1), and Phase 16 (calibration corpus readiness).
+(research probability calibration v1), Phase 16 (calibration corpus readiness), and
+Phase 17 (NAS live verification evidence gate).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -39,6 +40,8 @@ Phase 15 adds research-only probability calibration from labeled history when en
 [decisions/0016-phase-15-research-probability-calibration.md](decisions/0016-phase-15-research-probability-calibration.md)).
 Phase 16 adds read-only calibration corpus readiness diagnostics (see
 [decisions/0017-phase-16-calibration-readiness.md](decisions/0017-phase-16-calibration-readiness.md)).
+Phase 17 hardens NAS live verification as a distinct evidence gate after package/deploy (see
+[decisions/0018-phase-17-nas-live-verification.md](decisions/0018-phase-17-nas-live-verification.md)).
 
 ## System context
 

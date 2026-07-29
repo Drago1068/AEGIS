@@ -1,15 +1,23 @@
 <#
 .SYNOPSIS
-  Verify a live AEGIS NAS deployment (Phase 7 + optional Phase 9 TLS). Distinct from package upload / deploy start.
+  Verify a live AEGIS NAS deployment (Phase 7/9 + Phase 17 evidence gate). Distinct from package upload / deploy start.
 
 .DESCRIPTION
-  Checks /health, /ready, auth gate (401 without session) on watchlist/daily-bars/research,
-  frontend reachability, and (when SSH is configured) Alembic current + log guidance.
-  When AEGIS_NAS_TLS_ENABLED=true, requires https:// verify URLs.
+  Checks /health, /ready, auth gates (including calibration-readiness), frontend reachability,
+  optional authenticated research/readiness routes, and (when SSH is configured) Alembic current
+  through migration 0008 / head. Use -DryRun to print the checklist without contacting the NAS
+  (not acceptance evidence). See docs/architecture/decisions/0018-phase-17-nas-live-verification.md.
 
 .EXAMPLE
   .\docker\nas\scripts\verify.ps1
+
+.EXAMPLE
+  .\docker\nas\scripts\verify.ps1 -DryRun
 #>
+param(
+    [switch]$DryRun
+)
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
@@ -18,23 +26,59 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 $RepoRoot = Get-RepoRoot -ScriptDir $ScriptDir
 $EnvNas = Join-Path $RepoRoot ".env.nas"
-Import-DotEnvFile -Path $EnvNas
+
+$verifySymbol = "AAPL"
+if (Test-Path -LiteralPath $EnvNas) {
+    Import-DotEnvFile -Path $EnvNas
+    if (-not [string]::IsNullOrWhiteSpace($env:AEGIS_NAS_VERIFY_SYMBOL)) {
+        $verifySymbol = $env:AEGIS_NAS_VERIFY_SYMBOL.Trim().ToUpperInvariant()
+    }
+}
+
+function Write-VerifyChecklist {
+    param([string]$Symbol)
+    Write-Host "Live verification checklist (ADR-0018):"
+    Write-Host "  1. GET /health -> 200"
+    Write-Host "  2. GET /ready -> 200"
+    Write-Host "  3. Auth gate 401: watchlist, daily-bars, research latest, calibration-readiness"
+    Write-Host "  4. Frontend base URL -> 200|302|307|308"
+    Write-Host "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
+    Write-Host "  6. Authenticated GET /research/$Symbol/calibration-readiness -> 200"
+    Write-Host "  7. Authenticated GET /research/$Symbol/assessments/latest -> 200|404"
+    Write-Host "  8. SSH alembic current includes 0008|head (when SSH configured)"
+    Write-Host "  9. TLS profile: https:// URLs + Secure cookies when enabled"
+}
+
+if ($DryRun) {
+    Write-Host "==> DRY RUN - checklist only; NOT live verification evidence"
+    Write-VerifyChecklist -Symbol $verifySymbol
+    Write-Host ""
+    Write-Host "Dry-run complete. Run without -DryRun against a live NAS for acceptance evidence."
+    exit 0
+}
+
 Require-EnvVars -Names @(
     "AEGIS_NAS_API_BASE_URL",
-    "AEGIS_NAS_FRONTEND_BASE_URL"
+    "AEGIS_NAS_FRONTEND_BASE_URL",
+    "AEGIS_OPERATOR_USERNAME",
+    "AEGIS_OPERATOR_PASSWORD"
 )
 
 $api = $env:AEGIS_NAS_API_BASE_URL.TrimEnd("/")
 $frontend = $env:AEGIS_NAS_FRONTEND_BASE_URL.TrimEnd("/")
+$operatorUser = $env:AEGIS_OPERATOR_USERNAME
+$operatorPassword = $env:AEGIS_OPERATOR_PASSWORD
 
 if ($api -match "replace-with-" -or $frontend -match "replace-with-") {
     throw "AEGIS_NAS_API_BASE_URL / AEGIS_NAS_FRONTEND_BASE_URL still look like placeholders."
 }
+if ($operatorPassword -match "replace-with-|change-me-before-non-local-use") {
+    throw "AEGIS_OPERATOR_PASSWORD still looks like a template placeholder."
+}
 
 if (Test-NasTlsEnabled) {
-    # PEM presence already validated at package/deploy; verify focuses on HTTPS URLs.
     if (-not $api.StartsWith("https://") -or -not $frontend.StartsWith("https://")) {
-        throw "TLS profile requires https:// verify URLs (API=$api, FRONTEND=$frontend)."
+        throw ("TLS profile requires https:// verify URLs (API={0}; FRONTEND={1})." -f $api, $frontend)
     }
     $secure = "$($env:AEGIS_SESSION_COOKIE_SECURE)".Trim().ToLowerInvariant()
     if ($secure -ne "true" -and $secure -ne "1") {
@@ -50,13 +94,22 @@ if (@("true", "1", "yes") -contains $insecure) {
     $curlInsecure = @("-k")
 }
 
+$curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+if ($null -eq $curl) {
+    throw "curl.exe is required for verify.ps1 (OpenSSH/curl ships with modern Windows)."
+}
+
 function Get-HttpStatus {
-    param([string]$Url)
-    $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
-    if ($null -eq $curl) {
-        throw "curl.exe is required for verify.ps1 (OpenSSH/curl ships with modern Windows)."
+    param(
+        [string]$Url,
+        [string]$CookieJar = ""
+    )
+    $curlArgs = @("-sS") + $curlInsecure + @("-o", "NUL", "-w", "%{http_code}", "--max-time", "30")
+    if (-not [string]::IsNullOrWhiteSpace($CookieJar)) {
+        $curlArgs += @("-b", $CookieJar)
     }
-    $code = & curl.exe -sS @curlInsecure -o NUL -w "%{http_code}" --max-time 30 $Url
+    $curlArgs += $Url
+    $code = & curl.exe @curlArgs
     if ($LASTEXITCODE -ne 0) {
         throw "HTTP request failed for $Url (curl exit $LASTEXITCODE)"
     }
@@ -71,18 +124,46 @@ function Assert-Status {
     Write-Host "OK  $Label -> $Actual"
 }
 
+Write-VerifyChecklist -Symbol $verifySymbol
+Write-Host ""
+
 Write-Host "==> Public health and readiness"
 Assert-Status -Label "GET $api/health" -Actual (Get-HttpStatus "$api/health") -Expected @(200)
 Assert-Status -Label "GET $api/ready" -Actual (Get-HttpStatus "$api/ready") -Expected @(200)
 
 Write-Host "==> Auth gate (expect 401 without session)"
 Assert-Status -Label "GET $api/watchlist" -Actual (Get-HttpStatus "$api/watchlist") -Expected @(401)
-Assert-Status -Label "GET $api/market-data/AAPL/daily-bars" -Actual (Get-HttpStatus "$api/market-data/AAPL/daily-bars") -Expected @(401)
-Assert-Status -Label "GET $api/research/AAPL/assessments/latest" -Actual (Get-HttpStatus "$api/research/AAPL/assessments/latest") -Expected @(401)
+Assert-Status -Label "GET $api/market-data/$verifySymbol/daily-bars" -Actual (Get-HttpStatus "$api/market-data/$verifySymbol/daily-bars") -Expected @(401)
+Assert-Status -Label "GET $api/research/$verifySymbol/assessments/latest" -Actual (Get-HttpStatus "$api/research/$verifySymbol/assessments/latest") -Expected @(401)
+Assert-Status -Label "GET $api/research/$verifySymbol/calibration-readiness" -Actual (Get-HttpStatus "$api/research/$verifySymbol/calibration-readiness") -Expected @(401)
 
 Write-Host "==> Frontend reachability"
 $feStatus = Get-HttpStatus $frontend
 Assert-Status -Label "GET $frontend" -Actual $feStatus -Expected @(200, 307, 308, 302)
+
+Write-Host "==> Operator login + authenticated research diagnostics"
+$cookieJar = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.cookies" -f [guid]::NewGuid().ToString("N"))
+try {
+    $loginBody = @{ username = $operatorUser; password = $operatorPassword } | ConvertTo-Json -Compress
+    $loginCode = & curl.exe -sS @curlInsecure -o NUL -w "%{http_code}" --max-time 30 `
+        -c $cookieJar -H "Content-Type: application/json" -H "Accept: application/json" `
+        -d $loginBody "$api/auth/login"
+    if ($LASTEXITCODE -ne 0) {
+        throw "POST /auth/login request failed (curl exit $LASTEXITCODE)"
+    }
+    Assert-Status -Label "POST $api/auth/login" -Actual ([int]$loginCode) -Expected @(200)
+
+    $readyCode = Get-HttpStatus "$api/research/$verifySymbol/calibration-readiness" -CookieJar $cookieJar
+    Assert-Status -Label "GET $api/research/$verifySymbol/calibration-readiness (auth)" -Actual $readyCode -Expected @(200)
+
+    $latestCode = Get-HttpStatus "$api/research/$verifySymbol/assessments/latest" -CookieJar $cookieJar
+    Assert-Status -Label "GET $api/research/$verifySymbol/assessments/latest (auth)" -Actual $latestCode -Expected @(200, 404)
+}
+finally {
+    if (Test-Path -LiteralPath $cookieJar) {
+        Remove-Item -LiteralPath $cookieJar -Force -ErrorAction SilentlyContinue
+    }
+}
 
 $composeFileFlags = Get-ComposeNasRemoteFileFlags
 $composeFileArgs = ($composeFileFlags -join " ")
@@ -97,7 +178,7 @@ if (
     -not [string]::IsNullOrWhiteSpace($remoteDir)
 ) {
     Write-Host "==> Alembic current (via SSH)"
-    $remote = "{0}@{1}" -f $sshUser, $sshHost
+    $remote = ('{0}@{1}' -f $sshUser, $sshHost)
     $sshArgs = Get-SshArgs
     $dir = $remoteDir.TrimEnd("/")
     $cmd = @"
@@ -105,13 +186,13 @@ set -euo pipefail
 cd '$dir'
 out=`$(docker compose $composeFileArgs --env-file .env.nas --project-directory . exec -T backend alembic current)
 echo "`$out"
-echo "`$out" | grep -E '0005|head' >/dev/null
+echo "`$out" | grep -E '0008|head' >/dev/null
 "@
     & ssh @sshArgs $remote $cmd
     if ($LASTEXITCODE -ne 0) {
-        throw "Alembic current did not report migration 0005 / head. Apply alembic upgrade head on the NAS."
+        throw "Alembic current did not report migration 0008 / head. Apply alembic upgrade head on the NAS."
     }
-    Write-Host "OK  alembic current includes 0005 / head"
+    Write-Host "OK  alembic current includes 0008 / head"
 
     Write-Host ""
     Write-Host "Log inspection guidance (run on NAS or via SSH):"
@@ -125,9 +206,10 @@ echo "`$out" | grep -E '0005|head' >/dev/null
     Write-Host ""
     Write-Host "NOTE: SSH vars not fully set; skipped remote Alembic check."
     Write-Host "On the NAS, confirm: docker compose ... exec -T backend alembic current"
-    Write-Host "Expect revision 0005 (research_assessment_snapshots) / head."
+    Write-Host "Expect revision 0008 (research_assessment_probability_calibrations) / head."
 }
 
 Write-Host ""
-Write-Host "Verification passed for HTTP(S) checks against $api and $frontend."
+Write-Host "LIVE VERIFICATION PASSED for HTTP(S) checks against $api and $frontend (symbol=$verifySymbol)."
 Write-Host "Upload/start alone is never sufficient; this verify step is the acceptance evidence."
+Write-Host "Evidence: retain this stdout. Dry-run runs are not evidence."

@@ -125,6 +125,7 @@ deploy/verify scripts also require connection and public-URL settings.
 | `AEGIS_NAS_COMPOSE_PROJECT_NAME` | Compose overlay | Compose project name on the NAS. | `aegis` |
 | `AEGIS_NAS_API_BASE_URL` | verify scripts | Operator-facing API origin used for HTTP(S) checks. | `https://replace-with-operator-facing-api-origin` |
 | `AEGIS_NAS_FRONTEND_BASE_URL` | verify scripts | Operator-facing frontend origin. | `https://replace-with-operator-facing-frontend-origin` |
+| `AEGIS_NAS_VERIFY_SYMBOL` | verify scripts | Optional symbol for research / calibration-readiness checks (default `AAPL`). | `AAPL` |
 | `AEGIS_NAS_TLS_ENABLED` | package/deploy/validate/verify | When `true`, include `docker-compose.nas.tls.yml` (Caddy). | `false` |
 | `AEGIS_TLS_MODE` | TLS scripts / Caddyfile choice | `files` (operator PEMs) or `acme` (public DNS). | `files` |
 | `AEGIS_TLS_FRONTEND_HOST` | Caddy | Console hostname (no scheme). Required when TLS enabled. | `replace-with-frontend-hostname` |

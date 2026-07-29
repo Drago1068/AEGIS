@@ -1,16 +1,17 @@
 # UGREEN NAS Deployment Runbook (Phase 7 + optional Phase 9 TLS)
 
-AEGIS 3.0 packages the existing Compose stack for UGREEN NAS DXP-series hardware
+AEGIS packages the existing Compose stack for UGREEN NAS DXP-series hardware
 (`linux/amd64`, see ADR-0001 / ADR-0008). Product capabilities are unchanged: research-only
-decision support with session auth. No orders, actionable promotion, calibration, second
-provider, OAuth, MFA, or RBAC.
+decision support with session auth. No orders or actionable promotion. Probability
+calibration remains opt-in (`AEGIS_RESEARCH_CALIBRATION_AFTER_LABEL_ENABLED`, default false).
 
 Optional **Phase 9** TLS termination (ADR-0010) adds a Caddy reverse-proxy overlay so
 operators can serve HTTPS and keep `AEGIS_SESSION_COOKIE_SECURE=true`. The proxy is TLS +
 routing only — **not** Basic Auth.
 
-**Upload is not verification.** Package → transfer/start → verify are three separate steps.
-A successful SCP/rsync or `docker compose up` alone is not a verified live deployment.
+**Phase 17** hardens live verification (ADR-0018): upload is still not verification; use
+`verify` after deploy and retain stdout as evidence. Dry-run is checklist-only and is **not**
+acceptance evidence. See [../../docs/operations/nas-live-verification.md](../../docs/operations/nas-live-verification.md).
 
 ## Which scripts to use
 
@@ -24,7 +25,8 @@ details and secrets come only from a gitignored `.env.nas` (never from committed
 
 ## Prerequisites
 
-1. Local Phase 0–8 quality gates pass for the revision you intend to deploy.
+1. Local Phase quality gates pass for the revision you intend to deploy (through Phase 16+
+   for calibration readiness routes).
 2. Docker with Buildx on the packaging machine; Docker Compose v2+ on the NAS.
 3. SSH access to the NAS (OpenSSH `ssh` / `scp` on the workstation).
 4. Copy `.env.nas.example` → `.env.nas` and replace every placeholder:
@@ -76,34 +78,40 @@ Deploys over SSH/SCP using `AEGIS_NAS_SSH_*` and `AEGIS_NAS_REMOTE_DIR` from `.e
 2. When TLS files mode: copy operator PEMs into `docker/nas/proxy/certs/` on the NAS
 3. `docker load` on the NAS
 4. `docker compose ... up -d --no-build` (adds TLS overlay when enabled)
-5. `alembic upgrade head` inside the backend container (includes migration `0005`)
+5. `alembic upgrade head` inside the backend container (includes migration `0008`)
 
 This step proves upload and start only. It does **not** replace verify.
 
-### 3. Verify (mandatory)
+### 3. Verify (mandatory — Phase 17)
 
 ```powershell
 .\docker\nas\scripts\verify.ps1
+.\docker\nas\scripts\verify.ps1 -DryRun   # checklist only; NOT live evidence
 ```
 
 ```sh
 ./docker/nas/scripts/verify.sh
+./docker/nas/scripts/verify.sh --dry-run   # checklist only; NOT live evidence
 ```
 
-Checks against `AEGIS_NAS_API_BASE_URL` / `AEGIS_NAS_FRONTEND_BASE_URL`:
+Checks against `AEGIS_NAS_API_BASE_URL` / `AEGIS_NAS_FRONTEND_BASE_URL` (symbol from
+`AEGIS_NAS_VERIFY_SYMBOL`, default `AAPL`):
 
 | Check | Expectation |
 | --- | --- |
 | `GET /health` | 200 |
 | `GET /ready` | 200 |
-| `GET /watchlist` (no cookie) | 401 |
-| `GET /market-data/AAPL/daily-bars` (no cookie) | 401 |
-| `GET /research/AAPL/assessments/latest` (no cookie) | 401 |
+| Unauthenticated watchlist / daily-bars / research latest / **calibration-readiness** | 401 |
 | Frontend base URL | 200 or redirect |
-| `alembic current` (when SSH configured) | includes `0005` / head |
+| `POST /auth/login` + cookie | 200 |
+| Authenticated `GET /research/{symbol}/calibration-readiness` | 200 |
+| Authenticated `GET /research/{symbol}/assessments/latest` | 200 or 404 |
+| `alembic current` (when SSH configured) | includes **`0008`** / head |
 
 When TLS is enabled, verify URLs must be `https://`. For lab self-signed certs only, set
 `AEGIS_NAS_VERIFY_CURL_INSECURE=true` (never for production trust decisions).
+
+Full checklist: [../../docs/operations/nas-live-verification.md](../../docs/operations/nas-live-verification.md).
 
 Log guidance (print from verify, or run on the NAS):
 
@@ -177,13 +185,16 @@ Templates and cert directory notes: [proxy/README.md](proxy/README.md).
 
 ## Migrations (first start)
 
-Deploy runs `alembic upgrade head` after containers start. Head as of Phase 6/7 includes:
+Deploy runs `alembic upgrade head` after containers start. Head as of Phase 15+ includes:
 
 - `0004` — `operators`
 - `0005` — `research_assessment_snapshots`
+- `0006` — provider historical corrections columns
+- `0007` — `research_assessment_outcome_labels`
+- `0008` — `research_assessment_probability_calibrations`
 
 If you start the stack manually, run the same `exec ... alembic upgrade head` before calling
-the deployment verified.
+verify. Phase 17 verify expects `0008` or `head` when SSH is configured.
 
 ## Local dry-run (no NAS)
 

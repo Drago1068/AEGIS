@@ -7,6 +7,25 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 17 - NAS Live Verification (Ops Evidence Gate)
+
+Hardens the package/deploy/**verify** boundary for the current research-only stack: auth
+gates include calibration-readiness, authenticated readiness checks, Alembic through `0008`,
+and an explicit dry-run that is not acceptance evidence. See
+[docs/architecture/decisions/0018-phase-17-nas-live-verification.md](docs/architecture/decisions/0018-phase-17-nas-live-verification.md)
+and [docs/operations/nas-live-verification.md](docs/operations/nas-live-verification.md).
+
+#### Added
+
+- ADR-0018: live-verified definition; dry-run vs evidence.
+- `verify.ps1` / `verify.sh`: calibration-readiness 401 gate, operator login + authenticated
+  research/readiness checks, Alembic `0008|head`, `-DryRun` / `--dry-run`.
+- Operator checklist and runbook updates; optional `AEGIS_NAS_VERIFY_SYMBOL`.
+
+#### Explicitly out of scope
+
+Default-on calibration, actionable promotion, orders, and NAS hardware provisioning.
+
 ### Phase 16 - Calibration Corpus Readiness & Operator Diagnostics
 
 Read-only readiness diagnostics for Phase 15 corpus gates so operators can inspect whether

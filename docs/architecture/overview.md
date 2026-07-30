@@ -19,7 +19,8 @@ outcome labels), Phase 14 (scheduled outcome labeling after assessments), Phase 
 (research probability calibration v1), Phase 16 (calibration corpus readiness),
 Phase 17 (NAS live verification evidence gate), Phase 18 (on-demand calibration),
 Phase 19 (calibration history), Phase 20 (outcome label history), Phase 21
-(NAS live verify of Phases 18–20), and Phase 22 (symbol research evidence summary).
+(NAS live verify of Phases 18–20), Phase 22 (symbol research evidence summary), and
+Phase 23 (NAS live verify of Phase 22).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -57,6 +58,8 @@ Phase 21 redeploys and live-verifies Phases 18–20 on the NAS, including histor
 [decisions/0022-phase-21-nas-live-verify-phases-18-20.md](decisions/0022-phase-21-nas-live-verify-phases-18-20.md)).
 Phase 22 adds `GET /research/{symbol}/evidence-summary` as a read-only aggregate (see
 [decisions/0023-phase-22-research-evidence-summary.md](decisions/0023-phase-22-research-evidence-summary.md)).
+Phase 23 live-verifies that aggregate on the NAS (see
+[decisions/0024-phase-23-nas-live-verify-phase-22.md](decisions/0024-phase-23-nas-live-verify-phase-22.md)).
 
 ## System context
 

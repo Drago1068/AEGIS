@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 23 - NAS Live Verification of Phase 22
+
+Ops evidence gate: redeploy current revision and verify
+`GET /research/{symbol}/evidence-summary` on the live NAS. See
+[docs/architecture/decisions/0024-phase-23-nas-live-verify-phase-22.md](docs/architecture/decisions/0024-phase-23-nas-live-verify-phase-22.md).
+
+#### Added
+
+- ADR-0024: live verify includes authenticated evidence-summary (state=`research_only`).
+- `verify.ps1` / `verify.sh` evidence-summary auth gate + authenticated check.
+
+#### Explicitly out of scope
+
+Default-on calibration, multi-horizon methods, actionable promotion, orders.
+
 ### Phase 22 - Symbol Research Evidence Summary
 
 Authenticated read-only aggregate of research evidence for one symbol (latest assessment,

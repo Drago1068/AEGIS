@@ -7,9 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 22 (symbol research evidence summary).** Authenticated
-`GET /research/{symbol}/evidence-summary` aggregates research-only evidence (ADR-0023). See
-[docs/architecture/decisions/0023-phase-22-research-evidence-summary.md](docs/architecture/decisions/0023-phase-22-research-evidence-summary.md)
+**Current phase: Phase 23 (NAS live verify of Phase 22).** Redeploy and evidence gate for
+`GET /research/{symbol}/evidence-summary` (ADR-0024). See
+[docs/architecture/decisions/0024-phase-23-nas-live-verify-phase-22.md](docs/architecture/decisions/0024-phase-23-nas-live-verify-phase-22.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

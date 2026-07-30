@@ -13,6 +13,7 @@ import {
   createProbabilityCalibration,
   createResearchAssessment,
   downloadCalibrationReadiness,
+  downloadOutcomeLabels,
   downloadResearchEvidenceSummary,
   getApiBaseUrl,
   getCalibrationReadiness,
@@ -233,6 +234,20 @@ export function ResearchAssessmentPanel({
     });
   }
 
+  function onDownloadOutcomeLabels() {
+    if (latest?.id == null) {
+      return;
+    }
+    startTransition(async () => {
+      setError(null);
+      try {
+        await downloadOutcomeLabels(baseUrl, symbol, latest.id as number, 20);
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
   function onComputeCalibration() {
     if (latest?.id == null || readiness?.status !== "ready") {
       return;
@@ -358,6 +373,14 @@ export function ResearchAssessmentPanel({
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Compute outcome labels
+          </button>
+          <button
+            type="button"
+            onClick={onDownloadOutcomeLabels}
+            disabled={isPending || latest?.id == null}
+            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
+          >
+            Download outcome labels JSON
           </button>
           <button
             type="button"

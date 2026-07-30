@@ -139,6 +139,28 @@ async def list_outcome_labels(
     return [OutcomeLabelResponse.model_validate(item) for item in rows]
 
 
+@router.get("/{symbol}/assessments/{assessment_id}/outcome-labels/export")
+async def export_outcome_labels(
+    symbol: str,
+    assessment_id: int,
+    limit: int = Query(default=20, ge=1, le=100),
+    service: OutcomeLabelService = Depends(get_outcome_label_service),
+) -> JSONResponse:
+    """Download outcome-label history as a JSON attachment (ADR-0035)."""
+
+    rows = await service.list_labels_for_assessment(symbol, assessment_id, limit)
+    payload = [
+        OutcomeLabelResponse.model_validate(item).model_dump(mode="json") for item in rows
+    ]
+    filename = (
+        f"aegis-{symbol.upper()}-assessment-{assessment_id}-outcome-labels.json"
+    )
+    return JSONResponse(
+        content=payload,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @router.get(
     "/{symbol}/assessments/{assessment_id}/outcome-labels/latest",
     response_model=OutcomeLabelResponse,

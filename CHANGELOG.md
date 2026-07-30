@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 34 - Outcome-Label History JSON Export
+
+Authenticated download of append-only outcome labels for an assessment. See
+[docs/architecture/decisions/0035-phase-34-outcome-labels-export.md](docs/architecture/decisions/0035-phase-34-outcome-labels-export.md).
+
+#### Added
+
+- `GET /research/{symbol}/assessments/{id}/outcome-labels/export?limit=` — same JSON array
+  as the list route with `Content-Disposition: attachment`.
+- Operator console "Download outcome labels JSON" control.
+- ADR-0035.
+
+#### Explicitly out of scope
+
+New label methods, default-on calibration, actionable promotion, orders, TLS cutover,
+CSV/PDF.
+
 ### Phase 33 - NAS Live Verification of Phase 32
 
 Ops evidence gate: redeploy current revision and verify

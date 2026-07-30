@@ -341,6 +341,26 @@ async def get_calibration_readiness(
     return CalibrationReadinessResponse.model_validate(readiness)
 
 
+@router.get("/{symbol}/calibration-readiness/export")
+async def export_calibration_readiness(
+    symbol: str,
+    assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
+    calibration_service: ResearchProbabilityCalibrationService = Depends(
+        get_research_calibration_service
+    ),
+) -> JSONResponse:
+    """Download calibration readiness diagnostics as a JSON attachment (ADR-0033)."""
+
+    snapshot = await assessment_service.latest_assessment(symbol)
+    readiness = await calibration_service.evaluate_readiness(symbol, snapshot)
+    payload = CalibrationReadinessResponse.model_validate(readiness)
+    filename = f"aegis-{payload.symbol.upper()}-calibration-readiness.json"
+    return JSONResponse(
+        content=payload.model_dump(mode="json"),
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @router.get("/{symbol}/assessments", response_model=list[ResearchAssessmentResponse])
 async def list_research_assessments(
     symbol: str,

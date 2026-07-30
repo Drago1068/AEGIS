@@ -12,6 +12,7 @@ import {
   createOutcomeLabels,
   createProbabilityCalibration,
   createResearchAssessment,
+  downloadCalibrationReadiness,
   downloadResearchEvidenceSummary,
   getApiBaseUrl,
   getCalibrationReadiness,
@@ -282,6 +283,17 @@ export function ResearchAssessmentPanel({
     });
   }
 
+  function onDownloadReadiness() {
+    startTransition(async () => {
+      setError(null);
+      try {
+        await downloadCalibrationReadiness(baseUrl, symbol);
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
   return (
     <section className="rounded-lg border border-aegis-line bg-aegis-panel p-5 shadow-sm">
       <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
@@ -314,6 +326,14 @@ export function ResearchAssessmentPanel({
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Refresh readiness
+          </button>
+          <button
+            type="button"
+            onClick={onDownloadReadiness}
+            disabled={isPending}
+            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
+          >
+            Download readiness JSON
           </button>
           <button
             type="button"

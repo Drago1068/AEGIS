@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 32 - Calibration Readiness JSON Export
+
+Authenticated download of calibration readiness diagnostics for offline audit. See
+[docs/architecture/decisions/0033-phase-32-calibration-readiness-export.md](docs/architecture/decisions/0033-phase-32-calibration-readiness-export.md).
+
+#### Added
+
+- `GET /research/{symbol}/calibration-readiness/export` — same payload as readiness with
+  `Content-Disposition: attachment`.
+- Operator console "Download readiness JSON" control.
+- ADR-0033.
+
+#### Explicitly out of scope
+
+Default-on calibration, horizon-specific methods, actionable promotion, orders, TLS cutover,
+CSV/PDF.
+
 ### Phase 31 - NAS Live Verification of Phase 30
 
 Ops evidence gate: redeploy current revision (Phase 30 end-date UI) and re-run live verify

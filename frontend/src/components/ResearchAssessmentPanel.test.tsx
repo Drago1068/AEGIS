@@ -17,6 +17,7 @@ vi.mock("@/lib/api-client", async () => {
     listProbabilityCalibrations: vi.fn(),
     getResearchEvidenceSummary: vi.fn(),
     downloadResearchEvidenceSummary: vi.fn(),
+    downloadCalibrationReadiness: vi.fn(),
     listResearchAssessments: vi.fn(),
   };
 });
@@ -25,6 +26,7 @@ import {
   ApiClientError,
   createProbabilityCalibration,
   createResearchAssessment,
+  downloadCalibrationReadiness,
   downloadResearchEvidenceSummary,
   getCalibrationReadiness,
   getLatestResearchAssessment,
@@ -425,6 +427,22 @@ describe("ResearchAssessmentPanel", () => {
 
     await waitFor(() => {
       expect(downloadResearchEvidenceSummary).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+      );
+    });
+  });
+
+  it("downloads calibration readiness JSON via export route", async () => {
+    vi.mocked(downloadCalibrationReadiness).mockResolvedValue(
+      "aegis-AAPL-calibration-readiness.json",
+    );
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /download readiness json/i }));
+
+    await waitFor(() => {
+      expect(downloadCalibrationReadiness).toHaveBeenCalledWith(
         "http://localhost:8000",
         "AAPL",
       );

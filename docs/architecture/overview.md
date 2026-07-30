@@ -35,8 +35,8 @@ history in the console), Phase 29 (NAS live verify of Phase 28), Phase 30
 Phase 46 (NAS live verify of Phase 45), Phase 47 (label-ready assessment backfill
 candidates), Phase 48 (NAS live verify of Phase 47), Phase 49 (prefer unlabeled
 label-ready outcome-label backfill), Phase 50 (NAS live verify of Phase 49), and Phase 51
-(configurable research bar load limit), Phase 52 (NAS live verify of Phase 51), and
-Phase 53 (full daily-bar history for research corpus growth).
+(configurable research bar load limit), Phase 52 (NAS live verify of Phase 51), Phase 53 (full daily-bar history for research
+corpus growth), and Phase 54 (NAS live verify of Phase 53).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -143,6 +143,8 @@ Phase 52 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0053-phase-52-nas-live-verify-phase-51.md](decisions/0053-phase-52-nas-live-verify-phase-51.md)).
 Phase 53 defaults daily-bar ingest lookback to `full` for research corpus growth (see
 [decisions/0054-phase-53-full-daily-bar-history.md](decisions/0054-phase-53-full-daily-bar-history.md)).
+Phase 54 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0055-phase-54-nas-live-verify-phase-53.md](decisions/0055-phase-54-nas-live-verify-phase-53.md)).
 
 ## System context
 

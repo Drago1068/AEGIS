@@ -58,7 +58,8 @@ function Write-VerifyChecklist {
     Write-Host " 18. Authenticated GET /research/$Symbol/evidence-summary/export -> 200 (attachment, state=research_only)"
     Write-Host " 19. SSH alembic current includes 0009|head (when SSH configured)"
     Write-Host " 20. SSH .env.nas includes AEGIS_RESEARCH_BAR_LOAD_LIMIT in bounds (Phase 52)"
-    Write-Host " 21. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 21. SSH .env.nas includes AEGIS_DAILY_BAR_OUTPUT_SIZE=full (Phase 54)"
+    Write-Host " 22. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -572,6 +573,25 @@ fi
         throw "Phase 52: AEGIS_RESEARCH_BAR_LOAD_LIMIT missing or out of bounds on NAS .env.nas (ADR-0053)."
     }
     Write-Host "OK  AEGIS_RESEARCH_BAR_LOAD_LIMIT present on NAS .env.nas"
+
+    Write-Host "==> Phase 54 daily bar output size (via SSH)"
+    # Avoid parentheses in remote echo text: OpenSSH on Windows wraps remote cmds in
+    # bash -c, and unquoted (...) tokens break the remote script parse.
+    $outputSizeCmd = @"
+set -euo pipefail
+cd '$dir'
+if grep -E '^AEGIS_DAILY_BAR_OUTPUT_SIZE=full' .env.nas >/dev/null; then
+  grep -E '^AEGIS_DAILY_BAR_OUTPUT_SIZE=' .env.nas
+else
+  echo 'AEGIS_DAILY_BAR_OUTPUT_SIZE must be full on .env.nas' >&2
+  exit 1
+fi
+"@
+    & ssh @sshArgs $remote $outputSizeCmd
+    if ($LASTEXITCODE -ne 0) {
+        throw "Phase 54: AEGIS_DAILY_BAR_OUTPUT_SIZE must be full on NAS .env.nas (ADR-0055)."
+    }
+    Write-Host "OK  AEGIS_DAILY_BAR_OUTPUT_SIZE=full on NAS .env.nas"
 
     if (Test-NasTlsEnabled) {
         Write-Host "==> Caddy service (TLS profile)"

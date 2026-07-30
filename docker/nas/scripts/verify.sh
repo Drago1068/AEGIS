@@ -47,7 +47,8 @@ print_checklist() {
   echo " 18. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
   echo " 19. SSH alembic current includes 0009|head (when SSH configured)"
   echo " 20. SSH .env.nas includes AEGIS_RESEARCH_BAR_LOAD_LIMIT in bounds (Phase 52)"
-  echo " 21. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 21. SSH .env.nas includes AEGIS_DAILY_BAR_OUTPUT_SIZE=full (Phase 54)"
+  echo " 22. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -504,6 +505,18 @@ if [ "\$val" -lt 40 ] || [ "\$val" -gt 2000 ]; then
 fi
 EOF
   echo "OK  AEGIS_RESEARCH_BAR_LOAD_LIMIT present on NAS .env.nas"
+  echo "==> Phase 54 daily bar output size (via SSH)"
+  ssh "${SSH_ARGS[@]}" "${REMOTE}" bash -s <<EOF
+set -euo pipefail
+cd '${REMOTE_DIR}'
+val="\$(grep -E '^AEGIS_DAILY_BAR_OUTPUT_SIZE=' .env.nas | head -n1 | cut -d= -f2 | tr -d '[:space:]')"
+if [ "\$val" != "full" ]; then
+  echo "AEGIS_DAILY_BAR_OUTPUT_SIZE must be full (got: \$val)" >&2
+  exit 1
+fi
+echo "AEGIS_DAILY_BAR_OUTPUT_SIZE=\$val"
+EOF
+  echo "OK  AEGIS_DAILY_BAR_OUTPUT_SIZE=full on NAS .env.nas"
   if nas_tls_enabled; then
     echo "==> Caddy service (TLS profile)"
     ssh "${SSH_ARGS[@]}" "${REMOTE}" bash -s <<EOF

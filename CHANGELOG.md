@@ -7,6 +7,24 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 54 - NAS Live Verification of Phase 53
+
+Ops evidence gate: redeploy under lab TLS with ``AEGIS_DAILY_BAR_OUTPUT_SIZE=full``,
+re-ingest, and verify deeper stored bars unlock backfill growth. See
+[docs/architecture/decisions/0055-phase-54-nas-live-verify-phase-53.md](docs/architecture/decisions/0055-phase-54-nas-live-verify-phase-53.md).
+
+#### Added
+
+- ADR-0055: live verify requires ``full`` output size on ``.env.nas``, backend recreate,
+  authenticated ingest, and retained Phase 48/50 coupling.
+- Compose pass-through for daily-bar primary/secondary sources and Polygon API key so
+  Alpha Vantage premium ``full`` gates can failover to Polygon.
+- Verify checklist item for ``AEGIS_DAILY_BAR_OUTPUT_SIZE=full``.
+
+#### Explicitly out of scope
+
+New assessment math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 53 - Full Daily-Bar History for Research Corpus Growth
 
 Default provider lookback to ``full`` so ``AEGIS_RESEARCH_BAR_LOAD_LIMIT=252`` can load
@@ -18,6 +36,8 @@ deeper stored series after re-ingest. See
 - ``AEGIS_DAILY_BAR_OUTPUT_SIZE`` default ``full`` (``compact`` remains valid for light labs).
 - Compose backend pass-through for ``AEGIS_DAILY_BAR_OUTPUT_SIZE`` (local + NAS overlay).
 - Ops note: recreate backend and re-run ingest after switching an existing deploy to ``full``.
+- Document that free Alpha Vantage rejects ``outputsize=full`` (premium); secondary Polygon
+  failover is the research path when configured.
 
 #### Explicitly out of scope
 

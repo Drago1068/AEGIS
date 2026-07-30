@@ -17,16 +17,19 @@ bars). Deeper research loads cannot invent bars that were never ingested. Operat
 
 Change ``daily_bar_output_size`` default from ``compact`` to **``full``**:
 
-- Alpha Vantage: ``outputsize=full`` (full available daily history).
+- Alpha Vantage: ``outputsize=full`` (full available daily history). **Note:** on free
+  Alpha Vantage keys, ``outputsize=full`` is a premium gate; ingestion failovers to the
+  configured secondary (typically Polygon) on that ``ProviderRateLimitError`` (ADR-0011).
 - Polygon: existing ADR-0011 ``full`` calendar-day window (~730 days).
 
 ``compact`` remains a valid explicit setting for rate-limit-sensitive or storage-light labs.
 
 ### 2. Compose pass-through
 
-Wire ``AEGIS_DAILY_BAR_OUTPUT_SIZE`` into backend environment in ``docker-compose.yml`` and
-the NAS overlay (same pattern as Phase 52 bar-load wiring) so ``.env`` / ``.env.nas`` values
-reach the container.
+Wire ``AEGIS_DAILY_BAR_OUTPUT_SIZE`` and related daily-bar provider settings
+(``PRIMARY_SOURCE``, ``SECONDARY_SOURCE``, provider API keys) into backend environment in
+``docker-compose.yml`` and the NAS overlay so ``.env`` / ``.env.nas`` values reach the
+container (required for secondary failover when Alpha Vantage rejects ``full``).
 
 ### 3. Operator re-ingest
 

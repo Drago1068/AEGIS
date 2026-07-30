@@ -25,8 +25,8 @@ Phase 25 (NAS live verify of Phase 24), Phase 26 (multi-horizon outcome label
 surfacing), Phase 27 (NAS live verify of Phase 26), Phase 28 (research assessment
 history in the console), Phase 29 (NAS live verify of Phase 28), Phase 30
 (outcome label end-date surfacing), Phase 31 (NAS live verify of Phase 30), Phase 32
-(calibration readiness JSON export), Phase 33 (NAS live verify of Phase 32), and Phase 34
-(outcome-label history JSON export).
+(calibration readiness JSON export), Phase 33 (NAS live verify of Phase 32), Phase 34
+(outcome-label history JSON export), and Phase 35 (NAS live verify of Phase 34).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -91,6 +91,8 @@ Phase 33 live-verifies that export on the NAS (see
 Phase 34 adds `GET /research/{symbol}/assessments/{id}/outcome-labels/export` as a
 downloadable JSON attachment of label history (see
 [decisions/0035-phase-34-outcome-labels-export.md](decisions/0035-phase-34-outcome-labels-export.md)).
+Phase 35 live-verifies that export on the NAS (see
+[decisions/0036-phase-35-nas-live-verify-phase-34.md](decisions/0036-phase-35-nas-live-verify-phase-34.md)).
 
 ## System context
 

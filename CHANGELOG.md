@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 35 - NAS Live Verification of Phase 34
+
+Ops evidence gate: redeploy current revision and verify
+`GET /research/{symbol}/assessments/{id}/outcome-labels/export` on the live NAS. See
+[docs/architecture/decisions/0036-phase-35-nas-live-verify-phase-34.md](docs/architecture/decisions/0036-phase-35-nas-live-verify-phase-34.md).
+
+#### Added
+
+- ADR-0036: live verify includes outcome-labels export (401 unauth; attachment array when auth).
+- `verify.ps1` / `verify.sh` outcome-labels export auth gate + authenticated attachment check.
+
+#### Explicitly out of scope
+
+New label methods, default-on calibration, actionable promotion, orders, TLS cutover.
+
 ### Phase 34 - Outcome-Label History JSON Export
 
 Authenticated download of append-only outcome labels for an assessment. See

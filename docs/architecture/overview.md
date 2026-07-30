@@ -47,8 +47,8 @@ verify of Phase 61), Phase 63 (one-click mixed filter from evidence summary), Ph
 (NAS live verify of Phase 67; live evidence may remain pending SSH), Phase 69 (explicit
 mixed labeled count on evidence summary), Phase 70 (NAS live verify of Phases 67–69), Phase 71 (calibration corpus callout on evidence
 summary), Phase 72 (NAS live verify of Phase 71 / pending 67–70), Phase 73 (per-horizon
-readiness mini-rows on evidence summary), Phase 74 (NAS live verify of Phase 73), and
-Phase 75 (evidence-summary nested by_horizon verify assertion).
+readiness mini-rows on evidence summary), Phase 74 (NAS live verify of Phase 73), Phase 75 (evidence-summary nested by_horizon verify
+assertion), and Phase 76 (evidence-summary nested corpus/bucket verify assertion).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -209,6 +209,9 @@ Phase 74 live-verifies that revision on the NAS under the lab TLS profile (see
 Phase 75 asserts nested evidence-summary ``calibration_readiness.by_horizon`` keys in live
 verify scripts (see
 [decisions/0076-phase-75-evidence-summary-by-horizon-verify.md](decisions/0076-phase-75-evidence-summary-by-horizon-verify.md)).
+Phase 76 asserts nested evidence-summary corpus/bucket readiness fields in live verify
+scripts (see
+[decisions/0077-phase-76-evidence-summary-corpus-bucket-verify.md](decisions/0077-phase-76-evidence-summary-corpus-bucket-verify.md)).
 
 ## System context
 

@@ -70,7 +70,8 @@ function Write-VerifyChecklist {
     Write-Host " 30. Phase 72: frontend redeploy includes Phase 71 corpus callout (unit-tested; readiness nested fields)"
     Write-Host " 31. Phase 74: frontend redeploy includes Phase 73 by_horizon mini-rows (unit-tested; nested readiness)"
     Write-Host " 32. Authenticated evidence-summary nested calibration_readiness.by_horizon includes fwd5+fwd20 (Phase 75)"
-    Write-Host " 33. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 33. Authenticated evidence-summary nested corpus/bucket readiness fields (Phase 76)"
+    Write-Host " 34. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -643,6 +644,28 @@ try {
             }
         }
         Write-Host ("OK  Phase 75 evidence-summary by_horizon keys={0}" -f ($summaryHorizonKeys -join ","))
+        # Phase 76: nested corpus/bucket fields for Phase 71 callout contract.
+        foreach ($field in @("corpus_count", "bucket_count")) {
+            if (-not ($summary.calibration_readiness.PSObject.Properties.Name -contains $field)) {
+                throw "evidence-summary.calibration_readiness missing $field (Phase 76)"
+            }
+            if ($null -eq $summary.calibration_readiness.$field -or [int]$summary.calibration_readiness.$field -lt 0) {
+                throw "evidence-summary.calibration_readiness.$field must be >= 0 (Phase 76)"
+            }
+        }
+        foreach ($field in @("min_corpus", "min_bucket")) {
+            if (-not ($summary.calibration_readiness.PSObject.Properties.Name -contains $field)) {
+                throw "evidence-summary.calibration_readiness missing $field (Phase 76)"
+            }
+            if ($null -eq $summary.calibration_readiness.$field -or [int]$summary.calibration_readiness.$field -lt 1) {
+                throw "evidence-summary.calibration_readiness.$field must be >= 1 (Phase 76)"
+            }
+        }
+        Write-Host ("OK  Phase 76 evidence-summary corpus={0}/min {1} bucket={2}/min {3}" -f `
+            $summary.calibration_readiness.corpus_count,
+            $summary.calibration_readiness.min_corpus,
+            $summary.calibration_readiness.bucket_count,
+            $summary.calibration_readiness.min_bucket)
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -696,6 +719,22 @@ try {
         foreach ($required in @("forward_return_5", "forward_return_20")) {
             if ($exportHorizonKeys -notcontains $required) {
                 throw ("evidence-summary/export.calibration_readiness.by_horizon missing {0}" -f $required)
+            }
+        }
+        foreach ($field in @("corpus_count", "bucket_count")) {
+            if (-not ($exportBody.calibration_readiness.PSObject.Properties.Name -contains $field)) {
+                throw "evidence-summary/export.calibration_readiness missing $field (Phase 76)"
+            }
+            if ($null -eq $exportBody.calibration_readiness.$field -or [int]$exportBody.calibration_readiness.$field -lt 0) {
+                throw "evidence-summary/export.calibration_readiness.$field must be >= 0 (Phase 76)"
+            }
+        }
+        foreach ($field in @("min_corpus", "min_bucket")) {
+            if (-not ($exportBody.calibration_readiness.PSObject.Properties.Name -contains $field)) {
+                throw "evidence-summary/export.calibration_readiness missing $field (Phase 76)"
+            }
+            if ($null -eq $exportBody.calibration_readiness.$field -or [int]$exportBody.calibration_readiness.$field -lt 1) {
+                throw "evidence-summary/export.calibration_readiness.$field must be >= 1 (Phase 76)"
             }
         }
         Write-Host "OK  evidence-summary/export attachment state=research_only assessments=$($exportBody.assessment_count) provenance fields present"

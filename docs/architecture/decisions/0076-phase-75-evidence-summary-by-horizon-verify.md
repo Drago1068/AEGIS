@@ -1,6 +1,6 @@
 # ADR-0076: Phase 75 Evidence-Summary Nested by_horizon Verify Assertion
 
-- Status: Accepted
+- Status: Accepted (live verified 2026-07-30 on ``46cc9e2``)
 - Date: 2026-07-30
 
 ## Context

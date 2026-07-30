@@ -25,7 +25,8 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0061](../architecture/decisions/0061-phase-60-nas-live-verify-phase-59.md),
 [ADR-0073](../architecture/decisions/0073-phase-72-nas-live-verify-phase-71.md),
 [ADR-0075](../architecture/decisions/0075-phase-74-nas-live-verify-phase-73.md),
-[ADR-0076](../architecture/decisions/0076-phase-75-evidence-summary-by-horizon-verify.md).
+[ADR-0076](../architecture/decisions/0076-phase-75-evidence-summary-by-horizon-verify.md),
+[ADR-0077](../architecture/decisions/0077-phase-76-evidence-summary-corpus-bucket-verify.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 
@@ -100,7 +101,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 30 | Phase 72 frontend redeploy (Phase 71 corpus callout) | Frontend recreated; corpus UI unit-tested; nested readiness fields on summary |
 | 31 | Phase 74 frontend redeploy (Phase 73 by_horizon rows) | Frontend recreated; by_horizon UI unit-tested; nested readiness retained |
 | 32 | Authenticated evidence-summary nested ``by_horizon`` (Phase 75) | ``calibration_readiness.by_horizon`` includes ``forward_return_5`` + ``forward_return_20`` (+ export) |
-| 33 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 33 | Authenticated evidence-summary nested corpus/bucket (Phase 76) | ``corpus_count``, ``min_corpus``, ``bucket_count``, ``min_bucket`` present with bounds (+ export) |
+| 34 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

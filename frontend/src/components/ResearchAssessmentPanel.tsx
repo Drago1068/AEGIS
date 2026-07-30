@@ -14,6 +14,7 @@ import {
   createResearchAssessment,
   downloadCalibrationReadiness,
   downloadOutcomeLabels,
+  downloadProbabilityCalibrations,
   downloadResearchEvidenceSummary,
   getApiBaseUrl,
   getCalibrationReadiness,
@@ -248,6 +249,20 @@ export function ResearchAssessmentPanel({
     });
   }
 
+  function onDownloadCalibrations() {
+    if (latest?.id == null) {
+      return;
+    }
+    startTransition(async () => {
+      setError(null);
+      try {
+        await downloadProbabilityCalibrations(baseUrl, symbol, latest.id as number, 20);
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
   function onComputeCalibration() {
     if (latest?.id == null || readiness?.status !== "ready") {
       return;
@@ -389,6 +404,14 @@ export function ResearchAssessmentPanel({
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Compute calibration
+          </button>
+          <button
+            type="button"
+            onClick={onDownloadCalibrations}
+            disabled={isPending || latest?.id == null}
+            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
+          >
+            Download calibrations JSON
           </button>
           <button
             type="button"

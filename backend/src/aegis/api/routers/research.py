@@ -219,6 +219,29 @@ async def list_probability_calibrations(
     return [ProbabilityCalibrationResponse.model_validate(item) for item in rows]
 
 
+@router.get("/{symbol}/assessments/{assessment_id}/calibrations/export")
+async def export_probability_calibrations(
+    symbol: str,
+    assessment_id: int,
+    limit: int = Query(default=20, ge=1, le=100),
+    service: ResearchProbabilityCalibrationService = Depends(get_research_calibration_service),
+) -> JSONResponse:
+    """Download calibration history as a JSON attachment (ADR-0037)."""
+
+    rows = await service.list_calibrations_for_assessment(symbol, assessment_id, limit)
+    payload = [
+        ProbabilityCalibrationResponse.model_validate(item).model_dump(mode="json")
+        for item in rows
+    ]
+    filename = (
+        f"aegis-{symbol.upper()}-assessment-{assessment_id}-calibrations.json"
+    )
+    return JSONResponse(
+        content=payload,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @router.get(
     "/{symbol}/assessments/{assessment_id}/calibrations/latest",
     response_model=ProbabilityCalibrationResponse,

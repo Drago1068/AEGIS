@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 36 - Calibration History JSON Export
+
+Authenticated download of append-only probability calibrations for an assessment. See
+[docs/architecture/decisions/0037-phase-36-calibrations-export.md](docs/architecture/decisions/0037-phase-36-calibrations-export.md).
+
+#### Added
+
+- `GET /research/{symbol}/assessments/{id}/calibrations/export?limit=` — same JSON array
+  as the list route with `Content-Disposition: attachment`.
+- Operator console "Download calibrations JSON" control.
+- ADR-0037.
+
+#### Explicitly out of scope
+
+Default-on calibration, new methods, actionable promotion, orders, TLS cutover, CSV/PDF.
+
 ### Phase 35 - NAS Live Verification of Phase 34
 
 Ops evidence gate: redeploy current revision and verify

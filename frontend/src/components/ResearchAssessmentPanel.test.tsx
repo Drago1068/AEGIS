@@ -19,6 +19,7 @@ vi.mock("@/lib/api-client", async () => {
     downloadResearchEvidenceSummary: vi.fn(),
     downloadCalibrationReadiness: vi.fn(),
     downloadOutcomeLabels: vi.fn(),
+    downloadProbabilityCalibrations: vi.fn(),
     listResearchAssessments: vi.fn(),
   };
 });
@@ -29,6 +30,7 @@ import {
   createResearchAssessment,
   downloadCalibrationReadiness,
   downloadOutcomeLabels,
+  downloadProbabilityCalibrations,
   downloadResearchEvidenceSummary,
   getCalibrationReadiness,
   getLatestResearchAssessment,
@@ -461,6 +463,24 @@ describe("ResearchAssessmentPanel", () => {
 
     await waitFor(() => {
       expect(downloadOutcomeLabels).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        1,
+        20,
+      );
+    });
+  });
+
+  it("downloads calibrations JSON via export route", async () => {
+    vi.mocked(downloadProbabilityCalibrations).mockResolvedValue(
+      "aegis-AAPL-assessment-1-calibrations.json",
+    );
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /download calibrations json/i }));
+
+    await waitFor(() => {
+      expect(downloadProbabilityCalibrations).toHaveBeenCalledWith(
         "http://localhost:8000",
         "AAPL",
         1,

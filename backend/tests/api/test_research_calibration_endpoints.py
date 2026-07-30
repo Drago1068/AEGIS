@@ -171,3 +171,73 @@ async def test_list_calibrations_empty() -> None:
 
     assert response.status_code == 200
     assert response.json() == []
+
+
+async def test_export_calibrations_attachment() -> None:
+    newer = _calibration()
+    older = replace(
+        newer,
+        id=6,
+        computed_at=datetime(2024, 1, 25, 18, 0, tzinfo=UTC),
+        probability_confidence=0.55,
+    )
+    service = _FakeCalibrationService(listed=[newer, older])
+
+    async with _client(service) as client:
+        response = await client.get(
+            "/research/aapl/assessments/99/calibrations/export?limit=10"
+        )
+
+    assert response.status_code == 200
+    assert "application/json" in response.headers["content-type"]
+    disposition = response.headers["content-disposition"]
+    assert "attachment" in disposition
+    assert 'filename="aegis-AAPL-assessment-99-calibrations.json"' in disposition
+    body = response.json()
+    assert isinstance(body, list)
+    assert len(body) == 2
+    assert body[0]["id"] == 7
+    assert body[0]["probability_confidence"] == 0.6
+    assert body[0]["state"] == "research_only"
+    assert service.list_calls == [("aapl", 99, 10)]
+
+
+async def test_export_calibrations_empty_array() -> None:
+    service = _FakeCalibrationService(listed=[])
+
+    async with _client(service) as client:
+        response = await client.get("/research/AAPL/assessments/99/calibrations/export")
+
+    assert response.status_code == 200
+    assert response.json() == []
+    assert "attachment" in response.headers["content-disposition"]
+
+
+async def test_export_calibrations_requires_auth() -> None:
+    from aegis.api.dependencies import get_operator_repository, get_session_store
+
+    class _EmptyOperators:
+        async def ensure_seeded(self, username: str, password: str) -> None:
+            return None
+
+        async def get_by_username(self, username: str) -> None:
+            return None
+
+    class _EmptySessions:
+        async def get(self, session_id: str) -> None:
+            return None
+
+        async def create(self, operator_id: int, username: str) -> str:
+            return "unused"
+
+        async def delete(self, session_id: str) -> None:
+            return None
+
+    app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
+    app.dependency_overrides[get_operator_repository] = lambda: _EmptyOperators()
+    app.dependency_overrides[get_session_store] = lambda: _EmptySessions()
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://testserver"
+    ) as client:
+        response = await client.get("/research/AAPL/assessments/99/calibrations/export")
+    assert response.status_code == 401

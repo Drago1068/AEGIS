@@ -7,6 +7,24 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 43 - Historical Outcome-Label Backfill
+
+Research-only batch re-attempt of `forward_total_return_v1` labels over recent assessment
+history so operators can grow the labeled corpus toward calibration readiness. See
+[docs/architecture/decisions/0044-phase-43-outcome-label-backfill.md](docs/architecture/decisions/0044-phase-43-outcome-label-backfill.md).
+
+#### Added
+
+- `POST /research/{symbol}/outcome-labels/backfill?limit=` — fail-closed per assessment;
+  always 200 with summary counts.
+- Operator console "Backfill outcome labels" control.
+- ADR-0044.
+
+#### Explicitly out of scope
+
+Default-on calibration, new horizons, guaranteeing readiness `ready`, actionable promotion,
+orders, ACME/public TLS.
+
 ### Phase 42 - NAS Live Verification of Phase 41
 
 Ops evidence gate: redeploy current revision under the lab TLS profile and verify

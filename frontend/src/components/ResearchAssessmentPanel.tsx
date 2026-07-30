@@ -6,9 +6,11 @@ import {
   ApiClientError,
   CalibrationReadiness,
   OutcomeLabel,
+  OutcomeLabelBackfillResponse,
   ProbabilityCalibration,
   ResearchAssessment,
   ResearchEvidenceSummary,
+  backfillOutcomeLabels,
   createOutcomeLabels,
   createProbabilityCalibration,
   createResearchAssessment,
@@ -113,6 +115,9 @@ export function ResearchAssessmentPanel({
     [],
   );
   const [evidenceSummary, setEvidenceSummary] = useState<ResearchEvidenceSummary | null>(
+    null,
+  );
+  const [backfillSummary, setBackfillSummary] = useState<OutcomeLabelBackfillResponse | null>(
     null,
   );
   const [error, setError] = useState<string | null>(null);
@@ -228,6 +233,23 @@ export function ResearchAssessmentPanel({
       try {
         await createOutcomeLabels(baseUrl, symbol, latest.id as number);
         await loadOutcomeLabelHistory(latest.id as number);
+        await loadReadiness();
+        await loadEvidenceSummary();
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
+  function onBackfillOutcomeLabels() {
+    startTransition(async () => {
+      setError(null);
+      try {
+        const summary = await backfillOutcomeLabels(baseUrl, symbol, 20);
+        setBackfillSummary(summary);
+        if (latest?.id != null) {
+          await loadOutcomeLabelHistory(latest.id as number);
+        }
         await loadReadiness();
         await loadEvidenceSummary();
       } catch (err) {
@@ -420,6 +442,14 @@ export function ResearchAssessmentPanel({
           </button>
           <button
             type="button"
+            onClick={onBackfillOutcomeLabels}
+            disabled={isPending}
+            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
+          >
+            Backfill outcome labels
+          </button>
+          <button
+            type="button"
             onClick={onDownloadOutcomeLabels}
             disabled={isPending || latest?.id == null}
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
@@ -456,6 +486,13 @@ export function ResearchAssessmentPanel({
       {error ? (
         <p className="mb-3 text-sm text-aegis-danger" role="alert">
           {error}
+        </p>
+      ) : null}
+
+      {backfillSummary ? (
+        <p className="mb-3 text-sm text-aegis-muted" data-testid="outcome-label-backfill-summary">
+          Backfill (research-only): attempted={backfillSummary.assessment_count}, labeled=
+          {backfillSummary.persisted_count}, skipped={backfillSummary.skipped_count}
         </p>
       ) : null}
 

@@ -488,6 +488,51 @@ export async function createOutcomeLabels(
   return body as OutcomeLabel;
 }
 
+export interface OutcomeLabelBackfillItem {
+  symbol: string;
+  assessment_snapshot_id: number;
+  persisted: boolean;
+  reason?: string | null;
+  detail?: string | null;
+}
+
+export interface OutcomeLabelBackfillResponse {
+  symbol: string;
+  assessment_count: number;
+  persisted_count: number;
+  skipped_count: number;
+  outcomes: OutcomeLabelBackfillItem[];
+  detail: string;
+}
+
+/** Re-attempt Phase 13 labeling over recent assessment history (Phase 43, ADR-0044). */
+export async function backfillOutcomeLabels(
+  baseUrl: string,
+  symbol: string,
+  limit = 20,
+  options?: ApiRequestOptions,
+): Promise<OutcomeLabelBackfillResponse> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/outcome-labels/backfill` +
+    `?limit=${encodeURIComponent(String(limit))}`;
+  const { response, body } = await requestJson(
+    url,
+    {
+      method: "POST",
+      headers: { Accept: "application/json" },
+    },
+    options,
+  );
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected POST outcome-labels/backfill status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as OutcomeLabelBackfillResponse;
+}
+
 export async function getLatestOutcomeLabels(
   baseUrl: string,
   symbol: string,

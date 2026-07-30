@@ -22,7 +22,11 @@ from aegis.api.dependencies import (
 from aegis.api.schemas.research import ResearchAssessmentResponse
 from aegis.api.schemas.research_calibration_readiness import CalibrationReadinessResponse
 from aegis.api.schemas.research_evidence_summary import ResearchEvidenceSummaryResponse
-from aegis.api.schemas.research_outcome_labels import OutcomeLabelResponse
+from aegis.api.schemas.research_outcome_labels import (
+    OutcomeLabelBackfillItem,
+    OutcomeLabelBackfillResponse,
+    OutcomeLabelResponse,
+)
 from aegis.api.schemas.research_probability_calibration import ProbabilityCalibrationResponse
 from aegis.domain.research_assessment import (
     ResearchAssessmentService,
@@ -37,7 +41,10 @@ from aegis.domain.research_probability_calibration import (
     ResearchProbabilityCalibrationService,
 )
 from aegis.domain.scheduled_calibration import try_calibrate_assessment_after_create
-from aegis.domain.scheduled_outcome_labels import try_label_assessment_after_create
+from aegis.domain.scheduled_outcome_labels import (
+    run_outcome_labels_after_assessments,
+    try_label_assessment_after_create,
+)
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
 from aegis.persistence.repositories.research_assessment import ResearchAssessmentRepository
 from aegis.persistence.repositories.research_outcome_labels import ResearchOutcomeLabelRepository
@@ -99,6 +106,47 @@ async def create_research_assessment(
                 calibration_repository,
             )
     return ResearchAssessmentResponse.model_validate(snapshot)
+
+
+@router.post(
+    "/{symbol}/outcome-labels/backfill",
+    response_model=OutcomeLabelBackfillResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def backfill_outcome_labels(
+    symbol: str,
+    limit: int = Query(default=20, ge=1, le=100),
+    assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
+    label_service: OutcomeLabelService = Depends(get_outcome_label_service),
+) -> OutcomeLabelBackfillResponse:
+    """Re-attempt Phase 13 labeling over recent assessment history (ADR-0044).
+
+    Always returns 200 with a per-assessment summary. Individual fail-closed skips do not
+    abort the batch. Does not invent probability_confidence or enable auto-calibration.
+    """
+
+    snapshots = await assessment_service.list_assessments(symbol, limit)
+    pairs: list[tuple[str, int]] = []
+    for snapshot in snapshots:
+        if snapshot.id is not None:
+            pairs.append((snapshot.symbol, snapshot.id))
+    summary = await run_outcome_labels_after_assessments(pairs, label_service)
+    return OutcomeLabelBackfillResponse(
+        symbol=symbol.upper(),
+        assessment_count=len(pairs),
+        persisted_count=summary.persisted_count,
+        skipped_count=summary.skipped_count,
+        outcomes=[
+            OutcomeLabelBackfillItem(
+                symbol=outcome.symbol,
+                assessment_snapshot_id=outcome.assessment_snapshot_id,
+                persisted=outcome.persisted,
+                reason=outcome.reason,
+                detail=outcome.detail,
+            )
+            for outcome in summary.outcomes
+        ],
+    )
 
 
 @router.post(

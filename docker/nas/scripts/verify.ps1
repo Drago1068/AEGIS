@@ -45,8 +45,9 @@ function Write-VerifyChecklist {
     Write-Host "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
     Write-Host "  6. Authenticated GET /research/$Symbol/calibration-readiness -> 200"
     Write-Host "  7. Authenticated GET /research/$Symbol/assessments/latest -> 200|404"
-    Write-Host "  8. SSH alembic current includes 0008|head (when SSH configured)"
-    Write-Host "  9. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "  8. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
+    Write-Host "  9. SSH alembic current includes 0008|head (when SSH configured)"
+    Write-Host " 10. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -161,6 +162,58 @@ try {
 
     $latestCode = Get-HttpStatus "$api/research/$verifySymbol/assessments/latest" -CookieJar $cookieJar
     Assert-Status -Label "GET $api/research/$verifySymbol/assessments/latest (auth)" -Actual $latestCode -Expected @(200, 404)
+
+    # Phase 21: history list routes (empty array is valid). Prefer assessment id from latest when present.
+    $historyAssessmentId = 1
+    if ($latestCode -eq 200) {
+        $latestBodyPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.latest.json" -f [guid]::NewGuid().ToString("N"))
+        try {
+            & curl.exe -sS @curlInsecure -o $latestBodyPath --max-time 30 -b $cookieJar `
+                -H "Accept: application/json" "$api/research/$verifySymbol/assessments/latest" | Out-Null
+            if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $latestBodyPath)) {
+                $latestJson = Get-Content -LiteralPath $latestBodyPath -Raw | ConvertFrom-Json
+                if ($null -ne $latestJson.id) {
+                    $historyAssessmentId = [int]$latestJson.id
+                }
+            }
+        } finally {
+            if (Test-Path -LiteralPath $latestBodyPath) {
+                Remove-Item -LiteralPath $latestBodyPath -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
+    $calibListUrl = "$api/research/$verifySymbol/assessments/$historyAssessmentId/calibrations"
+    $labelListUrl = "$api/research/$verifySymbol/assessments/$historyAssessmentId/outcome-labels"
+    $calibListPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.calibrations.json" -f [guid]::NewGuid().ToString("N"))
+    $labelListPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.labels.json" -f [guid]::NewGuid().ToString("N"))
+    try {
+        $calibCode = & curl.exe -sS @curlInsecure -o $calibListPath -w "%{http_code}" --max-time 30 `
+            -b $cookieJar -H "Accept: application/json" $calibListUrl
+        if ($LASTEXITCODE -ne 0) { throw "GET calibrations list failed (curl exit $LASTEXITCODE)" }
+        Assert-Status -Label "GET $calibListUrl (auth)" -Actual ([int]$calibCode) -Expected @(200)
+        $calibBody = Get-Content -LiteralPath $calibListPath -Raw | ConvertFrom-Json
+        if ($calibBody -isnot [System.Array] -and $null -ne $calibBody) {
+            # ConvertFrom-Json may return a single object for one-element arrays; coerce via PowerShell.
+            $calibBody = @($calibBody)
+        }
+        if ($null -eq $calibBody) { throw "calibrations list body was null" }
+        Write-Host "OK  calibrations list is JSON array (count=$(@($calibBody).Count))"
+
+        $labelCode = & curl.exe -sS @curlInsecure -o $labelListPath -w "%{http_code}" --max-time 30 `
+            -b $cookieJar -H "Accept: application/json" $labelListUrl
+        if ($LASTEXITCODE -ne 0) { throw "GET outcome-labels list failed (curl exit $LASTEXITCODE)" }
+        Assert-Status -Label "GET $labelListUrl (auth)" -Actual ([int]$labelCode) -Expected @(200)
+        $labelBody = Get-Content -LiteralPath $labelListPath -Raw | ConvertFrom-Json
+        if ($null -eq $labelBody) { throw "outcome-labels list body was null" }
+        Write-Host "OK  outcome-labels list is JSON array (count=$(@($labelBody).Count))"
+    } finally {
+        foreach ($p in @($calibListPath, $labelListPath)) {
+            if (Test-Path -LiteralPath $p) {
+                Remove-Item -LiteralPath $p -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
 }
 finally {
     if (Test-Path -LiteralPath $cookieJar) {

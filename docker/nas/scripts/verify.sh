@@ -34,8 +34,9 @@ print_checklist() {
   echo "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
   echo "  6. Authenticated GET /research/${symbol}/calibration-readiness -> 200"
   echo "  7. Authenticated GET /research/${symbol}/assessments/latest -> 200|404"
-  echo "  8. SSH alembic current includes 0008|head (when SSH configured)"
-  echo "  9. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo "  8. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
+  echo "  9. SSH alembic current includes 0008|head (when SSH configured)"
+  echo " 10. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -151,6 +152,48 @@ assert_status "GET ${API}/research/${VERIFY_SYMBOL}/calibration-readiness (auth)
 
 latest_code="$(http_status "${API}/research/${VERIFY_SYMBOL}/assessments/latest" "${COOKIE_JAR}")"
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/assessments/latest (auth)" "${latest_code}" 200 404
+
+history_assessment_id=1
+if [[ "${latest_code}" == "200" ]]; then
+  latest_json="$(
+    curl -sS "${CURL_INSECURE[@]}" --max-time 30 \
+      -b "${COOKIE_JAR}" -H "Accept: application/json" \
+      "${API}/research/${VERIFY_SYMBOL}/assessments/latest"
+  )"
+  parsed_id="$(printf '%s' "${latest_json}" | sed -n 's/.*"id"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' | head -n 1)"
+  if [[ -n "${parsed_id}" ]]; then
+    history_assessment_id="${parsed_id}"
+  fi
+fi
+
+calib_list_url="${API}/research/${VERIFY_SYMBOL}/assessments/${history_assessment_id}/calibrations"
+label_list_url="${API}/research/${VERIFY_SYMBOL}/assessments/${history_assessment_id}/outcome-labels"
+calib_body="$(mktemp)"
+label_body="$(mktemp)"
+cleanup() { rm -f "${COOKIE_JAR}" "${calib_body}" "${label_body}"; }
+trap cleanup EXIT
+
+calib_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -o "${calib_body}" -w "%{http_code}" --max-time 30 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" "${calib_list_url}"
+)"
+assert_status "GET ${calib_list_url} (auth)" "${calib_code}" 200
+if ! head -c 1 "${calib_body}" | grep -q '\['; then
+  echo "calibrations list body is not a JSON array" >&2
+  exit 1
+fi
+echo "OK  calibrations list is JSON array"
+
+label_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -o "${label_body}" -w "%{http_code}" --max-time 30 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" "${label_list_url}"
+)"
+assert_status "GET ${label_list_url} (auth)" "${label_code}" 200
+if ! head -c 1 "${label_body}" | grep -q '\['; then
+  echo "outcome-labels list body is not a JSON array" >&2
+  exit 1
+fi
+echo "OK  outcome-labels list is JSON array"
 
 mapfile -t COMPOSE_FILES < <(compose_nas_file_flags "${REPO_ROOT}")
 COMPOSE_FILE_ARGS="${COMPOSE_FILES[*]}"

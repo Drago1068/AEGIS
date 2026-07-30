@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 21 - NAS Live Verification of Phases 18–20
+
+Ops evidence gate: redeploy current revision to the UGREEN NAS and verify on-demand
+calibration plus calibration/outcome-label history routes. See
+[docs/architecture/decisions/0022-phase-21-nas-live-verify-phases-18-20.md](docs/architecture/decisions/0022-phase-21-nas-live-verify-phases-18-20.md).
+
+#### Added
+
+- ADR-0022: live verify includes authenticated `GET .../calibrations` and
+  `GET .../outcome-labels` (JSON arrays; empty `[]` allowed).
+- `verify.ps1` history list checks after login.
+
+#### Explicitly out of scope
+
+Default-on calibration, multi-horizon methods, actionable promotion, orders.
+
 ### Phase 20 - Outcome Label History
 
 Authenticated list of append-only `forward_total_return_v1` rows for an assessment so

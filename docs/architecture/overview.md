@@ -18,7 +18,8 @@ Phase 12 (provider historical corrections on daily-bar observations), Phase 13 (
 outcome labels), Phase 14 (scheduled outcome labeling after assessments), Phase 15
 (research probability calibration v1), Phase 16 (calibration corpus readiness),
 Phase 17 (NAS live verification evidence gate), Phase 18 (on-demand calibration),
-Phase 19 (calibration history), and Phase 20 (outcome label history).
+Phase 19 (calibration history), Phase 20 (outcome label history), and Phase 21
+(NAS live verify of Phases 18–20).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -51,6 +52,9 @@ Phase 19 adds `GET .../calibrations` history (newest first) for audit of append-
 [decisions/0020-phase-19-calibration-history.md](decisions/0020-phase-19-calibration-history.md)).
 Phase 20 adds the same pattern for outcome labels via `GET .../outcome-labels?limit=` (see
 [decisions/0021-phase-20-outcome-label-history.md](decisions/0021-phase-20-outcome-label-history.md)).
+Phase 21 redeploys and live-verifies Phases 18–20 on the NAS, including history list checks
+(see
+[decisions/0022-phase-21-nas-live-verify-phases-18-20.md](decisions/0022-phase-21-nas-live-verify-phases-18-20.md)).
 
 ## System context
 

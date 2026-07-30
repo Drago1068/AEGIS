@@ -71,7 +71,7 @@ Research-only. Does not blend OHLCV or set `probability_confidence`. See
 | `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` | When `true`, assessments use `method_version` 2 with source availability/agreement factors and preferred-source component series. When `false`, preserve Phase 6 `method_version` 1. | `true` |
 | `AEGIS_RESEARCH_MULTI_SOURCE_CLOSE_TOLERANCE` | Relative close tolerance for agreement: `(max-min)/max` of usable closes on a comparable date. | `0.002` |
 | `AEGIS_RESEARCH_MULTI_SOURCE_DISAGREEMENT_FAIL_CLOSED` | When `true`, fail closed if agreement factor is below the documented floor (`0.80`) when comparable dates exist. When `false`, only the soft product penalty applies. | `false` |
-| `AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL` | When `false`, component series require 20 usable primary-quality bars from `AEGIS_DAILY_BAR_PRIMARY_SOURCE` only. When `true`, missing dates may be filled from the secondary source (no OHLCV blend). | `false` |
+| `AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL` | When `true`, missing component-series dates may be filled from the secondary source (no OHLCV blend). When `false`, require 20 usable primary-quality bars from `AEGIS_DAILY_BAR_PRIMARY_SOURCE` only. Research loads use session-depth limits (distinct trading dates; ADR-0056). | `true` |
 
 ## Backend: Phase 4 operator authentication (`aegis.config.settings.Settings`)
 

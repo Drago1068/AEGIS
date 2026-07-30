@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 55 - Research Cross-Source Fill and Session-Depth Bar Load
+
+Unlock older assessment as-of dates when primary compact history is shallow but secondary
+(Polygon) history is deep. See
+[docs/architecture/decisions/0056-phase-55-research-cross-source-session-depth.md](docs/architecture/decisions/0056-phase-55-research-cross-source-session-depth.md).
+
+#### Changed
+
+- Default ``AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL`` to ``true`` (still overridable).
+- Research bar loads use ``list_recent_for_sessions`` so ``AEGIS_RESEARCH_BAR_LOAD_LIMIT``
+  counts distinct trading dates, not dual-source observation rows.
+- Compose pass-through for the cross-source fill flag (local + NAS).
+
+#### Explicitly out of scope
+
+NAS live verify, default-on calibration, actionable promotion, orders, ACME.
+
 ### Phase 54 - NAS Live Verification of Phase 53
 
 Ops evidence gate: redeploy under lab TLS with ``AEGIS_DAILY_BAR_OUTPUT_SIZE=full``,

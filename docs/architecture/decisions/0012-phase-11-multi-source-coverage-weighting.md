@@ -34,8 +34,11 @@ Return / realized-vol / research-index use a **single preferred source** series:
 
 1. Prefer usable `data_quality=primary` bars from `AEGIS_DAILY_BAR_PRIMARY_SOURCE`.
 2. Cross-source fill from `AEGIS_DAILY_BAR_SECONDARY_SOURCE` is allowed **only** when
-   `AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true` (default **false**).
-3. Default fail-closed: fewer than 20 usable primary-source bars →
+   `AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true`. Phase 11 shipped default
+   **false**; Phase 55 / ADR-0056 changes the default to **true** so deep secondary
+   history can grow research corpora when primary compact lookback is shallow (still
+   overridable to false for primary-only labs).
+3. When fill is disabled: fewer than 20 usable primary-source bars →
    `insufficient_primary_bars` (no stitching across sources).
 4. When fill is enabled, each lookback date prefers primary if present, else secondary;
    never invent or average OHLCV. `component_source` is the single source id when uniform,

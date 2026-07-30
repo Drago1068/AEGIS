@@ -7,10 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 54 (NAS live verify of Phase 53).** Redeploy under lab TLS with
-`AEGIS_DAILY_BAR_OUTPUT_SIZE=full`, re-ingest, and verify deeper backfill growth
-(ADR-0055). See
-[docs/architecture/decisions/0055-phase-54-nas-live-verify-phase-53.md](docs/architecture/decisions/0055-phase-54-nas-live-verify-phase-53.md)
+**Current phase: Phase 55 (research cross-source fill + session-depth bar load).** Default
+cross-source component fill on and load research bars by distinct trading dates so deep
+secondary history can grow corpora (ADR-0056). See
+[docs/architecture/decisions/0056-phase-55-research-cross-source-session-depth.md](docs/architecture/decisions/0056-phase-55-research-cross-source-session-depth.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

@@ -270,12 +270,13 @@ class Settings(BaseSettings):
         ),
     )
     research_allow_cross_source_component_fill: bool = Field(
-        default=False,
+        default=True,
         description=(
-            "When false (default), component return/vol/index series require 20 usable "
-            "primary-quality bars from AEGIS_DAILY_BAR_PRIMARY_SOURCE only. When true, "
-            "missing dates may be filled from the secondary source (no OHLCV blend). "
-            "See ADR-0012."
+            "When true (default as of Phase 55 / ADR-0056), missing component-series dates "
+            "may be filled from the secondary source (no OHLCV blend) so deep secondary "
+            "history can grow research corpora when primary compact lookback is shallow. "
+            "When false, require 20 usable primary-quality bars from "
+            "AEGIS_DAILY_BAR_PRIMARY_SOURCE only. See ADR-0012 and ADR-0056."
         ),
     )
 

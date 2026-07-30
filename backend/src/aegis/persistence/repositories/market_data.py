@@ -174,6 +174,81 @@ class MarketDailyBarRepository:
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
+    async def list_recent_for_sessions(
+        self,
+        symbol: str,
+        session_limit: int,
+        *,
+        sources: list[str] | None = None,
+    ) -> list[MarketDailyBarObservation]:
+        """Return current bars covering the ``session_limit`` most recent trading dates.
+
+        Unlike :meth:`list_recent`, the limit applies to distinct ``trading_date`` values
+        so multi-source overlap does not starve older sessions (ADR-0056). May return more
+        than ``session_limit`` rows when multiple sources share dates.
+        """
+
+        if session_limit <= 0:
+            return []
+
+        dates_stmt = (
+            select(MarketDailyBarObservation.trading_date)
+            .where(MarketDailyBarObservation.symbol == symbol)
+            .group_by(MarketDailyBarObservation.trading_date)
+            .order_by(MarketDailyBarObservation.trading_date.desc())
+            .limit(session_limit)
+        )
+        if sources is not None:
+            dates_stmt = dates_stmt.where(
+                MarketDailyBarObservation.source.in_(sources)
+            )
+        recent_dates = dates_stmt.subquery()
+
+        max_ingested = (
+            select(
+                MarketDailyBarObservation.source,
+                MarketDailyBarObservation.trading_date,
+                func.max(MarketDailyBarObservation.ingested_at).label("max_ingested_at"),
+            )
+            .where(MarketDailyBarObservation.symbol == symbol)
+            .where(
+                MarketDailyBarObservation.trading_date.in_(
+                    select(recent_dates.c.trading_date)
+                )
+            )
+            .group_by(
+                MarketDailyBarObservation.source,
+                MarketDailyBarObservation.trading_date,
+            )
+        )
+        if sources is not None:
+            max_ingested = max_ingested.where(
+                MarketDailyBarObservation.source.in_(sources)
+            )
+        max_ingested = max_ingested.subquery()
+
+        stmt = (
+            select(MarketDailyBarObservation)
+            .join(
+                max_ingested,
+                (
+                    MarketDailyBarObservation.source == max_ingested.c.source
+                )
+                & (
+                    MarketDailyBarObservation.trading_date == max_ingested.c.trading_date
+                )
+                & (
+                    MarketDailyBarObservation.ingested_at == max_ingested.c.max_ingested_at
+                ),
+            )
+            .where(MarketDailyBarObservation.symbol == symbol)
+        )
+        if sources is not None:
+            stmt = stmt.where(MarketDailyBarObservation.source.in_(sources))
+        stmt = stmt.order_by(MarketDailyBarObservation.trading_date.desc())
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
 
 def _observation_from_bar(
     source: str,

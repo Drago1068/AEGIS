@@ -168,7 +168,8 @@ class ResearchBarReaderAdapter:
         self._repository = repository
 
     async def list_recent_bars(self, symbol: str, limit: int) -> list[ResearchBarInput]:
-        rows = await self._repository.list_recent(symbol, limit)
+        # Session-depth limit (ADR-0056): distinct trading dates, not raw observation rows.
+        rows = await self._repository.list_recent_for_sessions(symbol, limit)
         return [_bar_to_research_input(row) for row in rows]
 
 

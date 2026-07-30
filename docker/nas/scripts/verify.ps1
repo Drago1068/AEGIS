@@ -332,9 +332,9 @@ try {
             throw "Phase 48: assessments/backfill persisted=$assessPersisted but outcome-labels/backfill persisted=$labelPersisted (expected >=1 for label-ready candidates)"
         }
         if ($assessPersisted -gt 0) {
-            Write-Host "OK  Phase 48 label-ready coupling (assessments persisted=$assessPersisted -> labels persisted=$labelPersisted)"
+            Write-Host "OK  Phase 48/50 label-ready coupling at limit=20 (assessments persisted=$assessPersisted -> labels persisted=$labelPersisted)"
         } else {
-            Write-Host "OK  Phase 48 label-ready coupling skipped (assessments persisted=0; label zeros OK)"
+            Write-Host "OK  Phase 48/50 label-ready coupling skipped (assessments persisted=0; label zeros OK)"
         }
     } finally {
         if (Test-Path -LiteralPath $backfillPath) {

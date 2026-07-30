@@ -33,8 +33,8 @@ history in the console), Phase 29 (NAS live verify of Phase 28), Phase 30
 (NAS live verify of Phase 41), Phase 43 (historical outcome-label backfill), Phase 44
 (NAS live verify of Phase 43), Phase 45 (historical research assessment backfill),
 Phase 46 (NAS live verify of Phase 45), Phase 47 (label-ready assessment backfill
-candidates), Phase 48 (NAS live verify of Phase 47), and Phase 49 (prefer unlabeled
-label-ready outcome-label backfill).
+candidates), Phase 48 (NAS live verify of Phase 47), Phase 49 (prefer unlabeled
+label-ready outcome-label backfill), and Phase 50 (NAS live verify of Phase 49).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -133,6 +133,8 @@ Phase 48 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0049-phase-48-nas-live-verify-phase-47.md](decisions/0049-phase-48-nas-live-verify-phase-47.md)).
 Phase 49 prefers unlabeled label-ready assessments in outcome-label backfill (see
 [decisions/0050-phase-49-prefer-unlabeled-label-backfill.md](decisions/0050-phase-49-prefer-unlabeled-label-backfill.md)).
+Phase 50 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0051-phase-50-nas-live-verify-phase-49.md](decisions/0051-phase-50-nas-live-verify-phase-49.md)).
 
 ## System context
 

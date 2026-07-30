@@ -1,4 +1,4 @@
-# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46 + Phase 48)
+# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46 + Phase 48 + Phase 50)
 
 This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0018](../architecture/decisions/0018-phase-17-nas-live-verification.md),
@@ -16,7 +16,8 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0043](../architecture/decisions/0043-phase-42-nas-live-verify-phase-41.md),
 [ADR-0045](../architecture/decisions/0045-phase-44-nas-live-verify-phase-43.md),
 [ADR-0047](../architecture/decisions/0047-phase-46-nas-live-verify-phase-45.md),
-[ADR-0049](../architecture/decisions/0049-phase-48-nas-live-verify-phase-47.md).
+[ADR-0049](../architecture/decisions/0049-phase-48-nas-live-verify-phase-47.md),
+[ADR-0051](../architecture/decisions/0051-phase-50-nas-live-verify-phase-49.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 

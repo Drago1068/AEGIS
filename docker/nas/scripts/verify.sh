@@ -313,9 +313,9 @@ if [[ "${assess_persisted}" -gt 0 && "${label_persisted}" -lt 1 ]]; then
   exit 1
 fi
 if [[ "${assess_persisted}" -gt 0 ]]; then
-  echo "OK  Phase 48 label-ready coupling (assessments persisted=${assess_persisted} -> labels persisted=${label_persisted})"
+  echo "OK  Phase 48/50 label-ready coupling at limit=20 (assessments persisted=${assess_persisted} -> labels persisted=${label_persisted})"
 else
-  echo "OK  Phase 48 label-ready coupling skipped (assessments persisted=0; label zeros OK)"
+  echo "OK  Phase 48/50 label-ready coupling skipped (assessments persisted=0; label zeros OK)"
 fi
 
 history_assessment_id=1

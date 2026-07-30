@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 50 - NAS Live Verification of Phase 49
+
+Ops evidence gate: redeploy under the lab TLS profile and verify unlabeled label-ready
+outcome-label backfill (``limit=20``) on the live NAS. See
+[docs/architecture/decisions/0051-phase-50-nas-live-verify-phase-49.md](docs/architecture/decisions/0051-phase-50-nas-live-verify-phase-49.md).
+
+#### Added
+
+- ADR-0051: live verify confirms Phase 48 coupling still holds with outcome-label backfill
+  ``limit=20`` after Phase 49 candidate selection.
+- Checklist / docs updates for Phase 50.
+
+#### Explicitly out of scope
+
+New assessment/label math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 49 - Prefer Unlabeled Label-Ready Outcome-Label Backfill
 
 Prefer unlabeled assessments with stored forward-horizon closes so default ``limit=20``

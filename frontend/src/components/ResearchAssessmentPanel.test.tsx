@@ -14,7 +14,7 @@ vi.mock("@/lib/api-client", async () => {
     getLatestOutcomeLabels: vi.fn(),
     getCalibrationReadiness: vi.fn(),
     createProbabilityCalibration: vi.fn(),
-    getLatestProbabilityCalibration: vi.fn(),
+    listProbabilityCalibrations: vi.fn(),
   };
 });
 
@@ -24,8 +24,8 @@ import {
   createResearchAssessment,
   getCalibrationReadiness,
   getLatestOutcomeLabels,
-  getLatestProbabilityCalibration,
   getLatestResearchAssessment,
+  listProbabilityCalibrations,
 } from "@/lib/api-client";
 
 const sampleAssessment = {
@@ -89,9 +89,7 @@ describe("ResearchAssessmentPanel", () => {
     vi.mocked(getLatestOutcomeLabels).mockRejectedValue(
       new ApiClientError("missing labels", 404, null),
     );
-    vi.mocked(getLatestProbabilityCalibration).mockRejectedValue(
-      new ApiClientError("missing calibration", 404, null),
-    );
+    vi.mocked(listProbabilityCalibrations).mockResolvedValue([]);
   });
 
   it("shows research-only labeling and empty state", () => {
@@ -162,6 +160,7 @@ describe("ResearchAssessmentPanel", () => {
         detail: "corpus and bucket gates pass",
       });
     vi.mocked(createProbabilityCalibration).mockResolvedValue(sampleCalibration);
+    vi.mocked(listProbabilityCalibrations).mockResolvedValue([sampleCalibration]);
 
     render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
     fireEvent.click(screen.getByRole("button", { name: /refresh readiness/i }));
@@ -181,8 +180,29 @@ describe("ResearchAssessmentPanel", () => {
       );
     });
     await waitFor(() => {
+      expect(listProbabilityCalibrations).toHaveBeenCalled();
       expect(screen.getByText(/probability calibration \(research-only/i)).toBeInTheDocument();
       expect(screen.getByText(/0\.6200 \(calibrated research-only\)/)).toBeInTheDocument();
+    });
+  });
+
+  it("shows calibration history when more than one row exists", async () => {
+    const older = {
+      ...sampleCalibration,
+      id: 9,
+      computed_at: "2024-01-26T18:00:00Z",
+      probability_confidence: 0.5,
+    };
+    vi.mocked(getLatestResearchAssessment).mockResolvedValue(sampleAssessment);
+    vi.mocked(listProbabilityCalibrations).mockResolvedValue([sampleCalibration, older]);
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /refresh latest/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/calibration history \(newest first\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/p=0\.6200/)).toBeInTheDocument();
+      expect(screen.getByText(/p=0\.5000/)).toBeInTheDocument();
     });
   });
 

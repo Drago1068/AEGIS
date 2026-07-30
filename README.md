@@ -7,10 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 18 (on-demand probability calibration).** Operators can POST
-`research_calibration_v1` when readiness is `ready` without enabling automatic calibration
-(ADR-0019). See
-[docs/architecture/decisions/0019-phase-18-on-demand-calibration.md](docs/architecture/decisions/0019-phase-18-on-demand-calibration.md)
+**Current phase: Phase 19 (calibration history).** Authenticated list of append-only
+`research_calibration_v1` rows per assessment (ADR-0020). See
+[docs/architecture/decisions/0020-phase-19-calibration-history.md](docs/architecture/decisions/0020-phase-19-calibration-history.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

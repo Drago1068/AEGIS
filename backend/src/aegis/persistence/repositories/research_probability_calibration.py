@@ -26,9 +26,7 @@ class ResearchProbabilityCalibrationRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def list_labeled_examples(
-        self, symbol: str, limit: int
-    ) -> list[LabeledResearchExample]:
+    async def list_labeled_examples(self, symbol: str, limit: int) -> list[LabeledResearchExample]:
         """Return labeled examples with newest label per assessment."""
 
         stmt = (
@@ -71,9 +69,7 @@ class ResearchProbabilityCalibrationRepository:
                 break
         return examples
 
-    async def insert(
-        self, calibration: ProbabilityCalibrationData
-    ) -> ProbabilityCalibrationData:
+    async def insert(self, calibration: ProbabilityCalibrationData) -> ProbabilityCalibrationData:
         row = ResearchAssessmentProbabilityCalibration(
             assessment_snapshot_id=calibration.assessment_snapshot_id,
             computed_at=calibration.computed_at,
@@ -94,18 +90,35 @@ class ResearchProbabilityCalibrationRepository:
     async def get_latest_for_assessment(
         self, assessment_snapshot_id: int
     ) -> ProbabilityCalibrationData | None:
+        rows = await self.list_for_assessment(assessment_snapshot_id, limit=1)
+        return rows[0] if rows else None
+
+    async def list_for_assessment(
+        self,
+        assessment_snapshot_id: int,
+        limit: int,
+        *,
+        symbol: str | None = None,
+    ) -> list[ProbabilityCalibrationData]:
+        """Return up to ``limit`` calibrations for an assessment, newest first.
+
+        When ``symbol`` is set, only rows for that symbol (case-insensitive) are returned.
+        """
+
+        conditions = [
+            ResearchAssessmentProbabilityCalibration.assessment_snapshot_id
+            == assessment_snapshot_id
+        ]
+        if symbol is not None:
+            conditions.append(ResearchAssessmentProbabilityCalibration.symbol == symbol.upper())
         stmt = (
             select(ResearchAssessmentProbabilityCalibration)
-            .where(
-                ResearchAssessmentProbabilityCalibration.assessment_snapshot_id
-                == assessment_snapshot_id
-            )
+            .where(*conditions)
             .order_by(ResearchAssessmentProbabilityCalibration.computed_at.desc())
-            .limit(1)
+            .limit(limit)
         )
         result = await self._session.execute(stmt)
-        row = result.scalar_one_or_none()
-        return _calibration_to_data(row) if row is not None else None
+        return [_calibration_to_data(row) for row in result.scalars().all()]
 
 
 def _calibration_to_data(

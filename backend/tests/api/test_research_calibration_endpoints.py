@@ -1,7 +1,8 @@
-"""API tests for on-demand research probability calibration endpoints (Phase 18)."""
+"""API tests for on-demand research probability calibration endpoints (Phase 18/19)."""
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import UTC, datetime
 
 from httpx import ASGITransport, AsyncClient
@@ -50,10 +51,13 @@ class _FakeCalibrationService:
         *,
         on_calibrate: ProbabilityCalibrationData | Exception | None = None,
         latest: ProbabilityCalibrationData | None = None,
+        listed: list[ProbabilityCalibrationData] | None = None,
     ) -> None:
         self._on_calibrate = on_calibrate
         self._latest = latest
+        self._listed = listed or []
         self.calibrate_calls: list[tuple[str, int]] = []
+        self.list_calls: list[tuple[str, int, int]] = []
 
     async def calibrate_assessment(
         self, symbol: str, assessment_snapshot_id: int
@@ -68,6 +72,15 @@ class _FakeCalibrationService:
         self, assessment_snapshot_id: int
     ) -> ProbabilityCalibrationData | None:
         return self._latest
+
+    async def list_calibrations_for_assessment(
+        self,
+        symbol: str,
+        assessment_snapshot_id: int,
+        limit: int,
+    ) -> list[ProbabilityCalibrationData]:
+        self.list_calls.append((symbol, assessment_snapshot_id, limit))
+        return self._listed[:limit]
 
 
 def _client(service: _FakeCalibrationService) -> AsyncClient:
@@ -126,3 +139,35 @@ async def test_get_latest_calibration_404() -> None:
         response = await client.get("/research/AAPL/assessments/99/calibrations/latest")
 
     assert response.status_code == 404
+
+
+async def test_list_calibrations_newest_first() -> None:
+    newer = _calibration()
+    older = replace(
+        newer,
+        id=6,
+        computed_at=datetime(2024, 1, 25, 18, 0, tzinfo=UTC),
+        probability_confidence=0.55,
+    )
+    service = _FakeCalibrationService(listed=[newer, older])
+
+    async with _client(service) as client:
+        response = await client.get("/research/AAPL/assessments/99/calibrations?limit=10")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) == 2
+    assert body[0]["id"] == 7
+    assert body[1]["id"] == 6
+    assert body[0]["state"] == "research_only"
+    assert service.list_calls == [("AAPL", 99, 10)]
+
+
+async def test_list_calibrations_empty() -> None:
+    service = _FakeCalibrationService(listed=[])
+
+    async with _client(service) as client:
+        response = await client.get("/research/AAPL/assessments/99/calibrations")
+
+    assert response.status_code == 200
+    assert response.json() == []

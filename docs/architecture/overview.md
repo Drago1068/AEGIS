@@ -17,7 +17,8 @@ Phase 10 (second daily-bar provider), and Phase 11 (multi-source coverage weight
 Phase 12 (provider historical corrections on daily-bar observations), Phase 13 (research
 outcome labels), Phase 14 (scheduled outcome labeling after assessments), Phase 15
 (research probability calibration v1), Phase 16 (calibration corpus readiness),
-Phase 17 (NAS live verification evidence gate), and Phase 18 (on-demand calibration).
+Phase 17 (NAS live verification evidence gate), Phase 18 (on-demand calibration), and
+Phase 19 (calibration history).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -45,6 +46,9 @@ Phase 17 hardens NAS live verification as a distinct evidence gate after package
 Phase 18 adds on-demand POST/GET calibration routes and operator console compute when
 readiness is `ready`, without changing the automatic-calibration default (see
 [decisions/0019-phase-18-on-demand-calibration.md](decisions/0019-phase-18-on-demand-calibration.md)).
+Phase 19 adds `GET .../calibrations` history (newest first) for audit of append-only rows
+(see
+[decisions/0020-phase-19-calibration-history.md](decisions/0020-phase-19-calibration-history.md)).
 
 ## System context
 
@@ -91,7 +95,9 @@ empirical probability calibration from labeled history (ADR-0016). As of Phase 1
 `GET /research/{symbol}/calibration-readiness` reports corpus-gate readiness without
 persisting rows (ADR-0017). As of Phase 18, authenticated
 `POST/GET /research/{symbol}/assessments/{id}/calibrations` persist or fetch on-demand
-`research_calibration_v1` rows without requiring the automatic flag (ADR-0019). As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
+`research_calibration_v1` rows without requiring the automatic flag (ADR-0019). As of
+Phase 19, `GET .../calibrations?limit=` lists append-only history newest first (ADR-0020).
+As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
 assessments use `method_version` 2 multi-source coverage weighting (ADR-0012). See
 [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md),
 [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md),

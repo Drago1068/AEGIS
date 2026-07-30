@@ -555,6 +555,30 @@ export async function getLatestProbabilityCalibration(
   return body as ProbabilityCalibration;
 }
 
+export async function listProbabilityCalibrations(
+  baseUrl: string,
+  symbol: string,
+  assessmentId: number,
+  limit = 20,
+  options?: ApiRequestOptions,
+): Promise<ProbabilityCalibration[]> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/` +
+    `${assessmentId}/calibrations?limit=${encodeURIComponent(String(limit))}`;
+  const { response, body } = await requestJson(url, undefined, options);
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected GET calibrations status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  if (!Array.isArray(body)) {
+    throw new ApiClientError("Unexpected calibrations list payload", response.status, body);
+  }
+  return body as ProbabilityCalibration[];
+}
+
 export function getApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 }

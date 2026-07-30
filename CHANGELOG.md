@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 19 - Calibration History
+
+Authenticated list of append-only `research_calibration_v1` rows for an assessment so
+operators can audit repeated on-demand calibrations. See
+[docs/architecture/decisions/0020-phase-19-calibration-history.md](docs/architecture/decisions/0020-phase-19-calibration-history.md).
+
+#### Added
+
+- ADR-0020: `GET .../assessments/{id}/calibrations?limit=` (newest first; empty `[]` when
+  none); operator console calibration history when more than one row exists.
+- Reuses Phase 15/18 persistence; no new method or automatic-calibration default change.
+
+#### Explicitly out of scope
+
+Multi-horizon methods, default-on calibration, actionable promotion, orders.
+
 ### Phase 18 - On-Demand Probability Calibration
 
 Authenticated on-demand `research_calibration_v1` when readiness is `ready`, without enabling

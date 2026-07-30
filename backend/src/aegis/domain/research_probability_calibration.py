@@ -116,11 +116,7 @@ def evaluate_calibration_readiness(
         )
 
     research_index = float(research_index_raw)
-    historical = [
-        example
-        for example in corpus
-        if example.assessment_snapshot_id != snapshot.id
-    ]
+    historical = [example for example in corpus if example.assessment_snapshot_id != snapshot.id]
     bucket = [
         example
         for example in historical
@@ -140,8 +136,7 @@ def evaluate_calibration_readiness(
             index_bucket_width=index_bucket_width,
             calibration_method_id=CALIBRATION_METHOD_ID,
             detail=(
-                f"need at least {min_corpus} labeled historical examples, "
-                f"found {len(historical)}"
+                f"need at least {min_corpus} labeled historical examples, found {len(historical)}"
             ),
         )
 
@@ -239,11 +234,7 @@ def compute_research_calibration_v1(
         )
 
     research_index = _research_index_from_snapshot(snapshot)
-    historical = [
-        example
-        for example in corpus
-        if example.assessment_snapshot_id != snapshot.id
-    ]
+    historical = [example for example in corpus if example.assessment_snapshot_id != snapshot.id]
 
     if len(historical) < min_corpus:
         raise CalibrationUnavailableError(
@@ -303,23 +294,31 @@ def _clip01(value: float) -> float:
 class LabeledCorpusReader(Protocol):
     async def list_labeled_examples(
         self, symbol: str, limit: int
-    ) -> list[LabeledResearchExample]:
-        ...
+    ) -> list[LabeledResearchExample]: ...
 
 
 class AssessmentReaderForCalibration(Protocol):
-    async def get_by_id(self, assessment_snapshot_id: int) -> ResearchAssessmentSnapshotData | None:
-        ...
+    async def get_by_id(
+        self, assessment_snapshot_id: int
+    ) -> ResearchAssessmentSnapshotData | None: ...
 
 
 class ProbabilityCalibrationStore(Protocol):
-    async def insert(self, calibration: ProbabilityCalibrationData) -> ProbabilityCalibrationData:
-        ...
+    async def insert(
+        self, calibration: ProbabilityCalibrationData
+    ) -> ProbabilityCalibrationData: ...
 
     async def get_latest_for_assessment(
         self, assessment_snapshot_id: int
-    ) -> ProbabilityCalibrationData | None:
-        ...
+    ) -> ProbabilityCalibrationData | None: ...
+
+    async def list_for_assessment(
+        self,
+        assessment_snapshot_id: int,
+        limit: int,
+        *,
+        symbol: str | None = None,
+    ) -> list[ProbabilityCalibrationData]: ...
 
 
 class ResearchProbabilityCalibrationService:
@@ -386,6 +385,20 @@ class ResearchProbabilityCalibrationService:
         self, assessment_snapshot_id: int
     ) -> ProbabilityCalibrationData | None:
         return await self._calibration_store.get_latest_for_assessment(assessment_snapshot_id)
+
+    async def list_calibrations_for_assessment(
+        self,
+        symbol: str,
+        assessment_snapshot_id: int,
+        limit: int,
+    ) -> list[ProbabilityCalibrationData]:
+        """Return up to ``limit`` calibrations for ``assessment_snapshot_id`` and ``symbol``."""
+
+        return await self._calibration_store.list_for_assessment(
+            assessment_snapshot_id,
+            limit,
+            symbol=symbol,
+        )
 
     async def evaluate_readiness(
         self,

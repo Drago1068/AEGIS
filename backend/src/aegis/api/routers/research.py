@@ -164,6 +164,22 @@ async def create_probability_calibration(
 
 
 @router.get(
+    "/{symbol}/assessments/{assessment_id}/calibrations",
+    response_model=list[ProbabilityCalibrationResponse],
+)
+async def list_probability_calibrations(
+    symbol: str,
+    assessment_id: int,
+    limit: int = Query(default=20, ge=1, le=100),
+    service: ResearchProbabilityCalibrationService = Depends(get_research_calibration_service),
+) -> list[ProbabilityCalibrationResponse]:
+    """Return up to ``limit`` calibrations for ``assessment_id``, newest first."""
+
+    rows = await service.list_calibrations_for_assessment(symbol, assessment_id, limit)
+    return [ProbabilityCalibrationResponse.model_validate(item) for item in rows]
+
+
+@router.get(
     "/{symbol}/assessments/{assessment_id}/calibrations/latest",
     response_model=ProbabilityCalibrationResponse,
 )

@@ -14,8 +14,8 @@ import {
   getApiBaseUrl,
   getCalibrationReadiness,
   getLatestOutcomeLabels,
-  getLatestProbabilityCalibration,
   getLatestResearchAssessment,
+  listProbabilityCalibrations,
 } from "@/lib/api-client";
 
 type ResearchAssessmentPanelProps = {
@@ -48,6 +48,9 @@ export function ResearchAssessmentPanel({
   const [outcomeLabel, setOutcomeLabel] = useState<OutcomeLabel | null>(null);
   const [readiness, setReadiness] = useState<CalibrationReadiness | null>(null);
   const [calibration, setCalibration] = useState<ProbabilityCalibration | null>(null);
+  const [calibrationHistory, setCalibrationHistory] = useState<ProbabilityCalibration[]>(
+    [],
+  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const baseUrl = getApiBaseUrl();
@@ -57,21 +60,17 @@ export function ResearchAssessmentPanel({
     setReadiness(next);
   }
 
-  async function loadLatestCalibration(assessmentId: number) {
-    try {
-      const next = await getLatestProbabilityCalibration(baseUrl, symbol, assessmentId);
-      setCalibration(next);
+  async function loadCalibrationHistory(assessmentId: number) {
+    const rows = await listProbabilityCalibrations(baseUrl, symbol, assessmentId, 20);
+    setCalibrationHistory(rows);
+    const newest = rows[0] ?? null;
+    setCalibration(newest);
+    if (newest != null) {
       setLatest((current) =>
         current == null
           ? current
-          : { ...current, probability_confidence: next.probability_confidence },
+          : { ...current, probability_confidence: newest.probability_confidence },
       );
-    } catch (err) {
-      if (err instanceof ApiClientError && err.status === 404) {
-        setCalibration(null);
-        return;
-      }
-      throw err;
     }
   }
 
@@ -83,9 +82,10 @@ export function ResearchAssessmentPanel({
         setLatest(snapshot);
         setOutcomeLabel(null);
         setCalibration(null);
+        setCalibrationHistory([]);
         await loadReadiness();
         if (snapshot.id != null) {
-          await loadLatestCalibration(snapshot.id);
+          await loadCalibrationHistory(snapshot.id);
         }
       } catch (err) {
         setError(formatAssessmentError(err));
@@ -101,6 +101,7 @@ export function ResearchAssessmentPanel({
         setLatest(snapshot);
         setOutcomeLabel(null);
         setCalibration(null);
+        setCalibrationHistory([]);
         if (snapshot.id != null) {
           try {
             const label = await getLatestOutcomeLabels(baseUrl, symbol, snapshot.id);
@@ -112,7 +113,7 @@ export function ResearchAssessmentPanel({
               throw labelErr;
             }
           }
-          await loadLatestCalibration(snapshot.id);
+          await loadCalibrationHistory(snapshot.id);
         }
         await loadReadiness();
       } catch (err) {
@@ -121,6 +122,7 @@ export function ResearchAssessmentPanel({
           setOutcomeLabel(null);
           setReadiness(null);
           setCalibration(null);
+          setCalibrationHistory([]);
           setError(null);
           return;
         }
@@ -152,9 +154,8 @@ export function ResearchAssessmentPanel({
     startTransition(async () => {
       setError(null);
       try {
-        const next = await createProbabilityCalibration(baseUrl, symbol, latest.id as number);
-        setCalibration(next);
-        setLatest({ ...latest, probability_confidence: next.probability_confidence });
+        await createProbabilityCalibration(baseUrl, symbol, latest.id as number);
+        await loadCalibrationHistory(latest.id as number);
         await loadReadiness();
       } catch (err) {
         setError(formatAssessmentError(err));
@@ -394,6 +395,21 @@ export function ResearchAssessmentPanel({
                   <dd className="font-mono">{calibration.computed_at}</dd>
                 </div>
               </dl>
+              {calibrationHistory.length > 1 ? (
+                <div className="mt-3 border-t border-aegis-line pt-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
+                    Calibration history (newest first)
+                  </p>
+                  <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
+                    {calibrationHistory.map((row) => (
+                      <li key={row.id ?? `${row.computed_at}-${row.probability_confidence}`}>
+                        {row.computed_at} · p={row.probability_confidence.toFixed(4)} · corpus=
+                        {row.corpus_count}/{row.bucket_count}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </div>

@@ -51,7 +51,8 @@ print_checklist() {
   echo " 22. SSH .env.nas includes AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true (Phase 56)"
   echo " 23. Authenticated POST outcome-labels/backfill?limit=100 (Phase 58 source-aware throughput)"
   echo " 24. Authenticated evidence-summary includes Phase 59 provenance fields"
-  echo " 25. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 25. Authenticated assessments list+export with component_source=mixed (Phase 62)"
+  echo " 26. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -272,6 +273,52 @@ if ! head -c 1 "${assess_export_body}" | grep -q '\['; then
 fi
 echo "OK  assessments/export attachment JSON array"
 
+mixed_list_url="${API}/research/${VERIFY_SYMBOL}/assessments?limit=20&component_source=mixed"
+mixed_list_body="$(mktemp)"
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${mixed_list_body}"; }
+trap cleanup EXIT
+mixed_list_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -o "${mixed_list_body}" -w "%{http_code}" --max-time 60 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" "${mixed_list_url}"
+)"
+assert_status "GET ${mixed_list_url} (auth)" "${mixed_list_code}" 200
+if ! head -c 1 "${mixed_list_body}" | grep -q '\['; then
+  echo "assessments?component_source=mixed body is not a JSON array" >&2
+  exit 1
+fi
+mixed_list_count="$(python3 -c "import json,sys; print(len(json.load(open(sys.argv[1],encoding='utf-8'))))" "${mixed_list_body}")"
+python3 -c "
+import json, sys
+rows = json.load(open(sys.argv[1], encoding='utf-8'))
+for row in rows:
+    comps = row.get('components') or {}
+    src = comps.get('component_source') or row.get('input_source')
+    if src != 'mixed':
+        raise SystemExit(f\"non-mixed row id={row.get('id')} src={src}\")
+" "${mixed_list_body}"
+echo "OK  assessments?component_source=mixed JSON array (count=${mixed_list_count})"
+
+mixed_export_url="${API}/research/${VERIFY_SYMBOL}/assessments/export?limit=20&component_source=mixed"
+mixed_export_body="$(mktemp)"
+mixed_export_headers="$(mktemp)"
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${mixed_list_body}" "${mixed_export_body}" "${mixed_export_headers}"; }
+trap cleanup EXIT
+mixed_export_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -D "${mixed_export_headers}" -o "${mixed_export_body}" -w "%{http_code}" --max-time 60 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" "${mixed_export_url}"
+)"
+assert_status "GET ${mixed_export_url} (auth)" "${mixed_export_code}" 200
+if ! grep -qi 'content-disposition:.*attachment' "${mixed_export_headers}"; then
+  echo "assessments/export?component_source=mixed missing Content-Disposition attachment" >&2
+  exit 1
+fi
+if ! head -c 1 "${mixed_export_body}" | grep -q '\['; then
+  echo "assessments/export?component_source=mixed body is not a JSON array" >&2
+  exit 1
+fi
+echo "OK  assessments/export?component_source=mixed attachment JSON array"
+echo "OK  Phase 62 assessments component_source=mixed list+export"
+
 assess_backfill_url="${API}/research/${VERIFY_SYMBOL}/assessments/backfill?limit=20"
 assess_backfill_body="$(mktemp)"
 cleanup() { rm -f "${COOKIE_JAR}" "${ready_body}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${assess_backfill_body}"; }
@@ -473,6 +520,14 @@ if ! grep -q '"mixed_component_source_assessment_count"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 60 evidence-summary provenance fields present"
+# Phase 62: when mixed assessments exist in the evidence scan, filtered list must be non-empty.
+if grep -qE '"mixed_component_source_assessment_count"[[:space:]]*:[[:space:]]*[1-9]' "${summary_body}"; then
+  if [[ "${mixed_list_count}" -lt 1 ]]; then
+    echo "Phase 62: mixed_component_source_assessment_count>0 but assessments?component_source=mixed returned 0" >&2
+    exit 1
+  fi
+  echo "OK  Phase 62 mixed filter non-empty when mixed_count>0 (filtered=${mixed_list_count})"
+fi
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"

@@ -7,9 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 61 (assessment history component-source filter).** Optional
-``component_source`` filter on assessment list/export and console history (ADR-0062). See
-[docs/architecture/decisions/0062-phase-61-assessment-history-component-source-filter.md](docs/architecture/decisions/0062-phase-61-assessment-history-component-source-filter.md)
+**Current phase: Phase 62 (NAS live verify of Phase 61).** Redeploy under lab TLS and
+confirm assessment ``component_source=mixed`` list/export (ADR-0063). See
+[docs/architecture/decisions/0063-phase-62-nas-live-verify-phase-61.md](docs/architecture/decisions/0063-phase-62-nas-live-verify-phase-61.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

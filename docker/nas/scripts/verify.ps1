@@ -62,7 +62,8 @@ function Write-VerifyChecklist {
     Write-Host " 22. SSH .env.nas includes AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true (Phase 56)"
     Write-Host " 23. Authenticated POST outcome-labels/backfill?limit=100 (Phase 58 source-aware throughput)"
     Write-Host " 24. Authenticated evidence-summary includes Phase 59 provenance fields"
-    Write-Host " 25. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 25. Authenticated assessments list+export with component_source=mixed (Phase 62)"
+    Write-Host " 26. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -297,6 +298,61 @@ try {
         }
     }
 
+    # Phase 62: assessment history filtered by component_source=mixed (Phase 61).
+    $mixedListUrl = "$api/research/$verifySymbol/assessments?limit=20&component_source=mixed"
+    $mixedListPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.assessments-mixed.json" -f [guid]::NewGuid().ToString("N"))
+    $mixedListCount = 0
+    try {
+        $mixedListCode = & curl.exe -sS @curlInsecure -o $mixedListPath -w "%{http_code}" --max-time 60 `
+            -b $cookieJar -H "Accept: application/json" $mixedListUrl
+        if ($LASTEXITCODE -ne 0) { throw "GET assessments?component_source=mixed failed (curl exit $LASTEXITCODE)" }
+        Assert-Status -Label "GET $mixedListUrl (auth)" -Actual ([int]$mixedListCode) -Expected @(200)
+        $mixedListBody = Get-Content -LiteralPath $mixedListPath -Raw | ConvertFrom-Json
+        if ($null -eq $mixedListBody) { throw "assessments?component_source=mixed body was null" }
+        $mixedListCount = @($mixedListBody).Count
+        foreach ($row in @($mixedListBody)) {
+            $src = $null
+            if ($null -ne $row.components -and $null -ne $row.components.component_source) {
+                $src = [string]$row.components.component_source
+            }
+            if ([string]::IsNullOrWhiteSpace($src)) {
+                $src = [string]$row.input_source
+            }
+            if ($src -ne "mixed") {
+                throw "assessments?component_source=mixed returned non-mixed row id=$($row.id) src=$src"
+            }
+        }
+        Write-Host "OK  assessments?component_source=mixed JSON array (count=$mixedListCount)"
+    } finally {
+        if (Test-Path -LiteralPath $mixedListPath) {
+            Remove-Item -LiteralPath $mixedListPath -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    $mixedExportUrl = "$api/research/$verifySymbol/assessments/export?limit=20&component_source=mixed"
+    $mixedExportPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.assess-export-mixed.json" -f [guid]::NewGuid().ToString("N"))
+    $mixedExportHeadersPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.assess-export-mixed.hdr" -f [guid]::NewGuid().ToString("N"))
+    try {
+        $mixedExportCode = & curl.exe -sS @curlInsecure -D $mixedExportHeadersPath -o $mixedExportPath -w "%{http_code}" --max-time 60 `
+            -b $cookieJar -H "Accept: application/json" $mixedExportUrl
+        if ($LASTEXITCODE -ne 0) { throw "GET assessments/export?component_source=mixed failed (curl exit $LASTEXITCODE)" }
+        Assert-Status -Label "GET $mixedExportUrl (auth)" -Actual ([int]$mixedExportCode) -Expected @(200)
+        $mixedExportHeaders = Get-Content -LiteralPath $mixedExportHeadersPath -Raw
+        if ($mixedExportHeaders -notmatch '(?i)content-disposition:.*attachment') {
+            throw "assessments/export?component_source=mixed missing Content-Disposition attachment"
+        }
+        $mixedExportBody = Get-Content -LiteralPath $mixedExportPath -Raw | ConvertFrom-Json
+        if ($null -eq $mixedExportBody) { throw "assessments/export?component_source=mixed body was null" }
+        Write-Host "OK  assessments/export?component_source=mixed attachment JSON array (count=$(@($mixedExportBody).Count))"
+        Write-Host "OK  Phase 62 assessments component_source=mixed list+export"
+    } finally {
+        foreach ($p in @($mixedExportPath, $mixedExportHeadersPath)) {
+            if (Test-Path -LiteralPath $p) {
+                Remove-Item -LiteralPath $p -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
     # Phase 46/48: assessment backfill then outcome-label backfill.
     # Phase 48: if assessments persisted>0, labels must persist >=1 (label-ready candidates).
     $assessBackfillUrl = "$api/research/$verifySymbol/assessments/backfill?limit=20"
@@ -524,6 +580,12 @@ try {
         $labelSrc = if ($null -eq $summary.latest_resolved_label_bar_source) { "null" } else { $summary.latest_resolved_label_bar_source }
         Write-Host "OK  evidence-summary state=research_only assessments=$($summary.assessment_count) label_keys=$labelPart end_date_keys=$endPart component_source=$compSrc label_bar_source=$labelSrc mixed_count=$($summary.mixed_component_source_assessment_count)"
         Write-Host "OK  Phase 60 evidence-summary provenance fields present"
+        if ([int]$summary.mixed_component_source_assessment_count -gt 0 -and $mixedListCount -lt 1) {
+            throw "Phase 62: mixed_component_source_assessment_count=$($summary.mixed_component_source_assessment_count) but assessments?component_source=mixed returned 0"
+        }
+        if ([int]$summary.mixed_component_source_assessment_count -gt 0) {
+            Write-Host "OK  Phase 62 mixed filter non-empty when mixed_count=$($summary.mixed_component_source_assessment_count) (filtered=$mixedListCount)"
+        }
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue

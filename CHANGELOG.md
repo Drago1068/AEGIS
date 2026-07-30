@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 62 - NAS Live Verification of Phase 61
+
+Ops evidence gate: redeploy under lab TLS and confirm assessment list/export
+``component_source=mixed`` filtering. See
+[docs/architecture/decisions/0063-phase-62-nas-live-verify-phase-61.md](docs/architecture/decisions/0063-phase-62-nas-live-verify-phase-61.md).
+
+#### Added
+
+- ADR-0063: live verify requires filtered assessments list+export for ``component_source=mixed``.
+- Verify checklist item for Phase 62 mixed filter.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 61 - Assessment History Component-Source Filter
 
 Operator filter/export of assessment history by ``component_source`` (including mixed-only)

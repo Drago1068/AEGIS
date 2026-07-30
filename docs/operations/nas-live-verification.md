@@ -89,7 +89,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 22 | SSH `.env.nas` `AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL` (Phase 56) | **`true`** |
 | 23 | Authenticated `POST .../outcome-labels/backfill?limit=100` (Phase 58) | **200**; persist when source-ready candidates exist |
 | 24 | Authenticated evidence-summary provenance (Phase 60) | ``latest_component_source``, ``latest_resolved_label_bar_source``, ``mixed_component_source_assessment_count`` present |
-| 25 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 25 | Authenticated assessments list+export ``component_source=mixed`` (Phase 62) | **200**; rows resolve to mixed; non-empty when evidence mixed_count > 0 |
+| 26 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

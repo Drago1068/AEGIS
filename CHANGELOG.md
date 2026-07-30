@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 29 - NAS Live Verification of Phase 28
+
+Ops evidence gate: redeploy current revision and verify
+`GET /research/{symbol}/assessments?limit=` on the live NAS. See
+[docs/architecture/decisions/0030-phase-29-nas-live-verify-phase-28.md](docs/architecture/decisions/0030-phase-29-nas-live-verify-phase-28.md).
+
+#### Added
+
+- ADR-0030: live verify includes assessments list (401 unauth; 200 JSON array when auth).
+- `verify.ps1` / `verify.sh` assessments list auth gate + authenticated check.
+
+#### Explicitly out of scope
+
+New methods, horizon-specific calibration, default-on calibration, actionable promotion,
+orders, TLS cutover.
+
 ### Phase 28 - Research Assessment History in the Console
 
 Operator console shows newest-first assessment history from the existing list API. See

@@ -40,16 +40,17 @@ function Write-VerifyChecklist {
     Write-Host "Live verification checklist (ADR-0018):"
     Write-Host "  1. GET /health -> 200"
     Write-Host "  2. GET /ready -> 200"
-    Write-Host "  3. Auth gate 401: watchlist, daily-bars, research latest, calibration-readiness, evidence-summary, evidence-summary/export"
+    Write-Host "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list, calibration-readiness, evidence-summary, evidence-summary/export"
     Write-Host "  4. Frontend base URL -> 200|302|307|308"
     Write-Host "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
     Write-Host "  6. Authenticated GET /research/$Symbol/calibration-readiness -> 200"
     Write-Host "  7. Authenticated GET /research/$Symbol/assessments/latest -> 200|404"
-    Write-Host "  8. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
-    Write-Host "  9. Authenticated GET /research/$Symbol/evidence-summary -> 200 (state=research_only; log present label keys when any)"
-    Write-Host " 10. Authenticated GET /research/$Symbol/evidence-summary/export -> 200 (attachment, state=research_only)"
-    Write-Host " 11. SSH alembic current includes 0008|head (when SSH configured)"
-    Write-Host " 12. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "  8. Authenticated GET /research/$Symbol/assessments?limit= -> 200 (JSON array; [] OK)"
+    Write-Host "  9. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
+    Write-Host " 10. Authenticated GET /research/$Symbol/evidence-summary -> 200 (state=research_only; log present label keys when any)"
+    Write-Host " 11. Authenticated GET /research/$Symbol/evidence-summary/export -> 200 (attachment, state=research_only)"
+    Write-Host " 12. SSH alembic current includes 0008|head (when SSH configured)"
+    Write-Host " 13. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -138,6 +139,7 @@ Write-Host "==> Auth gate (expect 401 without session)"
 Assert-Status -Label "GET $api/watchlist" -Actual (Get-HttpStatus "$api/watchlist") -Expected @(401)
 Assert-Status -Label "GET $api/market-data/$verifySymbol/daily-bars" -Actual (Get-HttpStatus "$api/market-data/$verifySymbol/daily-bars") -Expected @(401)
 Assert-Status -Label "GET $api/research/$verifySymbol/assessments/latest" -Actual (Get-HttpStatus "$api/research/$verifySymbol/assessments/latest") -Expected @(401)
+Assert-Status -Label "GET $api/research/$verifySymbol/assessments" -Actual (Get-HttpStatus "$api/research/$verifySymbol/assessments") -Expected @(401)
 Assert-Status -Label "GET $api/research/$verifySymbol/calibration-readiness" -Actual (Get-HttpStatus "$api/research/$verifySymbol/calibration-readiness") -Expected @(401)
 Assert-Status -Label "GET $api/research/$verifySymbol/evidence-summary" -Actual (Get-HttpStatus "$api/research/$verifySymbol/evidence-summary") -Expected @(401)
 Assert-Status -Label "GET $api/research/$verifySymbol/evidence-summary/export" -Actual (Get-HttpStatus "$api/research/$verifySymbol/evidence-summary/export") -Expected @(401)
@@ -166,6 +168,23 @@ try {
 
     $latestCode = Get-HttpStatus "$api/research/$verifySymbol/assessments/latest" -CookieJar $cookieJar
     Assert-Status -Label "GET $api/research/$verifySymbol/assessments/latest (auth)" -Actual $latestCode -Expected @(200, 404)
+
+    # Phase 29: assessment history list (empty array is valid).
+    $assessListUrl = "$api/research/$verifySymbol/assessments?limit=20"
+    $assessListPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.assessments.json" -f [guid]::NewGuid().ToString("N"))
+    try {
+        $assessCode = & curl.exe -sS @curlInsecure -o $assessListPath -w "%{http_code}" --max-time 30 `
+            -b $cookieJar -H "Accept: application/json" $assessListUrl
+        if ($LASTEXITCODE -ne 0) { throw "GET assessments list failed (curl exit $LASTEXITCODE)" }
+        Assert-Status -Label "GET $assessListUrl (auth)" -Actual ([int]$assessCode) -Expected @(200)
+        $assessBody = Get-Content -LiteralPath $assessListPath -Raw | ConvertFrom-Json
+        if ($null -eq $assessBody) { throw "assessments list body was null" }
+        Write-Host "OK  assessments list is JSON array (count=$(@($assessBody).Count))"
+    } finally {
+        if (Test-Path -LiteralPath $assessListPath) {
+            Remove-Item -LiteralPath $assessListPath -Force -ErrorAction SilentlyContinue
+        }
+    }
 
     # Phase 21: history list routes (empty array is valid). Prefer assessment id from latest when present.
     $historyAssessmentId = 1

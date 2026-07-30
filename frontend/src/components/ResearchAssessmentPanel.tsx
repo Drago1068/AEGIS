@@ -137,6 +137,7 @@ export function ResearchAssessmentPanel({
   const [assessmentBackfillSummary, setAssessmentBackfillSummary] =
     useState<AssessmentBackfillResponse | null>(null);
   const [assessmentSourceFilter, setAssessmentSourceFilter] = useState("");
+  const [expandedHorizonKey, setExpandedHorizonKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const baseUrl = getApiBaseUrl();
@@ -157,6 +158,7 @@ export function ResearchAssessmentPanel({
   async function loadEvidenceSummary() {
     const next = await getResearchEvidenceSummary(baseUrl, symbol);
     setEvidenceSummary(next);
+    setExpandedHorizonKey(null);
   }
 
   async function loadOutcomeLabelHistory(assessmentId: number) {
@@ -611,12 +613,35 @@ export function ResearchAssessmentPanel({
                 <dt className="text-aegis-muted">Readiness by horizon</dt>
                 <dd>
                   <ul className="mt-1 space-y-1 text-xs text-aegis-muted">
-                    {evidenceSummary.calibration_readiness.by_horizon.map((row) => (
-                      <li key={row.outcome_horizon_key} className="font-mono">
-                        {row.outcome_horizon_key}: {row.status} (corpus={row.corpus_count},
-                        bucket={row.bucket_count})
-                      </li>
-                    ))}
+                    {evidenceSummary.calibration_readiness.by_horizon.map((row) => {
+                      const expanded = expandedHorizonKey === row.outcome_horizon_key;
+                      return (
+                        <li key={row.outcome_horizon_key}>
+                          <button
+                            type="button"
+                            className="w-full text-left font-mono underline-offset-2 hover:underline"
+                            aria-expanded={expanded}
+                            data-testid={`evidence-horizon-${row.outcome_horizon_key}`}
+                            onClick={() =>
+                              setExpandedHorizonKey(
+                                expanded ? null : row.outcome_horizon_key,
+                              )
+                            }
+                          >
+                            {row.outcome_horizon_key}: {row.status} (corpus=
+                            {row.corpus_count}, bucket={row.bucket_count})
+                          </button>
+                          {expanded ? (
+                            <p
+                              className="mt-1 pl-2 text-xs text-aegis-muted"
+                              data-testid={`evidence-horizon-detail-${row.outcome_horizon_key}`}
+                            >
+                              {row.detail || "(no detail)"}
+                            </p>
+                          ) : null}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </dd>
               </div>

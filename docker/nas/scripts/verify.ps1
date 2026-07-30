@@ -71,7 +71,8 @@ function Write-VerifyChecklist {
     Write-Host " 31. Phase 74: frontend redeploy includes Phase 73 by_horizon mini-rows (unit-tested; nested readiness)"
     Write-Host " 32. Authenticated evidence-summary nested calibration_readiness.by_horizon includes fwd5+fwd20 (Phase 75)"
     Write-Host " 33. Authenticated evidence-summary nested corpus/bucket readiness fields (Phase 76)"
-    Write-Host " 34. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 34. Phase 78: frontend redeploy includes Phase 77 horizon detail expand (unit-tested)"
+    Write-Host " 35. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {

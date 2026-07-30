@@ -454,12 +454,13 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/6 \/ min 5/)).toBeInTheDocument();
       expect(screen.getByTestId("evidence-readiness-by-horizon")).toBeInTheDocument();
       expect(screen.getByText(/readiness by horizon/i)).toBeInTheDocument();
-      expect(
-        screen.getByText(/forward_return_5: ready \(corpus=12, bucket=6\)/),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(/forward_return_20: insufficient_bucket \(corpus=12, bucket=2\)/),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId("evidence-horizon-forward_return_5")).toHaveTextContent(
+        /forward_return_5: ready \(corpus=12, bucket=6\)/,
+      );
+      expect(screen.getByTestId("evidence-horizon-forward_return_20")).toHaveTextContent(
+        /forward_return_20: insufficient_bucket \(corpus=12, bucket=2\)/,
+      );
+      expect(screen.queryByTestId("evidence-horizon-detail-forward_return_20")).toBeNull();
       expect(screen.getByText("1 / 1")).toBeInTheDocument();
       expect(screen.getByText(/latest component source/i)).toBeInTheDocument();
       expect(
@@ -477,6 +478,13 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/0\.1000 · end 2024-02-23/)).toBeInTheDocument();
       expect(getResearchEvidenceSummary).toHaveBeenCalledWith("http://localhost:8000", "AAPL");
     });
+
+    fireEvent.click(screen.getByTestId("evidence-horizon-forward_return_20"));
+    expect(screen.getByTestId("evidence-horizon-detail-forward_return_20")).toHaveTextContent(
+      "need bucket",
+    );
+    fireEvent.click(screen.getByTestId("evidence-horizon-forward_return_20"));
+    expect(screen.queryByTestId("evidence-horizon-detail-forward_return_20")).toBeNull();
   });
 
   it("downloads evidence summary JSON via export route", async () => {

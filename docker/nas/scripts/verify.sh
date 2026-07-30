@@ -60,7 +60,8 @@ print_checklist() {
   echo " 31. Phase 74: frontend redeploy includes Phase 73 by_horizon mini-rows (unit-tested; nested readiness)"
   echo " 32. Authenticated evidence-summary nested calibration_readiness.by_horizon includes fwd5+fwd20 (Phase 75)"
   echo " 33. Authenticated evidence-summary nested corpus/bucket readiness fields (Phase 76)"
-  echo " 34. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 34. Phase 78: frontend redeploy includes Phase 77 horizon detail expand (unit-tested)"
+  echo " 35. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then

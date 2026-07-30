@@ -7,6 +7,34 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 78 - NAS Live Verification of Phase 77
+
+Ops evidence gate: redeploy frontend under lab TLS with Phase 77 horizon detail expand.
+See
+[docs/architecture/decisions/0079-phase-78-nas-live-verify-phase-77.md](docs/architecture/decisions/0079-phase-78-nas-live-verify-phase-77.md).
+
+#### Added
+
+- ADR-0079: live verify requires frontend recreate for Phase 77 expand UX; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 77 - Evidence-Summary Horizon Detail Expand
+
+Clickable readiness-by-horizon mini-rows show nested ``by_horizon.detail`` when expanded.
+See
+[docs/architecture/decisions/0078-phase-77-horizon-detail-expand.md](docs/architecture/decisions/0078-phase-77-horizon-detail-expand.md).
+
+#### Added
+
+- Evidence-summary horizon mini-row toggle revealing nested readiness ``detail``.
+
+#### Explicitly out of scope
+
+New API fields, default-on calibration, gate changes, orders.
+
 ### Phase 76 - Evidence-Summary Nested Corpus/Bucket Verify Assertion
 
 Ops hardening: assert nested ``corpus_count`` / ``min_corpus`` / ``bucket_count`` /

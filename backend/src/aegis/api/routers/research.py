@@ -20,6 +20,7 @@ from aegis.api.dependencies import (
 )
 from aegis.api.schemas.research import ResearchAssessmentResponse
 from aegis.api.schemas.research_calibration_readiness import CalibrationReadinessResponse
+from aegis.api.schemas.research_evidence_summary import ResearchEvidenceSummaryResponse
 from aegis.api.schemas.research_outcome_labels import OutcomeLabelResponse
 from aegis.api.schemas.research_probability_calibration import ProbabilityCalibrationResponse
 from aegis.domain.research_assessment import (
@@ -213,6 +214,65 @@ async def get_latest_probability_calibration(
             detail=f"no probability calibration for assessment {assessment_id}",
         )
     return ProbabilityCalibrationResponse.model_validate(calibration)
+
+
+@router.get(
+    "/{symbol}/evidence-summary",
+    response_model=ResearchEvidenceSummaryResponse,
+)
+async def get_research_evidence_summary(
+    symbol: str,
+    assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
+    outcome_label_service: OutcomeLabelService = Depends(get_outcome_label_service),
+    calibration_service: ResearchProbabilityCalibrationService = Depends(
+        get_research_calibration_service
+    ),
+    calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
+        get_research_calibration_repository
+    ),
+) -> ResearchEvidenceSummaryResponse:
+    """Return a read-only research evidence aggregate for ``symbol`` (ADR-0023)."""
+
+    snapshots = await assessment_service.list_assessments(symbol, 100)
+    assessment_count = len(snapshots)
+    snapshot = snapshots[0] if snapshots else None
+    readiness = await calibration_service.evaluate_readiness(symbol, snapshot)
+
+    latest_assessment = None
+    latest_outcome_label = None
+    latest_calibration = None
+    outcome_label_count = 0
+    calibration_count = 0
+
+    if snapshot is not None and snapshot.id is not None:
+        enriched = await enrich_assessment_with_calibration(snapshot, calibration_repository)
+        latest_assessment = ResearchAssessmentResponse.model_validate(enriched)
+        labels = await outcome_label_service.list_labels_for_assessment(symbol, snapshot.id, 100)
+        outcome_label_count = len(labels)
+        if labels:
+            latest_outcome_label = OutcomeLabelResponse.model_validate(labels[0])
+        calibrations = await calibration_service.list_calibrations_for_assessment(
+            symbol, snapshot.id, 100
+        )
+        calibration_count = len(calibrations)
+        if calibrations:
+            latest_calibration = ProbabilityCalibrationResponse.model_validate(calibrations[0])
+
+    return ResearchEvidenceSummaryResponse(
+        symbol=symbol.upper(),
+        state="research_only",
+        latest_assessment=latest_assessment,
+        calibration_readiness=CalibrationReadinessResponse.model_validate(readiness),
+        latest_outcome_label=latest_outcome_label,
+        latest_calibration=latest_calibration,
+        assessment_count=assessment_count,
+        outcome_label_count=outcome_label_count,
+        calibration_count=calibration_count,
+        detail=(
+            "Research-only evidence summary — not advice; missing fields are null or zero, "
+            "never invented."
+        ),
+    )
 
 
 @router.get(

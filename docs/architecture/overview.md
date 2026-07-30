@@ -18,8 +18,8 @@ Phase 12 (provider historical corrections on daily-bar observations), Phase 13 (
 outcome labels), Phase 14 (scheduled outcome labeling after assessments), Phase 15
 (research probability calibration v1), Phase 16 (calibration corpus readiness),
 Phase 17 (NAS live verification evidence gate), Phase 18 (on-demand calibration),
-Phase 19 (calibration history), Phase 20 (outcome label history), and Phase 21
-(NAS live verify of Phases 18–20).
+Phase 19 (calibration history), Phase 20 (outcome label history), Phase 21
+(NAS live verify of Phases 18–20), and Phase 22 (symbol research evidence summary).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -55,6 +55,8 @@ Phase 20 adds the same pattern for outcome labels via `GET .../outcome-labels?li
 Phase 21 redeploys and live-verifies Phases 18–20 on the NAS, including history list checks
 (see
 [decisions/0022-phase-21-nas-live-verify-phases-18-20.md](decisions/0022-phase-21-nas-live-verify-phases-18-20.md)).
+Phase 22 adds `GET /research/{symbol}/evidence-summary` as a read-only aggregate (see
+[decisions/0023-phase-22-research-evidence-summary.md](decisions/0023-phase-22-research-evidence-summary.md)).
 
 ## System context
 
@@ -104,7 +106,8 @@ persisting rows (ADR-0017). As of Phase 18, authenticated
 `research_calibration_v1` rows without requiring the automatic flag (ADR-0019). As of
 Phase 19, `GET .../calibrations?limit=` lists append-only history newest first (ADR-0020).
 As of Phase 20, `GET .../outcome-labels?limit=` lists append-only label history (ADR-0021).
-As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
+As of Phase 22, `GET /research/{symbol}/evidence-summary` aggregates research-only evidence
+for one symbol (ADR-0023). As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
 assessments use `method_version` 2 multi-source coverage weighting (ADR-0012). See
 [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md),
 [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md),

@@ -603,6 +603,36 @@ export async function listProbabilityCalibrations(
   return body as ProbabilityCalibration[];
 }
 
+export interface ResearchEvidenceSummary {
+  symbol: string;
+  state: string;
+  latest_assessment: ResearchAssessment | null;
+  calibration_readiness: CalibrationReadiness;
+  latest_outcome_label: OutcomeLabel | null;
+  latest_calibration: ProbabilityCalibration | null;
+  assessment_count: number;
+  outcome_label_count: number;
+  calibration_count: number;
+  detail: string;
+}
+
+export async function getResearchEvidenceSummary(
+  baseUrl: string,
+  symbol: string,
+  options?: ApiRequestOptions,
+): Promise<ResearchEvidenceSummary> {
+  const url = `${baseUrl}/research/${encodeURIComponent(symbol)}/evidence-summary`;
+  const { response, body } = await requestJson(url, undefined, options);
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected GET evidence-summary status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as ResearchEvidenceSummary;
+}
+
 export function getApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 }

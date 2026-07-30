@@ -1,0 +1,232 @@
+"""API tests for research evidence summary (Phase 22, ADR-0023)."""
+
+from __future__ import annotations
+
+from datetime import UTC, date, datetime
+
+from httpx import ASGITransport, AsyncClient
+
+from aegis.api.dependencies import (
+    get_outcome_label_service,
+    get_research_assessment_service,
+    get_research_calibration_repository,
+    get_research_calibration_service,
+    require_operator,
+)
+from aegis.api.main import create_app
+from aegis.config.settings import Settings
+from aegis.domain.research_assessment import ResearchAssessmentSnapshotData
+from aegis.domain.research_outcome_labels import LABEL_METHOD_ID, OutcomeLabelData
+from aegis.domain.research_probability_calibration import (
+    CALIBRATION_METHOD_ID,
+    CalibrationReadinessData,
+    CalibrationReadinessStatus,
+    ProbabilityCalibrationData,
+)
+from aegis.persistence.models import Operator
+
+
+def _operator() -> Operator:
+    return Operator(
+        id=1,
+        username="operator",
+        password_hash="unused",
+        created_at=datetime(2024, 1, 1, tzinfo=UTC),
+        updated_at=datetime(2024, 1, 1, tzinfo=UTC),
+    )
+
+
+def _snapshot() -> ResearchAssessmentSnapshotData:
+    return ResearchAssessmentSnapshotData(
+        id=1,
+        symbol="AAPL",
+        method_id="daily_bar_research_v1",
+        method_version=1,
+        state="research_only",
+        as_of_trading_date=date(2024, 1, 26),
+        event_time=datetime(2024, 1, 26, 23, 59, 59, tzinfo=UTC),
+        computed_at=datetime(2024, 1, 26, 18, 0, tzinfo=UTC),
+        coverage_confidence=0.95,
+        probability_confidence=None,
+        components={"research_index": 0.46},
+        schema_version=1,
+        input_source="alpha_vantage",
+        lookback_start_date=date(2023, 12, 27),
+        lookback_end_date=date(2024, 1, 26),
+        bar_count=20,
+    )
+
+
+def _readiness() -> CalibrationReadinessData:
+    return CalibrationReadinessData(
+        symbol="AAPL",
+        status=CalibrationReadinessStatus.INSUFFICIENT_LABELED_CORPUS,
+        assessment_snapshot_id=1,
+        research_index=0.46,
+        corpus_count=3,
+        bucket_count=2,
+        min_corpus=10,
+        min_bucket=5,
+        index_bucket_width=0.15,
+        calibration_method_id=CALIBRATION_METHOD_ID,
+        detail="need at least 10 labeled historical examples, found 3",
+    )
+
+
+def _label() -> OutcomeLabelData:
+    return OutcomeLabelData(
+        id=10,
+        assessment_snapshot_id=1,
+        symbol="AAPL",
+        label_method_id=LABEL_METHOD_ID,
+        label_method_version=1,
+        state="research_only",
+        as_of_trading_date=date(2024, 1, 26),
+        computed_at=datetime(2024, 1, 26, 19, 0, tzinfo=UTC),
+        labels={"forward_return_5": 0.05},
+        label_end_dates={"forward_return_5": "2024-02-02"},
+        schema_version=1,
+        bar_source="alpha_vantage",
+    )
+
+
+def _calibration() -> ProbabilityCalibrationData:
+    return ProbabilityCalibrationData(
+        id=7,
+        assessment_snapshot_id=1,
+        symbol="AAPL",
+        calibration_method_id=CALIBRATION_METHOD_ID,
+        calibration_method_version=1,
+        state="research_only",
+        computed_at=datetime(2024, 1, 26, 20, 0, tzinfo=UTC),
+        probability_confidence=0.62,
+        corpus_count=12,
+        bucket_count=6,
+        schema_version=1,
+    )
+
+
+class _FakeAssessmentService:
+    def __init__(self, listed: list[ResearchAssessmentSnapshotData] | None = None) -> None:
+        self._listed = listed or []
+
+    async def list_assessments(
+        self, symbol: str, limit: int
+    ) -> list[ResearchAssessmentSnapshotData]:
+        return self._listed[:limit]
+
+    async def latest_assessment(self, symbol: str) -> ResearchAssessmentSnapshotData | None:
+        return self._listed[0] if self._listed else None
+
+
+class _FakeOutcomeLabelService:
+    def __init__(self, listed: list[OutcomeLabelData] | None = None) -> None:
+        self._listed = listed or []
+
+    async def list_labels_for_assessment(
+        self, symbol: str, assessment_snapshot_id: int, limit: int
+    ) -> list[OutcomeLabelData]:
+        return self._listed[:limit]
+
+
+class _FakeCalibrationService:
+    def __init__(
+        self,
+        *,
+        readiness: CalibrationReadinessData,
+        listed: list[ProbabilityCalibrationData] | None = None,
+    ) -> None:
+        self._readiness = readiness
+        self._listed = listed or []
+
+    async def evaluate_readiness(
+        self, symbol: str, snapshot: ResearchAssessmentSnapshotData | None
+    ) -> CalibrationReadinessData:
+        return self._readiness
+
+    async def list_calibrations_for_assessment(
+        self, symbol: str, assessment_snapshot_id: int, limit: int
+    ) -> list[ProbabilityCalibrationData]:
+        return self._listed[:limit]
+
+
+class _FakeCalibrationRepository:
+    async def get_latest_for_assessment(
+        self, assessment_snapshot_id: int
+    ) -> ProbabilityCalibrationData | None:
+        return None
+
+
+def _client(
+    *,
+    assessments: list[ResearchAssessmentSnapshotData] | None = None,
+    labels: list[OutcomeLabelData] | None = None,
+    calibrations: list[ProbabilityCalibrationData] | None = None,
+    readiness: CalibrationReadinessData | None = None,
+) -> AsyncClient:
+    app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
+    app.dependency_overrides[require_operator] = _operator
+    app.dependency_overrides[get_research_assessment_service] = lambda: _FakeAssessmentService(
+        assessments
+    )
+    app.dependency_overrides[get_outcome_label_service] = lambda: _FakeOutcomeLabelService(labels)
+    app.dependency_overrides[get_research_calibration_service] = lambda: _FakeCalibrationService(
+        readiness=readiness or _readiness(),
+        listed=calibrations,
+    )
+    app.dependency_overrides[get_research_calibration_repository] = lambda: (
+        _FakeCalibrationRepository()
+    )
+    return AsyncClient(transport=ASGITransport(app=app), base_url="http://testserver")
+
+
+async def test_evidence_summary_empty_symbol() -> None:
+    readiness = CalibrationReadinessData(
+        symbol="AAPL",
+        status=CalibrationReadinessStatus.NO_ASSESSMENT,
+        assessment_snapshot_id=None,
+        research_index=None,
+        corpus_count=0,
+        bucket_count=0,
+        min_corpus=10,
+        min_bucket=5,
+        index_bucket_width=0.15,
+        calibration_method_id=CALIBRATION_METHOD_ID,
+        detail="no assessment",
+    )
+    async with _client(readiness=readiness) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["symbol"] == "AAPL"
+    assert body["state"] == "research_only"
+    assert body["latest_assessment"] is None
+    assert body["latest_outcome_label"] is None
+    assert body["latest_calibration"] is None
+    assert body["assessment_count"] == 0
+    assert body["outcome_label_count"] == 0
+    assert body["calibration_count"] == 0
+    assert body["calibration_readiness"]["status"] == "no_assessment"
+    assert "never invented" in body["detail"].lower() or "not invented" in body["detail"].lower()
+
+
+async def test_evidence_summary_with_assessment_and_histories() -> None:
+    async with _client(
+        assessments=[_snapshot()],
+        labels=[_label()],
+        calibrations=[_calibration()],
+    ) as client:
+        response = await client.get("/research/aapl/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["symbol"] == "AAPL"
+    assert body["latest_assessment"]["id"] == 1
+    assert body["latest_assessment"]["probability_confidence"] is None
+    assert body["latest_outcome_label"]["labels"]["forward_return_5"] == 0.05
+    assert body["latest_calibration"]["probability_confidence"] == 0.62
+    assert body["assessment_count"] == 1
+    assert body["outcome_label_count"] == 1
+    assert body["calibration_count"] == 1
+    assert body["state"] == "research_only"

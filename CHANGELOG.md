@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 22 - Symbol Research Evidence Summary
+
+Authenticated read-only aggregate of research evidence for one symbol (latest assessment,
+readiness, latest label/calibration, history counts). See
+[docs/architecture/decisions/0023-phase-22-research-evidence-summary.md](docs/architecture/decisions/0023-phase-22-research-evidence-summary.md).
+
+#### Added
+
+- ADR-0023: `GET /research/{symbol}/evidence-summary`; operator console evidence summary
+  section. Missing fields are null/zero — never invented.
+
+#### Explicitly out of scope
+
+Multi-horizon methods, default-on calibration, actionable promotion, orders.
+
 ### Phase 21 - NAS Live Verification of Phases 18–20
 
 Ops evidence gate: redeploy current revision to the UGREEN NAS and verify on-demand

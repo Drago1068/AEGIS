@@ -15,6 +15,7 @@ vi.mock("@/lib/api-client", async () => {
     getCalibrationReadiness: vi.fn(),
     createProbabilityCalibration: vi.fn(),
     listProbabilityCalibrations: vi.fn(),
+    getResearchEvidenceSummary: vi.fn(),
   };
 });
 
@@ -24,6 +25,7 @@ import {
   createResearchAssessment,
   getCalibrationReadiness,
   getLatestResearchAssessment,
+  getResearchEvidenceSummary,
   listOutcomeLabels,
   listProbabilityCalibrations,
 } from "@/lib/api-client";
@@ -88,6 +90,30 @@ describe("ResearchAssessmentPanel", () => {
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
     vi.mocked(listProbabilityCalibrations).mockResolvedValue([]);
+    vi.mocked(getResearchEvidenceSummary).mockResolvedValue({
+      symbol: "AAPL",
+      state: "research_only",
+      latest_assessment: null,
+      calibration_readiness: {
+        symbol: "AAPL",
+        status: "insufficient_labeled_corpus",
+        assessment_snapshot_id: 1,
+        research_index: 0.46,
+        corpus_count: 3,
+        bucket_count: 2,
+        min_corpus: 10,
+        min_bucket: 5,
+        index_bucket_width: 0.15,
+        calibration_method_id: "research_calibration_v1",
+        detail: "need at least 10 labeled historical examples, found 3",
+      },
+      latest_outcome_label: null,
+      latest_calibration: null,
+      assessment_count: 0,
+      outcome_label_count: 0,
+      calibration_count: 0,
+      detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
+    });
   });
 
   it("shows research-only labeling and empty state", () => {
@@ -124,7 +150,7 @@ describe("ResearchAssessmentPanel", () => {
     });
     await waitFor(() => {
       expect(screen.getByText(/calibration readiness/i)).toBeInTheDocument();
-      expect(screen.getByText("insufficient_labeled_corpus")).toBeInTheDocument();
+      expect(screen.getAllByText("insufficient_labeled_corpus").length).toBeGreaterThan(0);
     });
     expect(screen.getByRole("button", { name: /compute calibration/i })).toBeDisabled();
   });
@@ -272,6 +298,43 @@ describe("ResearchAssessmentPanel", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/no research assessment stored yet/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows evidence summary after refresh evidence summary", async () => {
+    vi.mocked(getResearchEvidenceSummary).mockResolvedValue({
+      symbol: "AAPL",
+      state: "research_only",
+      latest_assessment: sampleAssessment,
+      calibration_readiness: {
+        symbol: "AAPL",
+        status: "ready",
+        assessment_snapshot_id: 1,
+        research_index: 0.46,
+        corpus_count: 12,
+        bucket_count: 6,
+        min_corpus: 10,
+        min_bucket: 5,
+        index_bucket_width: 0.15,
+        calibration_method_id: "research_calibration_v1",
+        detail: "corpus and bucket gates pass",
+      },
+      latest_outcome_label: null,
+      latest_calibration: sampleCalibration,
+      assessment_count: 2,
+      outcome_label_count: 0,
+      calibration_count: 1,
+      detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
+    });
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /refresh evidence summary/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/evidence summary \(research-only/i)).toBeInTheDocument();
+      expect(screen.getByText(/assessments \(≤100\)/i)).toBeInTheDocument();
+      expect(screen.getByText("0 / 1")).toBeInTheDocument();
+      expect(getResearchEvidenceSummary).toHaveBeenCalledWith("http://localhost:8000", "AAPL");
     });
   });
 

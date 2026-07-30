@@ -8,12 +8,14 @@ import {
   OutcomeLabel,
   ProbabilityCalibration,
   ResearchAssessment,
+  ResearchEvidenceSummary,
   createOutcomeLabels,
   createProbabilityCalibration,
   createResearchAssessment,
   getApiBaseUrl,
   getCalibrationReadiness,
   getLatestResearchAssessment,
+  getResearchEvidenceSummary,
   listOutcomeLabels,
   listProbabilityCalibrations,
 } from "@/lib/api-client";
@@ -52,6 +54,9 @@ export function ResearchAssessmentPanel({
   const [calibrationHistory, setCalibrationHistory] = useState<ProbabilityCalibration[]>(
     [],
   );
+  const [evidenceSummary, setEvidenceSummary] = useState<ResearchEvidenceSummary | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const baseUrl = getApiBaseUrl();
@@ -59,6 +64,11 @@ export function ResearchAssessmentPanel({
   async function loadReadiness() {
     const next = await getCalibrationReadiness(baseUrl, symbol);
     setReadiness(next);
+  }
+
+  async function loadEvidenceSummary() {
+    const next = await getResearchEvidenceSummary(baseUrl, symbol);
+    setEvidenceSummary(next);
   }
 
   async function loadOutcomeLabelHistory(assessmentId: number) {
@@ -91,11 +101,13 @@ export function ResearchAssessmentPanel({
         setOutcomeLabelHistory([]);
         setCalibration(null);
         setCalibrationHistory([]);
+        setEvidenceSummary(null);
         await loadReadiness();
         if (snapshot.id != null) {
           await loadOutcomeLabelHistory(snapshot.id);
           await loadCalibrationHistory(snapshot.id);
         }
+        await loadEvidenceSummary();
       } catch (err) {
         setError(formatAssessmentError(err));
       }
@@ -112,11 +124,13 @@ export function ResearchAssessmentPanel({
         setOutcomeLabelHistory([]);
         setCalibration(null);
         setCalibrationHistory([]);
+        setEvidenceSummary(null);
         if (snapshot.id != null) {
           await loadOutcomeLabelHistory(snapshot.id);
           await loadCalibrationHistory(snapshot.id);
         }
         await loadReadiness();
+        await loadEvidenceSummary();
       } catch (err) {
         if (err instanceof ApiClientError && err.status === 404) {
           setLatest(null);
@@ -125,7 +139,13 @@ export function ResearchAssessmentPanel({
           setReadiness(null);
           setCalibration(null);
           setCalibrationHistory([]);
+          setEvidenceSummary(null);
           setError(null);
+          try {
+            await loadEvidenceSummary();
+          } catch {
+            // empty summary optional when symbol has no assessments
+          }
           return;
         }
         setError(formatAssessmentError(err));
@@ -143,6 +163,7 @@ export function ResearchAssessmentPanel({
         await createOutcomeLabels(baseUrl, symbol, latest.id as number);
         await loadOutcomeLabelHistory(latest.id as number);
         await loadReadiness();
+        await loadEvidenceSummary();
       } catch (err) {
         setError(formatAssessmentError(err));
       }
@@ -159,6 +180,18 @@ export function ResearchAssessmentPanel({
         await createProbabilityCalibration(baseUrl, symbol, latest.id as number);
         await loadCalibrationHistory(latest.id as number);
         await loadReadiness();
+        await loadEvidenceSummary();
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
+  function onRefreshEvidenceSummary() {
+    startTransition(async () => {
+      setError(null);
+      try {
+        await loadEvidenceSummary();
       } catch (err) {
         setError(formatAssessmentError(err));
       }
@@ -211,6 +244,14 @@ export function ResearchAssessmentPanel({
           </button>
           <button
             type="button"
+            onClick={onRefreshEvidenceSummary}
+            disabled={isPending}
+            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
+          >
+            Refresh evidence summary
+          </button>
+          <button
+            type="button"
             onClick={onComputeOutcomeLabels}
             disabled={isPending || latest?.id == null}
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
@@ -240,6 +281,51 @@ export function ResearchAssessmentPanel({
         <p className="mb-3 text-sm text-aegis-danger" role="alert">
           {error}
         </p>
+      ) : null}
+
+      {evidenceSummary ? (
+        <div className="mb-4 rounded border border-aegis-line bg-white/60 p-3 text-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
+            Evidence summary (research-only — not advice)
+          </p>
+          <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+            <div>
+              <dt className="text-aegis-muted">State</dt>
+              <dd className="font-mono">{evidenceSummary.state}</dd>
+            </div>
+            <div>
+              <dt className="text-aegis-muted">Readiness</dt>
+              <dd className="font-mono">{evidenceSummary.calibration_readiness.status}</dd>
+            </div>
+            <div>
+              <dt className="text-aegis-muted">Assessments (≤100)</dt>
+              <dd className="font-mono">{evidenceSummary.assessment_count}</dd>
+            </div>
+            <div>
+              <dt className="text-aegis-muted">Labels / calibrations (latest id)</dt>
+              <dd className="font-mono">
+                {evidenceSummary.outcome_label_count} / {evidenceSummary.calibration_count}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-aegis-muted">Latest probability_confidence</dt>
+              <dd className="font-mono">
+                {evidenceSummary.latest_calibration == null
+                  ? "null"
+                  : evidenceSummary.latest_calibration.probability_confidence.toFixed(4)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-aegis-muted">Latest forward_return_5</dt>
+              <dd className="font-mono">
+                {evidenceSummary.latest_outcome_label?.labels.forward_return_5 == null
+                  ? "null"
+                  : evidenceSummary.latest_outcome_label.labels.forward_return_5.toFixed(4)}
+              </dd>
+            </div>
+          </dl>
+          <p className="mt-2 text-xs text-aegis-muted">{evidenceSummary.detail}</p>
+        </div>
       ) : null}
 
       {latest ? (

@@ -119,7 +119,7 @@ def compute_forward_total_return_labels(
             "assessment snapshot id is required to attach outcome labels",
         )
 
-    bar_source = _resolve_label_bar_source(snapshot)
+    bar_source = _resolve_label_bar_source(snapshot, bars)
     as_of_close = _close_on_date(
         bars,
         snapshot.as_of_trading_date,
@@ -174,19 +174,57 @@ def compute_forward_total_return_labels(
     )
 
 
-def resolve_label_bar_source(snapshot: ResearchAssessmentSnapshotData) -> str:
-    """Resolve the observation source used for Phase 13 label closes (ADR-0014 / ADR-0058)."""
+def resolve_label_bar_source(
+    snapshot: ResearchAssessmentSnapshotData,
+    bars: Sequence[ResearchBarInput] | None = None,
+) -> str:
+    """Resolve the observation source used for Phase 13 label closes (ADR-0014 / ADR-0058).
+
+    When the assessment component series is truly ``mixed``, and ``bars`` are provided,
+    prefer the first ``coverage_sources`` entry that has an as-of close, else any usable
+    as-of bar's source (Phase 65). Without bars, ``mixed`` is returned so callers fail
+    closed rather than inventing a source.
+    """
 
     if snapshot.input_source != COMPONENT_SOURCE_MIXED:
         return snapshot.input_source
     component_source = snapshot.components.get("component_source")
     if isinstance(component_source, str) and component_source != COMPONENT_SOURCE_MIXED:
         return component_source
-    return snapshot.input_source
+    if bars is not None:
+        return _resolve_mixed_as_of_bar_source(snapshot, bars)
+    return COMPONENT_SOURCE_MIXED
 
 
-def _resolve_label_bar_source(snapshot: ResearchAssessmentSnapshotData) -> str:
-    return resolve_label_bar_source(snapshot)
+def _resolve_mixed_as_of_bar_source(
+    snapshot: ResearchAssessmentSnapshotData,
+    bars: Sequence[ResearchBarInput],
+) -> str:
+    """Pick a concrete bar source for a mixed component series from as-of provenance."""
+
+    as_of = snapshot.as_of_trading_date
+    preferred: list[str] = []
+    raw_coverage = snapshot.components.get("coverage_sources")
+    if isinstance(raw_coverage, list):
+        preferred = [item for item in raw_coverage if isinstance(item, str) and item.strip()]
+    bar_list = list(bars)
+    for source in preferred:
+        if _close_on_date(bar_list, as_of, source) is not None:
+            return source
+    for bar in bar_list:
+        if bar.trading_date != as_of:
+            continue
+        if bar.close <= 0:
+            continue
+        return bar.source
+    return COMPONENT_SOURCE_MIXED
+
+
+def _resolve_label_bar_source(
+    snapshot: ResearchAssessmentSnapshotData,
+    bars: Sequence[ResearchBarInput] | None = None,
+) -> str:
+    return resolve_label_bar_source(snapshot, bars)
 
 
 def _index_closes(
@@ -277,7 +315,7 @@ def is_snapshot_label_ready(
     as-of or forward-horizon closes.
     """
 
-    bar_source = _resolve_label_bar_source(snapshot)
+    bar_source = _resolve_label_bar_source(snapshot, bars)
     closes_by_date = _index_closes(list(bars), bar_source)
     if snapshot.as_of_trading_date not in closes_by_date:
         return False

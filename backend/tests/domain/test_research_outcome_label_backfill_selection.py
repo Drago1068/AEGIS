@@ -213,3 +213,57 @@ def test_source_aware_ready_uses_component_source_when_input_mixed() -> None:
         calendar_name=_CALENDAR,
     )
     assert pairs == [("AAPL", 8)]
+
+
+def test_select_prefers_mixed_before_uniform_newest() -> None:
+    """Phase 65: mixed unlabeled ready candidates precede newer uniform-source peers."""
+
+    n = LOOKBACK_SESSIONS + DEFAULT_MIN_FORWARD_SESSIONS + 4
+    closes = [Decimal(str(100 + i)) for i in range(n)]
+    bars = _closes_to_bars(closes, end_date=date(2024, 1, 26))
+    chrono = list(reversed(bars))
+    ready_newest = chrono[-(DEFAULT_MIN_FORWARD_SESSIONS + 1)].trading_date
+    ready_older = chrono[-(DEFAULT_MIN_FORWARD_SESSIONS + 2)].trading_date
+    snapshots = [
+        _snapshot(snapshot_id=5, as_of=ready_newest),
+        _snapshot(
+            snapshot_id=4,
+            as_of=ready_older,
+            input_source="mixed",
+            component_source="mixed",
+        ),
+    ]
+    # Older mixed row needs AV bars on as_of (coverage prefers alpha_vantage).
+    snapshots[1].components["coverage_sources"] = ["alpha_vantage", "polygon"]
+    pairs = select_label_backfill_candidates(
+        snapshots,
+        labeled_assessment_ids=set(),
+        limit=1,
+        bars_newest_first=bars,
+        calendar_name=_CALENDAR,
+    )
+    assert pairs == [("AAPL", 4)]
+
+
+def test_true_mixed_ready_resolves_as_of_source_from_coverage() -> None:
+    n = LOOKBACK_SESSIONS + DEFAULT_MIN_FORWARD_SESSIONS + 3
+    closes = [Decimal(str(100 + i)) for i in range(n)]
+    av_bars = _closes_to_bars(closes, end_date=date(2024, 1, 26), source="alpha_vantage")
+    chrono = list(reversed(av_bars))
+    ready_as_of = chrono[-(DEFAULT_MIN_FORWARD_SESSIONS + 1)].trading_date
+    snapshot = _snapshot(
+        snapshot_id=9,
+        as_of=ready_as_of,
+        input_source="mixed",
+        component_source="mixed",
+    )
+    snapshot.components["coverage_sources"] = ["alpha_vantage", "polygon"]
+    assert is_snapshot_label_ready(snapshot, av_bars, calendar_name=_CALENDAR)
+    pairs = select_label_backfill_candidates(
+        [snapshot],
+        labeled_assessment_ids=set(),
+        limit=1,
+        bars_newest_first=av_bars,
+        calendar_name=_CALENDAR,
+    )
+    assert pairs == [("AAPL", 9)]

@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 65 - Prefer Mixed Assessments in Outcome-Label Backfill
+
+Prefer unlabeled label-ready ``component_source=mixed`` assessments when selecting backfill
+candidates, and resolve true-mixed label bar sources from as-of provenance. See
+[docs/architecture/decisions/0066-phase-65-prefer-mixed-label-backfill.md](docs/architecture/decisions/0066-phase-65-prefer-mixed-label-backfill.md).
+
+#### Changed
+
+- Backfill candidate order: mixed-first, then newest-first within each tier.
+- ``resolve_label_bar_source`` accepts bars to pick a concrete source for true-mixed series.
+
+#### Explicitly out of scope
+
+Weakening gates, default-on calibration, NAS live verify, actionable promotion, orders.
+
 ### Phase 64 - NAS Live Verification of Phase 63
 
 Ops evidence gate: redeploy under lab TLS so the one-click mixed history filter is live.

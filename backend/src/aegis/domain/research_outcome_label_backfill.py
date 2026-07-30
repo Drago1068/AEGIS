@@ -1,8 +1,10 @@
-"""Outcome-label backfill candidate selection (Phase 49 / Phase 57).
+"""Outcome-label backfill candidate selection (Phase 49 / 57 / 65).
 
 Prefer assessments that lack a default-method label and would pass Phase 13 compute
 gates for the resolved label bar source, so tip / already-labeled / false-ready rows
-do not consume the operator ``limit`` (ADR-0050, ADR-0058).
+do not consume the operator ``limit`` (ADR-0050, ADR-0058). Among eligible candidates,
+prefer ``component_source=mixed`` (newest-first within each tier) so cross-source rows
+are labeled sooner for calibration corpus growth (ADR-0066).
 """
 
 from __future__ import annotations
@@ -10,7 +12,11 @@ from __future__ import annotations
 from collections.abc import Sequence
 from datetime import date
 
-from aegis.domain.research_assessment import ResearchAssessmentSnapshotData, ResearchBarInput
+from aegis.domain.research_assessment import (
+    ResearchAssessmentSnapshotData,
+    ResearchBarInput,
+    is_mixed_component_source,
+)
 from aegis.domain.research_outcome_labels import (
     has_stored_forward_horizon_close,
     is_snapshot_label_ready,
@@ -67,6 +73,9 @@ def select_label_backfill_candidates(
     :func:`is_snapshot_label_ready` so selection matches compute source gates (ADR-0058).
     ``label_ready_as_of`` remains for tests / callers that precompute a date set; when both
     are provided, snapshot readiness must pass the source-aware check **and** the date set.
+
+    Eligible candidates are ordered mixed-first (Phase 65), then newest-first within each
+    tier, before applying ``limit``.
     """
 
     if limit <= 0:
@@ -74,7 +83,8 @@ def select_label_backfill_candidates(
 
     use_source_ready = bars_newest_first is not None and calendar_name is not None
 
-    pairs: list[tuple[str, int]] = []
+    mixed: list[tuple[str, int]] = []
+    other: list[tuple[str, int]] = []
     for snapshot in snapshots_newest_first:
         if snapshot.id is None:
             continue
@@ -93,7 +103,11 @@ def select_label_backfill_candidates(
             and snapshot.as_of_trading_date not in label_ready_as_of
         ):
             continue
-        pairs.append((snapshot.symbol, snapshot.id))
-        if len(pairs) >= limit:
-            break
-    return pairs
+        pair = (snapshot.symbol, snapshot.id)
+        if is_mixed_component_source(snapshot):
+            mixed.append(pair)
+        else:
+            other.append(pair)
+
+    ordered = mixed + other
+    return ordered[:limit]

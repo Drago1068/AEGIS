@@ -647,6 +647,14 @@ export async function downloadProbabilityCalibrations(
   return filename;
 }
 
+export interface CalibrationHorizonReadiness {
+  outcome_horizon_key: string;
+  status: string;
+  corpus_count: number;
+  bucket_count: number;
+  detail: string;
+}
+
 export interface CalibrationReadiness {
   symbol: string;
   status: string;
@@ -659,6 +667,8 @@ export interface CalibrationReadiness {
   index_bucket_width: number;
   calibration_method_id: string;
   detail: string;
+  outcome_horizon_key?: string;
+  by_horizon?: CalibrationHorizonReadiness[];
 }
 
 export async function getCalibrationReadiness(
@@ -737,6 +747,7 @@ export interface ProbabilityCalibration {
   symbol: string;
   calibration_method_id: string;
   calibration_method_version: number;
+  outcome_horizon_key?: string;
   state: string;
   computed_at: string;
   probability_confidence: number;
@@ -749,11 +760,12 @@ export async function createProbabilityCalibration(
   baseUrl: string,
   symbol: string,
   assessmentId: number,
+  horizon = "forward_return_5",
   options?: ApiRequestOptions,
 ): Promise<ProbabilityCalibration> {
   const url =
     `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/` +
-    `${assessmentId}/calibrations`;
+    `${assessmentId}/calibrations?horizon=${encodeURIComponent(horizon)}`;
   const { response, body } = await requestJson(
     url,
     {

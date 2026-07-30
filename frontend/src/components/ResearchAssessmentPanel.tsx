@@ -271,7 +271,16 @@ export function ResearchAssessmentPanel({
     startTransition(async () => {
       setError(null);
       try {
-        await createProbabilityCalibration(baseUrl, symbol, latest.id as number);
+        const horizons =
+          readiness.by_horizon && readiness.by_horizon.length > 0
+            ? readiness.by_horizon
+                .filter((row) => row.status === "ready")
+                .map((row) => row.outcome_horizon_key)
+            : ["forward_return_5"];
+        const targets = horizons.length > 0 ? horizons : ["forward_return_5"];
+        for (const horizon of targets) {
+          await createProbabilityCalibration(baseUrl, symbol, latest.id as number, horizon);
+        }
         await loadCalibrationHistory(latest.id as number);
         await loadReadiness();
         await loadEvidenceSummary();
@@ -666,6 +675,12 @@ export function ResearchAssessmentPanel({
                   <dd className="font-mono">{readiness.calibration_method_id}</dd>
                 </div>
                 <div>
+                  <dt className="text-aegis-muted">Primary horizon</dt>
+                  <dd className="font-mono">
+                    {readiness.outcome_horizon_key ?? "forward_return_5"}
+                  </dd>
+                </div>
+                <div>
                   <dt className="text-aegis-muted">Labeled corpus</dt>
                   <dd className="font-mono">
                     {readiness.corpus_count} / min {readiness.min_corpus}
@@ -679,6 +694,16 @@ export function ResearchAssessmentPanel({
                   </dd>
                 </div>
               </dl>
+              {readiness.by_horizon && readiness.by_horizon.length > 0 ? (
+                <ul className="mt-2 space-y-1 text-xs text-aegis-muted">
+                  {readiness.by_horizon.map((row) => (
+                    <li key={row.outcome_horizon_key} className="font-mono">
+                      {row.outcome_horizon_key}: {row.status} (corpus={row.corpus_count}, bucket=
+                      {row.bucket_count})
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
               <p className="mt-2 text-xs text-aegis-muted">{readiness.detail}</p>
             </div>
           ) : null}
@@ -699,6 +724,12 @@ export function ResearchAssessmentPanel({
                   </dd>
                 </div>
                 <div>
+                  <dt className="text-aegis-muted">Horizon</dt>
+                  <dd className="font-mono">
+                    {calibration.outcome_horizon_key ?? "forward_return_5"}
+                  </dd>
+                </div>
+                <div>
                   <dt className="text-aegis-muted">Corpus / bucket</dt>
                   <dd className="font-mono">
                     {calibration.corpus_count} / {calibration.bucket_count}
@@ -716,8 +747,14 @@ export function ResearchAssessmentPanel({
                   </p>
                   <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
                     {calibrationHistory.map((row) => (
-                      <li key={row.id ?? `${row.computed_at}-${row.probability_confidence}`}>
-                        {row.computed_at} · p={row.probability_confidence.toFixed(4)} · corpus=
+                      <li
+                        key={
+                          row.id ??
+                          `${row.computed_at}-${row.outcome_horizon_key}-${row.probability_confidence}`
+                        }
+                      >
+                        {row.computed_at} · {row.outcome_horizon_key ?? "forward_return_5"} · p=
+                        {row.probability_confidence.toFixed(4)} · corpus=
                         {row.corpus_count}/{row.bucket_count}
                       </li>
                     ))}

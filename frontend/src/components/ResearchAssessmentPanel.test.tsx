@@ -214,6 +214,7 @@ describe("ResearchAssessmentPanel", () => {
         "http://localhost:8000",
         "AAPL",
         1,
+        "forward_return_5",
       );
     });
     await waitFor(() => {

@@ -23,11 +23,24 @@ from aegis.domain.research_outcome_labels import LABEL_METHOD_ID
 logger = logging.getLogger(__name__)
 
 CALIBRATION_METHOD_ID = "research_calibration_v1"
-CALIBRATION_METHOD_VERSION = 1
+CALIBRATION_METHOD_VERSION = 2
 CALIBRATION_SCHEMA_VERSION = 1
 STATE_RESEARCH_ONLY_CALIBRATION = STATE_RESEARCH_ONLY
-OUTCOME_HORIZON_KEY = "forward_return_5"
+OUTCOME_HORIZON_KEYS: tuple[str, ...] = ("forward_return_5", "forward_return_20")
+DEFAULT_OUTCOME_HORIZON_KEY = "forward_return_5"
+OUTCOME_HORIZON_KEY = DEFAULT_OUTCOME_HORIZON_KEY  # backward-compatible alias
 RESEARCH_INDEX_KEY = "research_index"
+
+
+def normalize_outcome_horizon_key(horizon_key: str | None) -> str:
+    """Return a supported horizon key or raise ValueError."""
+
+    key = (horizon_key or DEFAULT_OUTCOME_HORIZON_KEY).strip()
+    if key not in OUTCOME_HORIZON_KEYS:
+        raise ValueError(
+            f"unsupported outcome horizon {key!r}; expected one of {OUTCOME_HORIZON_KEYS}"
+        )
+    return key
 
 
 class CalibrationReadinessStatus(StrEnum):
@@ -38,6 +51,17 @@ class CalibrationReadinessStatus(StrEnum):
     MISSING_RESEARCH_INDEX = "missing_research_index"
     INSUFFICIENT_LABELED_CORPUS = "insufficient_labeled_corpus"
     INSUFFICIENT_SIMILAR_EXAMPLES = "insufficient_similar_examples"
+
+
+@dataclass(frozen=True, slots=True)
+class CalibrationHorizonReadinessData:
+    """Per-horizon corpus-gate diagnostics; never invents probability_confidence."""
+
+    outcome_horizon_key: str
+    status: CalibrationReadinessStatus
+    corpus_count: int
+    bucket_count: int
+    detail: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,6 +79,8 @@ class CalibrationReadinessData:
     index_bucket_width: float
     calibration_method_id: str
     detail: str
+    outcome_horizon_key: str = DEFAULT_OUTCOME_HORIZON_KEY
+    by_horizon: tuple[CalibrationHorizonReadinessData, ...] = ()
 
 
 def evaluate_calibration_readiness(
@@ -65,9 +91,11 @@ def evaluate_calibration_readiness(
     min_corpus: int,
     min_bucket: int,
     index_bucket_width: float,
+    outcome_horizon_key: str = DEFAULT_OUTCOME_HORIZON_KEY,
 ) -> CalibrationReadinessData:
     """Report whether research_calibration_v1 gates would pass; persists nothing."""
 
+    horizon = normalize_outcome_horizon_key(outcome_horizon_key)
     normalized = symbol.upper()
     if snapshot is None:
         return CalibrationReadinessData(
@@ -82,6 +110,7 @@ def evaluate_calibration_readiness(
             index_bucket_width=index_bucket_width,
             calibration_method_id=CALIBRATION_METHOD_ID,
             detail="no research assessment snapshot available",
+            outcome_horizon_key=horizon,
         )
 
     if snapshot.id is None:
@@ -97,6 +126,7 @@ def evaluate_calibration_readiness(
             index_bucket_width=index_bucket_width,
             calibration_method_id=CALIBRATION_METHOD_ID,
             detail="assessment snapshot id is required for calibration readiness",
+            outcome_horizon_key=horizon,
         )
 
     research_index_raw = snapshot.components.get(RESEARCH_INDEX_KEY)
@@ -113,6 +143,7 @@ def evaluate_calibration_readiness(
             index_bucket_width=index_bucket_width,
             calibration_method_id=CALIBRATION_METHOD_ID,
             detail=f"component {RESEARCH_INDEX_KEY!r} is required for calibration",
+            outcome_horizon_key=horizon,
         )
 
     research_index = float(research_index_raw)
@@ -136,8 +167,10 @@ def evaluate_calibration_readiness(
             index_bucket_width=index_bucket_width,
             calibration_method_id=CALIBRATION_METHOD_ID,
             detail=(
-                f"need at least {min_corpus} labeled historical examples, found {len(historical)}"
+                f"need at least {min_corpus} labeled historical examples for {horizon}, "
+                f"found {len(historical)}"
             ),
+            outcome_horizon_key=horizon,
         )
 
     if len(bucket) < min_bucket:
@@ -154,8 +187,9 @@ def evaluate_calibration_readiness(
             calibration_method_id=CALIBRATION_METHOD_ID,
             detail=(
                 f"need at least {min_bucket} examples within research_index "
-                f"±{index_bucket_width}, found {len(bucket)}"
+                f"±{index_bucket_width} for {horizon}, found {len(bucket)}"
             ),
+            outcome_horizon_key=horizon,
         )
 
     return CalibrationReadinessData(
@@ -169,7 +203,11 @@ def evaluate_calibration_readiness(
         min_bucket=min_bucket,
         index_bucket_width=index_bucket_width,
         calibration_method_id=CALIBRATION_METHOD_ID,
-        detail="corpus and similarity bucket gates would pass for research_calibration_v1",
+        detail=(
+            f"corpus and similarity bucket gates would pass for research_calibration_v1 "
+            f"({horizon})"
+        ),
+        outcome_horizon_key=horizon,
     )
 
 
@@ -193,11 +231,12 @@ class CalibrationUnavailableError(Exception):
 
 @dataclass(frozen=True, slots=True)
 class LabeledResearchExample:
-    """One historical assessment paired with its forward-return label."""
+    """One historical assessment paired with a forward-return label for one horizon."""
 
     assessment_snapshot_id: int
     research_index: float
-    forward_return_5: float
+    forward_return: float
+    outcome_horizon_key: str = DEFAULT_OUTCOME_HORIZON_KEY
 
 
 @dataclass(frozen=True, slots=True)
@@ -214,6 +253,7 @@ class ProbabilityCalibrationData:
     corpus_count: int
     bucket_count: int
     schema_version: int
+    outcome_horizon_key: str = DEFAULT_OUTCOME_HORIZON_KEY
     id: int | None = None
 
 
@@ -224,9 +264,11 @@ def compute_research_calibration_v1(
     min_corpus: int,
     min_bucket: int,
     index_bucket_width: float,
+    outcome_horizon_key: str = DEFAULT_OUTCOME_HORIZON_KEY,
 ) -> ProbabilityCalibrationData:
     """Compute empirical positive-rate calibration or raise fail-closed."""
 
+    horizon = normalize_outcome_horizon_key(outcome_horizon_key)
     if snapshot.id is None:
         raise CalibrationUnavailableError(
             CalibrationReason.ASSESSMENT_NOT_FOUND,
@@ -234,12 +276,20 @@ def compute_research_calibration_v1(
         )
 
     research_index = _research_index_from_snapshot(snapshot)
-    historical = [example for example in corpus if example.assessment_snapshot_id != snapshot.id]
+    historical = [
+        example
+        for example in corpus
+        if example.assessment_snapshot_id != snapshot.id
+        and example.outcome_horizon_key == horizon
+    ]
 
     if len(historical) < min_corpus:
         raise CalibrationUnavailableError(
             CalibrationReason.INSUFFICIENT_LABELED_CORPUS,
-            f"need at least {min_corpus} labeled historical examples, found {len(historical)}",
+            (
+                f"need at least {min_corpus} labeled historical examples for {horizon}, "
+                f"found {len(historical)}"
+            ),
         )
 
     bucket = [
@@ -252,11 +302,11 @@ def compute_research_calibration_v1(
             CalibrationReason.INSUFFICIENT_SIMILAR_EXAMPLES,
             (
                 f"need at least {min_bucket} examples within research_index "
-                f"±{index_bucket_width}, found {len(bucket)}"
+                f"±{index_bucket_width} for {horizon}, found {len(bucket)}"
             ),
         )
 
-    positive_count = sum(1 for example in bucket if example.forward_return_5 > 0)
+    positive_count = sum(1 for example in bucket if example.forward_return > 0)
     probability = _clip01(positive_count / len(bucket))
 
     return ProbabilityCalibrationData(
@@ -270,6 +320,7 @@ def compute_research_calibration_v1(
         corpus_count=len(historical),
         bucket_count=len(bucket),
         schema_version=CALIBRATION_SCHEMA_VERSION,
+        outcome_horizon_key=horizon,
     )
 
 
@@ -293,7 +344,11 @@ def _clip01(value: float) -> float:
 
 class LabeledCorpusReader(Protocol):
     async def list_labeled_examples(
-        self, symbol: str, limit: int
+        self,
+        symbol: str,
+        limit: int,
+        *,
+        outcome_horizon_key: str = DEFAULT_OUTCOME_HORIZON_KEY,
     ) -> list[LabeledResearchExample]: ...
 
 
@@ -344,8 +399,13 @@ class ResearchProbabilityCalibrationService:
         self._corpus_limit = corpus_limit
 
     async def calibrate_assessment(
-        self, symbol: str, assessment_snapshot_id: int
+        self,
+        symbol: str,
+        assessment_snapshot_id: int,
+        *,
+        outcome_horizon_key: str = DEFAULT_OUTCOME_HORIZON_KEY,
     ) -> ProbabilityCalibrationData:
+        horizon = normalize_outcome_horizon_key(outcome_horizon_key)
         snapshot = await self._assessment_store.get_by_id(assessment_snapshot_id)
         if snapshot is None or snapshot.symbol.upper() != symbol.upper():
             raise CalibrationUnavailableError(
@@ -361,6 +421,7 @@ class ResearchProbabilityCalibrationService:
         corpus = await self._corpus_reader.list_labeled_examples(
             symbol.upper(),
             self._corpus_limit,
+            outcome_horizon_key=horizon,
         )
         calibration = compute_research_calibration_v1(
             snapshot,
@@ -368,12 +429,14 @@ class ResearchProbabilityCalibrationService:
             min_corpus=self._min_corpus,
             min_bucket=self._min_bucket,
             index_bucket_width=self._index_bucket_width,
+            outcome_horizon_key=horizon,
         )
         logger.info(
             "research_probability_calibration_computed",
             extra={
                 "symbol": symbol.upper(),
                 "assessment_snapshot_id": assessment_snapshot_id,
+                "outcome_horizon_key": horizon,
                 "probability_confidence": calibration.probability_confidence,
                 "corpus_count": calibration.corpus_count,
                 "bucket_count": calibration.bucket_count,
@@ -404,31 +467,68 @@ class ResearchProbabilityCalibrationService:
         self,
         symbol: str,
         snapshot: ResearchAssessmentSnapshotData | None,
+        *,
+        outcome_horizon_key: str = DEFAULT_OUTCOME_HORIZON_KEY,
     ) -> CalibrationReadinessData:
         """Return corpus-gate readiness for ``symbol`` without persisting anything."""
 
-        corpus = await self._corpus_reader.list_labeled_examples(
-            symbol.upper(),
-            self._corpus_limit,
-        )
-        readiness = evaluate_calibration_readiness(
-            symbol,
-            snapshot,
-            corpus,
-            min_corpus=self._min_corpus,
-            min_bucket=self._min_bucket,
-            index_bucket_width=self._index_bucket_width,
+        primary_horizon = normalize_outcome_horizon_key(outcome_horizon_key)
+        by_horizon: list[CalibrationHorizonReadinessData] = []
+        primary: CalibrationReadinessData | None = None
+        for horizon in OUTCOME_HORIZON_KEYS:
+            corpus = await self._corpus_reader.list_labeled_examples(
+                symbol.upper(),
+                self._corpus_limit,
+                outcome_horizon_key=horizon,
+            )
+            readiness = evaluate_calibration_readiness(
+                symbol,
+                snapshot,
+                corpus,
+                min_corpus=self._min_corpus,
+                min_bucket=self._min_bucket,
+                index_bucket_width=self._index_bucket_width,
+                outcome_horizon_key=horizon,
+            )
+            by_horizon.append(
+                CalibrationHorizonReadinessData(
+                    outcome_horizon_key=horizon,
+                    status=readiness.status,
+                    corpus_count=readiness.corpus_count,
+                    bucket_count=readiness.bucket_count,
+                    detail=readiness.detail,
+                )
+            )
+            if horizon == primary_horizon:
+                primary = readiness
+
+        assert primary is not None
+        result = CalibrationReadinessData(
+            symbol=primary.symbol,
+            status=primary.status,
+            assessment_snapshot_id=primary.assessment_snapshot_id,
+            research_index=primary.research_index,
+            corpus_count=primary.corpus_count,
+            bucket_count=primary.bucket_count,
+            min_corpus=primary.min_corpus,
+            min_bucket=primary.min_bucket,
+            index_bucket_width=primary.index_bucket_width,
+            calibration_method_id=primary.calibration_method_id,
+            detail=primary.detail,
+            outcome_horizon_key=primary.outcome_horizon_key,
+            by_horizon=tuple(by_horizon),
         )
         logger.info(
             "research_calibration_readiness_evaluated",
             extra={
-                "symbol": readiness.symbol,
-                "status": readiness.status.value,
-                "corpus_count": readiness.corpus_count,
-                "bucket_count": readiness.bucket_count,
+                "symbol": result.symbol,
+                "status": result.status.value,
+                "outcome_horizon_key": result.outcome_horizon_key,
+                "corpus_count": result.corpus_count,
+                "bucket_count": result.bucket_count,
             },
         )
-        return readiness
+        return result
 
 
 def apply_probability_calibration(

@@ -1,4 +1,4 @@
-"""Repository for labeled research corpus and probability calibrations (Phase 15)."""
+"""Repository for labeled research corpus and probability calibrations (Phase 15/41)."""
 
 from __future__ import annotations
 
@@ -7,11 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aegis.domain.research_outcome_labels import LABEL_METHOD_VERSION
 from aegis.domain.research_probability_calibration import (
+    DEFAULT_OUTCOME_HORIZON_KEY,
     EXPECTED_LABEL_METHOD_ID,
-    OUTCOME_HORIZON_KEY,
     RESEARCH_INDEX_KEY,
     LabeledResearchExample,
     ProbabilityCalibrationData,
+    normalize_outcome_horizon_key,
 )
 from aegis.persistence.models import (
     ResearchAssessmentOutcomeLabel,
@@ -26,9 +27,16 @@ class ResearchProbabilityCalibrationRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def list_labeled_examples(self, symbol: str, limit: int) -> list[LabeledResearchExample]:
-        """Return labeled examples with newest label per assessment."""
+    async def list_labeled_examples(
+        self,
+        symbol: str,
+        limit: int,
+        *,
+        outcome_horizon_key: str = DEFAULT_OUTCOME_HORIZON_KEY,
+    ) -> list[LabeledResearchExample]:
+        """Return labeled examples with newest label per assessment for one horizon."""
 
+        horizon = normalize_outcome_horizon_key(outcome_horizon_key)
         stmt = (
             select(ResearchAssessmentOutcomeLabel, ResearchAssessmentSnapshot)
             .join(
@@ -53,7 +61,7 @@ class ResearchProbabilityCalibrationRepository:
                 continue
             seen_ids.add(assessment_id)
             research_index = assessment_row.components.get(RESEARCH_INDEX_KEY)
-            forward_return = label_row.labels.get(OUTCOME_HORIZON_KEY)
+            forward_return = label_row.labels.get(horizon)
             if not isinstance(research_index, (int, float)):
                 continue
             if not isinstance(forward_return, (int, float)):
@@ -62,7 +70,8 @@ class ResearchProbabilityCalibrationRepository:
                 LabeledResearchExample(
                     assessment_snapshot_id=assessment_id,
                     research_index=float(research_index),
-                    forward_return_5=float(forward_return),
+                    forward_return=float(forward_return),
+                    outcome_horizon_key=horizon,
                 )
             )
             if len(examples) >= limit:
@@ -76,6 +85,7 @@ class ResearchProbabilityCalibrationRepository:
             symbol=calibration.symbol,
             calibration_method_id=calibration.calibration_method_id,
             calibration_method_version=calibration.calibration_method_version,
+            outcome_horizon_key=calibration.outcome_horizon_key,
             state=calibration.state,
             probability_confidence=calibration.probability_confidence,
             corpus_count=calibration.corpus_count,
@@ -136,4 +146,5 @@ def _calibration_to_data(
         corpus_count=row.corpus_count,
         bucket_count=row.bucket_count,
         schema_version=row.schema_version,
+        outcome_horizon_key=row.outcome_horizon_key,
     )

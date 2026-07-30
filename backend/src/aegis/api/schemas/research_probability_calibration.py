@@ -1,4 +1,4 @@
-"""Response schemas for research probability calibration endpoints (Phase 18)."""
+"""Response schemas for research probability calibration endpoints (Phase 18/41)."""
 
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ class ProbabilityCalibrationResponse(BaseModel):
     symbol: str
     calibration_method_id: str
     calibration_method_version: int
+    outcome_horizon_key: str
     state: str
     computed_at: datetime
     probability_confidence: float = Field(ge=0.0, le=1.0)

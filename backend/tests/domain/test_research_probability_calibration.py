@@ -54,7 +54,8 @@ def _corpus(count: int, *, research_index: float = 0.46) -> list[LabeledResearch
         LabeledResearchExample(
             assessment_snapshot_id=index,
             research_index=research_index,
-            forward_return_5=0.01 if index % 2 == 0 else -0.01,
+            forward_return=0.01 if index % 2 == 0 else -0.01,
+            outcome_horizon_key="forward_return_5",
         )
         for index in range(1, count + 1)
     ]

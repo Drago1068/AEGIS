@@ -28,7 +28,8 @@ history in the console), Phase 29 (NAS live verify of Phase 28), Phase 30
 (calibration readiness JSON export), Phase 33 (NAS live verify of Phase 32), Phase 34
 (outcome-label history JSON export), Phase 35 (NAS live verify of Phase 34), Phase 36
 (calibration history JSON export), Phase 37 (NAS live verify of Phase 36), Phase 38
-(assessment history JSON export), and Phase 39 (NAS live verify of Phase 38).
+(assessment history JSON export), Phase 39 (NAS live verify of Phase 38), Phase 40
+(NAS lab TLS cutover), and Phase 41 (multi-horizon probability calibration).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -105,6 +106,12 @@ attachment of assessment history (see
 [decisions/0039-phase-38-assessments-export.md](decisions/0039-phase-38-assessments-export.md)).
 Phase 39 live-verifies that export on the NAS (see
 [decisions/0040-phase-39-nas-live-verify-phase-38.md](decisions/0040-phase-39-nas-live-verify-phase-38.md)).
+Phase 40 enables the Phase 9 Caddy TLS lab profile on the NAS (see
+[decisions/0041-phase-40-nas-lab-tls-cutover.md](decisions/0041-phase-40-nas-lab-tls-cutover.md)
+and [../operations/nas-tls-cutover.md](../operations/nas-tls-cutover.md)).
+Phase 41 adds horizon-specific probability calibration for `forward_return_5` and
+`forward_return_20` (see
+[decisions/0042-phase-41-multi-horizon-calibration.md](decisions/0042-phase-41-multi-horizon-calibration.md)).
 
 ## System context
 

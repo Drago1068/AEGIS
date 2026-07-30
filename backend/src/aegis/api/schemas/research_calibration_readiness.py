@@ -1,8 +1,20 @@
-"""Response schemas for research probability calibration readiness (Phase 16)."""
+"""Response schemas for research probability calibration readiness (Phase 16/41)."""
 
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
+
+
+class CalibrationHorizonReadinessResponse(BaseModel):
+    """Per-horizon readiness slice (diagnostics only)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    outcome_horizon_key: str
+    status: str
+    corpus_count: int = Field(ge=0)
+    bucket_count: int = Field(ge=0)
+    detail: str
 
 
 class CalibrationReadinessResponse(BaseModel):
@@ -21,3 +33,5 @@ class CalibrationReadinessResponse(BaseModel):
     index_bucket_width: float = Field(gt=0)
     calibration_method_id: str
     detail: str
+    outcome_horizon_key: str = "forward_return_5"
+    by_horizon: list[CalibrationHorizonReadinessResponse] = Field(default_factory=list)

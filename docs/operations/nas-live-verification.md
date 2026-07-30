@@ -11,8 +11,10 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0034](../architecture/decisions/0034-phase-33-nas-live-verify-phase-32.md),
 [ADR-0036](../architecture/decisions/0036-phase-35-nas-live-verify-phase-34.md),
 [ADR-0038](../architecture/decisions/0038-phase-37-nas-live-verify-phase-36.md),
-[ADR-0040](../architecture/decisions/0040-phase-39-nas-live-verify-phase-38.md).
+[ADR-0040](../architecture/decisions/0040-phase-39-nas-live-verify-phase-38.md),
+[ADR-0041](../architecture/decisions/0041-phase-40-nas-lab-tls-cutover.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
+Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 
 **Upload ≠ verified.** Dry-run mode is **not** acceptance evidence.
 
@@ -61,7 +63,7 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 13 | Authenticated `GET .../assessments/{id}/calibrations/export` | **200**, attachment, JSON array (`[]` OK) |
 | 14 | Authenticated `GET /research/{symbol}/evidence-summary` | **200**, `state=research_only`; log present label/end-date keys only (none OK) |
 | 15 | Authenticated `GET /research/{symbol}/evidence-summary/export` | **200**, attachment, `state=research_only` |
-| 16 | SSH `alembic current` (when SSH configured) | includes **`0008`** or `head` |
+| 16 | SSH `alembic current` (when SSH configured) | includes **`0009`** or `head` |
 | 17 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.

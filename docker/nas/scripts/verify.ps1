@@ -53,7 +53,7 @@ function Write-VerifyChecklist {
     Write-Host " 13. Authenticated GET .../assessments/{id}/calibrations/export -> 200 (attachment, JSON array; [] OK)"
     Write-Host " 14. Authenticated GET /research/$Symbol/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
     Write-Host " 15. Authenticated GET /research/$Symbol/evidence-summary/export -> 200 (attachment, state=research_only)"
-    Write-Host " 16. SSH alembic current includes 0008|head (when SSH configured)"
+    Write-Host " 16. SSH alembic current includes 0009|head (when SSH configured)"
     Write-Host " 17. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
@@ -100,6 +100,16 @@ $insecure = "$($env:AEGIS_NAS_VERIFY_CURL_INSECURE)".Trim().ToLowerInvariant()
 if (@("true", "1", "yes") -contains $insecure) {
     Write-Host "NOTE: AEGIS_NAS_VERIFY_CURL_INSECURE set - curl will skip TLS certificate verification (lab only)."
     $curlInsecure = @("-k")
+}
+$resolveRaw = "$($env:AEGIS_NAS_VERIFY_CURL_RESOLVE)".Trim()
+if (-not [string]::IsNullOrWhiteSpace($resolveRaw)) {
+    foreach ($entry in ($resolveRaw -split ',')) {
+        $trimmed = $entry.Trim()
+        if (-not [string]::IsNullOrWhiteSpace($trimmed)) {
+            $curlInsecure += @("--resolve", $trimmed)
+        }
+    }
+    Write-Host "NOTE: AEGIS_NAS_VERIFY_CURL_RESOLVE set - curl --resolve overrides for lab DNS."
 }
 
 $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
@@ -436,13 +446,27 @@ set -euo pipefail
 cd '$dir'
 out=`$(docker compose $composeFileArgs --env-file .env.nas --project-directory . exec -T backend alembic current)
 echo "`$out"
-echo "`$out" | grep -E '0008|head' >/dev/null
+echo "`$out" | grep -E '0009|head' >/dev/null
 "@
     & ssh @sshArgs $remote $cmd
     if ($LASTEXITCODE -ne 0) {
-        throw "Alembic current did not report migration 0008 / head. Apply alembic upgrade head on the NAS."
+        throw "Alembic current did not report migration 0009 / head. Apply alembic upgrade head on the NAS."
     }
-    Write-Host "OK  alembic current includes 0008 / head"
+    Write-Host "OK  alembic current includes 0009 / head"
+
+    if (Test-NasTlsEnabled) {
+        Write-Host "==> Caddy service (TLS profile)"
+        $caddyCmd = @"
+set -euo pipefail
+cd '$dir'
+docker compose $composeFileArgs --env-file .env.nas --project-directory . ps --status running caddy | grep -E 'caddy' >/dev/null
+"@
+        & ssh @sshArgs $remote $caddyCmd
+        if ($LASTEXITCODE -ne 0) {
+            throw "TLS profile enabled but caddy service is not running."
+        }
+        Write-Host "OK  caddy service is running"
+    }
 
     Write-Host ""
     Write-Host "Log inspection guidance (run on NAS or via SSH):"

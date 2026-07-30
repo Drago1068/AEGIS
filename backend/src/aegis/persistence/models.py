@@ -185,6 +185,7 @@ class ResearchAssessmentProbabilityCalibration(Base):
     symbol: Mapped[str] = mapped_column(String(32), nullable=False)
     calibration_method_id: Mapped[str] = mapped_column(String(64), nullable=False)
     calibration_method_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    outcome_horizon_key: Mapped[str] = mapped_column(String(64), nullable=False)
     state: Mapped[str] = mapped_column(String(32), nullable=False)
     probability_confidence: Mapped[float] = mapped_column(Float, nullable=False)
     corpus_count: Mapped[int] = mapped_column(Integer, nullable=False)

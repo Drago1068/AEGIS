@@ -7,6 +7,40 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 41 - Multi-Horizon Probability Calibration
+
+Horizon-specific research_calibration_v1 for `forward_return_5` and `forward_return_20`. See
+[docs/architecture/decisions/0042-phase-41-multi-horizon-calibration.md](docs/architecture/decisions/0042-phase-41-multi-horizon-calibration.md).
+
+#### Added
+
+- Alembic `0009` `outcome_horizon_key` on calibration rows (backfill `forward_return_5`).
+- `POST .../calibrations?horizon=`; readiness `by_horizon[]`; console horizon surfacing.
+- ADR-0042.
+
+#### Explicitly out of scope
+
+New horizons beyond 5/20, default-on calibration, actionable promotion, orders, TLS changes.
+
+### Phase 40 - NAS Lab TLS Live Cutover
+
+Enable Phase 9 Caddy TLS on the live NAS with lab hosts, remapped ports, and self-signed
+PEMs. See
+[docs/architecture/decisions/0041-phase-40-nas-lab-tls-cutover.md](docs/architecture/decisions/0041-phase-40-nas-lab-tls-cutover.md)
+and [docs/operations/nas-tls-cutover.md](docs/operations/nas-tls-cutover.md).
+
+#### Added
+
+- ADR-0041 lab profile (`aegis.local` / `api.aegis.local`, HTTPS `18443`, HTTP `18080`).
+- Cutover/rollback runbook; `generate-lab-certs.ps1` / `.sh`.
+- Caddy non-443 redirect via `AEGIS_TLS_HTTPS_PORT`; verify Caddy running + optional
+  `AEGIS_NAS_VERIFY_CURL_RESOLVE`.
+
+#### Explicitly out of scope
+
+ACME, public DNS, multi-horizon calibration, default-on calibration, actionable promotion,
+orders.
+
 ### Phase 39 - NAS Live Verification of Phase 38
 
 Ops evidence gate: redeploy current revision and verify

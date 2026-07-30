@@ -42,7 +42,7 @@ print_checklist() {
   echo " 13. Authenticated GET .../assessments/{id}/calibrations/export -> 200 (attachment, JSON array; [] OK)"
   echo " 14. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
   echo " 15. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
-  echo " 16. SSH alembic current includes 0008|head (when SSH configured)"
+  echo " 16. SSH alembic current includes 0009|head (when SSH configured)"
   echo " 17. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
@@ -90,6 +90,16 @@ insecure="$(printf '%s' "${AEGIS_NAS_VERIFY_CURL_INSECURE:-false}" | tr '[:upper
 if [[ "${insecure}" == "true" || "${insecure}" == "1" || "${insecure}" == "yes" ]]; then
   echo "NOTE: AEGIS_NAS_VERIFY_CURL_INSECURE set — curl will skip TLS certificate verification (lab only)."
   CURL_INSECURE=(-k)
+fi
+if [[ -n "${AEGIS_NAS_VERIFY_CURL_RESOLVE:-}" ]]; then
+  IFS=',' read -r -a _resolve_entries <<< "${AEGIS_NAS_VERIFY_CURL_RESOLVE}"
+  for entry in "${_resolve_entries[@]}"; do
+    entry="$(printf '%s' "${entry}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+    if [[ -n "${entry}" ]]; then
+      CURL_INSECURE+=(--resolve "${entry}")
+    fi
+  done
+  echo "NOTE: AEGIS_NAS_VERIFY_CURL_RESOLVE set — curl --resolve overrides for lab DNS."
 fi
 
 http_status() {
@@ -377,11 +387,20 @@ docker compose ${COMPOSE_FILE_ARGS} --env-file .env.nas --project-directory . ex
 EOF
 )"
   echo "${out}"
-  if ! echo "${out}" | grep -Eq '0008|head'; then
-    echo "error: Alembic current did not report migration 0008 / head." >&2
+  if ! echo "${out}" | grep -Eq '0009|head'; then
+    echo "error: Alembic current did not report migration 0009 / head." >&2
     exit 1
   fi
-  echo "OK  alembic current includes 0008 / head"
+  echo "OK  alembic current includes 0009 / head"
+  if nas_tls_enabled; then
+    echo "==> Caddy service (TLS profile)"
+    ssh "${SSH_ARGS[@]}" "${REMOTE}" bash -s <<EOF
+set -euo pipefail
+cd '${REMOTE_DIR}'
+docker compose ${COMPOSE_FILE_ARGS} --env-file .env.nas --project-directory . ps --status running caddy | grep -E 'caddy' >/dev/null
+EOF
+    echo "OK  caddy service is running"
+  fi
   echo
   echo "Log inspection guidance (run on NAS or via SSH):"
   echo "  docker compose ${COMPOSE_FILE_ARGS} --env-file .env.nas logs --tail=200 backend"

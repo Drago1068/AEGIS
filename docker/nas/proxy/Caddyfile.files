@@ -5,6 +5,9 @@
 #
 # Caddy sets X-Forwarded-For / X-Forwarded-Proto / X-Forwarded-Host on reverse_proxy.
 # Application auth remains Phase 4 session cookies (no Basic Auth here).
+#
+# HTTP→HTTPS redirect includes AEGIS_TLS_HTTPS_PORT so remapped host ports (e.g. 18443)
+# work. Pass AEGIS_TLS_HTTPS_PORT into the Caddy service environment.
 
 {$AEGIS_TLS_FRONTEND_HOST} {
 	tls /certs/frontend.crt /certs/frontend.key
@@ -19,5 +22,5 @@
 }
 
 http://{$AEGIS_TLS_FRONTEND_HOST}, http://{$AEGIS_TLS_API_HOST} {
-	redir https://{host}{uri} permanent
+	redir https://{host}:{$AEGIS_TLS_HTTPS_PORT}{uri} permanent
 }

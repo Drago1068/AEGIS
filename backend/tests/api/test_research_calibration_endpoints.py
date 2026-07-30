@@ -35,7 +35,8 @@ def _calibration() -> ProbabilityCalibrationData:
         assessment_snapshot_id=99,
         symbol="AAPL",
         calibration_method_id=CALIBRATION_METHOD_ID,
-        calibration_method_version=1,
+        calibration_method_version=2,
+        outcome_horizon_key="forward_return_5",
         state="research_only",
         computed_at=datetime(2024, 1, 26, 18, 0, tzinfo=UTC),
         probability_confidence=0.6,
@@ -56,13 +57,17 @@ class _FakeCalibrationService:
         self._on_calibrate = on_calibrate
         self._latest = latest
         self._listed = listed or []
-        self.calibrate_calls: list[tuple[str, int]] = []
+        self.calibrate_calls: list[tuple[str, int, str]] = []
         self.list_calls: list[tuple[str, int, int]] = []
 
     async def calibrate_assessment(
-        self, symbol: str, assessment_snapshot_id: int
+        self,
+        symbol: str,
+        assessment_snapshot_id: int,
+        *,
+        outcome_horizon_key: str = "forward_return_5",
     ) -> ProbabilityCalibrationData:
-        self.calibrate_calls.append((symbol, assessment_snapshot_id))
+        self.calibrate_calls.append((symbol, assessment_snapshot_id, outcome_horizon_key))
         if isinstance(self._on_calibrate, Exception):
             raise self._on_calibrate
         assert isinstance(self._on_calibrate, ProbabilityCalibrationData)
@@ -102,7 +107,35 @@ async def test_post_calibration_returns_payload() -> None:
     assert body["calibration_method_id"] == CALIBRATION_METHOD_ID
     assert body["probability_confidence"] == 0.6
     assert body["state"] == "research_only"
-    assert service.calibrate_calls == [("AAPL", 99)]
+    assert body["outcome_horizon_key"] == "forward_return_5"
+    assert service.calibrate_calls == [("AAPL", 99, "forward_return_5")]
+
+
+async def test_post_calibration_accepts_horizon_query() -> None:
+    calibration = replace(_calibration(), outcome_horizon_key="forward_return_20")
+    service = _FakeCalibrationService(on_calibrate=calibration)
+
+    async with _client(service) as client:
+        response = await client.post(
+            "/research/AAPL/assessments/99/calibrations?horizon=forward_return_20"
+        )
+
+    assert response.status_code == 200
+    assert response.json()["outcome_horizon_key"] == "forward_return_20"
+    assert service.calibrate_calls == [("AAPL", 99, "forward_return_20")]
+
+
+async def test_post_calibration_rejects_unsupported_horizon() -> None:
+    service = _FakeCalibrationService(on_calibrate=_calibration())
+
+    async with _client(service) as client:
+        response = await client.post(
+            "/research/AAPL/assessments/99/calibrations?horizon=forward_return_99"
+        )
+
+    assert response.status_code == 422
+    assert response.json()["detail"]["reason"] == "unsupported_horizon"
+    assert service.calibrate_calls == []
 
 
 async def test_post_calibration_422_on_fail_closed() -> None:

@@ -189,12 +189,28 @@ async def get_latest_outcome_labels(
 async def create_probability_calibration(
     symbol: str,
     assessment_id: int,
+    horizon: str = Query(
+        default="forward_return_5",
+        description="Outcome label horizon key (forward_return_5 or forward_return_20).",
+    ),
     service: ResearchProbabilityCalibrationService = Depends(get_research_calibration_service),
 ) -> ProbabilityCalibrationResponse:
     """Compute and append research_calibration_v1 for ``assessment_id`` (fail-closed)."""
 
     try:
-        calibration = await service.calibrate_assessment(symbol, assessment_id)
+        from aegis.domain.research_probability_calibration import normalize_outcome_horizon_key
+
+        horizon_key = normalize_outcome_horizon_key(horizon)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail={"reason": "unsupported_horizon", "message": str(exc)},
+        ) from exc
+
+    try:
+        calibration = await service.calibrate_assessment(
+            symbol, assessment_id, outcome_horizon_key=horizon_key
+        )
     except CalibrationUnavailableError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,

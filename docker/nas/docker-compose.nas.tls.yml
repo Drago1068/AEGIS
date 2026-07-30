@@ -34,6 +34,7 @@ services:
     environment:
       AEGIS_TLS_FRONTEND_HOST: ${AEGIS_TLS_FRONTEND_HOST:?Set AEGIS_TLS_FRONTEND_HOST in .env.nas}
       AEGIS_TLS_API_HOST: ${AEGIS_TLS_API_HOST:?Set AEGIS_TLS_API_HOST in .env.nas}
+      AEGIS_TLS_HTTPS_PORT: ${AEGIS_TLS_HTTPS_PORT:-443}
       AEGIS_TLS_ACME_EMAIL: ${AEGIS_TLS_ACME_EMAIL:-}
     volumes:
       # Paths are relative to this compose file's directory (docker/nas/).

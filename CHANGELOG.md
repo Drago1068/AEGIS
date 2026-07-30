@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 37 - NAS Live Verification of Phase 36
+
+Ops evidence gate: redeploy current revision and verify
+`GET /research/{symbol}/assessments/{id}/calibrations/export` on the live NAS. See
+[docs/architecture/decisions/0038-phase-37-nas-live-verify-phase-36.md](docs/architecture/decisions/0038-phase-37-nas-live-verify-phase-36.md).
+
+#### Added
+
+- ADR-0038: live verify includes calibrations export (401 unauth; attachment array when auth).
+- `verify.ps1` / `verify.sh` calibrations export auth gate + authenticated attachment check.
+
+#### Explicitly out of scope
+
+New calibration methods, default-on calibration, actionable promotion, orders, TLS cutover.
+
 ### Phase 36 - Calibration History JSON Export
 
 Authenticated download of append-only probability calibrations for an assessment. See

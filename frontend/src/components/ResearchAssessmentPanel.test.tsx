@@ -695,6 +695,23 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByLabelText(/history source filter/i)).toHaveValue("mixed");
       expect(screen.getByText(/src=mixed/)).toBeInTheDocument();
     });
+
+    expect(screen.getByTestId("load-scan-labeled-labels")).toHaveTextContent(
+      /load labels for assessment 3/i,
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId("load-scan-labeled-labels")).not.toBeDisabled();
+    });
+    vi.mocked(listOutcomeLabels).mockClear();
+    fireEvent.click(screen.getByTestId("load-scan-labeled-labels"));
+    await waitFor(() => {
+      expect(listOutcomeLabels).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        3,
+        20,
+      );
+    });
   });
 
   it("runs outcome-label backfill and shows research-only summary counts", async () => {

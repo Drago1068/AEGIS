@@ -372,6 +372,21 @@ export function ResearchAssessmentPanel({
     });
   }
 
+  function onLoadScanLabeledLabels() {
+    const assessmentId = evidenceSummary?.most_recent_labeled_assessment_id;
+    if (assessmentId == null) {
+      return;
+    }
+    startTransition(async () => {
+      setError(null);
+      try {
+        await loadOutcomeLabelHistory(assessmentId);
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
   function onDownloadEvidenceSummary() {
     startTransition(async () => {
       setError(null);
@@ -781,6 +796,18 @@ export function ResearchAssessmentPanel({
                     </div>
                   );
                 })}
+                <div className="sm:col-span-2">
+                  <button
+                    type="button"
+                    className="text-sm underline-offset-2 hover:underline"
+                    disabled={isPending || evidenceSummary.most_recent_labeled_assessment_id == null}
+                    data-testid="load-scan-labeled-labels"
+                    onClick={onLoadScanLabeledLabels}
+                  >
+                    Load labels for assessment{" "}
+                    {evidenceSummary.most_recent_labeled_assessment_id}
+                  </button>
+                </div>
               </>
             ) : null}
           </dl>

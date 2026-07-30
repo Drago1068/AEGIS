@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 82 - NAS Live Verification of Phase 81
+
+Ops evidence gate: redeploy frontend under lab TLS with Phase 81 load-scan-labeled control.
+See
+[docs/architecture/decisions/0083-phase-82-nas-live-verify-phase-81.md](docs/architecture/decisions/0083-phase-82-nas-live-verify-phase-81.md).
+
+#### Added
+
+- ADR-0083: live verify requires frontend recreate for Phase 81; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 81 - Load Scan-Labeled Outcome Labels
+
+One-click load of outcome-label history for ``most_recent_labeled_assessment_id`` when it
+differs from the absolute latest. See
+[docs/architecture/decisions/0082-phase-81-load-scan-labeled-labels.md](docs/architecture/decisions/0082-phase-81-load-scan-labeled-labels.md).
+
+#### Added
+
+- Evidence-summary “Load labels for assessment {id}” control (existing list API).
+
+#### Explicitly out of scope
+
+New API endpoints, changing ``latest_assessment``, default-on calibration, orders.
+
 ### Phase 80 - NAS Live Verification of Phase 79
 
 Ops evidence gate: redeploy backend+frontend under lab TLS and confirm
-``most_recent_labeled_*`` on evidence-summary. See
+``most_recent_labeled_*`` on evidence-summary. Live verify passed 2026-07-30
+(``most_recent_labeled_assessment_id=125`` while latest label keys were none). See
 [docs/architecture/decisions/0081-phase-80-nas-live-verify-phase-79.md](docs/architecture/decisions/0081-phase-80-nas-live-verify-phase-79.md).
 
 #### Added

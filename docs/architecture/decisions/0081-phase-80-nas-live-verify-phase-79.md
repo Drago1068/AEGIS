@@ -1,6 +1,6 @@
 # ADR-0081: Phase 80 NAS Live Verification of Phase 79
 
-- Status: Accepted (pending live evidence)
+- Status: Accepted (live verified 2026-07-30; ``most_recent_labeled_assessment_id=125`` on AAPL)
 - Date: 2026-07-30
 
 ## Context

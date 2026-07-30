@@ -73,7 +73,8 @@ function Write-VerifyChecklist {
     Write-Host " 33. Authenticated evidence-summary nested corpus/bucket readiness fields (Phase 76)"
     Write-Host " 34. Phase 78: frontend redeploy includes Phase 77 horizon detail expand (unit-tested)"
     Write-Host " 35. Authenticated evidence-summary most_recent_labeled_* fields (Phase 80)"
-    Write-Host " 36. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 36. Phase 82: frontend redeploy includes Phase 81 load-scan-labeled control (unit-tested)"
+    Write-Host " 37. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {

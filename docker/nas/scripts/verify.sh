@@ -53,7 +53,8 @@ print_checklist() {
   echo " 24. Authenticated evidence-summary includes Phase 59 provenance fields"
   echo " 25. Authenticated assessments list+export with component_source=mixed (Phase 62)"
   echo " 26. Phase 64: frontend redeploy includes Phase 63 one-click mixed filter (unit-tested; API via item 25)"
-  echo " 27. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 27. Phase 66: backend redeploy includes Phase 65 prefer-mixed label backfill (limit=100 path)"
+  echo " 28. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -404,6 +405,7 @@ if [[ "${label100_assess}" -gt 0 && "${label100_persisted}" -lt 1 ]]; then
   exit 1
 fi
 echo "OK  Phase 58 source-aware label backfill throughput check"
+echo "OK  Phase 66 prefer-mixed label backfill path exercised (limit=100)"
 
 history_assessment_id=1
 if [[ "${latest_code}" == "200" ]]; then

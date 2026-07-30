@@ -42,7 +42,8 @@ fill + session-depth bar load), Phase 56 (NAS live verify of Phase 55), Phase 57
 Phase 59 (cross-source provenance in evidence summary), Phase 60 (NAS live verify of
 Phase 59), Phase 61 (assessment history component-source filter), Phase 62 (NAS live
 verify of Phase 61), Phase 63 (one-click mixed filter from evidence summary), Phase 64
-(NAS live verify of Phase 63), and Phase 65 (prefer mixed in outcome-label backfill).
+(NAS live verify of Phase 63), Phase 65 (prefer mixed in outcome-label backfill), and
+Phase 66 (NAS live verify of Phase 65).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -178,6 +179,8 @@ Phase 64 live-verifies that revision on the NAS under the lab TLS profile (see
 Phase 65 prefers mixed unlabeled label-ready assessments in outcome-label backfill and
 resolves true-mixed label bar sources from as-of provenance (see
 [decisions/0066-phase-65-prefer-mixed-label-backfill.md](decisions/0066-phase-65-prefer-mixed-label-backfill.md)).
+Phase 66 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0067-phase-66-nas-live-verify-phase-65.md](decisions/0067-phase-66-nas-live-verify-phase-65.md)).
 
 ## System context
 

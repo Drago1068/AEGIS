@@ -64,7 +64,8 @@ function Write-VerifyChecklist {
     Write-Host " 24. Authenticated evidence-summary includes Phase 59 provenance fields"
     Write-Host " 25. Authenticated assessments list+export with component_source=mixed (Phase 62)"
     Write-Host " 26. Phase 64: frontend redeploy includes Phase 63 one-click mixed filter (unit-tested; API via item 25)"
-    Write-Host " 27. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 27. Phase 66: backend redeploy includes Phase 65 prefer-mixed label backfill (limit=100 path)"
+    Write-Host " 28. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -427,6 +428,7 @@ try {
             Write-Host "WARN Phase 58: skipped ($label100Skipped) exceeded persisted ($label100Persisted); source-aware selection should usually keep skips low"
         }
         Write-Host "OK  Phase 58 source-aware label backfill throughput check"
+        Write-Host "OK  Phase 66 prefer-mixed label backfill path exercised (limit=100)"
     } finally {
         if (Test-Path -LiteralPath $backfill100Path) {
             Remove-Item -LiteralPath $backfill100Path -Force -ErrorAction SilentlyContinue

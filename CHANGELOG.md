@@ -7,6 +7,20 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 66 - NAS Live Verification of Phase 65
+
+Ops evidence gate: redeploy under lab TLS so prefer-mixed label backfill is live. See
+[docs/architecture/decisions/0067-phase-66-nas-live-verify-phase-65.md](docs/architecture/decisions/0067-phase-66-nas-live-verify-phase-65.md).
+
+#### Added
+
+- ADR-0067: live verify requires backend recreate + ``outcome-labels/backfill?limit=100``.
+- Verify checklist item for Phase 66 prefer-mixed backfill path.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 65 - Prefer Mixed Assessments in Outcome-Label Backfill
 
 Prefer unlabeled label-ready ``component_source=mixed`` assessments when selecting backfill

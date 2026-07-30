@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 53 - Full Daily-Bar History for Research Corpus Growth
+
+Default provider lookback to ``full`` so ``AEGIS_RESEARCH_BAR_LOAD_LIMIT=252`` can load
+deeper stored series after re-ingest. See
+[docs/architecture/decisions/0054-phase-53-full-daily-bar-history.md](docs/architecture/decisions/0054-phase-53-full-daily-bar-history.md).
+
+#### Changed
+
+- ``AEGIS_DAILY_BAR_OUTPUT_SIZE`` default ``full`` (``compact`` remains valid for light labs).
+- Compose backend pass-through for ``AEGIS_DAILY_BAR_OUTPUT_SIZE`` (local + NAS overlay).
+- Ops note: recreate backend and re-run ingest after switching an existing deploy to ``full``.
+
+#### Explicitly out of scope
+
+Automatic history rebuild jobs, guaranteeing readiness ``ready``, default-on calibration,
+actionable promotion, orders, ACME.
+
 ### Phase 52 - NAS Live Verification of Phase 51
 
 Ops evidence gate: redeploy under the lab TLS profile with

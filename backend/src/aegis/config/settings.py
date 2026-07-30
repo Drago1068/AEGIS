@@ -122,11 +122,12 @@ class Settings(BaseSettings):
         ),
     )
     daily_bar_output_size: Literal["compact", "full"] = Field(
-        default="compact",
+        default="full",
         description=(
             "Daily-bar lookback hint: for Alpha Vantage, the `outputsize` parameter "
             "(`compact` ≈ 100 bars, `full` = full history); for Polygon, calendar-day "
-            "lookback windows documented in ADR-0011."
+            "lookback windows documented in ADR-0011. Default `full` for research corpus "
+            "growth (ADR-0054); set `compact` explicitly for light labs."
         ),
     )
     exchange_calendar_name: str = Field(

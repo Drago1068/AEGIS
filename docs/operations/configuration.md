@@ -35,7 +35,7 @@ non-functional development placeholder.
 | `AEGIS_POLYGON_BASE_URL` | Base URL for the Polygon.io REST API (no trailing path). | `https://api.polygon.io` |
 | `AEGIS_POLYGON_REQUEST_INTERVAL_SECONDS` | Configured pacing hint between Polygon requests within one ingestion run. | `12.0` |
 | `AEGIS_WATCHLIST_SYMBOLS` | Comma-separated **bootstrap seed** symbols. As of Phase 2, only used to seed the database-backed `watchlist_symbols` table the first time it is empty; the database is the source of truth afterward. See [ADR-0003](../architecture/decisions/0003-phase-2-scheduled-watchlist.md). | `AAPL,MSFT,SPY` |
-| `AEGIS_DAILY_BAR_OUTPUT_SIZE` | Lookback hint: Alpha Vantage `outputsize` (`compact` / `full`); Polygon calendar-day windows per ADR-0011. | `compact` |
+| `AEGIS_DAILY_BAR_OUTPUT_SIZE` | Lookback hint: Alpha Vantage `outputsize` (`compact` / `full`); Polygon calendar-day windows per ADR-0011. Default **`full`** for research corpus growth (ADR-0054); set `compact` for light labs. After changing this on an existing deploy, recreate the backend and re-run ingest so append-only storage can grow with newly fetched older bars. | `full` |
 | `AEGIS_EXCHANGE_CALENDAR_NAME` | `pandas-market-calendars` calendar name used to validate that a bar's trading date is a real exchange session day. | `NYSE` |
 | `AEGIS_MAX_LATEST_BAR_STALENESS_TRADING_DAYS` | Maximum number of exchange trading days the most recent bar in a provider response may lag behind the current trading day before it is treated as stale. | `3` |
 | `AEGIS_MARKET_DATA_CORRECTION_PRICE_EPSILON` | Relative OHLC tolerance for provider revision detection (ADR-0013). Incoming bars differing beyond this epsilon from the current stored bar trigger a correction row. | `0.000001` (`1e-6`) |
@@ -153,6 +153,19 @@ does not replace Phase 4 application auth.
 | Variable | Description | Development default |
 | --- | --- | --- |
 | `AEGIS_INTEGRATION_BACKEND_URL` | Base URL the cross-service integration tests use to reach a running backend container. Not read by application code. | `http://localhost:8000` |
+
+## Switching daily-bar lookback (Phase 53)
+
+`AEGIS_DAILY_BAR_OUTPUT_SIZE=full` is the research-capable default (ADR-0054). `compact`
+remains valid for light labs. Changing this value on an already-running stack:
+
+1. Update `.env` / `.env.nas` and recreate the backend so Compose injects the new value.
+2. Re-run ingest (console / `POST /market-data/ingest` or the next scheduled run).
+3. Confirm stored bar depth grew, then use assessment / outcome-label backfill with
+   `AEGIS_RESEARCH_BAR_LOAD_LIMIT` (default 252).
+
+AEGIS never rewrites historical observations; older bars appear only as new append-only
+rows when providers return them.
 
 ## Rules
 

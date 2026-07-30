@@ -34,7 +34,10 @@ details and secrets come only from a gitignored `.env.nas` (never from committed
    - Operator-facing `NEXT_PUBLIC_API_BASE_URL`, `AEGIS_CORS_ORIGINS`, verify URLs
    - SSH host/user/remote directory (no real values belong in git)
 5. When the console is served over HTTPS, keep `AEGIS_SESSION_COOKIE_SECURE=true`.
-6. For optional TLS (Phase 9): set `AEGIS_NAS_TLS_ENABLED=true`, hostnames, and either
+6. For research corpus growth (Phase 53 / ADR-0054), keep `AEGIS_DAILY_BAR_OUTPUT_SIZE=full`
+   (example default). After changing from `compact` on an existing NAS, recreate the backend
+   and run on-demand or scheduled ingest so append-only storage can grow with older bars.
+7. For optional TLS (Phase 9): set `AEGIS_NAS_TLS_ENABLED=true`, hostnames, and either
    operator PEMs (`AEGIS_TLS_MODE=files`) or ACME email (`AEGIS_TLS_MODE=acme`).
 
 ## Flow

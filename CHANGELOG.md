@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 28 - Research Assessment History in the Console
+
+Operator console shows newest-first assessment history from the existing list API. See
+[docs/architecture/decisions/0029-phase-28-assessment-history-console.md](docs/architecture/decisions/0029-phase-28-assessment-history-console.md).
+
+#### Added
+
+- Assessment history block (when more than one snapshot): computed_at, research_index,
+  coverage_confidence, probability_confidence (null-safe).
+- ADR-0029.
+
+#### Explicitly out of scope
+
+New assessment methods, horizon-specific calibration, default-on calibration, actionable
+promotion, orders, TLS cutover.
+
 ### Phase 27 - NAS Live Verification of Phase 26
 
 Ops evidence gate: redeploy current revision (Phase 26 multi-horizon UI) and re-run live

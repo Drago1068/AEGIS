@@ -17,6 +17,7 @@ vi.mock("@/lib/api-client", async () => {
     listProbabilityCalibrations: vi.fn(),
     getResearchEvidenceSummary: vi.fn(),
     downloadResearchEvidenceSummary: vi.fn(),
+    listResearchAssessments: vi.fn(),
   };
 });
 
@@ -30,6 +31,7 @@ import {
   getResearchEvidenceSummary,
   listOutcomeLabels,
   listProbabilityCalibrations,
+  listResearchAssessments,
 } from "@/lib/api-client";
 
 const sampleAssessment = {
@@ -92,6 +94,7 @@ describe("ResearchAssessmentPanel", () => {
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
     vi.mocked(listProbabilityCalibrations).mockResolvedValue([]);
+    vi.mocked(listResearchAssessments).mockResolvedValue([]);
     vi.mocked(getResearchEvidenceSummary).mockResolvedValue({
       symbol: "AAPL",
       state: "research_only",
@@ -229,6 +232,48 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/calibration history \(newest first\)/i)).toBeInTheDocument();
       expect(screen.getByText(/p=0\.6200/)).toBeInTheDocument();
       expect(screen.getByText(/p=0\.5000/)).toBeInTheDocument();
+    });
+  });
+
+  it("shows assessment history when more than one row exists", async () => {
+    const older = {
+      ...sampleAssessment,
+      id: 2,
+      computed_at: "2024-01-25T18:00:00Z",
+      as_of_trading_date: "2024-01-25",
+      coverage_confidence: 0.9,
+      probability_confidence: null,
+      components: {
+        total_return_20: 0.05,
+        realized_vol_20: 0.15,
+        research_index: 0.4,
+      },
+    };
+    const newer = {
+      ...sampleAssessment,
+      id: 3,
+      computed_at: "2024-01-26T18:00:00Z",
+      probability_confidence: 0.62,
+    };
+    vi.mocked(getLatestResearchAssessment).mockResolvedValue(newer);
+    vi.mocked(listResearchAssessments).mockResolvedValue([newer, older]);
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /refresh latest/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/assessment history \(newest first\)/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/2024-01-26T18:00:00Z · index=0\.4600 · cov=0\.9500 · p=0\.6200/),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/2024-01-25T18:00:00Z · index=0\.4000 · cov=0\.9000 · p=null/),
+      ).toBeInTheDocument();
+      expect(listResearchAssessments).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        20,
+      );
     });
   });
 

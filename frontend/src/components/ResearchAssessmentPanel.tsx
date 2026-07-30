@@ -19,6 +19,7 @@ import {
   getResearchEvidenceSummary,
   listOutcomeLabels,
   listProbabilityCalibrations,
+  listResearchAssessments,
 } from "@/lib/api-client";
 
 type ResearchAssessmentPanelProps = {
@@ -76,11 +77,25 @@ function formatLabelHorizonSummary(labels: Record<string, number>): string {
     .join(" · ");
 }
 
+/** Compact assessment history line from API payload only (Phase 28, ADR-0029). */
+function formatAssessmentHistoryRow(row: ResearchAssessment): string {
+  const index = row.components.research_index;
+  const indexLabel =
+    typeof index === "number" ? `index=${index.toFixed(4)}` : "index=n/a";
+  const cov = `cov=${row.coverage_confidence.toFixed(4)}`;
+  const p =
+    row.probability_confidence === null
+      ? "p=null"
+      : `p=${row.probability_confidence.toFixed(4)}`;
+  return `${row.computed_at} · ${indexLabel} · ${cov} · ${p}`;
+}
+
 export function ResearchAssessmentPanel({
   symbol,
   initialLatest,
 }: ResearchAssessmentPanelProps) {
   const [latest, setLatest] = useState<ResearchAssessment | null>(initialLatest);
+  const [assessmentHistory, setAssessmentHistory] = useState<ResearchAssessment[]>([]);
   const [outcomeLabel, setOutcomeLabel] = useState<OutcomeLabel | null>(null);
   const [outcomeLabelHistory, setOutcomeLabelHistory] = useState<OutcomeLabel[]>([]);
   const [readiness, setReadiness] = useState<CalibrationReadiness | null>(null);
@@ -94,6 +109,11 @@ export function ResearchAssessmentPanel({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const baseUrl = getApiBaseUrl();
+
+  async function loadAssessmentHistory() {
+    const rows = await listResearchAssessments(baseUrl, symbol, 20);
+    setAssessmentHistory(rows);
+  }
 
   async function loadReadiness() {
     const next = await getCalibrationReadiness(baseUrl, symbol);
@@ -136,6 +156,7 @@ export function ResearchAssessmentPanel({
         setCalibration(null);
         setCalibrationHistory([]);
         setEvidenceSummary(null);
+        await loadAssessmentHistory();
         await loadReadiness();
         if (snapshot.id != null) {
           await loadOutcomeLabelHistory(snapshot.id);
@@ -159,6 +180,7 @@ export function ResearchAssessmentPanel({
         setCalibration(null);
         setCalibrationHistory([]);
         setEvidenceSummary(null);
+        await loadAssessmentHistory();
         if (snapshot.id != null) {
           await loadOutcomeLabelHistory(snapshot.id);
           await loadCalibrationHistory(snapshot.id);
@@ -168,6 +190,7 @@ export function ResearchAssessmentPanel({
       } catch (err) {
         if (err instanceof ApiClientError && err.status === 404) {
           setLatest(null);
+          setAssessmentHistory([]);
           setOutcomeLabel(null);
           setOutcomeLabelHistory([]);
           setReadiness(null);
@@ -466,6 +489,21 @@ export function ResearchAssessmentPanel({
             Computed at {latest.computed_at} from source {latest.input_source}. Research
             only — not actionable.
           </p>
+          {assessmentHistory.length > 1 ? (
+            <div className="rounded border border-aegis-line bg-white/60 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
+                Assessment history (newest first)
+              </p>
+              <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
+                {assessmentHistory.map((row) => {
+                  const line = formatAssessmentHistoryRow(row);
+                  return (
+                    <li key={row.id ?? `${row.computed_at}-${line}`}>{line}</li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
           {outcomeLabel ? (
             <div className="rounded border border-aegis-line bg-white/60 p-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">

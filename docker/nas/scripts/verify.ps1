@@ -66,7 +66,8 @@ function Write-VerifyChecklist {
     Write-Host " 26. Phase 64: frontend redeploy includes Phase 63 one-click mixed filter (unit-tested; API via item 25)"
     Write-Host " 27. Phase 66: backend redeploy includes Phase 65 prefer-mixed label backfill (limit=100 path)"
     Write-Host " 28. Authenticated evidence-summary includes Phase 67 mixed label coverage fields"
-    Write-Host " 29. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 29. Authenticated evidence-summary includes Phase 69 mixed_labeled_assessment_count (Phase 70)"
+    Write-Host " 30. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -610,6 +611,18 @@ try {
             throw "Phase 68: mixed labeled rows exist but latest_mixed_label_bar_source is null"
         }
         Write-Host "OK  Phase 68 mixed label coverage mixed_unlabeled=$mixedUnlabeled latest_mixed_label_bar_source=$mixedLabelSrc"
+        # Phase 70: explicit mixed labeled count from Phase 69.
+        if (-not ($summary.PSObject.Properties.Name -contains "mixed_labeled_assessment_count")) {
+            throw "evidence-summary missing mixed_labeled_assessment_count (Phase 69/70)"
+        }
+        if ($null -eq $summary.mixed_labeled_assessment_count -or [int]$summary.mixed_labeled_assessment_count -lt 0) {
+            throw "evidence-summary mixed_labeled_assessment_count must be >= 0"
+        }
+        $mixedLabeled = [int]$summary.mixed_labeled_assessment_count
+        if (($mixedLabeled + $mixedUnlabeled) -ne $mixedTotal) {
+            throw "Phase 70: mixed_labeled($mixedLabeled)+mixed_unlabeled($mixedUnlabeled) != mixed_count($mixedTotal)"
+        }
+        Write-Host "OK  Phase 70 mixed labeled coverage mixed_labeled=$mixedLabeled mixed_unlabeled=$mixedUnlabeled mixed_count=$mixedTotal"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -650,6 +663,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_mixed_label_bar_source")) {
             throw "evidence-summary/export missing latest_mixed_label_bar_source (Phase 67/68)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "mixed_labeled_assessment_count")) {
+            throw "evidence-summary/export missing mixed_labeled_assessment_count (Phase 69/70)"
         }
         Write-Host "OK  evidence-summary/export attachment state=research_only assessments=$($exportBody.assessment_count) provenance fields present"
     } finally {

@@ -7,10 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 69 (explicit mixed labeled count).** Evidence summary exposes
-``mixed_labeled_assessment_count`` with console “N of M mixed” (ADR-0070). Phase 68 NAS
-live verify of Phase 67 remains pending SSH restore. See
-[docs/architecture/decisions/0070-phase-69-mixed-labeled-count-evidence-summary.md](docs/architecture/decisions/0070-phase-69-mixed-labeled-count-evidence-summary.md)
+**Current phase: Phase 70 (NAS live verify of Phases 67–69).** ADR/scripts ready; live
+deploy blocked until NAS SSH (:22) is restored. See
+[docs/architecture/decisions/0071-phase-70-nas-live-verify-phases-67-69.md](docs/architecture/decisions/0071-phase-70-nas-live-verify-phases-67-69.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

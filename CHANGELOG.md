@@ -7,6 +7,24 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 70 - NAS Live Verification of Phases 67–69
+
+Ops evidence gate: redeploy under lab TLS and confirm mixed unlabeled/labeled coverage
+fields (Phases 67–69). Live deploy remains blocked while NAS SSH is down; scripts and ADR
+are committed for resume. See
+[docs/architecture/decisions/0071-phase-70-nas-live-verify-phases-67-69.md](docs/architecture/decisions/0071-phase-70-nas-live-verify-phases-67-69.md).
+
+#### Added
+
+- ADR-0071: combined live verify for ``mixed_unlabeled_assessment_count``,
+  ``mixed_labeled_assessment_count``, ``latest_mixed_label_bar_source``, and labeled+unlabeled
+  == mixed count.
+- Verify checklist item for Phase 70 mixed labeled count.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 69 - Explicit Mixed Labeled Count on Evidence Summary
 
 Add ``mixed_labeled_assessment_count`` and console “N of M mixed” so labeled vs unlabeled

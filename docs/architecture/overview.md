@@ -44,8 +44,8 @@ Phase 59), Phase 61 (assessment history component-source filter), Phase 62 (NAS 
 verify of Phase 61), Phase 63 (one-click mixed filter from evidence summary), Phase 64
 (NAS live verify of Phase 63), Phase 65 (prefer mixed in outcome-label backfill), Phase 66
 (NAS live verify of Phase 65), Phase 67 (mixed label coverage on evidence summary), Phase 68
-(NAS live verify of Phase 67; live evidence may remain pending SSH), and Phase 69 (explicit
-mixed labeled count on evidence summary).
+(NAS live verify of Phase 67; live evidence may remain pending SSH), Phase 69 (explicit
+mixed labeled count on evidence summary), and Phase 70 (NAS live verify of Phases 67–69).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -190,6 +190,9 @@ Phase 68 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0069-phase-68-nas-live-verify-phase-67.md](decisions/0069-phase-68-nas-live-verify-phase-67.md)).
 Phase 69 adds an explicit mixed labeled count and console “N of M mixed” display (see
 [decisions/0070-phase-69-mixed-labeled-count-evidence-summary.md](decisions/0070-phase-69-mixed-labeled-count-evidence-summary.md)).
+Phase 70 live-verifies Phases 67–69 on the NAS under the lab TLS profile once SSH is
+available (see
+[decisions/0071-phase-70-nas-live-verify-phases-67-69.md](decisions/0071-phase-70-nas-live-verify-phases-67-69.md)).
 
 ## System context
 

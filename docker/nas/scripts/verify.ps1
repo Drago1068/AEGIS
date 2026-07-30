@@ -57,7 +57,8 @@ function Write-VerifyChecklist {
     Write-Host " 17. Authenticated GET /research/$Symbol/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
     Write-Host " 18. Authenticated GET /research/$Symbol/evidence-summary/export -> 200 (attachment, state=research_only)"
     Write-Host " 19. SSH alembic current includes 0009|head (when SSH configured)"
-    Write-Host " 20. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 20. SSH .env.nas includes AEGIS_RESEARCH_BAR_LOAD_LIMIT in bounds (Phase 52)"
+    Write-Host " 21. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -549,6 +550,28 @@ echo "`$out" | grep -E '0009|head' >/dev/null
         throw "Alembic current did not report migration 0009 / head. Apply alembic upgrade head on the NAS."
     }
     Write-Host "OK  alembic current includes 0009 / head"
+
+    Write-Host "==> Phase 52 research bar load setting (via SSH)"
+    $barLoadCmd = @"
+set -euo pipefail
+cd '$dir'
+if grep -E '^AEGIS_RESEARCH_BAR_LOAD_LIMIT=[0-9]+' .env.nas >/dev/null; then
+  grep -E '^AEGIS_RESEARCH_BAR_LOAD_LIMIT=' .env.nas
+else
+  echo 'AEGIS_RESEARCH_BAR_LOAD_LIMIT missing from .env.nas' >&2
+  exit 1
+fi
+val=`$(grep -E '^AEGIS_RESEARCH_BAR_LOAD_LIMIT=' .env.nas | head -n1 | cut -d= -f2)
+if [ "`$val" -lt 40 ] || [ "`$val" -gt 2000 ]; then
+  echo "AEGIS_RESEARCH_BAR_LOAD_LIMIT out of bounds: `$val" >&2
+  exit 1
+fi
+"@
+    & ssh @sshArgs $remote $barLoadCmd
+    if ($LASTEXITCODE -ne 0) {
+        throw "Phase 52: AEGIS_RESEARCH_BAR_LOAD_LIMIT missing or out of bounds on NAS .env.nas (ADR-0053)."
+    }
+    Write-Host "OK  AEGIS_RESEARCH_BAR_LOAD_LIMIT present on NAS .env.nas"
 
     if (Test-NasTlsEnabled) {
         Write-Host "==> Caddy service (TLS profile)"

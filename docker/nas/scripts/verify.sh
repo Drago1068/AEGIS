@@ -46,7 +46,8 @@ print_checklist() {
   echo " 17. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
   echo " 18. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
   echo " 19. SSH alembic current includes 0009|head (when SSH configured)"
-  echo " 20. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 20. SSH .env.nas includes AEGIS_RESEARCH_BAR_LOAD_LIMIT in bounds (Phase 52)"
+  echo " 21. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -486,6 +487,23 @@ EOF
     exit 1
   fi
   echo "OK  alembic current includes 0009 / head"
+  echo "==> Phase 52 research bar load setting (via SSH)"
+  ssh "${SSH_ARGS[@]}" "${REMOTE}" bash -s <<EOF
+set -euo pipefail
+cd '${REMOTE_DIR}'
+if grep -E '^AEGIS_RESEARCH_BAR_LOAD_LIMIT=[0-9]+' .env.nas >/dev/null; then
+  grep -E '^AEGIS_RESEARCH_BAR_LOAD_LIMIT=' .env.nas
+else
+  echo 'AEGIS_RESEARCH_BAR_LOAD_LIMIT missing from .env.nas' >&2
+  exit 1
+fi
+val="\$(grep -E '^AEGIS_RESEARCH_BAR_LOAD_LIMIT=' .env.nas | head -n1 | cut -d= -f2)"
+if [ "\$val" -lt 40 ] || [ "\$val" -gt 2000 ]; then
+  echo "AEGIS_RESEARCH_BAR_LOAD_LIMIT out of bounds: \$val" >&2
+  exit 1
+fi
+EOF
+  echo "OK  AEGIS_RESEARCH_BAR_LOAD_LIMIT present on NAS .env.nas"
   if nas_tls_enabled; then
     echo "==> Caddy service (TLS profile)"
     ssh "${SSH_ARGS[@]}" "${REMOTE}" bash -s <<EOF

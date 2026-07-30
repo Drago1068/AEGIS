@@ -7,6 +7,26 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 52 - NAS Live Verification of Phase 51
+
+Ops evidence gate: redeploy under the lab TLS profile with
+``AEGIS_RESEARCH_BAR_LOAD_LIMIT=252`` and verify assessment/label backfill on the live NAS.
+See
+[docs/architecture/decisions/0053-phase-52-nas-live-verify-phase-51.md](docs/architecture/decisions/0053-phase-52-nas-live-verify-phase-51.md).
+
+#### Added
+
+- ``AEGIS_RESEARCH_BAR_LOAD_LIMIT`` wired into Compose backend environment (local + NAS
+  overlay) so ``.env.nas`` / ``.env`` values reach the container (default ``252``).
+- ADR-0053: live verify requires bar-load setting on ``.env.nas`` and retains Phase 48/50
+  coupling; new assessment persistence preferred when deeper stored bars unlock candidates.
+- Checklist / docs updates for Phase 52.
+
+#### Explicitly out of scope
+
+Ingest ``outputsize`` / re-ingest, new assessment math, default-on calibration, ACME,
+actionable promotion, orders.
+
 ### Phase 51 - Configurable Research Bar Load Limit
 
 Configurable recent-bar depth for assessment and outcome-label paths so operators can grow

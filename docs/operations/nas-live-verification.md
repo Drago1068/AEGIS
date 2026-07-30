@@ -1,4 +1,4 @@
-# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46 + Phase 48 + Phase 50)
+# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46 + Phase 48 + Phase 50 + Phase 52)
 
 This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0018](../architecture/decisions/0018-phase-17-nas-live-verification.md),
@@ -17,7 +17,8 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0045](../architecture/decisions/0045-phase-44-nas-live-verify-phase-43.md),
 [ADR-0047](../architecture/decisions/0047-phase-46-nas-live-verify-phase-45.md),
 [ADR-0049](../architecture/decisions/0049-phase-48-nas-live-verify-phase-47.md),
-[ADR-0051](../architecture/decisions/0051-phase-50-nas-live-verify-phase-49.md).
+[ADR-0051](../architecture/decisions/0051-phase-50-nas-live-verify-phase-49.md),
+[ADR-0053](../architecture/decisions/0053-phase-52-nas-live-verify-phase-51.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 
@@ -27,10 +28,12 @@ Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 
 1. Local Phase acceptance gates passed for the revision you deployed.
 2. `.env.nas` filled (not placeholders) with SSH, public URLs, and strong operator password.
-3. `package` and `deploy` completed for that revision (`alembic upgrade head` on start).
+3. For Phase 52+, ensure ``AEGIS_RESEARCH_BAR_LOAD_LIMIT=252`` (or higher within bounds) is set
+   in `.env.nas` before recreate (ADR-0053).
+4. `package` and `deploy` completed for that revision (`alembic upgrade head` on start).
    On aarch64 NAS hosts, a native on-NAS `docker compose build` is an acceptable packaging
    path when workstation cross-build is impractical.
-4. Optional TLS: `AEGIS_NAS_TLS_ENABLED=true`, HTTPS verify URLs, Secure cookies.
+5. Optional TLS: `AEGIS_NAS_TLS_ENABLED=true`, HTTPS verify URLs, Secure cookies.
 
 ## Run live verify
 
@@ -63,7 +66,7 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 8 | Authenticated `GET /research/{symbol}/assessments/latest` | 200 or **404** (empty history OK) |
 | 9 | Authenticated `GET /research/{symbol}/assessments?limit=` | **200** JSON array (`[]` OK) |
 | 10 | Authenticated `GET /research/{symbol}/assessments/export` | **200**, attachment, JSON array (`[]` OK) |
-| 11 | Authenticated `POST /research/{symbol}/assessments/backfill?limit=` | **200**, summary counts present (zeros / skips OK) |
+| 11 | Authenticated `POST /research/{symbol}/assessments/backfill?limit=` | **200**, summary counts present (zeros / skips OK; Phase 52 prefers new persists when deeper stored bars unlock candidates) |
 | 12 | Authenticated `POST /research/{symbol}/outcome-labels/backfill?limit=` | **200**, summary counts present; if step 11 `persisted_count > 0` then labels `persisted_count >= 1` (Phase 49 prefers unlabeled label-ready candidates) |
 | 13 | Authenticated `POST .../assessments/{id}/calibrations?horizon=forward_return_5` | **200** or fail-closed **422** |
 | 14 | Authenticated `GET .../assessments/{id}/calibrations` and `.../outcome-labels` | **200** JSON array (`[]` OK) |
@@ -72,7 +75,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 17 | Authenticated `GET /research/{symbol}/evidence-summary` | **200**, `state=research_only`; log present label/end-date keys only (none OK) |
 | 18 | Authenticated `GET /research/{symbol}/evidence-summary/export` | **200**, attachment, `state=research_only` |
 | 19 | SSH `alembic current` (when SSH configured) | includes **`0009`** or `head` |
-| 20 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 20 | SSH `.env.nas` `AEGIS_RESEARCH_BAR_LOAD_LIMIT` (Phase 52) | present and in **40–2000** |
+| 21 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

@@ -57,7 +57,8 @@ print_checklist() {
   echo " 28. Authenticated evidence-summary includes Phase 67 mixed label coverage fields"
   echo " 29. Authenticated evidence-summary includes Phase 69 mixed_labeled_assessment_count (Phase 70)"
   echo " 30. Phase 72: frontend redeploy includes Phase 71 corpus callout (unit-tested; readiness nested fields)"
-  echo " 31. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 31. Phase 74: frontend redeploy includes Phase 73 by_horizon mini-rows (unit-tested; nested readiness)"
+  echo " 32. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then

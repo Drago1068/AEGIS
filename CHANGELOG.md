@@ -7,6 +7,20 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 74 - NAS Live Verification of Phase 73
+
+Ops evidence gate: redeploy frontend under lab TLS with Phase 73 by_horizon mini-rows.
+Live verify passed 2026-07-30. See
+[docs/architecture/decisions/0075-phase-74-nas-live-verify-phase-73.md](docs/architecture/decisions/0075-phase-74-nas-live-verify-phase-73.md).
+
+#### Added
+
+- ADR-0075: live verify requires frontend recreate for Phase 73 horizon rows; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 73 - Per-Horizon Readiness Mini-Rows on Evidence Summary
 
 Show nested ``by_horizon`` readiness status/corpus/bucket on the evidence summary after the

@@ -7,9 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 67 (mixed label coverage on evidence summary).** Evidence summary
-exposes mixed unlabeled count and latest mixed label bar source (ADR-0068). See
-[docs/architecture/decisions/0068-phase-67-mixed-label-coverage-evidence-summary.md](docs/architecture/decisions/0068-phase-67-mixed-label-coverage-evidence-summary.md)
+**Current phase: Phase 68 (NAS live verify of Phase 67).** Redeploy under lab TLS and
+confirm mixed label coverage fields on evidence-summary (ADR-0069). See
+[docs/architecture/decisions/0069-phase-68-nas-live-verify-phase-67.md](docs/architecture/decisions/0069-phase-68-nas-live-verify-phase-67.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

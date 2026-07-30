@@ -54,7 +54,8 @@ print_checklist() {
   echo " 25. Authenticated assessments list+export with component_source=mixed (Phase 62)"
   echo " 26. Phase 64: frontend redeploy includes Phase 63 one-click mixed filter (unit-tested; API via item 25)"
   echo " 27. Phase 66: backend redeploy includes Phase 65 prefer-mixed label backfill (limit=100 path)"
-  echo " 28. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 28. Authenticated evidence-summary includes Phase 67 mixed label coverage fields"
+  echo " 29. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -531,6 +532,16 @@ if grep -qE '"mixed_component_source_assessment_count"[[:space:]]*:[[:space:]]*[
   fi
   echo "OK  Phase 62 mixed filter non-empty when mixed_count>0 (filtered=${mixed_list_count})"
 fi
+# Phase 68: mixed label coverage fields from Phase 67.
+if ! grep -q '"mixed_unlabeled_assessment_count"' "${summary_body}"; then
+  echo "evidence-summary missing mixed_unlabeled_assessment_count (Phase 67/68)" >&2
+  exit 1
+fi
+if ! grep -q '"latest_mixed_label_bar_source"' "${summary_body}"; then
+  echo "evidence-summary missing latest_mixed_label_bar_source (Phase 67/68)" >&2
+  exit 1
+fi
+echo "OK  Phase 68 mixed label coverage fields present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"

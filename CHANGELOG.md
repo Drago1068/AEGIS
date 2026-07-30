@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 68 - NAS Live Verification of Phase 67
+
+Ops evidence gate: redeploy under lab TLS and confirm mixed label coverage fields on
+evidence-summary. See
+[docs/architecture/decisions/0069-phase-68-nas-live-verify-phase-67.md](docs/architecture/decisions/0069-phase-68-nas-live-verify-phase-67.md).
+
+#### Added
+
+- ADR-0069: live verify requires ``mixed_unlabeled_assessment_count`` and
+  ``latest_mixed_label_bar_source`` on evidence-summary (+ export).
+- Verify checklist item for Phase 68 mixed label coverage.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 67 - Mixed Label Coverage on Evidence Summary
 
 Surface how many scanned mixed assessments still lack labels and the newest mixed label

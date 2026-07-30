@@ -35,7 +35,7 @@ print_checklist() {
   echo "  6. Authenticated GET /research/${symbol}/calibration-readiness -> 200"
   echo "  7. Authenticated GET /research/${symbol}/assessments/latest -> 200|404"
   echo "  8. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
-  echo "  9. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only)"
+  echo "  9. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label keys when any)"
   echo " 10. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
   echo " 11. SSH alembic current includes 0008|head (when SSH configured)"
   echo " 12. TLS profile: https:// URLs + Secure cookies when enabled"
@@ -212,7 +212,15 @@ if ! grep -q '"state"[[:space:]]*:[[:space:]]*"research_only"' "${summary_body}"
   echo "evidence-summary missing state=research_only" >&2
   exit 1
 fi
-echo "OK  evidence-summary state=research_only"
+# Phase 27: log present label keys only (never invent missing horizons).
+if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
+  echo "OK  evidence-summary state=research_only label_keys=(none)"
+elif printf '%s' "${summary_body}" | grep -q '"forward_return_'; then
+  keys="$(printf '%s' "${summary_body}" | grep -oE '"forward_return_[0-9]+"' | tr -d '"' | sort -u | paste -sd, -)"
+  echo "OK  evidence-summary state=research_only label_keys=${keys}"
+else
+  echo "OK  evidence-summary state=research_only label_keys=(none-or-empty)"
+fi
 
 export_url="${API}/research/${VERIFY_SYMBOL}/evidence-summary/export"
 export_body="$(mktemp)"

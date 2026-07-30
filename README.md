@@ -7,9 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 26 (multi-horizon outcome label surfacing).** Console shows all
-present `forward_return_*` keys from label payloads (ADR-0027). See
-[docs/architecture/decisions/0027-phase-26-multi-horizon-label-surfacing.md](docs/architecture/decisions/0027-phase-26-multi-horizon-label-surfacing.md)
+**Current phase: Phase 27 (NAS live verify of Phase 26).** Redeploy and evidence gate for
+multi-horizon label UI (ADR-0028). See
+[docs/architecture/decisions/0028-phase-27-nas-live-verify-phase-26.md](docs/architecture/decisions/0028-phase-27-nas-live-verify-phase-26.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

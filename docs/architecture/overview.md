@@ -21,8 +21,8 @@ Phase 17 (NAS live verification evidence gate), Phase 18 (on-demand calibration)
 Phase 19 (calibration history), Phase 20 (outcome label history), Phase 21
 (NAS live verify of Phases 18–20), Phase 22 (symbol research evidence summary),
 Phase 23 (NAS live verify of Phase 22), Phase 24 (evidence-summary JSON export),
-Phase 25 (NAS live verify of Phase 24), and Phase 26 (multi-horizon outcome label
-surfacing).
+Phase 25 (NAS live verify of Phase 24), Phase 26 (multi-horizon outcome label
+surfacing), and Phase 27 (NAS live verify of Phase 26).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -69,6 +69,8 @@ Phase 25 live-verifies that export on the NAS (see
 [decisions/0026-phase-25-nas-live-verify-phase-24.md](decisions/0026-phase-25-nas-live-verify-phase-24.md)).
 Phase 26 surfaces all present outcome-label horizon keys in the operator console (see
 [decisions/0027-phase-26-multi-horizon-label-surfacing.md](decisions/0027-phase-26-multi-horizon-label-surfacing.md)).
+Phase 27 live-verifies that revision on the NAS (see
+[decisions/0028-phase-27-nas-live-verify-phase-26.md](decisions/0028-phase-27-nas-live-verify-phase-26.md)).
 
 ## System context
 

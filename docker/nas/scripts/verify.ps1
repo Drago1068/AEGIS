@@ -46,7 +46,7 @@ function Write-VerifyChecklist {
     Write-Host "  6. Authenticated GET /research/$Symbol/calibration-readiness -> 200"
     Write-Host "  7. Authenticated GET /research/$Symbol/assessments/latest -> 200|404"
     Write-Host "  8. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
-    Write-Host "  9. Authenticated GET /research/$Symbol/evidence-summary -> 200 (state=research_only)"
+    Write-Host "  9. Authenticated GET /research/$Symbol/evidence-summary -> 200 (state=research_only; log present label keys when any)"
     Write-Host " 10. Authenticated GET /research/$Symbol/evidence-summary/export -> 200 (attachment, state=research_only)"
     Write-Host " 11. SSH alembic current includes 0008|head (when SSH configured)"
     Write-Host " 12. TLS profile: https:// URLs + Secure cookies when enabled"
@@ -234,7 +234,16 @@ try {
         if ($null -eq $summary.assessment_count -or [int]$summary.assessment_count -lt 0) {
             throw "evidence-summary assessment_count must be >= 0"
         }
-        Write-Host "OK  evidence-summary state=research_only assessments=$($summary.assessment_count)"
+        # Phase 27: log present label keys only (never invent missing horizons).
+        $labelKeys = @()
+        if ($null -ne $summary.latest_outcome_label -and $null -ne $summary.latest_outcome_label.labels) {
+            $labelKeys = @($summary.latest_outcome_label.labels.PSObject.Properties.Name)
+        }
+        if ($labelKeys.Count -gt 0) {
+            Write-Host "OK  evidence-summary state=research_only assessments=$($summary.assessment_count) label_keys=$($labelKeys -join ',')"
+        } else {
+            Write-Host "OK  evidence-summary state=research_only assessments=$($summary.assessment_count) label_keys=(none)"
+        }
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue

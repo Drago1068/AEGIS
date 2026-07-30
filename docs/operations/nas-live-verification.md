@@ -1,10 +1,11 @@
-# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25)
+# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27)
 
 This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0018](../architecture/decisions/0018-phase-17-nas-live-verification.md),
 [ADR-0022](../architecture/decisions/0022-phase-21-nas-live-verify-phases-18-20.md),
 [ADR-0024](../architecture/decisions/0024-phase-23-nas-live-verify-phase-22.md),
-[ADR-0026](../architecture/decisions/0026-phase-25-nas-live-verify-phase-24.md).
+[ADR-0026](../architecture/decisions/0026-phase-25-nas-live-verify-phase-24.md),
+[ADR-0028](../architecture/decisions/0028-phase-27-nas-live-verify-phase-26.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 
 **Upload ≠ verified.** Dry-run mode is **not** acceptance evidence.
@@ -47,7 +48,7 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 6 | Authenticated `GET /research/{symbol}/calibration-readiness` | 200 |
 | 7 | Authenticated `GET /research/{symbol}/assessments/latest` | 200 or **404** (empty history OK) |
 | 8 | Authenticated `GET .../assessments/{id}/calibrations` and `.../outcome-labels` | **200** JSON array (`[]` OK) |
-| 9 | Authenticated `GET /research/{symbol}/evidence-summary` | **200**, `state=research_only` |
+| 9 | Authenticated `GET /research/{symbol}/evidence-summary` | **200**, `state=research_only`; log present label keys only (none OK) |
 | 10 | Authenticated `GET /research/{symbol}/evidence-summary/export` | **200**, `Content-Disposition` attachment, `state=research_only` |
 | 11 | SSH `alembic current` (when SSH configured) | includes **`0008`** or `head` |
 | 12 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |

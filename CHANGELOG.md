@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 27 - NAS Live Verification of Phase 26
+
+Ops evidence gate: redeploy current revision (Phase 26 multi-horizon UI) and re-run live
+verify on the NAS. See
+[docs/architecture/decisions/0028-phase-27-nas-live-verify-phase-26.md](docs/architecture/decisions/0028-phase-27-nas-live-verify-phase-26.md).
+
+#### Added
+
+- ADR-0028: redeploy + verify; evidence-summary logs present label keys only.
+- `verify.ps1` / `verify.sh` log present `forward_return_*` keys when labels exist.
+
+#### Explicitly out of scope
+
+New horizons/methods, horizon-specific calibration, default-on calibration, actionable
+promotion, orders, TLS cutover.
+
 ### Phase 26 - Multi-Horizon Outcome Label Surfacing
 
 Operator console shows every horizon key present on outcome-label payloads (5 and 20

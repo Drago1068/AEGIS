@@ -66,6 +66,31 @@ class ResearchOutcomeLabelRepository:
         result = await self._session.execute(stmt)
         return [_to_data(row) for row in result.scalars().all()]
 
+    async def assessment_ids_with_labels(
+        self,
+        symbol: str,
+        assessment_ids: list[int] | tuple[int, ...],
+        *,
+        label_method_id: str,
+    ) -> set[int]:
+        """Return the subset of ``assessment_ids`` that already have a matching label row."""
+
+        if not assessment_ids:
+            return set()
+        stmt = (
+            select(ResearchAssessmentOutcomeLabel.assessment_snapshot_id)
+            .where(
+                ResearchAssessmentOutcomeLabel.symbol == symbol.upper(),
+                ResearchAssessmentOutcomeLabel.label_method_id == label_method_id,
+                ResearchAssessmentOutcomeLabel.assessment_snapshot_id.in_(
+                    list(assessment_ids)
+                ),
+            )
+            .distinct()
+        )
+        result = await self._session.execute(stmt)
+        return {int(row) for row in result.scalars().all()}
+
 
 def _to_data(row: ResearchAssessmentOutcomeLabel) -> OutcomeLabelData:
     labels: dict[str, float] = {}

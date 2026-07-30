@@ -20,8 +20,9 @@ Phase 48 is an **ops evidence gate** on the HTTPS lab profile:
 3. Additionally confirm:
    - Unauthenticated `POST .../assessments/backfill` → **401** (unchanged)
    - Authenticated `POST .../assessments/backfill?limit=` → **200** with summary counts
-   - Authenticated `POST .../outcome-labels/backfill?limit=` (verify uses ``limit=100`` so
-     older label-ready rows beneath tip assessments are in scope) → **200** with summary
+   - Authenticated `POST .../outcome-labels/backfill?limit=` → **200** with summary counts
+     (Phase 49 selection prefers unlabeled label-ready rows; verify may use default
+     ``limit=20``)
    - **Phase 48 coupling:** when assessment backfill reports ``persisted_count > 0``,
      the subsequent outcome-label backfill in the same verify run must report
      ``persisted_count >= 1`` (proves label-ready candidates). When assessment

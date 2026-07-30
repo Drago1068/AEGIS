@@ -7,7 +7,7 @@ for a future calibration phase; they are not probabilities, recommendations, or 
 from __future__ import annotations
 
 import logging
-from collections.abc import Container
+from collections.abc import Container, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
@@ -88,6 +88,16 @@ class OutcomeLabelStore(Protocol):
         symbol: str | None = None,
     ) -> list[OutcomeLabelData]:
         """Return up to ``limit`` labels for an assessment, newest first."""
+        ...
+
+    async def assessment_ids_with_labels(
+        self,
+        symbol: str,
+        assessment_ids: Sequence[int],
+        *,
+        label_method_id: str,
+    ) -> set[int]:
+        """Return the subset of ``assessment_ids`` that already have a label row."""
         ...
 
 
@@ -288,6 +298,48 @@ class OutcomeLabelService:
             },
         )
         return await self._label_store.insert(label)
+
+    async def assessment_ids_with_labels(
+        self,
+        symbol: str,
+        assessment_ids: list[int],
+        *,
+        label_method_id: str = LABEL_METHOD_ID,
+    ) -> set[int]:
+        """Return assessment ids that already have a label for ``label_method_id``."""
+
+        return await self._label_store.assessment_ids_with_labels(
+            symbol,
+            assessment_ids,
+            label_method_id=label_method_id,
+        )
+
+    async def select_backfill_candidates(
+        self,
+        symbol: str,
+        snapshots_newest_first: list[ResearchAssessmentSnapshotData],
+        limit: int,
+    ) -> list[tuple[str, int]]:
+        """Prefer unlabeled, label-ready assessments for Phase 49 backfill (ADR-0050)."""
+
+        from aegis.domain.research_outcome_label_backfill import (
+            label_ready_as_of_dates,
+            select_label_backfill_candidates,
+        )
+
+        ids = [snapshot.id for snapshot in snapshots_newest_first if snapshot.id is not None]
+        labeled_ids = await self.assessment_ids_with_labels(symbol, ids)
+        bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
+        ready_dates = label_ready_as_of_dates(
+            bars,
+            calendar_name=self._calendar_name,
+        )
+        return select_label_backfill_candidates(
+            snapshots_newest_first,
+            labeled_assessment_ids=labeled_ids,
+            limit=limit,
+            label_ready_as_of=ready_dates,
+        )
 
     async def latest_label_for_assessment(
         self, assessment_snapshot_id: int

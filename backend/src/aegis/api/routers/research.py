@@ -159,17 +159,16 @@ async def backfill_outcome_labels(
     assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
     label_service: OutcomeLabelService = Depends(get_outcome_label_service),
 ) -> OutcomeLabelBackfillResponse:
-    """Re-attempt Phase 13 labeling over recent assessment history (ADR-0044).
+    """Re-attempt Phase 13 labeling over unlabeled label-ready assessments (ADR-0050).
 
     Always returns 200 with a per-assessment summary. Individual fail-closed skips do not
     abort the batch. Does not invent probability_confidence or enable auto-calibration.
     """
 
-    snapshots = await assessment_service.list_assessments(symbol, limit)
-    pairs: list[tuple[str, int]] = []
-    for snapshot in snapshots:
-        if snapshot.id is not None:
-            pairs.append((snapshot.symbol, snapshot.id))
+    from aegis.domain.research_outcome_label_backfill import BACKFILL_SCAN_LIMIT
+
+    snapshots = await assessment_service.list_assessments(symbol, BACKFILL_SCAN_LIMIT)
+    pairs = await label_service.select_backfill_candidates(symbol, snapshots, limit)
     summary = await run_outcome_labels_after_assessments(pairs, label_service)
     return OutcomeLabelBackfillResponse(
         symbol=symbol.upper(),

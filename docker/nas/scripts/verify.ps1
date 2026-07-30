@@ -315,7 +315,7 @@ try {
     }
 
     # Phase 44/48: outcome-label backfill (always 200 summary; Phase 48 coupling when assessments persisted).
-    $backfillUrl = "$api/research/$verifySymbol/outcome-labels/backfill?limit=100"
+    $backfillUrl = "$api/research/$verifySymbol/outcome-labels/backfill?limit=20"
     $backfillPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.backfill.json" -f [guid]::NewGuid().ToString("N"))
     try {
         $backfillCode = & curl.exe -sS @curlInsecure -o $backfillPath -w "%{http_code}" --max-time 60 `

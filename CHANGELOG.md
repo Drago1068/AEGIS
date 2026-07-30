@@ -7,6 +7,24 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 49 - Prefer Unlabeled Label-Ready Outcome-Label Backfill
+
+Prefer unlabeled assessments with stored forward-horizon closes so default ``limit=20``
+grows the labeled corpus without tip / already-labeled waste. See
+[docs/architecture/decisions/0050-phase-49-prefer-unlabeled-label-backfill.md](docs/architecture/decisions/0050-phase-49-prefer-unlabeled-label-backfill.md).
+
+#### Changed
+
+- ``POST .../outcome-labels/backfill`` scans up to 100 assessments, omits rows that already
+  have ``forward_total_return_v1`` labels or lack forward-horizon closes, then labels up to
+  ``limit`` remaining candidates (ADR-0050).
+- NAS verify outcome-label backfill uses ``limit=20`` again (Phase 48 coupling retained).
+
+#### Explicitly out of scope
+
+Raising ``BAR_LOAD_LIMIT``, auto-chaining assessment→label backfill, default-on calibration,
+actionable promotion, orders, ACME.
+
 ### Phase 48 - NAS Live Verification of Phase 47
 
 Ops evidence gate: redeploy under the lab TLS profile and verify label-ready assessment

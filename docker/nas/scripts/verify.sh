@@ -288,7 +288,7 @@ assess_persisted="$(
 )"
 echo "OK  assessments/backfill summary counts present (persisted=${assess_persisted})"
 
-backfill_url="${API}/research/${VERIFY_SYMBOL}/outcome-labels/backfill?limit=100"
+backfill_url="${API}/research/${VERIFY_SYMBOL}/outcome-labels/backfill?limit=20"
 backfill_body="$(mktemp)"
 cleanup() { rm -f "${COOKIE_JAR}" "${ready_body}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${assess_backfill_body}" "${backfill_body}"; }
 trap cleanup EXIT

@@ -63,7 +63,7 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 9 | Authenticated `GET /research/{symbol}/assessments?limit=` | **200** JSON array (`[]` OK) |
 | 10 | Authenticated `GET /research/{symbol}/assessments/export` | **200**, attachment, JSON array (`[]` OK) |
 | 11 | Authenticated `POST /research/{symbol}/assessments/backfill?limit=` | **200**, summary counts present (zeros / skips OK) |
-| 12 | Authenticated `POST /research/{symbol}/outcome-labels/backfill?limit=` (verify uses **100**) | **200**, summary counts present; if step 11 `persisted_count > 0` then labels `persisted_count >= 1` |
+| 12 | Authenticated `POST /research/{symbol}/outcome-labels/backfill?limit=` | **200**, summary counts present; if step 11 `persisted_count > 0` then labels `persisted_count >= 1` (Phase 49 prefers unlabeled label-ready candidates) |
 | 13 | Authenticated `POST .../assessments/{id}/calibrations?horizon=forward_return_5` | **200** or fail-closed **422** |
 | 14 | Authenticated `GET .../assessments/{id}/calibrations` and `.../outcome-labels` | **200** JSON array (`[]` OK) |
 | 15 | Authenticated `GET .../assessments/{id}/outcome-labels/export` | **200**, attachment, JSON array (`[]` OK) |

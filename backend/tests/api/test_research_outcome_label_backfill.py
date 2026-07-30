@@ -1,4 +1,4 @@
-"""API tests for research outcome-label backfill (Phase 43, ADR-0044)."""
+"""API tests for research outcome-label backfill (Phase 43/49)."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from aegis.domain.research_assessment import (
     STATE_RESEARCH_ONLY,
     ResearchAssessmentSnapshotData,
 )
+from aegis.domain.research_outcome_label_backfill import BACKFILL_SCAN_LIMIT
 from aegis.domain.research_outcome_labels import (
     LABEL_METHOD_ID,
     OutcomeLabelData,
@@ -99,9 +100,29 @@ class _FakeOutcomeLabelService:
         self,
         *,
         fail_ids: set[int] | None = None,
+        selected: list[tuple[str, int]] | None = None,
     ) -> None:
         self._fail_ids = fail_ids or set()
+        self._selected = selected
         self.label_calls: list[tuple[str, int]] = []
+        self.select_calls: list[tuple[str, int, int]] = []
+
+    async def select_backfill_candidates(
+        self,
+        symbol: str,
+        snapshots: list[ResearchAssessmentSnapshotData],
+        limit: int,
+    ) -> list[tuple[str, int]]:
+        self.select_calls.append((symbol, len(snapshots), limit))
+        if self._selected is not None:
+            return self._selected[:limit]
+        pairs: list[tuple[str, int]] = []
+        for snapshot in snapshots:
+            if snapshot.id is not None:
+                pairs.append((snapshot.symbol, snapshot.id))
+            if len(pairs) >= limit:
+                break
+        return pairs
 
     async def label_assessment(self, symbol: str, assessment_id: int) -> OutcomeLabelData:
         self.label_calls.append((symbol, assessment_id))
@@ -145,8 +166,25 @@ async def test_backfill_persists_and_skips_fail_closed() -> None:
     assert body["outcomes"][1]["persisted"] is False
     assert body["outcomes"][1]["reason"] == "insufficient_forward_bars"
     assert "not advice" in body["detail"]
-    assert assessment_service.list_calls == [("AAPL", 20)]
+    assert assessment_service.list_calls == [("AAPL", BACKFILL_SCAN_LIMIT)]
+    assert label_service.select_calls == [("AAPL", 2, 20)]
     assert label_service.label_calls == [("AAPL", 2), ("AAPL", 1)]
+
+
+async def test_backfill_uses_selected_unlabeled_candidates_only() -> None:
+    assessment_service = _FakeAssessmentService(
+        [_snapshot(snapshot_id=3), _snapshot(snapshot_id=2), _snapshot(snapshot_id=1)]
+    )
+    label_service = _FakeOutcomeLabelService(selected=[("AAPL", 1)])
+
+    async with _client(assessment_service, label_service) as client:
+        response = await client.post("/research/AAPL/outcome-labels/backfill?limit=20")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["assessment_count"] == 1
+    assert body["persisted_count"] == 1
+    assert label_service.label_calls == [("AAPL", 1)]
 
 
 async def test_backfill_empty_history_returns_zero_counts() -> None:
@@ -164,3 +202,4 @@ async def test_backfill_empty_history_returns_zero_counts() -> None:
     assert body["skipped_count"] == 0
     assert body["outcomes"] == []
     assert label_service.label_calls == []
+    assert assessment_service.list_calls == [("aapl", BACKFILL_SCAN_LIMIT)]

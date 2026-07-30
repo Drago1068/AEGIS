@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 64 - NAS Live Verification of Phase 63
+
+Ops evidence gate: redeploy under lab TLS so the one-click mixed history filter is live.
+See
+[docs/architecture/decisions/0065-phase-64-nas-live-verify-phase-63.md](docs/architecture/decisions/0065-phase-64-nas-live-verify-phase-63.md).
+
+#### Added
+
+- ADR-0065: live verify requires frontend recreate + full verify (Phase 62 mixed API retained;
+  console one-click covered by Phase 63 unit tests).
+- Verify checklist item for Phase 64 frontend redeploy.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 63 - One-Click Mixed Filter from Evidence Summary
 
 Operator console: jump from evidence-summary mixed count to filtered assessment history.

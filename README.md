@@ -7,9 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 63 (one-click mixed filter from evidence summary).** Console control
-applies history ``component_source=mixed`` from the evidence mixed count (ADR-0064). See
-[docs/architecture/decisions/0064-phase-63-one-click-mixed-filter.md](docs/architecture/decisions/0064-phase-63-one-click-mixed-filter.md)
+**Current phase: Phase 64 (NAS live verify of Phase 63).** Redeploy under lab TLS so the
+one-click mixed history filter is live (ADR-0065). See
+[docs/architecture/decisions/0065-phase-64-nas-live-verify-phase-63.md](docs/architecture/decisions/0065-phase-64-nas-live-verify-phase-63.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

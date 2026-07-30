@@ -63,7 +63,8 @@ function Write-VerifyChecklist {
     Write-Host " 23. Authenticated POST outcome-labels/backfill?limit=100 (Phase 58 source-aware throughput)"
     Write-Host " 24. Authenticated evidence-summary includes Phase 59 provenance fields"
     Write-Host " 25. Authenticated assessments list+export with component_source=mixed (Phase 62)"
-    Write-Host " 26. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 26. Phase 64: frontend redeploy includes Phase 63 one-click mixed filter (unit-tested; API via item 25)"
+    Write-Host " 27. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {

@@ -52,7 +52,8 @@ print_checklist() {
   echo " 23. Authenticated POST outcome-labels/backfill?limit=100 (Phase 58 source-aware throughput)"
   echo " 24. Authenticated evidence-summary includes Phase 59 provenance fields"
   echo " 25. Authenticated assessments list+export with component_source=mixed (Phase 62)"
-  echo " 26. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 26. Phase 64: frontend redeploy includes Phase 63 one-click mixed filter (unit-tested; API via item 25)"
+  echo " 27. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then

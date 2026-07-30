@@ -592,6 +592,20 @@ export function ResearchAssessmentPanel({
               <dd className="font-mono">{evidenceSummary.calibration_readiness.status}</dd>
             </div>
             <div>
+              <dt className="text-aegis-muted">Calibration corpus (readiness)</dt>
+              <dd className="font-mono">
+                {evidenceSummary.calibration_readiness.corpus_count} / min{" "}
+                {evidenceSummary.calibration_readiness.min_corpus}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-aegis-muted">Calibration bucket (readiness)</dt>
+              <dd className="font-mono">
+                {evidenceSummary.calibration_readiness.bucket_count} / min{" "}
+                {evidenceSummary.calibration_readiness.min_bucket}
+              </dd>
+            </div>
+            <div>
               <dt className="text-aegis-muted">Assessments (≤100)</dt>
               <dd className="font-mono">{evidenceSummary.assessment_count}</dd>
             </div>

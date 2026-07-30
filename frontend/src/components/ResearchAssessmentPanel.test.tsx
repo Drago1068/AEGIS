@@ -432,6 +432,10 @@ describe("ResearchAssessmentPanel", () => {
     await waitFor(() => {
       expect(screen.getByText(/evidence summary \(research-only/i)).toBeInTheDocument();
       expect(screen.getByText(/assessments \(≤100\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/calibration corpus \(readiness\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/12 \/ min 10/)).toBeInTheDocument();
+      expect(screen.getByText(/calibration bucket \(readiness\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/6 \/ min 5/)).toBeInTheDocument();
       expect(screen.getByText("1 / 1")).toBeInTheDocument();
       expect(screen.getByText(/latest component source/i)).toBeInTheDocument();
       expect(

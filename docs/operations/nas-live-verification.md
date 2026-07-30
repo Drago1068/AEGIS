@@ -94,7 +94,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 27 | Phase 66 backend redeploy (Phase 65 prefer-mixed label backfill) | Backend recreated; ``outcome-labels/backfill?limit=100`` **200** |
 | 28 | Authenticated evidence-summary mixed label coverage (Phase 68) | ``mixed_unlabeled_assessment_count``, ``latest_mixed_label_bar_source`` present |
 | 29 | Authenticated evidence-summary mixed labeled count (Phase 70) | ``mixed_labeled_assessment_count`` present; labeled+unlabeled == mixed count |
-| 30 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 30 | Phase 72 frontend redeploy (Phase 71 corpus callout) | Frontend recreated; corpus UI unit-tested; nested readiness fields on summary |
+| 31 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

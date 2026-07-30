@@ -45,7 +45,8 @@ verify of Phase 61), Phase 63 (one-click mixed filter from evidence summary), Ph
 (NAS live verify of Phase 63), Phase 65 (prefer mixed in outcome-label backfill), Phase 66
 (NAS live verify of Phase 65), Phase 67 (mixed label coverage on evidence summary), Phase 68
 (NAS live verify of Phase 67; live evidence may remain pending SSH), Phase 69 (explicit
-mixed labeled count on evidence summary), and Phase 70 (NAS live verify of Phases 67–69).
+mixed labeled count on evidence summary), Phase 70 (NAS live verify of Phases 67–69), Phase 71 (calibration corpus callout on evidence
+summary), and Phase 72 (NAS live verify of Phase 71 / pending 67–70).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -193,6 +194,11 @@ Phase 69 adds an explicit mixed labeled count and console “N of M mixed” dis
 Phase 70 live-verifies Phases 67–69 on the NAS under the lab TLS profile once SSH is
 available (see
 [decisions/0071-phase-70-nas-live-verify-phases-67-69.md](decisions/0071-phase-70-nas-live-verify-phases-67-69.md)).
+Phase 71 surfaces calibration corpus and bucket counts from nested readiness on the
+evidence summary console (see
+[decisions/0072-phase-71-calibration-corpus-callout-evidence-summary.md](decisions/0072-phase-71-calibration-corpus-callout-evidence-summary.md)).
+Phase 72 live-verifies Phase 71 (and pending 67–70) on the NAS once SSH is available (see
+[decisions/0073-phase-72-nas-live-verify-phase-71.md](decisions/0073-phase-72-nas-live-verify-phase-71.md)).
 
 ## System context
 

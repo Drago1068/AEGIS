@@ -7,6 +7,34 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 72 - NAS Live Verification of Phase 71 (and pending 67–70)
+
+Ops evidence gate: redeploy under lab TLS once SSH is restored; Phase 70 checks remain
+mandatory. See
+[docs/architecture/decisions/0073-phase-72-nas-live-verify-phase-71.md](docs/architecture/decisions/0073-phase-72-nas-live-verify-phase-71.md).
+
+#### Added
+
+- ADR-0073: combined resume gate for Phases 67–71 when NAS SSH recovers.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 71 - Calibration Corpus Callout on Evidence Summary
+
+Show readiness ``corpus_count`` / ``min_corpus`` and bucket counts on the evidence summary
+next to mixed label coverage. See
+[docs/architecture/decisions/0072-phase-71-calibration-corpus-callout-evidence-summary.md](docs/architecture/decisions/0072-phase-71-calibration-corpus-callout-evidence-summary.md).
+
+#### Added
+
+- Evidence-summary console rows for calibration corpus and bucket from nested readiness.
+
+#### Explicitly out of scope
+
+New API fields, Phase 70 NAS live verify (SSH-blocked), default-on calibration, orders.
+
 ### Phase 70 - NAS Live Verification of Phases 67–69
 
 Ops evidence gate: redeploy under lab TLS and confirm mixed unlabeled/labeled coverage

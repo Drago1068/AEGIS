@@ -67,7 +67,8 @@ function Write-VerifyChecklist {
     Write-Host " 27. Phase 66: backend redeploy includes Phase 65 prefer-mixed label backfill (limit=100 path)"
     Write-Host " 28. Authenticated evidence-summary includes Phase 67 mixed label coverage fields"
     Write-Host " 29. Authenticated evidence-summary includes Phase 69 mixed_labeled_assessment_count (Phase 70)"
-    Write-Host " 30. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 30. Phase 72: frontend redeploy includes Phase 71 corpus callout (unit-tested; readiness nested fields)"
+    Write-Host " 31. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {

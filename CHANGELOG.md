@@ -7,6 +7,20 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 80 - NAS Live Verification of Phase 79
+
+Ops evidence gate: redeploy backend+frontend under lab TLS and confirm
+``most_recent_labeled_*`` on evidence-summary. See
+[docs/architecture/decisions/0081-phase-80-nas-live-verify-phase-79.md](docs/architecture/decisions/0081-phase-80-nas-live-verify-phase-79.md).
+
+#### Added
+
+- ADR-0081: live verify requires nested most-recent labeled fields; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 79 - Most-Recent Labeled Outcome on Evidence Summary
 
 Surface the newest labeled assessment in the ≤100 scan when the absolute latest is still

@@ -69,7 +69,8 @@ function Write-VerifyChecklist {
     Write-Host " 29. Authenticated evidence-summary includes Phase 69 mixed_labeled_assessment_count (Phase 70)"
     Write-Host " 30. Phase 72: frontend redeploy includes Phase 71 corpus callout (unit-tested; readiness nested fields)"
     Write-Host " 31. Phase 74: frontend redeploy includes Phase 73 by_horizon mini-rows (unit-tested; nested readiness)"
-    Write-Host " 32. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 32. Authenticated evidence-summary nested calibration_readiness.by_horizon includes fwd5+fwd20 (Phase 75)"
+    Write-Host " 33. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -625,6 +626,23 @@ try {
             throw "Phase 70: mixed_labeled($mixedLabeled)+mixed_unlabeled($mixedUnlabeled) != mixed_count($mixedTotal)"
         }
         Write-Host "OK  Phase 70 mixed labeled coverage mixed_labeled=$mixedLabeled mixed_unlabeled=$mixedUnlabeled mixed_count=$mixedTotal"
+        # Phase 75: nested readiness by_horizon on evidence-summary (Phase 73 UI contract).
+        if ($null -eq $summary.calibration_readiness) {
+            throw "evidence-summary missing calibration_readiness (Phase 75)"
+        }
+        if ($null -eq $summary.calibration_readiness.by_horizon) {
+            throw "evidence-summary.calibration_readiness missing by_horizon (Phase 75)"
+        }
+        $summaryHorizonKeys = @(
+            $summary.calibration_readiness.by_horizon | ForEach-Object { [string]$_.outcome_horizon_key }
+        )
+        foreach ($required in @("forward_return_5", "forward_return_20")) {
+            if ($summaryHorizonKeys -notcontains $required) {
+                throw ("evidence-summary.calibration_readiness.by_horizon missing {0} (got: {1})" -f `
+                    $required, ($summaryHorizonKeys -join ","))
+            }
+        }
+        Write-Host ("OK  Phase 75 evidence-summary by_horizon keys={0}" -f ($summaryHorizonKeys -join ","))
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -668,6 +686,17 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "mixed_labeled_assessment_count")) {
             throw "evidence-summary/export missing mixed_labeled_assessment_count (Phase 69/70)"
+        }
+        if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
+            throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"
+        }
+        $exportHorizonKeys = @(
+            $exportBody.calibration_readiness.by_horizon | ForEach-Object { [string]$_.outcome_horizon_key }
+        )
+        foreach ($required in @("forward_return_5", "forward_return_20")) {
+            if ($exportHorizonKeys -notcontains $required) {
+                throw ("evidence-summary/export.calibration_readiness.by_horizon missing {0}" -f $required)
+            }
         }
         Write-Host "OK  evidence-summary/export attachment state=research_only assessments=$($exportBody.assessment_count) provenance fields present"
     } finally {

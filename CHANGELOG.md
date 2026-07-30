@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 75 - Evidence-Summary Nested by_horizon Verify Assertion
+
+Ops hardening: assert authenticated evidence-summary (+ export) nested
+``calibration_readiness.by_horizon`` includes ``forward_return_5`` and ``forward_return_20``.
+See
+[docs/architecture/decisions/0076-phase-75-evidence-summary-by-horizon-verify.md](docs/architecture/decisions/0076-phase-75-evidence-summary-by-horizon-verify.md).
+
+#### Added
+
+- ADR-0076 and verify checklist item for nested evidence-summary ``by_horizon`` keys.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 74 - NAS Live Verification of Phase 73
 
 Ops evidence gate: redeploy frontend under lab TLS with Phase 73 by_horizon mini-rows.

@@ -7,9 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 75 draft (evidence-summary by_horizon verify assertion).** Next:
-assert nested ``calibration_readiness.by_horizon`` on authenticated evidence-summary in
-`verify.ps1` / `verify.sh`. Phase 74 live verify closed. See [CHANGELOG.md](CHANGELOG.md).
+**Current phase: Phase 75 (evidence-summary by_horizon verify assertion).** Assert nested
+``calibration_readiness.by_horizon`` on evidence-summary in `verify.ps1` / `verify.sh`
+(ADR-0076). See
+[docs/architecture/decisions/0076-phase-75-evidence-summary-by-horizon-verify.md](docs/architecture/decisions/0076-phase-75-evidence-summary-by-horizon-verify.md)
+and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
 

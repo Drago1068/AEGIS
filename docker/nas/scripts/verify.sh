@@ -58,7 +58,8 @@ print_checklist() {
   echo " 29. Authenticated evidence-summary includes Phase 69 mixed_labeled_assessment_count (Phase 70)"
   echo " 30. Phase 72: frontend redeploy includes Phase 71 corpus callout (unit-tested; readiness nested fields)"
   echo " 31. Phase 74: frontend redeploy includes Phase 73 by_horizon mini-rows (unit-tested; nested readiness)"
-  echo " 32. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 32. Authenticated evidence-summary nested calibration_readiness.by_horizon includes fwd5+fwd20 (Phase 75)"
+  echo " 33. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -550,6 +551,16 @@ if ! grep -q '"mixed_labeled_assessment_count"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 70 mixed labeled coverage field present"
+# Phase 75: nested readiness by_horizon on evidence-summary (Phase 73 UI contract).
+if ! grep -q '"by_horizon"' "${summary_body}"; then
+  echo "evidence-summary.calibration_readiness missing by_horizon (Phase 75)" >&2
+  exit 1
+fi
+if ! grep -q 'forward_return_5' "${summary_body}" || ! grep -q 'forward_return_20' "${summary_body}"; then
+  echo "evidence-summary.calibration_readiness.by_horizon missing forward_return_5/20 (Phase 75)" >&2
+  exit 1
+fi
+echo "OK  Phase 75 evidence-summary by_horizon includes forward_return_5 and forward_return_20"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -587,6 +598,14 @@ if ! grep -qi 'content-disposition:.*attachment' "${export_headers}"; then
 fi
 if ! grep -q '"state"[[:space:]]*:[[:space:]]*"research_only"' "${export_body}"; then
   echo "evidence-summary/export missing state=research_only" >&2
+  exit 1
+fi
+if ! grep -q '"by_horizon"' "${export_body}"; then
+  echo "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)" >&2
+  exit 1
+fi
+if ! grep -q 'forward_return_5' "${export_body}" || ! grep -q 'forward_return_20' "${export_body}"; then
+  echo "evidence-summary/export.calibration_readiness.by_horizon missing forward_return_5/20 (Phase 75)" >&2
   exit 1
 fi
 echo "OK  evidence-summary/export attachment state=research_only"

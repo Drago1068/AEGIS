@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 39 - NAS Live Verification of Phase 38
+
+Ops evidence gate: redeploy current revision and verify
+`GET /research/{symbol}/assessments/export` on the live NAS. See
+[docs/architecture/decisions/0040-phase-39-nas-live-verify-phase-38.md](docs/architecture/decisions/0040-phase-39-nas-live-verify-phase-38.md).
+
+#### Added
+
+- ADR-0040: live verify includes assessments export (401 unauth; attachment array when auth).
+- `verify.ps1` / `verify.sh` assessments export auth gate + authenticated attachment check.
+
+#### Explicitly out of scope
+
+New assessment methods, default-on calibration, actionable promotion, orders, TLS cutover.
+
 ### Phase 38 - Assessment History JSON Export
 
 Authenticated download of append-only research assessments for a symbol. See

@@ -29,20 +29,21 @@ print_checklist() {
   echo "Live verification checklist (ADR-0018):"
   echo "  1. GET /health -> 200"
   echo "  2. GET /ready -> 200"
-  echo "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list, calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export)"
+  echo "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list(+export), calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export)"
   echo "  4. Frontend base URL -> 200|302|307|308"
   echo "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
   echo "  6. Authenticated GET /research/${symbol}/calibration-readiness -> 200"
   echo "  7. Authenticated GET /research/${symbol}/calibration-readiness/export -> 200 (attachment)"
   echo "  8. Authenticated GET /research/${symbol}/assessments/latest -> 200|404"
   echo "  9. Authenticated GET /research/${symbol}/assessments?limit= -> 200 (JSON array; [] OK)"
-  echo " 10. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
-  echo " 11. Authenticated GET .../assessments/{id}/outcome-labels/export -> 200 (attachment, JSON array; [] OK)"
-  echo " 12. Authenticated GET .../assessments/{id}/calibrations/export -> 200 (attachment, JSON array; [] OK)"
-  echo " 13. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
-  echo " 14. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
-  echo " 15. SSH alembic current includes 0008|head (when SSH configured)"
-  echo " 16. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 10. Authenticated GET /research/${symbol}/assessments/export -> 200 (attachment, JSON array; [] OK)"
+  echo " 11. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
+  echo " 12. Authenticated GET .../assessments/{id}/outcome-labels/export -> 200 (attachment, JSON array; [] OK)"
+  echo " 13. Authenticated GET .../assessments/{id}/calibrations/export -> 200 (attachment, JSON array; [] OK)"
+  echo " 14. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
+  echo " 15. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
+  echo " 16. SSH alembic current includes 0008|head (when SSH configured)"
+  echo " 17. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -133,6 +134,7 @@ assert_status "GET ${API}/watchlist" "$(http_status "${API}/watchlist")" 401
 assert_status "GET ${API}/market-data/${VERIFY_SYMBOL}/daily-bars" "$(http_status "${API}/market-data/${VERIFY_SYMBOL}/daily-bars")" 401
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/assessments/latest" "$(http_status "${API}/research/${VERIFY_SYMBOL}/assessments/latest")" 401
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/assessments" "$(http_status "${API}/research/${VERIFY_SYMBOL}/assessments")" 401
+assert_status "GET ${API}/research/${VERIFY_SYMBOL}/assessments/export" "$(http_status "${API}/research/${VERIFY_SYMBOL}/assessments/export")" 401
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/calibration-readiness" "$(http_status "${API}/research/${VERIFY_SYMBOL}/calibration-readiness")" 401
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/calibration-readiness/export" "$(http_status "${API}/research/${VERIFY_SYMBOL}/calibration-readiness/export")" 401
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/assessments/1/outcome-labels/export" "$(http_status "${API}/research/${VERIFY_SYMBOL}/assessments/1/outcome-labels/export")" 401
@@ -200,6 +202,26 @@ if ! head -c 1 "${assess_body}" | grep -q '\['; then
 fi
 echo "OK  assessments list is JSON array"
 
+assess_export_url="${API}/research/${VERIFY_SYMBOL}/assessments/export?limit=20"
+assess_export_body="$(mktemp)"
+assess_export_headers="$(mktemp)"
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}"; }
+trap cleanup EXIT
+assess_export_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -D "${assess_export_headers}" -o "${assess_export_body}" -w "%{http_code}" --max-time 30 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" "${assess_export_url}"
+)"
+assert_status "GET ${assess_export_url} (auth)" "${assess_export_code}" 200
+if ! grep -qi 'content-disposition:.*attachment' "${assess_export_headers}"; then
+  echo "assessments/export missing Content-Disposition attachment" >&2
+  exit 1
+fi
+if ! head -c 1 "${assess_export_body}" | grep -q '\['; then
+  echo "assessments/export body is not a JSON array" >&2
+  exit 1
+fi
+echo "OK  assessments/export attachment JSON array"
+
 history_assessment_id=1
 if [[ "${latest_code}" == "200" ]]; then
   latest_json="$(
@@ -217,7 +239,7 @@ calib_list_url="${API}/research/${VERIFY_SYMBOL}/assessments/${history_assessmen
 label_list_url="${API}/research/${VERIFY_SYMBOL}/assessments/${history_assessment_id}/outcome-labels"
 calib_body="$(mktemp)"
 label_body="$(mktemp)"
-cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${calib_body}" "${label_body}"; }
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${calib_body}" "${label_body}"; }
 trap cleanup EXIT
 
 calib_code="$(
@@ -245,7 +267,7 @@ echo "OK  outcome-labels list is JSON array"
 label_export_url="${API}/research/${VERIFY_SYMBOL}/assessments/${history_assessment_id}/outcome-labels/export?limit=20"
 label_export_body="$(mktemp)"
 label_export_headers="$(mktemp)"
-cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}"; }
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}"; }
 trap cleanup EXIT
 label_export_code="$(
   curl -sS "${CURL_INSECURE[@]}" -D "${label_export_headers}" -o "${label_export_body}" -w "%{http_code}" --max-time 30 \
@@ -265,7 +287,7 @@ echo "OK  outcome-labels/export attachment JSON array"
 calib_export_url="${API}/research/${VERIFY_SYMBOL}/assessments/${history_assessment_id}/calibrations/export?limit=20"
 calib_export_body="$(mktemp)"
 calib_export_headers="$(mktemp)"
-cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}" "${calib_export_body}" "${calib_export_headers}"; }
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}" "${calib_export_body}" "${calib_export_headers}"; }
 trap cleanup EXIT
 calib_export_code="$(
   curl -sS "${CURL_INSECURE[@]}" -D "${calib_export_headers}" -o "${calib_export_body}" -w "%{http_code}" --max-time 30 \
@@ -284,7 +306,7 @@ echo "OK  calibrations/export attachment JSON array"
 
 summary_url="${API}/research/${VERIFY_SYMBOL}/evidence-summary"
 summary_body="$(mktemp)"
-cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}" "${calib_export_body}" "${calib_export_headers}" "${summary_body}"; }
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}" "${calib_export_body}" "${calib_export_headers}" "${summary_body}"; }
 trap cleanup EXIT
 summary_code="$(
   curl -sS "${CURL_INSECURE[@]}" -o "${summary_body}" -w "%{http_code}" --max-time 30 \
@@ -319,7 +341,7 @@ fi
 export_url="${API}/research/${VERIFY_SYMBOL}/evidence-summary/export"
 export_body="$(mktemp)"
 export_headers="$(mktemp)"
-cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}" "${calib_export_body}" "${calib_export_headers}" "${summary_body}" "${export_body}" "${export_headers}"; }
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}" "${calib_export_body}" "${calib_export_headers}" "${summary_body}" "${export_body}" "${export_headers}"; }
 trap cleanup EXIT
 export_code="$(
   curl -sS "${CURL_INSECURE[@]}" -D "${export_headers}" -o "${export_body}" -w "%{http_code}" --max-time 30 \

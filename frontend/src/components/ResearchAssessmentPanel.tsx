@@ -619,7 +619,28 @@ export function ResearchAssessmentPanel({
             <div>
               <dt className="text-aegis-muted">Mixed-source assessments (scanned)</dt>
               <dd className="font-mono">
-                {evidenceSummary.mixed_component_source_assessment_count}
+                {evidenceSummary.mixed_component_source_assessment_count > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onAssessmentSourceFilterChange("mixed");
+                      const history = document.getElementById("assessment-history");
+                      if (history && typeof history.scrollIntoView === "function") {
+                        history.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                      }
+                    }}
+                    disabled={isPending}
+                    className="underline decoration-aegis-line underline-offset-2 hover:text-aegis-ink disabled:opacity-60"
+                    aria-label="Filter assessment history to mixed component source"
+                  >
+                    {evidenceSummary.mixed_component_source_assessment_count}
+                    <span className="ml-1 font-sans text-xs font-normal text-aegis-muted">
+                      (show in history)
+                    </span>
+                  </button>
+                ) : (
+                  evidenceSummary.mixed_component_source_assessment_count
+                )}
               </dd>
             </div>
             <div>
@@ -742,7 +763,10 @@ export function ResearchAssessmentPanel({
             Computed at {latest.computed_at} from source {latest.input_source}. Research
             only — not actionable.
           </p>
-          <div className="rounded border border-aegis-line bg-white/60 p-3">
+          <div
+            id="assessment-history"
+            className="rounded border border-aegis-line bg-white/60 p-3"
+          >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
                 Assessment history (newest first)

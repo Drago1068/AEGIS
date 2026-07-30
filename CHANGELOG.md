@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 63 - One-Click Mixed Filter from Evidence Summary
+
+Operator console: jump from evidence-summary mixed count to filtered assessment history.
+See
+[docs/architecture/decisions/0064-phase-63-one-click-mixed-filter.md](docs/architecture/decisions/0064-phase-63-one-click-mixed-filter.md).
+
+#### Added
+
+- Evidence-summary mixed-count control applies history ``component_source=mixed`` filter
+  and scrolls to assessment history.
+
+#### Explicitly out of scope
+
+Gate/math changes, default-on calibration, NAS live verify, actionable promotion, orders.
+
 ### Phase 62 - NAS Live Verification of Phase 61
 
 Ops evidence gate: redeploy under lab TLS and confirm assessment list/export

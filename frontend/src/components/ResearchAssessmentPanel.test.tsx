@@ -553,6 +553,66 @@ describe("ResearchAssessmentPanel", () => {
     });
   });
 
+  it("applies mixed history filter from evidence-summary mixed count", async () => {
+    const mixedRow = {
+      ...sampleAssessment,
+      id: 3,
+      input_source: "mixed",
+      components: {
+        ...sampleAssessment.components,
+        component_source: "mixed",
+      },
+    };
+    vi.mocked(getResearchEvidenceSummary).mockResolvedValue({
+      symbol: "AAPL",
+      state: "research_only",
+      latest_assessment: sampleAssessment,
+      calibration_readiness: {
+        symbol: "AAPL",
+        status: "insufficient_corpus",
+        assessment_snapshot_id: 1,
+        research_index: 0.46,
+        corpus_count: 0,
+        bucket_count: 0,
+        min_corpus: 10,
+        min_bucket: 5,
+        index_bucket_width: 0.15,
+        calibration_method_id: "research_calibration_v1",
+        detail: "research only",
+      },
+      latest_outcome_label: null,
+      latest_calibration: null,
+      assessment_count: 2,
+      outcome_label_count: 0,
+      calibration_count: 0,
+      latest_component_source: "mixed",
+      latest_resolved_label_bar_source: null,
+      mixed_component_source_assessment_count: 19,
+      detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
+    });
+    vi.mocked(listResearchAssessments).mockResolvedValue([mixedRow]);
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /refresh evidence summary/i }));
+
+    const showMixed = await screen.findByRole("button", {
+      name: /filter assessment history to mixed component source/i,
+    });
+    expect(showMixed).toHaveTextContent("19");
+    fireEvent.click(showMixed);
+
+    await waitFor(() => {
+      expect(listResearchAssessments).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        20,
+        { componentSource: "mixed" },
+      );
+      expect(screen.getByLabelText(/history source filter/i)).toHaveValue("mixed");
+      expect(screen.getByText(/src=mixed/)).toBeInTheDocument();
+    });
+  });
+
   it("runs outcome-label backfill and shows research-only summary counts", async () => {
     vi.mocked(getLatestResearchAssessment).mockResolvedValue(sampleAssessment);
     vi.mocked(backfillOutcomeLabels).mockResolvedValue({

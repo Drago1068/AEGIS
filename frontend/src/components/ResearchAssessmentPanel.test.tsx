@@ -12,6 +12,7 @@ vi.mock("@/lib/api-client", async () => {
     getLatestResearchAssessment: vi.fn(),
     createOutcomeLabels: vi.fn(),
     backfillOutcomeLabels: vi.fn(),
+    backfillResearchAssessments: vi.fn(),
     listOutcomeLabels: vi.fn(),
     getCalibrationReadiness: vi.fn(),
     createProbabilityCalibration: vi.fn(),
@@ -29,6 +30,7 @@ vi.mock("@/lib/api-client", async () => {
 import {
   ApiClientError,
   backfillOutcomeLabels,
+  backfillResearchAssessments,
   createProbabilityCalibration,
   createResearchAssessment,
   downloadCalibrationReadiness,
@@ -542,6 +544,33 @@ describe("ResearchAssessmentPanel", () => {
     });
     expect(await screen.findByTestId("outcome-label-backfill-summary")).toHaveTextContent(
       /attempted=2.*labeled=1.*skipped=1/,
+    );
+  });
+
+  it("runs assessment backfill and shows research-only summary counts", async () => {
+    vi.mocked(getLatestResearchAssessment).mockResolvedValue(sampleAssessment);
+    vi.mocked(backfillResearchAssessments).mockResolvedValue({
+      symbol: "AAPL",
+      candidate_count: 3,
+      persisted_count: 2,
+      skipped_count: 1,
+      outcomes: [],
+      detail:
+        "Research-only assessment backfill — not advice; skips are fail-closed, never invent confidence.",
+    });
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /backfill assessments/i }));
+
+    await waitFor(() => {
+      expect(backfillResearchAssessments).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        20,
+      );
+    });
+    expect(await screen.findByTestId("assessment-backfill-summary")).toHaveTextContent(
+      /candidates=3.*persisted=2.*skipped=1/,
     );
   });
 

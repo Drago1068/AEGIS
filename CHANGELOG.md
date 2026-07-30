@@ -7,6 +7,24 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 45 - Historical Research Assessment Backfill
+
+Research-only batch creation of point-in-time assessments for past primary bar dates so
+operators can grow labeled corpus candidates. See
+[docs/architecture/decisions/0046-phase-45-assessment-backfill.md](docs/architecture/decisions/0046-phase-45-assessment-backfill.md).
+
+#### Added
+
+- `POST /research/{symbol}/assessments/backfill?limit=` — truncate bars to each as-of,
+  fail-closed per date, always 200 with summary counts.
+- Operator console "Backfill assessments" control.
+- ADR-0046.
+
+#### Explicitly out of scope
+
+Default-on calibration, auto-labeling during assessment backfill, rewriting history,
+actionable promotion, orders, ACME/public TLS.
+
 ### Phase 44 - NAS Live Verification of Phase 43
 
 Ops evidence gate: redeploy current revision under the lab TLS profile and verify

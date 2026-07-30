@@ -36,3 +36,28 @@ class ResearchAssessmentResponse(BaseModel):
     lookback_start_date: date
     lookback_end_date: date
     bar_count: int
+
+
+class AssessmentBackfillItem(BaseModel):
+    """Per-date outcome from a historical assessment backfill pass (Phase 45)."""
+
+    symbol: str
+    as_of_trading_date: date
+    persisted: bool
+    assessment_snapshot_id: int | None = None
+    reason: str | None = None
+    detail: str | None = None
+
+
+class AssessmentBackfillResponse(BaseModel):
+    """Summary of research-only assessment backfill for one symbol (ADR-0046)."""
+
+    symbol: str
+    candidate_count: int = Field(ge=0)
+    persisted_count: int = Field(ge=0)
+    skipped_count: int = Field(ge=0)
+    outcomes: list[AssessmentBackfillItem] = Field(default_factory=lambda: [])
+    detail: str = (
+        "Research-only assessment backfill — not advice; skips are fail-closed, "
+        "never invent confidence."
+    )

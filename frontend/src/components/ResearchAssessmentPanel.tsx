@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 
 import {
   ApiClientError,
+  AssessmentBackfillResponse,
   CalibrationReadiness,
   OutcomeLabel,
   OutcomeLabelBackfillResponse,
@@ -11,6 +12,7 @@ import {
   ResearchAssessment,
   ResearchEvidenceSummary,
   backfillOutcomeLabels,
+  backfillResearchAssessments,
   createOutcomeLabels,
   createProbabilityCalibration,
   createResearchAssessment,
@@ -120,6 +122,8 @@ export function ResearchAssessmentPanel({
   const [backfillSummary, setBackfillSummary] = useState<OutcomeLabelBackfillResponse | null>(
     null,
   );
+  const [assessmentBackfillSummary, setAssessmentBackfillSummary] =
+    useState<AssessmentBackfillResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const baseUrl = getApiBaseUrl();
@@ -249,6 +253,33 @@ export function ResearchAssessmentPanel({
         setBackfillSummary(summary);
         if (latest?.id != null) {
           await loadOutcomeLabelHistory(latest.id as number);
+        }
+        await loadReadiness();
+        await loadEvidenceSummary();
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
+  function onBackfillAssessments() {
+    startTransition(async () => {
+      setError(null);
+      try {
+        const summary = await backfillResearchAssessments(baseUrl, symbol, 20);
+        setAssessmentBackfillSummary(summary);
+        await loadAssessmentHistory();
+        try {
+          const nextLatest = await getLatestResearchAssessment(baseUrl, symbol);
+          setLatest(nextLatest);
+          if (nextLatest.id != null) {
+            await loadOutcomeLabelHistory(nextLatest.id);
+            await loadCalibrationHistory(nextLatest.id);
+          }
+        } catch (err) {
+          if (!(err instanceof ApiClientError && err.status === 404)) {
+            throw err;
+          }
         }
         await loadReadiness();
         await loadEvidenceSummary();
@@ -434,6 +465,14 @@ export function ResearchAssessmentPanel({
           </button>
           <button
             type="button"
+            onClick={onBackfillAssessments}
+            disabled={isPending}
+            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
+          >
+            Backfill assessments
+          </button>
+          <button
+            type="button"
             onClick={onComputeOutcomeLabels}
             disabled={isPending || latest?.id == null}
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
@@ -493,6 +532,18 @@ export function ResearchAssessmentPanel({
         <p className="mb-3 text-sm text-aegis-muted" data-testid="outcome-label-backfill-summary">
           Backfill (research-only): attempted={backfillSummary.assessment_count}, labeled=
           {backfillSummary.persisted_count}, skipped={backfillSummary.skipped_count}
+        </p>
+      ) : null}
+
+      {assessmentBackfillSummary ? (
+        <p
+          className="mb-3 text-sm text-aegis-muted"
+          data-testid="assessment-backfill-summary"
+        >
+          Assessment backfill (research-only): candidates=
+          {assessmentBackfillSummary.candidate_count}, persisted=
+          {assessmentBackfillSummary.persisted_count}, skipped=
+          {assessmentBackfillSummary.skipped_count}
         </p>
       ) : null}
 

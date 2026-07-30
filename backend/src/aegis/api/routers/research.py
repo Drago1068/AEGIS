@@ -19,7 +19,11 @@ from aegis.api.dependencies import (
     get_research_calibration_service,
     require_operator,
 )
-from aegis.api.schemas.research import ResearchAssessmentResponse
+from aegis.api.schemas.research import (
+    AssessmentBackfillItem,
+    AssessmentBackfillResponse,
+    ResearchAssessmentResponse,
+)
 from aegis.api.schemas.research_calibration_readiness import CalibrationReadinessResponse
 from aegis.api.schemas.research_evidence_summary import ResearchEvidenceSummaryResponse
 from aegis.api.schemas.research_outcome_labels import (
@@ -106,6 +110,42 @@ async def create_research_assessment(
                 calibration_repository,
             )
     return ResearchAssessmentResponse.model_validate(snapshot)
+
+
+@router.post(
+    "/{symbol}/assessments/backfill",
+    response_model=AssessmentBackfillResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def backfill_research_assessments(
+    symbol: str,
+    limit: int = Query(default=20, ge=1, le=100),
+    service: ResearchAssessmentService = Depends(get_research_assessment_service),
+) -> AssessmentBackfillResponse:
+    """Create point-in-time assessments for recent primary bar dates (ADR-0046).
+
+    Always returns 200 with a per-date summary. Does not invent probability_confidence or
+    run labeling/calibration.
+    """
+
+    summary = await service.backfill_assessments(symbol, limit)
+    return AssessmentBackfillResponse(
+        symbol=symbol.upper(),
+        candidate_count=summary.candidate_count,
+        persisted_count=summary.persisted_count,
+        skipped_count=summary.skipped_count,
+        outcomes=[
+            AssessmentBackfillItem(
+                symbol=outcome.symbol,
+                as_of_trading_date=outcome.as_of_trading_date,
+                persisted=outcome.persisted,
+                assessment_snapshot_id=outcome.assessment_snapshot_id,
+                reason=outcome.reason,
+                detail=outcome.detail,
+            )
+            for outcome in summary.outcomes
+        ],
+    )
 
 
 @router.post(

@@ -351,6 +351,52 @@ export async function createResearchAssessment(
   return body as ResearchAssessment;
 }
 
+export interface AssessmentBackfillItem {
+  symbol: string;
+  as_of_trading_date: string;
+  persisted: boolean;
+  assessment_snapshot_id?: number | null;
+  reason?: string | null;
+  detail?: string | null;
+}
+
+export interface AssessmentBackfillResponse {
+  symbol: string;
+  candidate_count: number;
+  persisted_count: number;
+  skipped_count: number;
+  outcomes: AssessmentBackfillItem[];
+  detail: string;
+}
+
+/** Create point-in-time assessments for recent primary bar dates (Phase 45, ADR-0046). */
+export async function backfillResearchAssessments(
+  baseUrl: string,
+  symbol: string,
+  limit = 20,
+  options?: ApiRequestOptions,
+): Promise<AssessmentBackfillResponse> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/backfill` +
+    `?limit=${encodeURIComponent(String(limit))}`;
+  const { response, body } = await requestJson(
+    url,
+    {
+      method: "POST",
+      headers: { Accept: "application/json" },
+    },
+    options,
+  );
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected POST assessments/backfill status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as AssessmentBackfillResponse;
+}
+
 export async function listResearchAssessments(
   baseUrl: string,
   symbol: string,

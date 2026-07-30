@@ -28,9 +28,12 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 from enum import StrEnum
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from aegis.domain.calendars import is_trading_day, most_recent_trading_day
+
+if TYPE_CHECKING:
+    from aegis.domain.research_assessment_backfill import AssessmentBackfillSummary
 
 logger = logging.getLogger(__name__)
 
@@ -748,6 +751,35 @@ class ResearchAssessmentService:
         self, symbol: str
     ) -> ResearchAssessmentSnapshotData | None:
         return await self._snapshot_store.get_latest(symbol.upper())
+
+    async def backfill_assessments(
+        self, symbol: str, limit: int
+    ) -> AssessmentBackfillSummary:
+        """Create point-in-time assessments for recent primary bar dates (ADR-0046).
+
+        Always returns a summary; individual fail-closed skips do not abort the batch.
+        Does not run outcome labeling or calibration.
+        """
+
+        from aegis.domain.research_assessment_backfill import run_assessment_backfill
+
+        normalized = symbol.upper()
+        bars = await self._bar_reader.list_recent_bars(normalized, BAR_LOAD_LIMIT)
+        # Bound existing-date lookup; backfill only considers candidates within loaded bars.
+        existing_rows = await self._snapshot_store.list_recent(
+            normalized, max(limit * 5, 100)
+        )
+        existing_as_of = {row.as_of_trading_date for row in existing_rows}
+        return await run_assessment_backfill(
+            normalized,
+            bars_newest_first=bars,
+            existing_as_of_dates=existing_as_of,
+            limit=limit,
+            calendar_name=self._calendar_name,
+            max_latest_bar_staleness_trading_days=self._max_staleness,
+            insert_snapshot=self._snapshot_store.insert,
+            multi_source=self._multi_source,
+        )
 
 
 def _resolve_computed_at(computed_at: datetime | None) -> datetime:

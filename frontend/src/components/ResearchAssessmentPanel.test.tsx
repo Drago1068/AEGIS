@@ -132,6 +132,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_component_source: null,
       latest_resolved_label_bar_source: null,
       mixed_component_source_assessment_count: 0,
+      mixed_unlabeled_assessment_count: 0,
+      latest_mixed_label_bar_source: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
   });
@@ -417,6 +419,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_component_source: "mixed",
       latest_resolved_label_bar_source: "alpha_vantage",
       mixed_component_source_assessment_count: 1,
+      mixed_unlabeled_assessment_count: 0,
+      latest_mixed_label_bar_source: "alpha_vantage",
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
 
@@ -433,6 +437,8 @@ describe("ResearchAssessmentPanel", () => {
       ).toHaveTextContent(/mixed \(cross-source fill\)/);
       expect(screen.getByText(/resolved label bar source/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed-source assessments \(scanned\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/mixed unlabeled \(scanned\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/latest mixed label bar source/i)).toBeInTheDocument();
       expect(screen.getByText(/latest forward_return_5/i)).toBeInTheDocument();
       expect(screen.getByText(/latest forward_return_20/i)).toBeInTheDocument();
       expect(screen.getByText(/0\.0500 · end 2024-02-02/)).toBeInTheDocument();
@@ -588,6 +594,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_component_source: "mixed",
       latest_resolved_label_bar_source: null,
       mixed_component_source_assessment_count: 19,
+      mixed_unlabeled_assessment_count: 0,
+      latest_mixed_label_bar_source: "polygon",
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listResearchAssessments).mockResolvedValue([mixedRow]);

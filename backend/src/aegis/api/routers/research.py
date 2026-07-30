@@ -37,6 +37,7 @@ from aegis.domain.research_assessment import (
     ResearchAssessmentService,
     ResearchAssessmentUnavailableError,
     component_source_of,
+    count_mixed_unlabeled_assessments,
     filter_assessments_by_component_source,
     is_mixed_component_source,
 )
@@ -396,6 +397,27 @@ async def _build_research_evidence_summary(
     mixed_component_source_assessment_count = sum(
         1 for row in snapshots if is_mixed_component_source(row)
     )
+    scanned_ids = [row.id for row in snapshots if row.id is not None]
+    labeled_ids = (
+        await outcome_label_service.assessment_ids_with_labels(symbol, scanned_ids)
+        if scanned_ids
+        else set()
+    )
+    mixed_unlabeled_assessment_count = count_mixed_unlabeled_assessments(
+        snapshots, labeled_ids
+    )
+    latest_mixed_label_bar_source = None
+    for row in snapshots:
+        if row.id is None or not is_mixed_component_source(row):
+            continue
+        if row.id not in labeled_ids:
+            continue
+        mixed_labels = await outcome_label_service.list_labels_for_assessment(
+            symbol, row.id, 1
+        )
+        if mixed_labels:
+            latest_mixed_label_bar_source = mixed_labels[0].bar_source
+            break
 
     if snapshot is not None and snapshot.id is not None:
         enriched = await enrich_assessment_with_calibration(snapshot, calibration_repository)
@@ -427,6 +449,8 @@ async def _build_research_evidence_summary(
         latest_component_source=latest_component_source,
         latest_resolved_label_bar_source=latest_resolved_label_bar_source,
         mixed_component_source_assessment_count=mixed_component_source_assessment_count,
+        mixed_unlabeled_assessment_count=mixed_unlabeled_assessment_count,
+        latest_mixed_label_bar_source=latest_mixed_label_bar_source,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

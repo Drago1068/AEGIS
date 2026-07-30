@@ -952,6 +952,10 @@ export interface ResearchEvidenceSummary {
   latest_resolved_label_bar_source: string | null;
   /** Count of newest ≤100 assessments with component_source "mixed". */
   mixed_component_source_assessment_count: number;
+  /** Mixed assessments among the scanned set that still lack a default-method label. */
+  mixed_unlabeled_assessment_count: number;
+  /** bar_source from the newest labeled mixed assessment; null when none labeled. */
+  latest_mixed_label_bar_source: string | null;
   detail: string;
 }
 

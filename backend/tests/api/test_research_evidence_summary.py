@@ -134,7 +134,23 @@ class _FakeOutcomeLabelService:
     async def list_labels_for_assessment(
         self, symbol: str, assessment_snapshot_id: int, limit: int
     ) -> list[OutcomeLabelData]:
-        return self._listed[:limit]
+        matched = [
+            row
+            for row in self._listed
+            if row.assessment_snapshot_id == assessment_snapshot_id
+        ]
+        return matched[:limit]
+
+    async def assessment_ids_with_labels(
+        self,
+        symbol: str,
+        assessment_ids: list[int],
+        *,
+        label_method_id: str = LABEL_METHOD_ID,
+    ) -> set[int]:
+        _ = label_method_id
+        labeled = {row.assessment_snapshot_id for row in self._listed}
+        return {item for item in assessment_ids if item in labeled}
 
 
 class _FakeCalibrationService:
@@ -218,6 +234,8 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_component_source"] is None
     assert body["latest_resolved_label_bar_source"] is None
     assert body["mixed_component_source_assessment_count"] == 0
+    assert body["mixed_unlabeled_assessment_count"] == 0
+    assert body["latest_mixed_label_bar_source"] is None
     assert body["calibration_readiness"]["status"] == "no_assessment"
     assert "never invented" in body["detail"].lower() or "not invented" in body["detail"].lower()
 
@@ -244,6 +262,8 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_component_source"] == "alpha_vantage"
     assert body["latest_resolved_label_bar_source"] == "alpha_vantage"
     assert body["mixed_component_source_assessment_count"] == 0
+    assert body["mixed_unlabeled_assessment_count"] == 0
+    assert body["latest_mixed_label_bar_source"] is None
 
 
 async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:
@@ -253,17 +273,72 @@ async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:
         component_source="mixed",
     )
     primary = _snapshot(snapshot_id=1, component_source="alpha_vantage")
+    mixed_label = OutcomeLabelData(
+        id=11,
+        assessment_snapshot_id=2,
+        symbol="AAPL",
+        label_method_id=LABEL_METHOD_ID,
+        label_method_version=1,
+        state="research_only",
+        as_of_trading_date=date(2024, 1, 26),
+        computed_at=datetime(2024, 1, 26, 19, 0, tzinfo=UTC),
+        labels={"forward_return_5": 0.05},
+        label_end_dates={"forward_return_5": "2024-02-02"},
+        schema_version=1,
+        bar_source="polygon",
+    )
     async with _client(
         assessments=[mixed, primary],
-        labels=[_label()],
+        labels=[mixed_label],
     ) as client:
         response = await client.get("/research/AAPL/evidence-summary")
 
     assert response.status_code == 200
     body = response.json()
     assert body["latest_component_source"] == "mixed"
-    assert body["latest_resolved_label_bar_source"] == "alpha_vantage"
+    assert body["latest_resolved_label_bar_source"] == "polygon"
     assert body["mixed_component_source_assessment_count"] == 1
+    assert body["mixed_unlabeled_assessment_count"] == 0
+    assert body["latest_mixed_label_bar_source"] == "polygon"
+
+
+async def test_evidence_summary_counts_mixed_unlabeled() -> None:
+    mixed_unlabeled = _snapshot(
+        snapshot_id=3,
+        input_source="mixed",
+        component_source="mixed",
+    )
+    mixed_labeled = _snapshot(
+        snapshot_id=2,
+        input_source="mixed",
+        component_source="mixed",
+    )
+    primary = _snapshot(snapshot_id=1, component_source="alpha_vantage")
+    labeled = OutcomeLabelData(
+        id=11,
+        assessment_snapshot_id=2,
+        symbol="AAPL",
+        label_method_id=LABEL_METHOD_ID,
+        label_method_version=1,
+        state="research_only",
+        as_of_trading_date=date(2024, 1, 26),
+        computed_at=datetime(2024, 1, 26, 19, 0, tzinfo=UTC),
+        labels={"forward_return_5": 0.04},
+        label_end_dates={"forward_return_5": "2024-02-02"},
+        schema_version=1,
+        bar_source="alpha_vantage",
+    )
+    async with _client(
+        assessments=[mixed_unlabeled, mixed_labeled, primary],
+        labels=[labeled],
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["mixed_component_source_assessment_count"] == 2
+    assert body["mixed_unlabeled_assessment_count"] == 1
+    assert body["latest_mixed_label_bar_source"] == "alpha_vantage"
 
     async with _client(
         assessments=[_snapshot()],

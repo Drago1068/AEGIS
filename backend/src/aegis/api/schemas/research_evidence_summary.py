@@ -45,4 +45,19 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Count of scanned assessments (≤100 newest) whose component_source is 'mixed'."
         ),
     )
+    mixed_unlabeled_assessment_count: int = Field(
+        default=0,
+        ge=0,
+        description=(
+            "Count of scanned mixed-component assessments (≤100 newest) that lack a "
+            "default-method outcome label."
+        ),
+    )
+    latest_mixed_label_bar_source: str | None = Field(
+        default=None,
+        description=(
+            "bar_source from the newest mixed-component assessment that has a persisted "
+            "outcome label. Null when none of the scanned mixed assessments are labeled."
+        ),
+    )
     detail: str

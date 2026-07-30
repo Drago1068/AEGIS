@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 67 - Mixed Label Coverage on Evidence Summary
+
+Surface how many scanned mixed assessments still lack labels and the newest mixed label
+``bar_source`` on the research evidence summary. See
+[docs/architecture/decisions/0068-phase-67-mixed-label-coverage-evidence-summary.md](docs/architecture/decisions/0068-phase-67-mixed-label-coverage-evidence-summary.md).
+
+#### Added
+
+- Evidence-summary fields: ``mixed_unlabeled_assessment_count``,
+  ``latest_mixed_label_bar_source``.
+- Console rows for mixed unlabeled count and latest mixed label bar source.
+
+#### Explicitly out of scope
+
+Gate/math changes, default-on calibration, NAS live verify, actionable promotion, orders.
+
 ### Phase 66 - NAS Live Verification of Phase 65
 
 Ops evidence gate: redeploy under lab TLS so prefer-mixed label backfill is live. See

@@ -644,6 +644,18 @@ export function ResearchAssessmentPanel({
               </dd>
             </div>
             <div>
+              <dt className="text-aegis-muted">Mixed unlabeled (scanned)</dt>
+              <dd className="font-mono">
+                {evidenceSummary.mixed_unlabeled_assessment_count}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-aegis-muted">Latest mixed label bar source</dt>
+              <dd className="font-mono">
+                {evidenceSummary.latest_mixed_label_bar_source ?? "null"}
+              </dd>
+            </div>
+            <div>
               <dt className="text-aegis-muted">Latest probability_confidence</dt>
               <dd className="font-mono">
                 {evidenceSummary.latest_calibration == null

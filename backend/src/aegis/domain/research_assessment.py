@@ -76,6 +76,27 @@ def is_mixed_component_source(snapshot: ResearchAssessmentSnapshotData) -> bool:
     return component_source_of(snapshot) == COMPONENT_SOURCE_MIXED
 
 
+def count_mixed_unlabeled_assessments(
+    snapshots: Sequence[ResearchAssessmentSnapshotData],
+    labeled_assessment_ids: set[int],
+) -> int:
+    """Count mixed-component assessments among ``snapshots`` lacking a default-method label.
+
+    Used by evidence-summary audit fields (Phase 67). Does not invent labels.
+    """
+
+    count = 0
+    for snapshot in snapshots:
+        if snapshot.id is None:
+            continue
+        if not is_mixed_component_source(snapshot):
+            continue
+        if snapshot.id in labeled_assessment_ids:
+            continue
+        count += 1
+    return count
+
+
 # Newest-assessment scan window when filtering list/export by component_source (ADR-0062).
 ASSESSMENT_FILTER_SCAN_LIMIT = 252
 

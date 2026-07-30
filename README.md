@@ -7,9 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 72 (NAS live verify of Phase 71 / pending 67–70).** ADR ready; live
-deploy blocked until NAS SSH (:22) is restored. Phase 71 corpus callout is on ``main``. See
-[docs/architecture/decisions/0073-phase-72-nas-live-verify-phase-71.md](docs/architecture/decisions/0073-phase-72-nas-live-verify-phase-71.md)
+**Current phase: Phase 73 (per-horizon readiness mini-rows on evidence summary).** Surface
+``by_horizon`` status/corpus/bucket on the evidence summary (ADR-0074). Phases 70 and 72
+closed with live verify of ``94cf550``. See
+[docs/architecture/decisions/0074-phase-73-per-horizon-readiness-evidence-summary.md](docs/architecture/decisions/0074-phase-73-per-horizon-readiness-evidence-summary.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

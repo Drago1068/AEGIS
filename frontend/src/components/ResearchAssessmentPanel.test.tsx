@@ -395,6 +395,22 @@ describe("ResearchAssessmentPanel", () => {
         index_bucket_width: 0.15,
         calibration_method_id: "research_calibration_v1",
         detail: "corpus and bucket gates pass",
+        by_horizon: [
+          {
+            outcome_horizon_key: "forward_return_5",
+            status: "ready",
+            corpus_count: 12,
+            bucket_count: 6,
+            detail: "ok",
+          },
+          {
+            outcome_horizon_key: "forward_return_20",
+            status: "insufficient_bucket",
+            corpus_count: 12,
+            bucket_count: 2,
+            detail: "need bucket",
+          },
+        ],
       },
       latest_outcome_label: {
         id: 20,
@@ -436,6 +452,14 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/12 \/ min 10/)).toBeInTheDocument();
       expect(screen.getByText(/calibration bucket \(readiness\)/i)).toBeInTheDocument();
       expect(screen.getByText(/6 \/ min 5/)).toBeInTheDocument();
+      expect(screen.getByTestId("evidence-readiness-by-horizon")).toBeInTheDocument();
+      expect(screen.getByText(/readiness by horizon/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/forward_return_5: ready \(corpus=12, bucket=6\)/),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/forward_return_20: insufficient_bucket \(corpus=12, bucket=2\)/),
+      ).toBeInTheDocument();
       expect(screen.getByText("1 / 1")).toBeInTheDocument();
       expect(screen.getByText(/latest component source/i)).toBeInTheDocument();
       expect(

@@ -7,10 +7,24 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 73 - Per-Horizon Readiness Mini-Rows on Evidence Summary
+
+Show nested ``by_horizon`` readiness status/corpus/bucket on the evidence summary after the
+aggregate corpus callout. See
+[docs/architecture/decisions/0074-phase-73-per-horizon-readiness-evidence-summary.md](docs/architecture/decisions/0074-phase-73-per-horizon-readiness-evidence-summary.md).
+
+#### Added
+
+- Evidence-summary “Readiness by horizon” mini-rows from nested ``calibration_readiness.by_horizon``.
+
+#### Explicitly out of scope
+
+New API fields, default-on calibration, gate changes, orders.
+
 ### Phase 72 - NAS Live Verification of Phase 71 (and pending 67–70)
 
 Ops evidence gate: redeploy under lab TLS once SSH is restored; Phase 70 checks remain
-mandatory. See
+mandatory. Live verify of ``94cf550`` passed on 2026-07-30 (closes Phases 70 and 72). See
 [docs/architecture/decisions/0073-phase-72-nas-live-verify-phase-71.md](docs/architecture/decisions/0073-phase-72-nas-live-verify-phase-71.md).
 
 #### Added

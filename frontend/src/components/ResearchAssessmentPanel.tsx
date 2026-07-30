@@ -605,6 +605,22 @@ export function ResearchAssessmentPanel({
                 {evidenceSummary.calibration_readiness.min_bucket}
               </dd>
             </div>
+            {evidenceSummary.calibration_readiness.by_horizon &&
+            evidenceSummary.calibration_readiness.by_horizon.length > 0 ? (
+              <div className="sm:col-span-2" data-testid="evidence-readiness-by-horizon">
+                <dt className="text-aegis-muted">Readiness by horizon</dt>
+                <dd>
+                  <ul className="mt-1 space-y-1 text-xs text-aegis-muted">
+                    {evidenceSummary.calibration_readiness.by_horizon.map((row) => (
+                      <li key={row.outcome_horizon_key} className="font-mono">
+                        {row.outcome_horizon_key}: {row.status} (corpus={row.corpus_count},
+                        bucket={row.bucket_count})
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            ) : null}
             <div>
               <dt className="text-aegis-muted">Assessments (≤100)</dt>
               <dd className="font-mono">{evidenceSummary.assessment_count}</dd>

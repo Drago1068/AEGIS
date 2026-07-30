@@ -1,13 +1,13 @@
 # ADR-0073: Phase 72 NAS Live Verification of Phase 71 (and pending 67–70)
 
-- Status: Accepted
+- Status: Accepted (live verified 2026-07-30 on ``94cf550``; also closes Phase 70)
 - Date: 2026-07-30
 
 ## Context
 
 Phase 71 added evidence-summary console rows for calibration corpus/bucket from nested
-readiness (ADR-0072). Phase 70 (live verify of Phases 67–69) remains blocked when NAS SSH
-port 22 is down. Phase 72 is the ops gate to redeploy frontend (and backend if not yet on
+readiness (ADR-0072). Phase 70 (live verify of Phases 67–69) remained blocked while NAS SSH
+port 22 was down. Phase 72 is the ops gate to redeploy frontend (and backend if not yet on
 ``f298cf0``+) once SSH recovers.
 
 ## Decisions

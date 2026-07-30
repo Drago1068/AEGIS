@@ -38,7 +38,7 @@ print_checklist() {
   echo "  9. Authenticated GET /research/${symbol}/assessments?limit= -> 200 (JSON array; [] OK)"
   echo " 10. Authenticated GET /research/${symbol}/assessments/export -> 200 (attachment, JSON array; [] OK)"
   echo " 11. Authenticated POST /research/${symbol}/assessments/backfill -> 200 (summary counts; zeros OK)"
-  echo " 12. Authenticated POST /research/${symbol}/outcome-labels/backfill -> 200 (summary counts; zeros OK)"
+  echo " 12. Authenticated POST /research/${symbol}/outcome-labels/backfill -> 200 (summary counts; if assessments persisted>0 then labels persisted>=1)"
   echo " 13. Authenticated POST .../assessments/{id}/calibrations?horizon=forward_return_5 -> 200|422"
   echo " 14. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
   echo " 15. Authenticated GET .../assessments/{id}/outcome-labels/export -> 200 (attachment, JSON array; [] OK)"
@@ -282,9 +282,13 @@ if ! grep -q '"candidate_count"' "${assess_backfill_body}" \
   echo "assessments/backfill missing summary count fields" >&2
   exit 1
 fi
-echo "OK  assessments/backfill summary counts present"
+assess_persisted="$(
+  python3 -c 'import json,sys; print(int(json.load(open(sys.argv[1])).get("persisted_count") or 0))' \
+    "${assess_backfill_body}"
+)"
+echo "OK  assessments/backfill summary counts present (persisted=${assess_persisted})"
 
-backfill_url="${API}/research/${VERIFY_SYMBOL}/outcome-labels/backfill?limit=20"
+backfill_url="${API}/research/${VERIFY_SYMBOL}/outcome-labels/backfill?limit=100"
 backfill_body="$(mktemp)"
 cleanup() { rm -f "${COOKIE_JAR}" "${ready_body}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${assess_backfill_body}" "${backfill_body}"; }
 trap cleanup EXIT
@@ -299,7 +303,20 @@ if ! grep -q '"assessment_count"' "${backfill_body}" \
   echo "outcome-labels/backfill missing summary count fields" >&2
   exit 1
 fi
-echo "OK  outcome-labels/backfill summary counts present"
+label_persisted="$(
+  python3 -c 'import json,sys; print(int(json.load(open(sys.argv[1])).get("persisted_count") or 0))' \
+    "${backfill_body}"
+)"
+echo "OK  outcome-labels/backfill summary counts present (persisted=${label_persisted})"
+if [[ "${assess_persisted}" -gt 0 && "${label_persisted}" -lt 1 ]]; then
+  echo "Phase 48: assessments/backfill persisted=${assess_persisted} but outcome-labels/backfill persisted=${label_persisted} (expected >=1 for label-ready candidates)" >&2
+  exit 1
+fi
+if [[ "${assess_persisted}" -gt 0 ]]; then
+  echo "OK  Phase 48 label-ready coupling (assessments persisted=${assess_persisted} -> labels persisted=${label_persisted})"
+else
+  echo "OK  Phase 48 label-ready coupling skipped (assessments persisted=0; label zeros OK)"
+fi
 
 history_assessment_id=1
 if [[ "${latest_code}" == "200" ]]; then

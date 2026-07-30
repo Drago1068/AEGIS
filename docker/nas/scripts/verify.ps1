@@ -49,7 +49,7 @@ function Write-VerifyChecklist {
     Write-Host "  9. Authenticated GET /research/$Symbol/assessments?limit= -> 200 (JSON array; [] OK)"
     Write-Host " 10. Authenticated GET /research/$Symbol/assessments/export -> 200 (attachment, JSON array; [] OK)"
     Write-Host " 11. Authenticated POST /research/$Symbol/assessments/backfill -> 200 (summary counts; zeros OK)"
-    Write-Host " 12. Authenticated POST /research/$Symbol/outcome-labels/backfill -> 200 (summary counts; zeros OK)"
+    Write-Host " 12. Authenticated POST /research/$Symbol/outcome-labels/backfill -> 200 (summary counts; if assessments persisted>0 then labels persisted>=1)"
     Write-Host " 13. Authenticated POST .../assessments/{id}/calibrations?horizon=forward_return_5 -> 200|422"
     Write-Host " 14. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
     Write-Host " 15. Authenticated GET .../assessments/{id}/outcome-labels/export -> 200 (attachment, JSON array; [] OK)"
@@ -292,9 +292,11 @@ try {
         }
     }
 
-    # Phase 46: assessment backfill (always 200 summary; zeros / skips OK).
+    # Phase 46/48: assessment backfill then outcome-label backfill.
+    # Phase 48: if assessments persisted>0, labels must persist >=1 (label-ready candidates).
     $assessBackfillUrl = "$api/research/$verifySymbol/assessments/backfill?limit=20"
     $assessBackfillPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.assess-backfill.json" -f [guid]::NewGuid().ToString("N"))
+    $assessPersisted = 0
     try {
         $assessBackfillCode = & curl.exe -sS @curlInsecure -o $assessBackfillPath -w "%{http_code}" --max-time 120 `
             -b $cookieJar -H "Accept: application/json" -X POST $assessBackfillUrl
@@ -304,15 +306,16 @@ try {
         if ($null -eq $assessBackfillBody.candidate_count) { throw "assessments/backfill missing candidate_count" }
         if ($null -eq $assessBackfillBody.persisted_count) { throw "assessments/backfill missing persisted_count" }
         if ($null -eq $assessBackfillBody.skipped_count) { throw "assessments/backfill missing skipped_count" }
-        Write-Host "OK  assessments/backfill candidate_count=$($assessBackfillBody.candidate_count) persisted=$($assessBackfillBody.persisted_count) skipped=$($assessBackfillBody.skipped_count)"
+        $assessPersisted = [int]$assessBackfillBody.persisted_count
+        Write-Host "OK  assessments/backfill candidate_count=$($assessBackfillBody.candidate_count) persisted=$assessPersisted skipped=$($assessBackfillBody.skipped_count)"
     } finally {
         if (Test-Path -LiteralPath $assessBackfillPath) {
             Remove-Item -LiteralPath $assessBackfillPath -Force -ErrorAction SilentlyContinue
         }
     }
 
-    # Phase 44: outcome-label backfill (always 200 summary; zeros / skips OK).
-    $backfillUrl = "$api/research/$verifySymbol/outcome-labels/backfill?limit=20"
+    # Phase 44/48: outcome-label backfill (always 200 summary; Phase 48 coupling when assessments persisted).
+    $backfillUrl = "$api/research/$verifySymbol/outcome-labels/backfill?limit=100"
     $backfillPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.backfill.json" -f [guid]::NewGuid().ToString("N"))
     try {
         $backfillCode = & curl.exe -sS @curlInsecure -o $backfillPath -w "%{http_code}" --max-time 60 `
@@ -323,7 +326,16 @@ try {
         if ($null -eq $backfillBody.assessment_count) { throw "backfill missing assessment_count" }
         if ($null -eq $backfillBody.persisted_count) { throw "backfill missing persisted_count" }
         if ($null -eq $backfillBody.skipped_count) { throw "backfill missing skipped_count" }
-        Write-Host "OK  outcome-labels/backfill assessment_count=$($backfillBody.assessment_count) persisted=$($backfillBody.persisted_count) skipped=$($backfillBody.skipped_count)"
+        $labelPersisted = [int]$backfillBody.persisted_count
+        Write-Host "OK  outcome-labels/backfill assessment_count=$($backfillBody.assessment_count) persisted=$labelPersisted skipped=$($backfillBody.skipped_count)"
+        if ($assessPersisted -gt 0 -and $labelPersisted -lt 1) {
+            throw "Phase 48: assessments/backfill persisted=$assessPersisted but outcome-labels/backfill persisted=$labelPersisted (expected >=1 for label-ready candidates)"
+        }
+        if ($assessPersisted -gt 0) {
+            Write-Host "OK  Phase 48 label-ready coupling (assessments persisted=$assessPersisted -> labels persisted=$labelPersisted)"
+        } else {
+            Write-Host "OK  Phase 48 label-ready coupling skipped (assessments persisted=0; label zeros OK)"
+        }
     } finally {
         if (Test-Path -LiteralPath $backfillPath) {
             Remove-Item -LiteralPath $backfillPath -Force -ErrorAction SilentlyContinue

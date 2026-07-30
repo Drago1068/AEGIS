@@ -1,4 +1,4 @@
-# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46)
+# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46 + Phase 48)
 
 This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0018](../architecture/decisions/0018-phase-17-nas-live-verification.md),
@@ -15,7 +15,8 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0041](../architecture/decisions/0041-phase-40-nas-lab-tls-cutover.md),
 [ADR-0043](../architecture/decisions/0043-phase-42-nas-live-verify-phase-41.md),
 [ADR-0045](../architecture/decisions/0045-phase-44-nas-live-verify-phase-43.md),
-[ADR-0047](../architecture/decisions/0047-phase-46-nas-live-verify-phase-45.md).
+[ADR-0047](../architecture/decisions/0047-phase-46-nas-live-verify-phase-45.md),
+[ADR-0049](../architecture/decisions/0049-phase-48-nas-live-verify-phase-47.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 
@@ -62,7 +63,7 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 9 | Authenticated `GET /research/{symbol}/assessments?limit=` | **200** JSON array (`[]` OK) |
 | 10 | Authenticated `GET /research/{symbol}/assessments/export` | **200**, attachment, JSON array (`[]` OK) |
 | 11 | Authenticated `POST /research/{symbol}/assessments/backfill?limit=` | **200**, summary counts present (zeros / skips OK) |
-| 12 | Authenticated `POST /research/{symbol}/outcome-labels/backfill?limit=` | **200**, summary counts present (zeros / skips OK) |
+| 12 | Authenticated `POST /research/{symbol}/outcome-labels/backfill?limit=` (verify uses **100**) | **200**, summary counts present; if step 11 `persisted_count > 0` then labels `persisted_count >= 1` |
 | 13 | Authenticated `POST .../assessments/{id}/calibrations?horizon=forward_return_5` | **200** or fail-closed **422** |
 | 14 | Authenticated `GET .../assessments/{id}/calibrations` and `.../outcome-labels` | **200** JSON array (`[]` OK) |
 | 15 | Authenticated `GET .../assessments/{id}/outcome-labels/export` | **200**, attachment, JSON array (`[]` OK) |

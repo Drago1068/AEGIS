@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 48 - NAS Live Verification of Phase 47
+
+Ops evidence gate: redeploy under the lab TLS profile and verify label-ready assessment
+backfill coupling on the live NAS. See
+[docs/architecture/decisions/0049-phase-48-nas-live-verify-phase-47.md](docs/architecture/decisions/0049-phase-48-nas-live-verify-phase-47.md).
+
+#### Added
+
+- ADR-0049: live verify retains Phase 46 assessment-backfill checks and adds Phase 48
+  coupling (when assessments ``persisted_count > 0``, outcome-label backfill must
+  ``persisted_count >= 1``; label backfill uses ``limit=100``).
+- `verify.ps1` / `verify.sh` Phase 48 gates.
+
+#### Explicitly out of scope
+
+New assessment/label math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 47 - Label-Ready Assessment Backfill Candidates
 
 Prefer as-of dates that already have stored forward-horizon closes so Phase 43 labeling

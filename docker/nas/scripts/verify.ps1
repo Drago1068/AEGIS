@@ -40,17 +40,18 @@ function Write-VerifyChecklist {
     Write-Host "Live verification checklist (ADR-0018):"
     Write-Host "  1. GET /health -> 200"
     Write-Host "  2. GET /ready -> 200"
-    Write-Host "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list, calibration-readiness, evidence-summary, evidence-summary/export"
+    Write-Host "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list, calibration-readiness, calibration-readiness/export, evidence-summary, evidence-summary/export"
     Write-Host "  4. Frontend base URL -> 200|302|307|308"
     Write-Host "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
     Write-Host "  6. Authenticated GET /research/$Symbol/calibration-readiness -> 200"
-    Write-Host "  7. Authenticated GET /research/$Symbol/assessments/latest -> 200|404"
-    Write-Host "  8. Authenticated GET /research/$Symbol/assessments?limit= -> 200 (JSON array; [] OK)"
-    Write-Host "  9. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
-    Write-Host " 10. Authenticated GET /research/$Symbol/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
-    Write-Host " 11. Authenticated GET /research/$Symbol/evidence-summary/export -> 200 (attachment, state=research_only)"
-    Write-Host " 12. SSH alembic current includes 0008|head (when SSH configured)"
-    Write-Host " 13. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "  7. Authenticated GET /research/$Symbol/calibration-readiness/export -> 200 (attachment)"
+    Write-Host "  8. Authenticated GET /research/$Symbol/assessments/latest -> 200|404"
+    Write-Host "  9. Authenticated GET /research/$Symbol/assessments?limit= -> 200 (JSON array; [] OK)"
+    Write-Host " 10. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
+    Write-Host " 11. Authenticated GET /research/$Symbol/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
+    Write-Host " 12. Authenticated GET /research/$Symbol/evidence-summary/export -> 200 (attachment, state=research_only)"
+    Write-Host " 13. SSH alembic current includes 0008|head (when SSH configured)"
+    Write-Host " 14. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -141,6 +142,7 @@ Assert-Status -Label "GET $api/market-data/$verifySymbol/daily-bars" -Actual (Ge
 Assert-Status -Label "GET $api/research/$verifySymbol/assessments/latest" -Actual (Get-HttpStatus "$api/research/$verifySymbol/assessments/latest") -Expected @(401)
 Assert-Status -Label "GET $api/research/$verifySymbol/assessments" -Actual (Get-HttpStatus "$api/research/$verifySymbol/assessments") -Expected @(401)
 Assert-Status -Label "GET $api/research/$verifySymbol/calibration-readiness" -Actual (Get-HttpStatus "$api/research/$verifySymbol/calibration-readiness") -Expected @(401)
+Assert-Status -Label "GET $api/research/$verifySymbol/calibration-readiness/export" -Actual (Get-HttpStatus "$api/research/$verifySymbol/calibration-readiness/export") -Expected @(401)
 Assert-Status -Label "GET $api/research/$verifySymbol/evidence-summary" -Actual (Get-HttpStatus "$api/research/$verifySymbol/evidence-summary") -Expected @(401)
 Assert-Status -Label "GET $api/research/$verifySymbol/evidence-summary/export" -Actual (Get-HttpStatus "$api/research/$verifySymbol/evidence-summary/export") -Expected @(401)
 
@@ -165,6 +167,32 @@ try {
 
     $readyCode = Get-HttpStatus "$api/research/$verifySymbol/calibration-readiness" -CookieJar $cookieJar
     Assert-Status -Label "GET $api/research/$verifySymbol/calibration-readiness (auth)" -Actual $readyCode -Expected @(200)
+
+    # Phase 33: calibration readiness JSON export (attachment).
+    $readyExportUrl = "$api/research/$verifySymbol/calibration-readiness/export"
+    $readyExportPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.readiness.json" -f [guid]::NewGuid().ToString("N"))
+    $readyExportHeadersPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.readiness.hdr" -f [guid]::NewGuid().ToString("N"))
+    try {
+        $readyExportCode = & curl.exe -sS @curlInsecure -D $readyExportHeadersPath -o $readyExportPath -w "%{http_code}" --max-time 30 `
+            -b $cookieJar -H "Accept: application/json" $readyExportUrl
+        if ($LASTEXITCODE -ne 0) { throw "GET calibration-readiness/export failed (curl exit $LASTEXITCODE)" }
+        Assert-Status -Label "GET $readyExportUrl (auth)" -Actual ([int]$readyExportCode) -Expected @(200)
+        $readyExportHeaders = Get-Content -LiteralPath $readyExportHeadersPath -Raw
+        if ($readyExportHeaders -notmatch '(?i)content-disposition:.*attachment') {
+            throw "calibration-readiness/export missing Content-Disposition attachment"
+        }
+        $readyExportBody = Get-Content -LiteralPath $readyExportPath -Raw | ConvertFrom-Json
+        if ([string]::IsNullOrWhiteSpace([string]$readyExportBody.status)) {
+            throw "calibration-readiness/export missing status"
+        }
+        Write-Host "OK  calibration-readiness/export attachment status=$($readyExportBody.status)"
+    } finally {
+        foreach ($p in @($readyExportPath, $readyExportHeadersPath)) {
+            if (Test-Path -LiteralPath $p) {
+                Remove-Item -LiteralPath $p -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
 
     $latestCode = Get-HttpStatus "$api/research/$verifySymbol/assessments/latest" -CookieJar $cookieJar
     Assert-Status -Label "GET $api/research/$verifySymbol/assessments/latest (auth)" -Actual $latestCode -Expected @(200, 404)

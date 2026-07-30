@@ -7,10 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 32 (calibration readiness JSON export).** Authenticated
-`GET /research/{symbol}/calibration-readiness/export` downloads readiness diagnostics
-(ADR-0033). See
-[docs/architecture/decisions/0033-phase-32-calibration-readiness-export.md](docs/architecture/decisions/0033-phase-32-calibration-readiness-export.md)
+**Current phase: Phase 33 (NAS live verify of Phase 32).** Redeploy and evidence gate for
+`GET /research/{symbol}/calibration-readiness/export` (ADR-0034). See
+[docs/architecture/decisions/0034-phase-33-nas-live-verify-phase-32.md](docs/architecture/decisions/0034-phase-33-nas-live-verify-phase-32.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

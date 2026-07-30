@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 33 - NAS Live Verification of Phase 32
+
+Ops evidence gate: redeploy current revision and verify
+`GET /research/{symbol}/calibration-readiness/export` on the live NAS. See
+[docs/architecture/decisions/0034-phase-33-nas-live-verify-phase-32.md](docs/architecture/decisions/0034-phase-33-nas-live-verify-phase-32.md).
+
+#### Added
+
+- ADR-0034: live verify includes readiness export (401 unauth; attachment when auth).
+- `verify.ps1` / `verify.sh` readiness export auth gate + authenticated attachment check.
+
+#### Explicitly out of scope
+
+Default-on calibration, horizon-specific methods, actionable promotion, orders, TLS cutover.
+
 ### Phase 32 - Calibration Readiness JSON Export
 
 Authenticated download of calibration readiness diagnostics for offline audit. See

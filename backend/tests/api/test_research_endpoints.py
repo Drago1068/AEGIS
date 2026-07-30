@@ -87,6 +87,7 @@ class _FakeResearchService:
         self._listed = listed or []
         self._latest = latest
         self.assess_calls: list[str] = []
+        self.list_calls: list[tuple[str, int]] = []
 
     async def assess(self, symbol: str) -> ResearchAssessmentSnapshotData:
         self.assess_calls.append(symbol)
@@ -98,6 +99,7 @@ class _FakeResearchService:
     async def list_assessments(
         self, symbol: str, limit: int
     ) -> list[ResearchAssessmentSnapshotData]:
+        self.list_calls.append((symbol, limit))
         return self._listed[:limit]
 
     async def latest_assessment(
@@ -372,6 +374,69 @@ async def test_list_assessments_newest_first() -> None:
     body = response.json()
     assert len(body) == 2
     assert body[0]["computed_at"] > body[1]["computed_at"]
+
+
+async def test_export_assessments_attachment() -> None:
+    older = _snapshot(id=98, computed_at=datetime(2024, 1, 20, tzinfo=UTC))
+    newer = _snapshot(id=99, computed_at=datetime(2024, 1, 26, tzinfo=UTC))
+    service = _FakeResearchService(listed=[newer, older])
+
+    async with _client(service) as client:
+        response = await client.get("/research/aapl/assessments/export?limit=10")
+
+    assert response.status_code == 200
+    assert "application/json" in response.headers["content-type"]
+    disposition = response.headers["content-disposition"]
+    assert "attachment" in disposition
+    assert 'filename="aegis-AAPL-assessments.json"' in disposition
+    body = response.json()
+    assert isinstance(body, list)
+    assert len(body) == 2
+    assert body[0]["id"] == 99
+    assert body[0]["state"] == STATE_RESEARCH_ONLY
+    assert body[0]["probability_confidence"] is None
+    assert service.list_calls == [("aapl", 10)]
+
+
+async def test_export_assessments_empty_array() -> None:
+    service = _FakeResearchService(listed=[])
+
+    async with _client(service) as client:
+        response = await client.get("/research/AAPL/assessments/export")
+
+    assert response.status_code == 200
+    assert response.json() == []
+    assert "attachment" in response.headers["content-disposition"]
+
+
+async def test_export_assessments_requires_auth() -> None:
+    from aegis.api.dependencies import get_operator_repository, get_session_store
+
+    class _EmptyOperators:
+        async def ensure_seeded(self, username: str, password: str) -> None:
+            return None
+
+        async def get_by_username(self, username: str) -> None:
+            return None
+
+    class _EmptySessions:
+        async def get(self, session_id: str) -> None:
+            return None
+
+        async def create(self, operator_id: int, username: str) -> str:
+            return "unused"
+
+        async def delete(self, session_id: str) -> None:
+            return None
+
+    app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
+    app.dependency_overrides[get_operator_repository] = lambda: _EmptyOperators()
+    app.dependency_overrides[get_session_store] = lambda: _EmptySessions()
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://testserver"
+    ) as client:
+        response = await client.get("/research/AAPL/assessments/export")
+    assert response.status_code == 401
 
 
 async def test_latest_returns_404_when_missing() -> None:

@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 38 - Assessment History JSON Export
+
+Authenticated download of append-only research assessments for a symbol. See
+[docs/architecture/decisions/0039-phase-38-assessments-export.md](docs/architecture/decisions/0039-phase-38-assessments-export.md).
+
+#### Added
+
+- `GET /research/{symbol}/assessments/export?limit=` — same JSON array as the list route
+  with `Content-Disposition: attachment`.
+- Operator console "Download assessments JSON" control.
+- ADR-0039.
+
+#### Explicitly out of scope
+
+Default-on calibration, new methods, actionable promotion, orders, TLS cutover, CSV/PDF.
+
 ### Phase 37 - NAS Live Verification of Phase 36
 
 Ops evidence gate: redeploy current revision and verify

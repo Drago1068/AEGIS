@@ -371,6 +371,61 @@ export async function listResearchAssessments(
   return body as ResearchAssessment[];
 }
 
+/** Download assessment history JSON attachment (Phase 38, ADR-0039). */
+export async function downloadResearchAssessments(
+  baseUrl: string,
+  symbol: string,
+  limit = 20,
+  options?: ApiRequestOptions,
+): Promise<string> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/export` +
+    `?limit=${encodeURIComponent(String(limit))}`;
+  const headers = new Headers();
+  if (options?.cookie) {
+    headers.set("Cookie", options.cookie);
+  }
+  if (!headers.has("Accept")) {
+    headers.set("Accept", "application/json");
+  }
+
+  const response = await fetch(url, {
+    headers,
+    credentials: "include",
+  });
+  redirectToLoginIfNeeded(response.status, options);
+  if (!response.ok) {
+    const body = await readJson(response);
+    throw new ApiClientError(
+      `Unexpected GET assessments export status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+
+  const blob = await response.blob();
+  const filename =
+    parseContentDispositionFilename(response.headers.get("Content-Disposition")) ??
+    `aegis-${symbol.toUpperCase()}-assessments.json`;
+
+  if (typeof window !== "undefined") {
+    const objectUrl = URL.createObjectURL(blob);
+    try {
+      const anchor = document.createElement("a");
+      anchor.href = objectUrl;
+      anchor.download = filename;
+      anchor.rel = "noopener";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  }
+
+  return filename;
+}
+
 export async function getLatestResearchAssessment(
   baseUrl: string,
   symbol: string,

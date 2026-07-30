@@ -561,3 +561,52 @@ describe("downloadProbabilityCalibrations", () => {
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock");
   });
 });
+
+describe("downloadResearchAssessments", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it("downloads the assessments export attachment and returns the filename", async () => {
+    const { downloadResearchAssessments } = await import("./api-client");
+    const blob = new Blob(["[]"], { type: "application/json" });
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: {
+        get: (name: string) =>
+          name.toLowerCase() === "content-disposition"
+            ? 'attachment; filename="aegis-AAPL-assessments.json"'
+            : null,
+      },
+      blob: async () => blob,
+      json: async () => null,
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const createObjectURL = vi.fn(() => "blob:mock");
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal("URL", { createObjectURL, revokeObjectURL });
+    const click = vi.fn();
+    const remove = vi.fn();
+    vi.spyOn(document.body, "appendChild").mockImplementation((node) => node);
+    vi.spyOn(document, "createElement").mockReturnValue({
+      href: "",
+      download: "",
+      rel: "",
+      click,
+      remove,
+    } as unknown as HTMLAnchorElement);
+
+    await expect(
+      downloadResearchAssessments("http://localhost:8000", "AAPL", 20),
+    ).resolves.toBe("aegis-AAPL-assessments.json");
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/research/AAPL/assessments/export?limit=20",
+      expect.objectContaining({ credentials: "include" }),
+    );
+    expect(click).toHaveBeenCalled();
+    expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock");
+  });
+});

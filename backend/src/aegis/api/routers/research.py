@@ -425,6 +425,33 @@ async def list_research_assessments(
     return [ResearchAssessmentResponse.model_validate(item) for item in enriched]
 
 
+@router.get("/{symbol}/assessments/export")
+async def export_research_assessments(
+    symbol: str,
+    limit: int = Query(default=20, ge=1, le=100),
+    service: ResearchAssessmentService = Depends(get_research_assessment_service),
+    calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
+        get_research_calibration_repository
+    ),
+) -> JSONResponse:
+    """Download assessment history as a JSON attachment (ADR-0039)."""
+
+    snapshots = await service.list_assessments(symbol, limit)
+    enriched = [
+        await enrich_assessment_with_calibration(snapshot, calibration_repository)
+        for snapshot in snapshots
+    ]
+    payload = [
+        ResearchAssessmentResponse.model_validate(item).model_dump(mode="json")
+        for item in enriched
+    ]
+    filename = f"aegis-{symbol.upper()}-assessments.json"
+    return JSONResponse(
+        content=payload,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @router.get(
     "/{symbol}/assessments/latest",
     response_model=ResearchAssessmentResponse,

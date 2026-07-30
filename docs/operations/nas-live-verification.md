@@ -1,4 +1,4 @@
-# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46 + Phase 48 + Phase 50 + Phase 52 + Phase 54 + Phase 56 + Phase 58)
+# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46 + Phase 48 + Phase 50 + Phase 52 + Phase 54 + Phase 56 + Phase 58 + Phase 60)
 
 This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0018](../architecture/decisions/0018-phase-17-nas-live-verification.md),
@@ -21,7 +21,8 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0053](../architecture/decisions/0053-phase-52-nas-live-verify-phase-51.md),
 [ADR-0055](../architecture/decisions/0055-phase-54-nas-live-verify-phase-53.md),
 [ADR-0057](../architecture/decisions/0057-phase-56-nas-live-verify-phase-55.md),
-[ADR-0059](../architecture/decisions/0059-phase-58-nas-live-verify-phase-57.md).
+[ADR-0059](../architecture/decisions/0059-phase-58-nas-live-verify-phase-57.md),
+[ADR-0061](../architecture/decisions/0061-phase-60-nas-live-verify-phase-59.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 
@@ -87,7 +88,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 21 | SSH `.env.nas` `AEGIS_DAILY_BAR_OUTPUT_SIZE` (Phase 54) | **`full`** |
 | 22 | SSH `.env.nas` `AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL` (Phase 56) | **`true`** |
 | 23 | Authenticated `POST .../outcome-labels/backfill?limit=100` (Phase 58) | **200**; persist when source-ready candidates exist |
-| 24 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 24 | Authenticated evidence-summary provenance (Phase 60) | ``latest_component_source``, ``latest_resolved_label_bar_source``, ``mixed_component_source_assessment_count`` present |
+| 25 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

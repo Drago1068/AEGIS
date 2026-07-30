@@ -50,7 +50,8 @@ print_checklist() {
   echo " 21. SSH .env.nas includes AEGIS_DAILY_BAR_OUTPUT_SIZE=full (Phase 54)"
   echo " 22. SSH .env.nas includes AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true (Phase 56)"
   echo " 23. Authenticated POST outcome-labels/backfill?limit=100 (Phase 58 source-aware throughput)"
-  echo " 24. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 24. Authenticated evidence-summary includes Phase 59 provenance fields"
+  echo " 25. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -459,6 +460,19 @@ if ! grep -q '"state"[[:space:]]*:[[:space:]]*"research_only"' "${summary_body}"
   echo "evidence-summary missing state=research_only" >&2
   exit 1
 fi
+if ! grep -q '"latest_component_source"' "${summary_body}"; then
+  echo "evidence-summary missing latest_component_source (Phase 59/60)" >&2
+  exit 1
+fi
+if ! grep -q '"latest_resolved_label_bar_source"' "${summary_body}"; then
+  echo "evidence-summary missing latest_resolved_label_bar_source (Phase 59/60)" >&2
+  exit 1
+fi
+if ! grep -q '"mixed_component_source_assessment_count"' "${summary_body}"; then
+  echo "evidence-summary missing mixed_component_source_assessment_count (Phase 59/60)" >&2
+  exit 1
+fi
+echo "OK  Phase 60 evidence-summary provenance fields present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"

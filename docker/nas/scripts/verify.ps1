@@ -61,7 +61,8 @@ function Write-VerifyChecklist {
     Write-Host " 21. SSH .env.nas includes AEGIS_DAILY_BAR_OUTPUT_SIZE=full (Phase 54)"
     Write-Host " 22. SSH .env.nas includes AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true (Phase 56)"
     Write-Host " 23. Authenticated POST outcome-labels/backfill?limit=100 (Phase 58 source-aware throughput)"
-    Write-Host " 24. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 24. Authenticated evidence-summary includes Phase 59 provenance fields"
+    Write-Host " 25. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -509,7 +510,20 @@ try {
         }
         $labelPart = if ($labelKeys.Count -gt 0) { $labelKeys -join "," } else { "(none)" }
         $endPart = if ($endDateKeys.Count -gt 0) { $endDateKeys -join "," } else { "(none)" }
-        Write-Host "OK  evidence-summary state=research_only assessments=$($summary.assessment_count) label_keys=$labelPart end_date_keys=$endPart"
+        # Phase 60: provenance fields from Phase 59 (null/zero OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_component_source")) {
+            throw "evidence-summary missing latest_component_source (Phase 59/60)"
+        }
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_resolved_label_bar_source")) {
+            throw "evidence-summary missing latest_resolved_label_bar_source (Phase 59/60)"
+        }
+        if ($null -eq $summary.mixed_component_source_assessment_count -or [int]$summary.mixed_component_source_assessment_count -lt 0) {
+            throw "evidence-summary mixed_component_source_assessment_count must be >= 0"
+        }
+        $compSrc = if ($null -eq $summary.latest_component_source) { "null" } else { $summary.latest_component_source }
+        $labelSrc = if ($null -eq $summary.latest_resolved_label_bar_source) { "null" } else { $summary.latest_resolved_label_bar_source }
+        Write-Host "OK  evidence-summary state=research_only assessments=$($summary.assessment_count) label_keys=$labelPart end_date_keys=$endPart component_source=$compSrc label_bar_source=$labelSrc mixed_count=$($summary.mixed_component_source_assessment_count)"
+        Write-Host "OK  Phase 60 evidence-summary provenance fields present"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -536,7 +550,16 @@ try {
         if ($null -eq $exportBody.assessment_count -or [int]$exportBody.assessment_count -lt 0) {
             throw "evidence-summary/export assessment_count must be >= 0"
         }
-        Write-Host "OK  evidence-summary/export attachment state=research_only assessments=$($exportBody.assessment_count)"
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_component_source")) {
+            throw "evidence-summary/export missing latest_component_source (Phase 59/60)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_resolved_label_bar_source")) {
+            throw "evidence-summary/export missing latest_resolved_label_bar_source (Phase 59/60)"
+        }
+        if ($null -eq $exportBody.mixed_component_source_assessment_count -or [int]$exportBody.mixed_component_source_assessment_count -lt 0) {
+            throw "evidence-summary/export mixed_component_source_assessment_count must be >= 0"
+        }
+        Write-Host "OK  evidence-summary/export attachment state=research_only assessments=$($exportBody.assessment_count) provenance fields present"
     } finally {
         foreach ($p in @($exportPath, $exportHeadersPath)) {
             if (Test-Path -LiteralPath $p) {

@@ -7,9 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 59 (cross-source provenance in evidence summary).** Surface mixed
-component source and resolved label bar source on evidence-summary / console (ADR-0060). See
-[docs/architecture/decisions/0060-phase-59-cross-source-provenance-evidence-summary.md](docs/architecture/decisions/0060-phase-59-cross-source-provenance-evidence-summary.md)
+**Current phase: Phase 60 (NAS live verify of Phase 59).** Redeploy under lab TLS and
+confirm evidence-summary provenance fields (ADR-0061). See
+[docs/architecture/decisions/0061-phase-60-nas-live-verify-phase-59.md](docs/architecture/decisions/0061-phase-60-nas-live-verify-phase-59.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

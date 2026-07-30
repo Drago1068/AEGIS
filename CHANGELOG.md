@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 60 - NAS Live Verification of Phase 59
+
+Ops evidence gate: redeploy under lab TLS and confirm evidence-summary provenance fields.
+See
+[docs/architecture/decisions/0061-phase-60-nas-live-verify-phase-59.md](docs/architecture/decisions/0061-phase-60-nas-live-verify-phase-59.md).
+
+#### Added
+
+- ADR-0061: live verify requires ``latest_component_source``,
+  ``latest_resolved_label_bar_source``, and ``mixed_component_source_assessment_count`` on
+  evidence-summary (+ export).
+- Verify checklist item for Phase 60 provenance fields.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 59 - Cross-Source Provenance in Evidence Summary
 
 Surface ``component_source=mixed`` and resolved label ``bar_source`` on the research evidence

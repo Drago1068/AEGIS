@@ -36,9 +36,17 @@ def _operator() -> Operator:
     )
 
 
-def _snapshot() -> ResearchAssessmentSnapshotData:
+def _snapshot(
+    *,
+    snapshot_id: int = 1,
+    input_source: str = "alpha_vantage",
+    component_source: str | None = None,
+) -> ResearchAssessmentSnapshotData:
+    components: dict[str, float | str] = {"research_index": 0.46}
+    if component_source is not None:
+        components["component_source"] = component_source
     return ResearchAssessmentSnapshotData(
-        id=1,
+        id=snapshot_id,
         symbol="AAPL",
         method_id="daily_bar_research_v1",
         method_version=1,
@@ -48,9 +56,9 @@ def _snapshot() -> ResearchAssessmentSnapshotData:
         computed_at=datetime(2024, 1, 26, 18, 0, tzinfo=UTC),
         coverage_confidence=0.95,
         probability_confidence=None,
-        components={"research_index": 0.46},
+        components=components,
         schema_version=1,
-        input_source="alpha_vantage",
+        input_source=input_source,
         lookback_start_date=date(2023, 12, 27),
         lookback_end_date=date(2024, 1, 26),
         bar_count=20,
@@ -207,6 +215,9 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["assessment_count"] == 0
     assert body["outcome_label_count"] == 0
     assert body["calibration_count"] == 0
+    assert body["latest_component_source"] is None
+    assert body["latest_resolved_label_bar_source"] is None
+    assert body["mixed_component_source_assessment_count"] == 0
     assert body["calibration_readiness"]["status"] == "no_assessment"
     assert "never invented" in body["detail"].lower() or "not invented" in body["detail"].lower()
 
@@ -230,9 +241,30 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["outcome_label_count"] == 1
     assert body["calibration_count"] == 1
     assert body["state"] == "research_only"
+    assert body["latest_component_source"] == "alpha_vantage"
+    assert body["latest_resolved_label_bar_source"] == "alpha_vantage"
+    assert body["mixed_component_source_assessment_count"] == 0
 
 
-async def test_evidence_summary_export_attachment() -> None:
+async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:
+    mixed = _snapshot(
+        snapshot_id=2,
+        input_source="mixed",
+        component_source="mixed",
+    )
+    primary = _snapshot(snapshot_id=1, component_source="alpha_vantage")
+    async with _client(
+        assessments=[mixed, primary],
+        labels=[_label()],
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["latest_component_source"] == "mixed"
+    assert body["latest_resolved_label_bar_source"] == "alpha_vantage"
+    assert body["mixed_component_source_assessment_count"] == 1
+
     async with _client(
         assessments=[_snapshot()],
         labels=[_label()],

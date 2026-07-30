@@ -174,13 +174,19 @@ def compute_forward_total_return_labels(
     )
 
 
-def _resolve_label_bar_source(snapshot: ResearchAssessmentSnapshotData) -> str:
+def resolve_label_bar_source(snapshot: ResearchAssessmentSnapshotData) -> str:
+    """Resolve the observation source used for Phase 13 label closes (ADR-0014 / ADR-0058)."""
+
     if snapshot.input_source != COMPONENT_SOURCE_MIXED:
         return snapshot.input_source
     component_source = snapshot.components.get("component_source")
     if isinstance(component_source, str) and component_source != COMPONENT_SOURCE_MIXED:
         return component_source
     return snapshot.input_source
+
+
+def _resolve_label_bar_source(snapshot: ResearchAssessmentSnapshotData) -> str:
+    return resolve_label_bar_source(snapshot)
 
 
 def _index_closes(

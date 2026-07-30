@@ -572,6 +572,27 @@ export function ResearchAssessmentPanel({
               </dd>
             </div>
             <div>
+              <dt className="text-aegis-muted">Latest component source</dt>
+              <dd className="font-mono">
+                {evidenceSummary.latest_component_source ?? "null"}
+                {evidenceSummary.latest_component_source === "mixed"
+                  ? " (cross-source fill)"
+                  : null}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-aegis-muted">Resolved label bar source</dt>
+              <dd className="font-mono">
+                {evidenceSummary.latest_resolved_label_bar_source ?? "null"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-aegis-muted">Mixed-source assessments (scanned)</dt>
+              <dd className="font-mono">
+                {evidenceSummary.mixed_component_source_assessment_count}
+              </dd>
+            </div>
+            <div>
               <dt className="text-aegis-muted">Latest probability_confidence</dt>
               <dd className="font-mono">
                 {evidenceSummary.latest_calibration == null
@@ -658,7 +679,12 @@ export function ResearchAssessmentPanel({
             {typeof latest.components.component_source === "string" ? (
               <div>
                 <dt className="text-aegis-muted">Component source</dt>
-                <dd className="font-mono">{latest.components.component_source}</dd>
+                <dd className="font-mono">
+                  {latest.components.component_source}
+                  {latest.components.component_source === "mixed"
+                    ? " (cross-source fill — research only)"
+                    : null}
+                </dd>
               </div>
             ) : null}
             {typeof latest.components.source_availability_factor === "number" ? (

@@ -936,6 +936,12 @@ export interface ResearchEvidenceSummary {
   assessment_count: number;
   outcome_label_count: number;
   calibration_count: number;
+  /** Component series source for latest assessment; may be "mixed". Null when no assessment. */
+  latest_component_source: string | null;
+  /** Label bar source for latest assessment (persisted label preferred). */
+  latest_resolved_label_bar_source: string | null;
+  /** Count of newest ≤100 assessments with component_source "mixed". */
+  mixed_component_source_assessment_count: number;
   detail: string;
 }
 

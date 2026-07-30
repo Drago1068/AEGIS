@@ -24,4 +24,25 @@ class ResearchEvidenceSummaryResponse(BaseModel):
     assessment_count: int = Field(ge=0)
     outcome_label_count: int = Field(ge=0)
     calibration_count: int = Field(ge=0)
+    latest_component_source: str | None = Field(
+        default=None,
+        description=(
+            "Component series source for the latest assessment (may be 'mixed' when "
+            "cross-source fill was used). Null when no assessment."
+        ),
+    )
+    latest_resolved_label_bar_source: str | None = Field(
+        default=None,
+        description=(
+            "Observation source used (or that would be used) for Phase 13 label closes on "
+            "the latest assessment. Prefers persisted label.bar_source when present."
+        ),
+    )
+    mixed_component_source_assessment_count: int = Field(
+        default=0,
+        ge=0,
+        description=(
+            "Count of scanned assessments (≤100 newest) whose component_source is 'mixed'."
+        ),
+    )
     detail: str

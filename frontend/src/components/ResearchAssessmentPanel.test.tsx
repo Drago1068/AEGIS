@@ -129,6 +129,9 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 0,
       outcome_label_count: 0,
       calibration_count: 0,
+      latest_component_source: null,
+      latest_resolved_label_bar_source: null,
+      mixed_component_source_assessment_count: 0,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
   });
@@ -410,6 +413,9 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 2,
       outcome_label_count: 1,
       calibration_count: 1,
+      latest_component_source: "mixed",
+      latest_resolved_label_bar_source: "alpha_vantage",
+      mixed_component_source_assessment_count: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
 
@@ -420,6 +426,10 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/evidence summary \(research-only/i)).toBeInTheDocument();
       expect(screen.getByText(/assessments \(≤100\)/i)).toBeInTheDocument();
       expect(screen.getByText("1 / 1")).toBeInTheDocument();
+      expect(screen.getByText(/latest component source/i)).toBeInTheDocument();
+      expect(screen.getByText(/cross-source fill/i)).toBeInTheDocument();
+      expect(screen.getByText(/resolved label bar source/i)).toBeInTheDocument();
+      expect(screen.getByText(/mixed-source assessments \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/latest forward_return_5/i)).toBeInTheDocument();
       expect(screen.getByText(/latest forward_return_20/i)).toBeInTheDocument();
       expect(screen.getByText(/0\.0500 · end 2024-02-02/)).toBeInTheDocument();

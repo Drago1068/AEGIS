@@ -35,10 +35,13 @@ from aegis.api.schemas.research_probability_calibration import ProbabilityCalibr
 from aegis.domain.research_assessment import (
     ResearchAssessmentService,
     ResearchAssessmentUnavailableError,
+    component_source_of,
+    is_mixed_component_source,
 )
 from aegis.domain.research_outcome_labels import (
     OutcomeLabelService,
     OutcomeLabelUnavailableError,
+    resolve_label_bar_source,
 )
 from aegis.domain.research_probability_calibration import (
     CalibrationUnavailableError,
@@ -386,14 +389,22 @@ async def _build_research_evidence_summary(
     latest_calibration = None
     outcome_label_count = 0
     calibration_count = 0
+    latest_component_source = None
+    latest_resolved_label_bar_source = None
+    mixed_component_source_assessment_count = sum(
+        1 for row in snapshots if is_mixed_component_source(row)
+    )
 
     if snapshot is not None and snapshot.id is not None:
         enriched = await enrich_assessment_with_calibration(snapshot, calibration_repository)
         latest_assessment = ResearchAssessmentResponse.model_validate(enriched)
+        latest_component_source = component_source_of(snapshot)
+        latest_resolved_label_bar_source = resolve_label_bar_source(snapshot)
         labels = await outcome_label_service.list_labels_for_assessment(symbol, snapshot.id, 100)
         outcome_label_count = len(labels)
         if labels:
             latest_outcome_label = OutcomeLabelResponse.model_validate(labels[0])
+            latest_resolved_label_bar_source = labels[0].bar_source
         calibrations = await calibration_service.list_calibrations_for_assessment(
             symbol, snapshot.id, 100
         )
@@ -411,6 +422,9 @@ async def _build_research_evidence_summary(
         assessment_count=assessment_count,
         outcome_label_count=outcome_label_count,
         calibration_count=calibration_count,
+        latest_component_source=latest_component_source,
+        latest_resolved_label_bar_source=latest_resolved_label_bar_source,
+        mixed_component_source_assessment_count=mixed_component_source_assessment_count,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

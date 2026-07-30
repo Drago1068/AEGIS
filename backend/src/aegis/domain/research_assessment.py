@@ -57,6 +57,24 @@ MULTI_SOURCE_AGREEMENT_FLOOR = 0.80
 COMPONENT_SOURCE_MIXED = "mixed"
 
 
+def component_source_of(snapshot: ResearchAssessmentSnapshotData) -> str:
+    """Return the assessment component series source id (may be ``mixed``).
+
+    Prefers ``components["component_source"]`` when present; otherwise ``input_source``.
+    """
+
+    raw = snapshot.components.get("component_source")
+    if isinstance(raw, str) and raw.strip():
+        return raw
+    return snapshot.input_source
+
+
+def is_mixed_component_source(snapshot: ResearchAssessmentSnapshotData) -> bool:
+    """True when the assessment used cross-source component fill (``mixed``)."""
+
+    return component_source_of(snapshot) == COMPONENT_SOURCE_MIXED
+
+
 class ResearchAssessmentReason(StrEnum):
     """Structured fail-closed reason codes for HTTP 422 ``detail.reason``."""
 

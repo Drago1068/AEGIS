@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 59 - Cross-Source Provenance in Evidence Summary
+
+Surface ``component_source=mixed`` and resolved label ``bar_source`` on the research evidence
+summary for audit transparency when cross-source fill is used. See
+[docs/architecture/decisions/0060-phase-59-cross-source-provenance-evidence-summary.md](docs/architecture/decisions/0060-phase-59-cross-source-provenance-evidence-summary.md).
+
+#### Added
+
+- Evidence-summary fields: ``latest_component_source``, ``latest_resolved_label_bar_source``,
+  ``mixed_component_source_assessment_count``.
+- Console evidence-summary provenance rows; annotate ``mixed`` as cross-source fill.
+
+#### Explicitly out of scope
+
+Changing assessment/label math, default-on calibration, NAS live verify, actionable promotion,
+orders.
+
 ### Phase 58 - NAS Live Verification of Phase 57
 
 Ops evidence gate: redeploy under lab TLS with source-aware label backfill and

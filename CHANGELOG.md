@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 31 - NAS Live Verification of Phase 30
+
+Ops evidence gate: redeploy current revision (Phase 30 end-date UI) and re-run live verify
+on the NAS. See
+[docs/architecture/decisions/0032-phase-31-nas-live-verify-phase-30.md](docs/architecture/decisions/0032-phase-31-nas-live-verify-phase-30.md).
+
+#### Added
+
+- ADR-0032: redeploy + verify; evidence-summary logs present `label_end_dates` keys only.
+- `verify.ps1` / `verify.sh` log `end_date_keys` alongside label keys.
+
+#### Explicitly out of scope
+
+New methods, horizon-specific calibration, default-on calibration, actionable promotion,
+orders, TLS cutover.
+
 ### Phase 30 - Outcome Label End-Date Surfacing
 
 Operator console shows `label_end_dates` next to present horizon returns (API payload only).

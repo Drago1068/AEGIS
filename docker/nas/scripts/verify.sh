@@ -36,7 +36,7 @@ print_checklist() {
   echo "  7. Authenticated GET /research/${symbol}/assessments/latest -> 200|404"
   echo "  8. Authenticated GET /research/${symbol}/assessments?limit= -> 200 (JSON array; [] OK)"
   echo "  9. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
-  echo " 10. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label keys when any)"
+  echo " 10. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
   echo " 11. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
   echo " 12. SSH alembic current includes 0008|head (when SSH configured)"
   echo " 13. TLS profile: https:// URLs + Secure cookies when enabled"
@@ -229,14 +229,25 @@ if ! grep -q '"state"[[:space:]]*:[[:space:]]*"research_only"' "${summary_body}"
   echo "evidence-summary missing state=research_only" >&2
   exit 1
 fi
-# Phase 27: log present label keys only (never invent missing horizons).
+# Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
-  echo "OK  evidence-summary state=research_only label_keys=(none)"
-elif printf '%s' "${summary_body}" | grep -q '"forward_return_'; then
-  keys="$(printf '%s' "${summary_body}" | grep -oE '"forward_return_[0-9]+"' | tr -d '"' | sort -u | paste -sd, -)"
-  echo "OK  evidence-summary state=research_only label_keys=${keys}"
+  echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
 else
-  echo "OK  evidence-summary state=research_only label_keys=(none-or-empty)"
+  if printf '%s' "${summary_body}" | grep -q '"labels"[[:space:]]*:[[:space:]]*{[^}]*}'; then
+    keys="$(printf '%s' "${summary_body}" | grep -oE '"forward_return_[0-9]+"' | tr -d '"' | sort -u | paste -sd, -)"
+    if [[ -z "${keys}" ]]; then keys="(none-or-empty)"; fi
+  else
+    keys="(none-or-empty)"
+  fi
+  if printf '%s' "${summary_body}" | grep -q '"label_end_dates"[[:space:]]*:[[:space:]]*null\|"label_end_dates"[[:space:]]*:[[:space:]]*{}'; then
+    end_keys="(none)"
+  elif printf '%s' "${summary_body}" | grep -q '"label_end_dates"'; then
+    end_keys="$(printf '%s' "${summary_body}" | grep -oE '"forward_return_[0-9]+"' | tr -d '"' | sort -u | paste -sd, -)"
+    if [[ -z "${end_keys}" ]]; then end_keys="(none)"; fi
+  else
+    end_keys="(none)"
+  fi
+  echo "OK  evidence-summary state=research_only label_keys=${keys} end_date_keys=${end_keys}"
 fi
 
 export_url="${API}/research/${VERIFY_SYMBOL}/evidence-summary/export"

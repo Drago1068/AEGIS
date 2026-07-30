@@ -424,6 +424,21 @@ async def _build_research_evidence_summary(
             latest_mixed_label_bar_source = mixed_labels[0].bar_source
             break
 
+    most_recent_labeled_assessment_id: int | None = None
+    most_recent_labeled_outcome_label = None
+    for row in snapshots:
+        if row.id is None or row.id not in labeled_ids:
+            continue
+        scan_labels = await outcome_label_service.list_labels_for_assessment(
+            symbol, row.id, 1
+        )
+        if scan_labels:
+            most_recent_labeled_assessment_id = row.id
+            most_recent_labeled_outcome_label = OutcomeLabelResponse.model_validate(
+                scan_labels[0]
+            )
+            break
+
     if snapshot is not None and snapshot.id is not None:
         enriched = await enrich_assessment_with_calibration(snapshot, calibration_repository)
         latest_assessment = ResearchAssessmentResponse.model_validate(enriched)
@@ -457,6 +472,8 @@ async def _build_research_evidence_summary(
         mixed_unlabeled_assessment_count=mixed_unlabeled_assessment_count,
         mixed_labeled_assessment_count=mixed_labeled_assessment_count,
         latest_mixed_label_bar_source=latest_mixed_label_bar_source,
+        most_recent_labeled_assessment_id=most_recent_labeled_assessment_id,
+        most_recent_labeled_outcome_label=most_recent_labeled_outcome_label,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

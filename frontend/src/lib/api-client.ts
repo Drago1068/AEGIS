@@ -958,6 +958,10 @@ export interface ResearchEvidenceSummary {
   mixed_labeled_assessment_count: number;
   /** bar_source from the newest labeled mixed assessment; null when none labeled. */
   latest_mixed_label_bar_source: string | null;
+  /** Newest labeled assessment id in the ≤100 scan; may differ from latest_assessment. */
+  most_recent_labeled_assessment_id: number | null;
+  /** Newest labeled outcome in the ≤100 scan; never invented. */
+  most_recent_labeled_outcome_label: OutcomeLabel | null;
   detail: string;
 }
 

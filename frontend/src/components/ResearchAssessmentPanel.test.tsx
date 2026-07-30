@@ -135,6 +135,8 @@ describe("ResearchAssessmentPanel", () => {
       mixed_unlabeled_assessment_count: 0,
       mixed_labeled_assessment_count: 0,
       latest_mixed_label_bar_source: null,
+      most_recent_labeled_assessment_id: null,
+      most_recent_labeled_outcome_label: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
   });
@@ -439,6 +441,24 @@ describe("ResearchAssessmentPanel", () => {
       mixed_unlabeled_assessment_count: 0,
       mixed_labeled_assessment_count: 1,
       latest_mixed_label_bar_source: "alpha_vantage",
+      most_recent_labeled_assessment_id: 1,
+      most_recent_labeled_outcome_label: {
+        id: 20,
+        assessment_snapshot_id: 1,
+        symbol: "AAPL",
+        label_method_id: "forward_total_return_v1",
+        label_method_version: 1,
+        state: "research_only",
+        as_of_trading_date: "2024-01-26",
+        computed_at: "2024-01-26T20:00:00Z",
+        labels: { forward_return_5: 0.05, forward_return_20: 0.1 },
+        label_end_dates: {
+          forward_return_5: "2024-02-02",
+          forward_return_20: "2024-02-23",
+        },
+        schema_version: 1,
+        bar_source: "alpha_vantage",
+      },
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
 
@@ -637,6 +657,21 @@ describe("ResearchAssessmentPanel", () => {
       mixed_unlabeled_assessment_count: 0,
       mixed_labeled_assessment_count: 19,
       latest_mixed_label_bar_source: "polygon",
+      most_recent_labeled_assessment_id: 3,
+      most_recent_labeled_outcome_label: {
+        id: 30,
+        assessment_snapshot_id: 3,
+        symbol: "AAPL",
+        label_method_id: "forward_total_return_v1",
+        label_method_version: 1,
+        state: "research_only",
+        as_of_trading_date: "2024-01-26",
+        computed_at: "2024-01-26T20:00:00Z",
+        labels: { forward_return_5: 0.02 },
+        label_end_dates: { forward_return_5: "2024-02-02" },
+        schema_version: 1,
+        bar_source: "polygon",
+      },
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listResearchAssessments).mockResolvedValue([mixedRow]);

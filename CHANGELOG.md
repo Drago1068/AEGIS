@@ -7,10 +7,26 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 79 - Most-Recent Labeled Outcome on Evidence Summary
+
+Surface the newest labeled assessment in the ≤100 scan when the absolute latest is still
+unlabeled. See
+[docs/architecture/decisions/0080-phase-79-most-recent-labeled-evidence-summary.md](docs/architecture/decisions/0080-phase-79-most-recent-labeled-evidence-summary.md).
+
+#### Added
+
+- Evidence-summary fields ``most_recent_labeled_assessment_id`` and
+  ``most_recent_labeled_outcome_label``.
+- Console “Scan-labeled …” rows when they differ from absolute latest.
+
+#### Explicitly out of scope
+
+Changing ``latest_assessment`` identity, default-on calibration, invented labels, orders.
+
 ### Phase 78 - NAS Live Verification of Phase 77
 
 Ops evidence gate: redeploy frontend under lab TLS with Phase 77 horizon detail expand.
-See
+Live verify passed 2026-07-30. See
 [docs/architecture/decisions/0079-phase-78-nas-live-verify-phase-77.md](docs/architecture/decisions/0079-phase-78-nas-live-verify-phase-77.md).
 
 #### Added

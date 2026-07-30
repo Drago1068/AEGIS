@@ -751,6 +751,38 @@ export function ResearchAssessmentPanel({
                 },
               )
             )}
+            {evidenceSummary.most_recent_labeled_outcome_label != null &&
+            (evidenceSummary.latest_outcome_label == null ||
+              evidenceSummary.most_recent_labeled_assessment_id !==
+                evidenceSummary.latest_assessment?.id) ? (
+              <>
+                <div>
+                  <dt className="text-aegis-muted">Most recent labeled assessment id</dt>
+                  <dd className="font-mono" data-testid="most-recent-labeled-assessment-id">
+                    {evidenceSummary.most_recent_labeled_assessment_id ?? "null"}
+                  </dd>
+                </div>
+                {sortedLabelEntries(
+                  evidenceSummary.most_recent_labeled_outcome_label.labels,
+                ).map(([key, value]) => {
+                  const end =
+                    evidenceSummary.most_recent_labeled_outcome_label?.label_end_dates?.[
+                      key
+                    ];
+                  return (
+                    <div key={`scan-${key}`}>
+                      <dt className="text-aegis-muted">Scan-labeled {key}</dt>
+                      <dd className="font-mono">
+                        {value.toFixed(4)}
+                        {typeof end === "string" && end.length > 0
+                          ? ` · end ${end}`
+                          : null}
+                      </dd>
+                    </div>
+                  );
+                })}
+              </>
+            ) : null}
           </dl>
           <p className="mt-2 text-xs text-aegis-muted">{evidenceSummary.detail}</p>
         </div>

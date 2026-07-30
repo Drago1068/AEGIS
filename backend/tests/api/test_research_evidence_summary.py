@@ -237,6 +237,8 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["mixed_unlabeled_assessment_count"] == 0
     assert body["mixed_labeled_assessment_count"] == 0
     assert body["latest_mixed_label_bar_source"] is None
+    assert body["most_recent_labeled_assessment_id"] is None
+    assert body["most_recent_labeled_outcome_label"] is None
     assert body["calibration_readiness"]["status"] == "no_assessment"
     assert "never invented" in body["detail"].lower() or "not invented" in body["detail"].lower()
 
@@ -266,6 +268,8 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["mixed_unlabeled_assessment_count"] == 0
     assert body["mixed_labeled_assessment_count"] == 0
     assert body["latest_mixed_label_bar_source"] is None
+    assert body["most_recent_labeled_assessment_id"] == 1
+    assert body["most_recent_labeled_outcome_label"]["labels"]["forward_return_5"] == 0.05
 
 
 async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:
@@ -343,6 +347,10 @@ async def test_evidence_summary_counts_mixed_unlabeled() -> None:
     assert body["mixed_unlabeled_assessment_count"] == 1
     assert body["mixed_labeled_assessment_count"] == 1
     assert body["latest_mixed_label_bar_source"] == "alpha_vantage"
+    assert body["latest_outcome_label"] is None
+    assert body["most_recent_labeled_assessment_id"] == 2
+    assert body["most_recent_labeled_outcome_label"]["labels"]["forward_return_5"] == 0.04
+    assert body["most_recent_labeled_outcome_label"]["assessment_snapshot_id"] == 2
 
     async with _client(
         assessments=[_snapshot()],

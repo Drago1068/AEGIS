@@ -1,6 +1,6 @@
 # ADR-0079: Phase 78 NAS Live Verification of Phase 77
 
-- Status: Accepted
+- Status: Accepted (live verified 2026-07-30; frontend recreate of ``1b868c2``)
 - Date: 2026-07-30
 
 ## Context

@@ -68,4 +68,20 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "outcome label. Null when none of the scanned mixed assessments are labeled."
         ),
     )
+    most_recent_labeled_assessment_id: int | None = Field(
+        default=None,
+        description=(
+            "Assessment id of the newest scanned assessment (≤100) that has a default-method "
+            "outcome label. Null when none labeled. Distinct from latest_assessment when the "
+            "absolute newest snapshot is still unlabeled."
+        ),
+    )
+    most_recent_labeled_outcome_label: OutcomeLabelResponse | None = Field(
+        default=None,
+        description=(
+            "Newest default-method outcome label among the ≤100 scan. Equals "
+            "latest_outcome_label when the absolute latest assessment is labeled; otherwise "
+            "the label from most_recent_labeled_assessment_id. Never invented."
+        ),
+    )
     detail: str

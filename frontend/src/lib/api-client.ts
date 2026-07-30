@@ -401,11 +401,16 @@ export async function listResearchAssessments(
   baseUrl: string,
   symbol: string,
   limit = 20,
-  options?: ApiRequestOptions,
+  options?: ApiRequestOptions & { componentSource?: string | null },
 ): Promise<ResearchAssessment[]> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  const source = options?.componentSource?.trim();
+  if (source) {
+    params.set("component_source", source);
+  }
   const url =
     `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments` +
-    `?limit=${limit}`;
+    `?${params.toString()}`;
   const { response, body } = await requestJson(url, undefined, options);
   if (!response.ok) {
     throw new ApiClientError(
@@ -417,16 +422,21 @@ export async function listResearchAssessments(
   return body as ResearchAssessment[];
 }
 
-/** Download assessment history JSON attachment (Phase 38, ADR-0039). */
+/** Download assessment history JSON attachment (Phase 38/61, ADR-0039 / ADR-0062). */
 export async function downloadResearchAssessments(
   baseUrl: string,
   symbol: string,
   limit = 20,
-  options?: ApiRequestOptions,
+  options?: ApiRequestOptions & { componentSource?: string | null },
 ): Promise<string> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  const source = options?.componentSource?.trim();
+  if (source) {
+    params.set("component_source", source);
+  }
   const url =
     `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/export` +
-    `?limit=${encodeURIComponent(String(limit))}`;
+    `?${params.toString()}`;
   const headers = new Headers();
   if (options?.cookie) {
     headers.set("Cookie", options.cookie);

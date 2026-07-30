@@ -90,7 +90,7 @@ function formatLabelHorizonSummary(
     .join(" · ");
 }
 
-/** Compact assessment history line from API payload only (Phase 28, ADR-0029). */
+/** Compact assessment history line from API payload only (Phase 28/61). */
 function formatAssessmentHistoryRow(row: ResearchAssessment): string {
   const index = row.components.research_index;
   const indexLabel =
@@ -100,8 +100,20 @@ function formatAssessmentHistoryRow(row: ResearchAssessment): string {
     row.probability_confidence === null
       ? "p=null"
       : `p=${row.probability_confidence.toFixed(4)}`;
-  return `${row.computed_at} · ${indexLabel} · ${cov} · ${p}`;
+  const srcRaw = row.components.component_source;
+  const src =
+    typeof srcRaw === "string" && srcRaw.trim()
+      ? srcRaw
+      : row.input_source;
+  return `${row.computed_at} · ${indexLabel} · ${cov} · ${p} · src=${src}`;
 }
+
+const ASSESSMENT_SOURCE_FILTER_OPTIONS = [
+  { value: "", label: "All sources" },
+  { value: "mixed", label: "mixed (cross-source fill)" },
+  { value: "alpha_vantage", label: "alpha_vantage" },
+  { value: "polygon", label: "polygon" },
+] as const;
 
 export function ResearchAssessmentPanel({
   symbol,
@@ -124,12 +136,16 @@ export function ResearchAssessmentPanel({
   );
   const [assessmentBackfillSummary, setAssessmentBackfillSummary] =
     useState<AssessmentBackfillResponse | null>(null);
+  const [assessmentSourceFilter, setAssessmentSourceFilter] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const baseUrl = getApiBaseUrl();
 
-  async function loadAssessmentHistory() {
-    const rows = await listResearchAssessments(baseUrl, symbol, 20);
+  async function loadAssessmentHistory(componentSource?: string) {
+    const source = componentSource ?? assessmentSourceFilter;
+    const rows = await listResearchAssessments(baseUrl, symbol, 20, {
+      componentSource: source || null,
+    });
     setAssessmentHistory(rows);
   }
 
@@ -369,7 +385,21 @@ export function ResearchAssessmentPanel({
     startTransition(async () => {
       setError(null);
       try {
-        await downloadResearchAssessments(baseUrl, symbol, 20);
+        await downloadResearchAssessments(baseUrl, symbol, 20, {
+          componentSource: assessmentSourceFilter || null,
+        });
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
+  function onAssessmentSourceFilterChange(next: string) {
+    setAssessmentSourceFilter(next);
+    startTransition(async () => {
+      setError(null);
+      try {
+        await loadAssessmentHistory(next);
       } catch (err) {
         setError(formatAssessmentError(err));
       }
@@ -712,11 +742,39 @@ export function ResearchAssessmentPanel({
             Computed at {latest.computed_at} from source {latest.input_source}. Research
             only — not actionable.
           </p>
-          {assessmentHistory.length > 1 ? (
-            <div className="rounded border border-aegis-line bg-white/60 p-3">
+          <div className="rounded border border-aegis-line bg-white/60 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
                 Assessment history (newest first)
               </p>
+              <label
+                htmlFor="assessment-history-source-filter"
+                className="flex items-center gap-2 text-xs text-aegis-muted"
+              >
+                History source filter
+                <select
+                  id="assessment-history-source-filter"
+                  aria-label="History source filter"
+                  value={assessmentSourceFilter}
+                  onChange={(event) => onAssessmentSourceFilterChange(event.target.value)}
+                  disabled={isPending}
+                  className="rounded border border-aegis-line bg-white px-2 py-1 font-mono text-aegis-ink"
+                >
+                  {ASSESSMENT_SOURCE_FILTER_OPTIONS.map((option) => (
+                    <option key={option.value || "all"} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            {assessmentHistory.length === 0 ? (
+              <p className="mt-2 font-mono text-xs text-aegis-muted">
+                {assessmentSourceFilter
+                  ? "No assessments match this source filter."
+                  : "Refresh or assess to load history."}
+              </p>
+            ) : (
               <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
                 {assessmentHistory.map((row) => {
                   const line = formatAssessmentHistoryRow(row);
@@ -725,8 +783,8 @@ export function ResearchAssessmentPanel({
                   );
                 })}
               </ul>
-            </div>
-          ) : null}
+            )}
+          </div>
           {outcomeLabel ? (
             <div className="rounded border border-aegis-line bg-white/60 p-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">

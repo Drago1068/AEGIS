@@ -376,6 +376,63 @@ async def test_list_assessments_newest_first() -> None:
     assert body[0]["computed_at"] > body[1]["computed_at"]
 
 
+async def test_list_assessments_filters_component_source_mixed() -> None:
+    from aegis.domain.research_assessment import ASSESSMENT_FILTER_SCAN_LIMIT
+
+    mixed = _snapshot(
+        id=3,
+        computed_at=datetime(2024, 1, 26, tzinfo=UTC),
+        components={
+            "research_index": 0.46,
+            "component_source": "mixed",
+        },
+        input_source="mixed",
+    )
+    poly = _snapshot(
+        id=2,
+        computed_at=datetime(2024, 1, 25, tzinfo=UTC),
+        components={"research_index": 0.4, "component_source": "polygon"},
+        input_source="polygon",
+    )
+    av = _snapshot(id=1, computed_at=datetime(2024, 1, 24, tzinfo=UTC))
+    service = _FakeResearchService(listed=[mixed, poly, av])
+
+    async with _client(service) as client:
+        response = await client.get(
+            "/research/AAPL/assessments?limit=20&component_source=mixed"
+        )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) == 1
+    assert body[0]["id"] == 3
+    assert body[0]["components"]["component_source"] == "mixed"
+    assert service.list_calls == [("AAPL", ASSESSMENT_FILTER_SCAN_LIMIT)]
+
+
+async def test_export_assessments_filters_component_source() -> None:
+    from aegis.domain.research_assessment import ASSESSMENT_FILTER_SCAN_LIMIT
+
+    mixed = _snapshot(
+        id=3,
+        components={"research_index": 0.46, "component_source": "mixed"},
+        input_source="mixed",
+    )
+    av = _snapshot(id=1)
+    service = _FakeResearchService(listed=[mixed, av])
+
+    async with _client(service) as client:
+        response = await client.get(
+            "/research/AAPL/assessments/export?limit=10&component_source=mixed"
+        )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) == 1
+    assert body[0]["id"] == 3
+    assert service.list_calls == [("AAPL", ASSESSMENT_FILTER_SCAN_LIMIT)]
+
+
 async def test_export_assessments_attachment() -> None:
     older = _snapshot(id=98, computed_at=datetime(2024, 1, 20, tzinfo=UTC))
     newer = _snapshot(id=99, computed_at=datetime(2024, 1, 26, tzinfo=UTC))

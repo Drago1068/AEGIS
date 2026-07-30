@@ -33,9 +33,11 @@ from aegis.api.schemas.research_outcome_labels import (
 )
 from aegis.api.schemas.research_probability_calibration import ProbabilityCalibrationResponse
 from aegis.domain.research_assessment import (
+    ASSESSMENT_FILTER_SCAN_LIMIT,
     ResearchAssessmentService,
     ResearchAssessmentUnavailableError,
     component_source_of,
+    filter_assessments_by_component_source,
     is_mixed_component_source,
 )
 from aegis.domain.research_outcome_labels import (
@@ -528,6 +530,13 @@ async def export_calibration_readiness(
 async def list_research_assessments(
     symbol: str,
     limit: int = Query(default=20, ge=1, le=100),
+    component_source: str | None = Query(
+        default=None,
+        description=(
+            "Optional filter: exact match on assessment component source "
+            "(e.g. mixed, alpha_vantage, polygon). Omit for unfiltered."
+        ),
+    ),
     service: ResearchAssessmentService = Depends(get_research_assessment_service),
     calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
         get_research_calibration_repository
@@ -535,7 +544,9 @@ async def list_research_assessments(
 ) -> list[ResearchAssessmentResponse]:
     """Return up to ``limit`` research assessments for ``symbol``, newest first."""
 
-    snapshots = await service.list_assessments(symbol, limit)
+    snapshots = await _list_assessments_filtered(
+        service, symbol, limit=limit, component_source=component_source
+    )
     enriched = [
         await enrich_assessment_with_calibration(snapshot, calibration_repository)
         for snapshot in snapshots
@@ -547,14 +558,23 @@ async def list_research_assessments(
 async def export_research_assessments(
     symbol: str,
     limit: int = Query(default=20, ge=1, le=100),
+    component_source: str | None = Query(
+        default=None,
+        description=(
+            "Optional filter: exact match on assessment component source "
+            "(e.g. mixed, alpha_vantage, polygon). Omit for unfiltered."
+        ),
+    ),
     service: ResearchAssessmentService = Depends(get_research_assessment_service),
     calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
         get_research_calibration_repository
     ),
 ) -> JSONResponse:
-    """Download assessment history as a JSON attachment (ADR-0039)."""
+    """Download assessment history as a JSON attachment (ADR-0039 / ADR-0062)."""
 
-    snapshots = await service.list_assessments(symbol, limit)
+    snapshots = await _list_assessments_filtered(
+        service, symbol, limit=limit, component_source=component_source
+    )
     enriched = [
         await enrich_assessment_with_calibration(snapshot, calibration_repository)
         for snapshot in snapshots
@@ -567,6 +587,24 @@ async def export_research_assessments(
     return JSONResponse(
         content=payload,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+async def _list_assessments_filtered(
+    service: ResearchAssessmentService,
+    symbol: str,
+    *,
+    limit: int,
+    component_source: str | None,
+) -> list:
+    """Load assessments; when filtering, scan then filter (ADR-0062)."""
+
+    needle = component_source.strip() if isinstance(component_source, str) else ""
+    if not needle:
+        return await service.list_assessments(symbol, limit)
+    scanned = await service.list_assessments(symbol, ASSESSMENT_FILTER_SCAN_LIMIT)
+    return filter_assessments_by_component_source(
+        scanned, needle, limit=limit
     )
 
 

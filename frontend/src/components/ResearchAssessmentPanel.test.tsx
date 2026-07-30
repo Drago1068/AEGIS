@@ -280,15 +280,16 @@ describe("ResearchAssessmentPanel", () => {
     await waitFor(() => {
       expect(screen.getByText(/assessment history \(newest first\)/i)).toBeInTheDocument();
       expect(
-        screen.getByText(/2024-01-26T18:00:00Z · index=0\.4600 · cov=0\.9500 · p=0\.6200/),
+        screen.getByText(/2024-01-26T18:00:00Z · index=0\.4600 · cov=0\.9500 · p=0\.6200 · src=alpha_vantage/),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/2024-01-25T18:00:00Z · index=0\.4000 · cov=0\.9000 · p=null/),
+        screen.getByText(/2024-01-25T18:00:00Z · index=0\.4000 · cov=0\.9000 · p=null · src=alpha_vantage/),
       ).toBeInTheDocument();
       expect(listResearchAssessments).toHaveBeenCalledWith(
         "http://localhost:8000",
         "AAPL",
         20,
+        { componentSource: null },
       );
     });
   });
@@ -427,7 +428,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/assessments \(≤100\)/i)).toBeInTheDocument();
       expect(screen.getByText("1 / 1")).toBeInTheDocument();
       expect(screen.getByText(/latest component source/i)).toBeInTheDocument();
-      expect(screen.getByText(/cross-source fill/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/latest component source/i).closest("div"),
+      ).toHaveTextContent(/mixed \(cross-source fill\)/);
       expect(screen.getByText(/resolved label bar source/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed-source assessments \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/latest forward_return_5/i)).toBeInTheDocument();
@@ -517,7 +520,36 @@ describe("ResearchAssessmentPanel", () => {
         "http://localhost:8000",
         "AAPL",
         20,
+        { componentSource: null },
       );
+    });
+  });
+
+  it("filters assessment history by component_source", async () => {
+    const mixedRow = {
+      ...sampleAssessment,
+      id: 3,
+      input_source: "mixed",
+      components: {
+        ...sampleAssessment.components,
+        component_source: "mixed",
+      },
+    };
+    vi.mocked(listResearchAssessments).mockResolvedValue([mixedRow]);
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.change(screen.getByLabelText(/history source filter/i), {
+      target: { value: "mixed" },
+    });
+
+    await waitFor(() => {
+      expect(listResearchAssessments).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        20,
+        { componentSource: "mixed" },
+      );
+      expect(screen.getByText(/src=mixed/)).toBeInTheDocument();
     });
   });
 
@@ -605,7 +637,9 @@ describe("ResearchAssessmentPanel", () => {
     render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={v2} />);
 
     expect(screen.getByText("daily_bar_research_v1 v2")).toBeInTheDocument();
-    expect(screen.getByText("alpha_vantage")).toBeInTheDocument();
+    expect(screen.getByText(/component source/i)).toBeInTheDocument();
+    const componentSourceRow = screen.getByText(/component source/i).closest("div");
+    expect(componentSourceRow).toHaveTextContent("alpha_vantage");
     expect(screen.getByText(/0\.9000 \(18\/20 comparable\)/)).toBeInTheDocument();
   });
 });

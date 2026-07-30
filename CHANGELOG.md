@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 61 - Assessment History Component-Source Filter
+
+Operator filter/export of assessment history by ``component_source`` (including mixed-only)
+so cross-source rows are auditable without scrolling. See
+[docs/architecture/decisions/0062-phase-61-assessment-history-component-source-filter.md](docs/architecture/decisions/0062-phase-61-assessment-history-component-source-filter.md).
+
+#### Added
+
+- Optional ``component_source`` query param on ``GET .../assessments`` and
+  ``GET .../assessments/export`` (scan ≤252 newest, return ≤``limit`` matches).
+- Console history source filter and ``src=`` provenance on history rows; export honors filter.
+
+#### Explicitly out of scope
+
+Gate changes, default-on calibration, NAS live verify, actionable promotion, orders.
+
 ### Phase 60 - NAS Live Verification of Phase 59
 
 Ops evidence gate: redeploy under lab TLS and confirm evidence-summary provenance fields.

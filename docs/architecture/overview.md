@@ -39,8 +39,8 @@ label-ready outcome-label backfill), Phase 50 (NAS live verify of Phase 49), and
 corpus growth), Phase 54 (NAS live verify of Phase 53), Phase 55 (research cross-source
 fill + session-depth bar load), Phase 56 (NAS live verify of Phase 55), Phase 57
 (source-aware label backfill throughput), Phase 58 (NAS live verify of Phase 57), and
-Phase 59 (cross-source provenance in evidence summary), and Phase 60 (NAS live verify of
-Phase 59).
+Phase 59 (cross-source provenance in evidence summary), Phase 60 (NAS live verify of
+Phase 59), and Phase 61 (assessment history component-source filter).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -163,6 +163,9 @@ Phase 59 surfaces cross-source provenance on the research evidence summary (see
 [decisions/0060-phase-59-cross-source-provenance-evidence-summary.md](decisions/0060-phase-59-cross-source-provenance-evidence-summary.md)).
 Phase 60 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0061-phase-60-nas-live-verify-phase-59.md](decisions/0061-phase-60-nas-live-verify-phase-59.md)).
+Phase 61 adds optional ``component_source`` filtering on assessment list/export and the
+operator console history (see
+[decisions/0062-phase-61-assessment-history-component-source-filter.md](decisions/0062-phase-61-assessment-history-component-source-filter.md)).
 
 ## System context
 

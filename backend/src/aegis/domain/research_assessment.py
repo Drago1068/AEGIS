@@ -24,6 +24,7 @@ from __future__ import annotations
 import logging
 import math
 import statistics
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
@@ -73,6 +74,35 @@ def is_mixed_component_source(snapshot: ResearchAssessmentSnapshotData) -> bool:
     """True when the assessment used cross-source component fill (``mixed``)."""
 
     return component_source_of(snapshot) == COMPONENT_SOURCE_MIXED
+
+
+# Newest-assessment scan window when filtering list/export by component_source (ADR-0062).
+ASSESSMENT_FILTER_SCAN_LIMIT = 252
+
+
+def filter_assessments_by_component_source(
+    snapshots_newest_first: Sequence[ResearchAssessmentSnapshotData],
+    component_source: str | None,
+    *,
+    limit: int,
+) -> list[ResearchAssessmentSnapshotData]:
+    """Return up to ``limit`` snapshots matching ``component_source`` (newest first).
+
+    When ``component_source`` is None or blank, return the first ``limit`` snapshots
+    unchanged. Matching uses :func:`component_source_of`.
+    """
+
+    if limit <= 0:
+        return []
+    needle = component_source.strip() if isinstance(component_source, str) else ""
+    if not needle:
+        return list(snapshots_newest_first[:limit])
+    matched = [
+        snapshot
+        for snapshot in snapshots_newest_first
+        if component_source_of(snapshot) == needle
+    ]
+    return matched[:limit]
 
 
 class ResearchAssessmentReason(StrEnum):

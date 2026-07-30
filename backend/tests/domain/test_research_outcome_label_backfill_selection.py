@@ -1,4 +1,4 @@
-"""Domain tests for outcome-label backfill candidate selection (Phase 49)."""
+"""Domain tests for outcome-label backfill candidate selection (Phase 49 / 57)."""
 
 from __future__ import annotations
 
@@ -17,11 +17,17 @@ from aegis.domain.research_outcome_label_backfill import (
     label_ready_as_of_dates,
     select_label_backfill_candidates,
 )
+from aegis.domain.research_outcome_labels import is_snapshot_label_ready
 
 _CALENDAR = "NYSE"
 
 
-def _bar(trading_date: date, *, close: str = "100") -> ResearchBarInput:
+def _bar(
+    trading_date: date,
+    *,
+    close: str = "100",
+    source: str = "alpha_vantage",
+) -> ResearchBarInput:
     value = Decimal(close)
     return ResearchBarInput(
         trading_date=trading_date,
@@ -30,12 +36,17 @@ def _bar(trading_date: date, *, close: str = "100") -> ResearchBarInput:
         low=value,
         close=value,
         volume=1_000,
-        source="alpha_vantage",
+        source=source,
         data_quality="primary",
     )
 
 
-def _closes_to_bars(closes: list[Decimal], *, end_date: date) -> list[ResearchBarInput]:
+def _closes_to_bars(
+    closes: list[Decimal],
+    *,
+    end_date: date,
+    source: str = "alpha_vantage",
+) -> list[ResearchBarInput]:
     from aegis.domain.calendars import is_trading_day
 
     session_dates: list[date] = []
@@ -46,12 +57,22 @@ def _closes_to_bars(closes: list[Decimal], *, end_date: date) -> list[ResearchBa
         cursor = date.fromordinal(cursor.toordinal() - 1)
     session_dates.reverse()
     bars_chrono = [
-        _bar(session_dates[i], close=str(closes[i])) for i in range(len(closes))
+        _bar(session_dates[i], close=str(closes[i]), source=source)
+        for i in range(len(closes))
     ]
     return list(reversed(bars_chrono))
 
 
-def _snapshot(*, snapshot_id: int, as_of: date) -> ResearchAssessmentSnapshotData:
+def _snapshot(
+    *,
+    snapshot_id: int,
+    as_of: date,
+    input_source: str = "alpha_vantage",
+    component_source: str | None = None,
+) -> ResearchAssessmentSnapshotData:
+    components: dict[str, float | str] = {"research_index": 0.46}
+    if component_source is not None:
+        components["component_source"] = component_source
     return ResearchAssessmentSnapshotData(
         id=snapshot_id,
         symbol="AAPL",
@@ -63,9 +84,9 @@ def _snapshot(*, snapshot_id: int, as_of: date) -> ResearchAssessmentSnapshotDat
         computed_at=datetime(2024, 1, 26, 18, 0, tzinfo=UTC),
         coverage_confidence=0.95,
         probability_confidence=None,
-        components={"research_index": 0.46},
+        components=components,
         schema_version=1,
-        input_source="alpha_vantage",
+        input_source=input_source,
         lookback_start_date=date(2023, 12, 27),
         lookback_end_date=as_of,
         bar_count=20,
@@ -90,12 +111,12 @@ def test_select_excludes_labeled_and_prefers_label_ready() -> None:
         _snapshot(snapshot_id=2, as_of=ready_as_of),
         _snapshot(snapshot_id=3, as_of=older_ready),
     ]
-    # id=2 already labeled — omit; tip not ready — omit; id=3 selected.
     pairs = select_label_backfill_candidates(
         snapshots,
         labeled_assessment_ids={2},
         limit=5,
-        label_ready_as_of=ready_dates,
+        bars_newest_first=bars,
+        calendar_name=_CALENDAR,
     )
     assert pairs == [("AAPL", 3)]
 
@@ -118,7 +139,6 @@ def test_select_respects_limit_newest_first_among_ready() -> None:
     n = LOOKBACK_SESSIONS + DEFAULT_MIN_FORWARD_SESSIONS + 4
     closes = [Decimal(str(100 + i)) for i in range(n)]
     bars = _closes_to_bars(closes, end_date=date(2024, 1, 26))
-    ready_dates = label_ready_as_of_dates(bars, calendar_name=_CALENDAR)
     chrono = list(reversed(bars))
     ready_newest = chrono[-(DEFAULT_MIN_FORWARD_SESSIONS + 1)].trading_date
     ready_older = chrono[-(DEFAULT_MIN_FORWARD_SESSIONS + 2)].trading_date
@@ -131,6 +151,65 @@ def test_select_respects_limit_newest_first_among_ready() -> None:
         snapshots,
         labeled_assessment_ids=set(),
         limit=1,
-        label_ready_as_of=ready_dates,
+        bars_newest_first=bars,
+        calendar_name=_CALENDAR,
     )
     assert pairs == [("AAPL", 4)]
+
+
+def test_source_aware_ready_omits_when_only_other_source_has_forward() -> None:
+    """AV-primary assessment is not ready if only Polygon has the forward close."""
+
+    n = LOOKBACK_SESSIONS + DEFAULT_MIN_FORWARD_SESSIONS + 3
+    closes = [Decimal(str(100 + i)) for i in range(n)]
+    av_bars = _closes_to_bars(closes, end_date=date(2024, 1, 26), source="alpha_vantage")
+    chrono = list(reversed(av_bars))
+    ready_as_of = chrono[-(DEFAULT_MIN_FORWARD_SESSIONS + 1)].trading_date
+
+    # Drop AV bars after ready_as_of so AV lacks forward horizon; keep Polygon full.
+    av_truncated = [
+        bar
+        for bar in av_bars
+        if bar.trading_date <= ready_as_of
+    ]
+    poly_full = _closes_to_bars(closes, end_date=date(2024, 1, 26), source="polygon")
+    mixed_bars = av_truncated + poly_full
+
+    snapshot = _snapshot(snapshot_id=7, as_of=ready_as_of, input_source="alpha_vantage")
+    assert not is_snapshot_label_ready(snapshot, mixed_bars, calendar_name=_CALENDAR)
+
+    # Any-source date set would still mark ready_as_of (false ready).
+    any_ready = label_ready_as_of_dates(mixed_bars, calendar_name=_CALENDAR)
+    assert ready_as_of in any_ready
+
+    pairs = select_label_backfill_candidates(
+        [snapshot],
+        labeled_assessment_ids=set(),
+        limit=5,
+        bars_newest_first=mixed_bars,
+        calendar_name=_CALENDAR,
+    )
+    assert pairs == []
+
+
+def test_source_aware_ready_uses_component_source_when_input_mixed() -> None:
+    n = LOOKBACK_SESSIONS + DEFAULT_MIN_FORWARD_SESSIONS + 3
+    closes = [Decimal(str(100 + i)) for i in range(n)]
+    poly_bars = _closes_to_bars(closes, end_date=date(2024, 1, 26), source="polygon")
+    chrono = list(reversed(poly_bars))
+    ready_as_of = chrono[-(DEFAULT_MIN_FORWARD_SESSIONS + 1)].trading_date
+    snapshot = _snapshot(
+        snapshot_id=8,
+        as_of=ready_as_of,
+        input_source="mixed",
+        component_source="polygon",
+    )
+    assert is_snapshot_label_ready(snapshot, poly_bars, calendar_name=_CALENDAR)
+    pairs = select_label_backfill_candidates(
+        [snapshot],
+        labeled_assessment_ids=set(),
+        limit=1,
+        bars_newest_first=poly_bars,
+        calendar_name=_CALENDAR,
+    )
+    assert pairs == [("AAPL", 8)]

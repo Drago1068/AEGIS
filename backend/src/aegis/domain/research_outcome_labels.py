@@ -257,6 +257,31 @@ def has_stored_forward_horizon_close(
     return end_date in closes_by_date
 
 
+def is_snapshot_label_ready(
+    snapshot: ResearchAssessmentSnapshotData,
+    bars: Sequence[ResearchBarInput],
+    *,
+    calendar_name: str,
+    horizons: tuple[int, ...] = FORWARD_HORIZON_SESSIONS,
+) -> bool:
+    """True when compute gates for ``snapshot`` would succeed with ``bars`` (ADR-0058).
+
+    Uses the same resolved ``bar_source`` as :func:`compute_forward_total_return_labels`
+    so cross-source calendar presence does not mark a row ready when that source lacks
+    as-of or forward-horizon closes.
+    """
+
+    bar_source = _resolve_label_bar_source(snapshot)
+    closes_by_date = _index_closes(list(bars), bar_source)
+    if snapshot.as_of_trading_date not in closes_by_date:
+        return False
+    for horizon in horizons:
+        end_date = forward_horizon_end_date(snapshot.as_of_trading_date, horizon, calendar_name)
+        if end_date not in closes_by_date:
+            return False
+    return True
+
+
 class OutcomeLabelService:
     """Load assessment + bars, compute labels, append on success."""
 
@@ -323,22 +348,18 @@ class OutcomeLabelService:
         """Prefer unlabeled, label-ready assessments for Phase 49 backfill (ADR-0050)."""
 
         from aegis.domain.research_outcome_label_backfill import (
-            label_ready_as_of_dates,
             select_label_backfill_candidates,
         )
 
         ids = [snapshot.id for snapshot in snapshots_newest_first if snapshot.id is not None]
         labeled_ids = await self.assessment_ids_with_labels(symbol, ids)
         bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
-        ready_dates = label_ready_as_of_dates(
-            bars,
-            calendar_name=self._calendar_name,
-        )
         return select_label_backfill_candidates(
             snapshots_newest_first,
             labeled_assessment_ids=labeled_ids,
             limit=limit,
-            label_ready_as_of=ready_dates,
+            bars_newest_first=bars,
+            calendar_name=self._calendar_name,
         )
 
     async def latest_label_for_assessment(

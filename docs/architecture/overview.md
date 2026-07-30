@@ -37,7 +37,8 @@ candidates), Phase 48 (NAS live verify of Phase 47), Phase 49 (prefer unlabeled
 label-ready outcome-label backfill), Phase 50 (NAS live verify of Phase 49), and Phase 51
 (configurable research bar load limit), Phase 52 (NAS live verify of Phase 51), Phase 53 (full daily-bar history for research
 corpus growth), Phase 54 (NAS live verify of Phase 53), Phase 55 (research cross-source
-fill + session-depth bar load), and Phase 56 (NAS live verify of Phase 55).
+fill + session-depth bar load), Phase 56 (NAS live verify of Phase 55), and Phase 57
+(source-aware label backfill throughput).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -151,6 +152,9 @@ trading-date session depth (see
 [decisions/0056-phase-55-research-cross-source-session-depth.md](decisions/0056-phase-55-research-cross-source-session-depth.md)).
 Phase 56 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0057-phase-56-nas-live-verify-phase-55.md](decisions/0057-phase-56-nas-live-verify-phase-55.md)).
+Phase 57 matches outcome-label backfill readiness to compute bar sources and raises
+scan/default limits (see
+[decisions/0058-phase-57-source-aware-label-backfill-throughput.md](decisions/0058-phase-57-source-aware-label-backfill-throughput.md)).
 
 ## System context
 

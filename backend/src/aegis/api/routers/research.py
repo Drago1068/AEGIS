@@ -155,14 +155,15 @@ async def backfill_research_assessments(
 )
 async def backfill_outcome_labels(
     symbol: str,
-    limit: int = Query(default=20, ge=1, le=100),
+    limit: int = Query(default=100, ge=1, le=252),
     assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
     label_service: OutcomeLabelService = Depends(get_outcome_label_service),
 ) -> OutcomeLabelBackfillResponse:
-    """Re-attempt Phase 13 labeling over unlabeled label-ready assessments (ADR-0050).
+    """Re-attempt Phase 13 labeling over unlabeled label-ready assessments (ADR-0050/0058).
 
     Always returns 200 with a per-assessment summary. Individual fail-closed skips do not
     abort the batch. Does not invent probability_confidence or enable auto-calibration.
+    Default ``limit`` is 100 (ADR-0058); scan depth is ``BACKFILL_SCAN_LIMIT``.
     """
 
     from aegis.domain.research_outcome_label_backfill import BACKFILL_SCAN_LIMIT

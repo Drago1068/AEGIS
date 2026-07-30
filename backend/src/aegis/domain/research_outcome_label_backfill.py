@@ -1,7 +1,8 @@
-"""Outcome-label backfill candidate selection (Phase 49, ADR-0050).
+"""Outcome-label backfill candidate selection (Phase 49 / Phase 57).
 
-Prefer assessments that lack a default-method label and have stored forward-horizon closes,
-so tip / already-labeled rows do not consume the operator ``limit``.
+Prefer assessments that lack a default-method label and would pass Phase 13 compute
+gates for the resolved label bar source, so tip / already-labeled / false-ready rows
+do not consume the operator ``limit`` (ADR-0050, ADR-0058).
 """
 
 from __future__ import annotations
@@ -10,9 +11,13 @@ from collections.abc import Sequence
 from datetime import date
 
 from aegis.domain.research_assessment import ResearchAssessmentSnapshotData, ResearchBarInput
-from aegis.domain.research_outcome_labels import has_stored_forward_horizon_close
+from aegis.domain.research_outcome_labels import (
+    has_stored_forward_horizon_close,
+    is_snapshot_label_ready,
+)
 
-BACKFILL_SCAN_LIMIT = 100
+# Scan depth for unlabeled label-ready selection (ADR-0058; was 100 in ADR-0050).
+BACKFILL_SCAN_LIMIT = 252
 
 
 def label_ready_as_of_dates(
@@ -20,11 +25,17 @@ def label_ready_as_of_dates(
     *,
     calendar_name: str,
     min_forward_sessions: int | None = None,
+    source: str | None = None,
 ) -> set[date]:
-    """Trading dates in ``bars`` that have a stored close on the forward-horizon end."""
+    """Trading dates in ``bars`` that have a stored close on the forward-horizon end.
+
+    When ``source`` is set, only closes from that observation source count (Phase 57).
+    """
 
     close_dates = {
-        bar.trading_date for bar in bars_newest_first if bar.close > 0
+        bar.trading_date
+        for bar in bars_newest_first
+        if bar.close > 0 and (source is None or bar.source == source)
     }
     ready: set[date] = set()
     for trading_date in close_dates:
@@ -43,17 +54,25 @@ def select_label_backfill_candidates(
     *,
     labeled_assessment_ids: set[int],
     limit: int,
+    bars_newest_first: Sequence[ResearchBarInput] | None = None,
+    calendar_name: str | None = None,
     label_ready_as_of: set[date] | None = None,
 ) -> list[tuple[str, int]]:
-    """Return up to ``limit`` ``(symbol, id)`` pairs: unlabeled, optionally label-ready.
+    """Return up to ``limit`` ``(symbol, id)`` pairs: unlabeled and label-ready.
 
-    ``snapshots_newest_first`` must already be newest-first. Assessments without an id,
-    already present in ``labeled_assessment_ids``, or (when ``label_ready_as_of`` is set)
-    whose ``as_of_trading_date`` is not in that set are omitted.
+    ``snapshots_newest_first`` must already be newest-first. Assessments without an id or
+    already present in ``labeled_assessment_ids`` are omitted.
+
+    Readiness (when bars + calendar are provided) uses
+    :func:`is_snapshot_label_ready` so selection matches compute source gates (ADR-0058).
+    ``label_ready_as_of`` remains for tests / callers that precompute a date set; when both
+    are provided, snapshot readiness must pass the source-aware check **and** the date set.
     """
 
     if limit <= 0:
         return []
+
+    use_source_ready = bars_newest_first is not None and calendar_name is not None
 
     pairs: list[tuple[str, int]] = []
     for snapshot in snapshots_newest_first:
@@ -61,7 +80,15 @@ def select_label_backfill_candidates(
             continue
         if snapshot.id in labeled_assessment_ids:
             continue
-        if (
+        if use_source_ready:
+            assert bars_newest_first is not None and calendar_name is not None
+            if not is_snapshot_label_ready(
+                snapshot,
+                bars_newest_first,
+                calendar_name=calendar_name,
+            ):
+                continue
+        elif (
             label_ready_as_of is not None
             and snapshot.as_of_trading_date not in label_ready_as_of
         ):

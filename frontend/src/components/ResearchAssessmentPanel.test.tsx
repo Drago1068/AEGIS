@@ -540,7 +540,7 @@ describe("ResearchAssessmentPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: /backfill outcome labels/i }));
 
     await waitFor(() => {
-      expect(backfillOutcomeLabels).toHaveBeenCalledWith("http://localhost:8000", "AAPL", 20);
+      expect(backfillOutcomeLabels).toHaveBeenCalledWith("http://localhost:8000", "AAPL", 100);
     });
     expect(await screen.findByTestId("outcome-label-backfill-summary")).toHaveTextContent(
       /attempted=2.*labeled=1.*skipped=1/,

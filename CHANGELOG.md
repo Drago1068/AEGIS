@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 57 - Source-Aware Label Backfill Throughput
+
+Grow labeling of unlabeled assessments by matching readiness to compute bar sources and
+raising scan/default limits. See
+[docs/architecture/decisions/0058-phase-57-source-aware-label-backfill-throughput.md](docs/architecture/decisions/0058-phase-57-source-aware-label-backfill-throughput.md).
+
+#### Changed
+
+- Label-ready selection uses resolved assessment bar source + all forward horizons
+  (omit false-ready rows that would fail closed at compute).
+- ``BACKFILL_SCAN_LIMIT`` **252**; API default ``limit=100`` (max 252); console uses 100.
+
+#### Explicitly out of scope
+
+Weakening label gates, default-on calibration, NAS live verify, actionable promotion, orders.
+
 ### Phase 56 - NAS Live Verification of Phase 55
 
 Ops evidence gate: redeploy under lab TLS with cross-source fill enabled and session-depth

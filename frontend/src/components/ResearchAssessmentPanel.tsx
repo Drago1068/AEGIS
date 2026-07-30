@@ -249,7 +249,7 @@ export function ResearchAssessmentPanel({
     startTransition(async () => {
       setError(null);
       try {
-        const summary = await backfillOutcomeLabels(baseUrl, symbol, 20);
+        const summary = await backfillOutcomeLabels(baseUrl, symbol, 100);
         setBackfillSummary(summary);
         if (latest?.id != null) {
           await loadOutcomeLabelHistory(latest.id as number);

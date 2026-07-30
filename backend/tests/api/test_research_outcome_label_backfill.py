@@ -203,3 +203,5 @@ async def test_backfill_empty_history_returns_zero_counts() -> None:
     assert body["outcomes"] == []
     assert label_service.label_calls == []
     assert assessment_service.list_calls == [("aapl", BACKFILL_SCAN_LIMIT)]
+    assert label_service.select_calls == [("aapl", 0, 100)]
+    assert BACKFILL_SCAN_LIMIT == 252

@@ -551,11 +551,11 @@ export interface OutcomeLabelBackfillResponse {
   detail: string;
 }
 
-/** Re-attempt Phase 13 labeling over recent assessment history (Phase 43, ADR-0044). */
+/** Re-attempt Phase 13 labeling over recent assessment history (Phase 43/57). */
 export async function backfillOutcomeLabels(
   baseUrl: string,
   symbol: string,
-  limit = 20,
+  limit = 100,
   options?: ApiRequestOptions,
 ): Promise<OutcomeLabelBackfillResponse> {
   const url =

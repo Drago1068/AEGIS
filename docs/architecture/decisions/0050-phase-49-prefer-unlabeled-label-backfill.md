@@ -43,6 +43,12 @@ Omitted rows are not reported as skip outcomes (they never enter the batch).
 - Guaranteeing readiness ``ready``
 - Actionable promotion, orders, ACME
 
+## Supersession note
+
+Phase 57 / ADR-0058 keeps this selection order but makes readiness **source-aware**
+(matching Phase 13 compute), raises ``BACKFILL_SCAN_LIMIT`` to 252, and raises API/console
+default ``limit`` to 100.
+
 ## Related documents
 
 - [0044-phase-43-outcome-label-backfill.md](0044-phase-43-outcome-label-backfill.md)

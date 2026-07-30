@@ -7,9 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 50 (NAS live verify of Phase 49).** Redeploy under lab TLS and verify
-unlabeled label-ready outcome-label backfill on the live NAS (ADR-0051). See
-[docs/architecture/decisions/0051-phase-50-nas-live-verify-phase-49.md](docs/architecture/decisions/0051-phase-50-nas-live-verify-phase-49.md)
+**Current phase: Phase 51 (configurable research bar load limit).** Configure recent-bar
+depth for assess / backfill / outcome labels (ADR-0052). See
+[docs/architecture/decisions/0052-phase-51-research-bar-load-limit.md](docs/architecture/decisions/0052-phase-51-research-bar-load-limit.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

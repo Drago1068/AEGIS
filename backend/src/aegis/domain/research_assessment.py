@@ -49,7 +49,8 @@ LOOKBACK_SESSIONS = 20
 STATE_RESEARCH_ONLY = "research_only"
 ANNUALIZATION_FACTOR = math.sqrt(252)
 VOLATILITY_EPSILON = 1e-12
-# Load a buffer of recent bars so multi-source rows in the window do not starve the lookback.
+# Historical constructor/module default (Phase 6). Wired services use
+# ``AEGIS_RESEARCH_BAR_LOAD_LIMIT`` (default 252; ADR-0052).
 BAR_LOAD_LIMIT = 120
 PRIMARY_QUALITY = "primary"
 MULTI_SOURCE_AGREEMENT_FLOOR = 0.80
@@ -708,6 +709,7 @@ class ResearchAssessmentService:
         max_latest_bar_staleness_trading_days: int,
         as_of: date | None = None,
         multi_source: ResearchMultiSourceCoverageConfig | None = None,
+        bar_load_limit: int = BAR_LOAD_LIMIT,
     ) -> None:
         self._bar_reader = bar_reader
         self._snapshot_store = snapshot_store
@@ -715,11 +717,14 @@ class ResearchAssessmentService:
         self._max_staleness = max_latest_bar_staleness_trading_days
         self._as_of = as_of
         self._multi_source = multi_source
+        self._bar_load_limit = bar_load_limit
 
     async def assess(self, symbol: str) -> ResearchAssessmentSnapshotData:
         """Compute and persist one assessment for ``symbol``, or raise fail-closed."""
 
-        bars = await self._bar_reader.list_recent_bars(symbol.upper(), BAR_LOAD_LIMIT)
+        bars = await self._bar_reader.list_recent_bars(
+            symbol.upper(), self._bar_load_limit
+        )
         try:
             snapshot = assess_from_bars(
                 symbol,
@@ -764,10 +769,12 @@ class ResearchAssessmentService:
         from aegis.domain.research_assessment_backfill import run_assessment_backfill
 
         normalized = symbol.upper()
-        bars = await self._bar_reader.list_recent_bars(normalized, BAR_LOAD_LIMIT)
-        # Bound existing-date lookup; backfill only considers candidates within loaded bars.
+        bars = await self._bar_reader.list_recent_bars(
+            normalized, self._bar_load_limit
+        )
+        # Bound existing-date lookup to at least the loaded bar window (ADR-0052).
         existing_rows = await self._snapshot_store.list_recent(
-            normalized, max(limit * 5, 100)
+            normalized, max(limit * 5, self._bar_load_limit, 100)
         )
         existing_as_of = {row.as_of_trading_date for row in existing_rows}
         return await run_assessment_backfill(

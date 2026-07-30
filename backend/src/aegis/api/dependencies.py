@@ -206,6 +206,7 @@ def build_research_assessment_service(
         calendar_name=settings.exchange_calendar_name,
         max_latest_bar_staleness_trading_days=settings.max_latest_bar_staleness_trading_days,
         multi_source=multi_source,
+        bar_load_limit=settings.research_bar_load_limit,
     )
 
 
@@ -270,6 +271,7 @@ def build_outcome_label_service(
         ResearchBarReaderAdapter(market_data_repository),
         label_repository,
         calendar_name=settings.exchange_calendar_name,
+        bar_load_limit=settings.research_bar_load_limit,
     )
 
 

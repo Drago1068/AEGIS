@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 51 - Configurable Research Bar Load Limit
+
+Configurable recent-bar depth for assessment and outcome-label paths so operators can grow
+beyond a saturated 120-bar window. See
+[docs/architecture/decisions/0052-phase-51-research-bar-load-limit.md](docs/architecture/decisions/0052-phase-51-research-bar-load-limit.md).
+
+#### Added
+
+- ``AEGIS_RESEARCH_BAR_LOAD_LIMIT`` (default ``252``) shared by on-demand assess, assessment
+  backfill, and outcome-label / Phase 49 selection (ADR-0052).
+- Assessment backfill existing as-of scan expands with the configured bar load.
+
+#### Explicitly out of scope
+
+Guaranteeing readiness ``ready``, ingest depth changes, auto-chaining backfills, default-on
+calibration, actionable promotion, orders, ACME.
+
 ### Phase 50 - NAS Live Verification of Phase 49
 
 Ops evidence gate: redeploy under the lab TLS profile and verify unlabeled label-ready

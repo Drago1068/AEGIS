@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -69,7 +71,7 @@ class ResearchOutcomeLabelRepository:
     async def assessment_ids_with_labels(
         self,
         symbol: str,
-        assessment_ids: list[int] | tuple[int, ...],
+        assessment_ids: Sequence[int],
         *,
         label_method_id: str,
     ) -> set[int]:

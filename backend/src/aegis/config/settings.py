@@ -233,6 +233,16 @@ class Settings(BaseSettings):
             "research_calibration_v1. See ADR-0016."
         ),
     )
+    research_bar_load_limit: int = Field(
+        default=252,
+        ge=40,
+        le=2000,
+        description=(
+            "Maximum recent daily bars loaded for research assessment, assessment backfill, "
+            "and outcome-label paths (including Phase 49 label-ready selection). Default 252 "
+            "(~one trading year). See ADR-0052."
+        ),
+    )
 
     research_multi_source_coverage_enabled: bool = Field(
         default=True,

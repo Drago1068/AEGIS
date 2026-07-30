@@ -59,6 +59,7 @@ non-functional development placeholder.
 | `AEGIS_RESEARCH_CALIBRATION_MIN_CORPUS` | Minimum labeled historical assessments (excluding target) for `research_calibration_v1`. | `10` |
 | `AEGIS_RESEARCH_CALIBRATION_MIN_BUCKET` | Minimum labeled examples in the research_index similarity bucket. | `5` |
 | `AEGIS_RESEARCH_CALIBRATION_INDEX_BUCKET_WIDTH` | Absolute research_index tolerance for the similarity bucket. | `0.15` |
+| `AEGIS_RESEARCH_BAR_LOAD_LIMIT` | Maximum recent daily bars loaded for research assessment, assessment backfill, and outcome-label paths (including Phase 49 label-ready selection). See [ADR-0052](../architecture/decisions/0052-phase-51-research-bar-load-limit.md). | `252` |
 
 ## Backend: Phase 11 multi-source coverage weighting (`aegis.config.settings.Settings`)
 

@@ -11,7 +11,7 @@ vi.mock("@/lib/api-client", async () => {
     createResearchAssessment: vi.fn(),
     getLatestResearchAssessment: vi.fn(),
     createOutcomeLabels: vi.fn(),
-    getLatestOutcomeLabels: vi.fn(),
+    listOutcomeLabels: vi.fn(),
     getCalibrationReadiness: vi.fn(),
     createProbabilityCalibration: vi.fn(),
     listProbabilityCalibrations: vi.fn(),
@@ -23,8 +23,8 @@ import {
   createProbabilityCalibration,
   createResearchAssessment,
   getCalibrationReadiness,
-  getLatestOutcomeLabels,
   getLatestResearchAssessment,
+  listOutcomeLabels,
   listProbabilityCalibrations,
 } from "@/lib/api-client";
 
@@ -86,9 +86,7 @@ describe("ResearchAssessmentPanel", () => {
       calibration_method_id: "research_calibration_v1",
       detail: "need at least 10 labeled historical examples, found 3",
     });
-    vi.mocked(getLatestOutcomeLabels).mockRejectedValue(
-      new ApiClientError("missing labels", 404, null),
-    );
+    vi.mocked(listOutcomeLabels).mockResolvedValue([]);
     vi.mocked(listProbabilityCalibrations).mockResolvedValue([]);
   });
 
@@ -203,6 +201,43 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/calibration history \(newest first\)/i)).toBeInTheDocument();
       expect(screen.getByText(/p=0\.6200/)).toBeInTheDocument();
       expect(screen.getByText(/p=0\.5000/)).toBeInTheDocument();
+    });
+  });
+
+  it("shows outcome label history when more than one row exists", async () => {
+    const newer = {
+      id: 20,
+      assessment_snapshot_id: 1,
+      symbol: "AAPL",
+      label_method_id: "forward_total_return_v1",
+      label_method_version: 1,
+      state: "research_only",
+      as_of_trading_date: "2024-01-26",
+      computed_at: "2024-01-26T20:00:00Z",
+      labels: { forward_return_5: 0.05, forward_return_20: 0.1 },
+      label_end_dates: {
+        forward_return_5: "2024-02-02",
+        forward_return_20: "2024-02-23",
+      },
+      schema_version: 1,
+      bar_source: "alpha_vantage",
+    };
+    const older = {
+      ...newer,
+      id: 19,
+      computed_at: "2024-01-26T18:00:00Z",
+      labels: { forward_return_5: 0.03, forward_return_20: 0.08 },
+    };
+    vi.mocked(getLatestResearchAssessment).mockResolvedValue(sampleAssessment);
+    vi.mocked(listOutcomeLabels).mockResolvedValue([newer, older]);
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /refresh latest/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/outcome label history \(newest first\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/fwd5=0\.0500/)).toBeInTheDocument();
+      expect(screen.getByText(/fwd5=0\.0300/)).toBeInTheDocument();
     });
   });
 

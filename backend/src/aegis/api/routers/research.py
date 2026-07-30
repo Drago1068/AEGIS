@@ -122,6 +122,22 @@ async def create_outcome_labels(
 
 
 @router.get(
+    "/{symbol}/assessments/{assessment_id}/outcome-labels",
+    response_model=list[OutcomeLabelResponse],
+)
+async def list_outcome_labels(
+    symbol: str,
+    assessment_id: int,
+    limit: int = Query(default=20, ge=1, le=100),
+    service: OutcomeLabelService = Depends(get_outcome_label_service),
+) -> list[OutcomeLabelResponse]:
+    """Return up to ``limit`` outcome labels for ``assessment_id``, newest first."""
+
+    rows = await service.list_labels_for_assessment(symbol, assessment_id, limit)
+    return [OutcomeLabelResponse.model_validate(item) for item in rows]
+
+
+@router.get(
     "/{symbol}/assessments/{assessment_id}/outcome-labels/latest",
     response_model=OutcomeLabelResponse,
 )

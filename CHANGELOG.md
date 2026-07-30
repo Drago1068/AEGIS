@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 20 - Outcome Label History
+
+Authenticated list of append-only `forward_total_return_v1` rows for an assessment so
+operators can audit repeated labeling. See
+[docs/architecture/decisions/0021-phase-20-outcome-label-history.md](docs/architecture/decisions/0021-phase-20-outcome-label-history.md).
+
+#### Added
+
+- ADR-0021: `GET .../assessments/{id}/outcome-labels?limit=` (newest first; empty `[]` when
+  none); operator console label history when more than one row exists.
+- Mirrors Phase 19 calibration history; no new label method.
+
+#### Explicitly out of scope
+
+Multi-horizon method changes, default-on calibration, actionable promotion, orders.
+
 ### Phase 19 - Calibration History
 
 Authenticated list of append-only `research_calibration_v1` rows for an assessment so

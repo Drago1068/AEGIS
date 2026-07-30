@@ -37,18 +37,34 @@ class ResearchOutcomeLabelRepository:
     async def get_latest_for_assessment(
         self, assessment_snapshot_id: int
     ) -> OutcomeLabelData | None:
+        rows = await self.list_for_assessment(assessment_snapshot_id, limit=1)
+        return rows[0] if rows else None
+
+    async def list_for_assessment(
+        self,
+        assessment_snapshot_id: int,
+        limit: int,
+        *,
+        symbol: str | None = None,
+    ) -> list[OutcomeLabelData]:
+        """Return up to ``limit`` labels for an assessment, newest first.
+
+        When ``symbol`` is set, only rows for that symbol (case-insensitive) are returned.
+        """
+
+        conditions = [
+            ResearchAssessmentOutcomeLabel.assessment_snapshot_id == assessment_snapshot_id
+        ]
+        if symbol is not None:
+            conditions.append(ResearchAssessmentOutcomeLabel.symbol == symbol.upper())
         stmt = (
             select(ResearchAssessmentOutcomeLabel)
-            .where(
-                ResearchAssessmentOutcomeLabel.assessment_snapshot_id
-                == assessment_snapshot_id
-            )
+            .where(*conditions)
             .order_by(ResearchAssessmentOutcomeLabel.computed_at.desc())
-            .limit(1)
+            .limit(limit)
         )
         result = await self._session.execute(stmt)
-        row = result.scalar_one_or_none()
-        return _to_data(row) if row is not None else None
+        return [_to_data(row) for row in result.scalars().all()]
 
 
 def _to_data(row: ResearchAssessmentOutcomeLabel) -> OutcomeLabelData:

@@ -79,6 +79,16 @@ class OutcomeLabelStore(Protocol):
         """Return the newest label for ``assessment_snapshot_id``, or ``None``."""
         ...
 
+    async def list_for_assessment(
+        self,
+        assessment_snapshot_id: int,
+        limit: int,
+        *,
+        symbol: str | None = None,
+    ) -> list[OutcomeLabelData]:
+        """Return up to ``limit`` labels for an assessment, newest first."""
+        ...
+
 
 def compute_forward_total_return_labels(
     snapshot: ResearchAssessmentSnapshotData,
@@ -226,9 +236,7 @@ class OutcomeLabelService:
         self._calendar_name = calendar_name
         self._bar_load_limit = bar_load_limit
 
-    async def label_assessment(
-        self, symbol: str, assessment_snapshot_id: int
-    ) -> OutcomeLabelData:
+    async def label_assessment(self, symbol: str, assessment_snapshot_id: int) -> OutcomeLabelData:
         snapshot = await self._assessment_store.get_by_id(assessment_snapshot_id)
         if snapshot is None or snapshot.symbol.upper() != symbol.upper():
             raise OutcomeLabelUnavailableError(
@@ -257,13 +265,26 @@ class OutcomeLabelService:
     ) -> OutcomeLabelData | None:
         return await self._label_store.get_latest_for_assessment(assessment_snapshot_id)
 
+    async def list_labels_for_assessment(
+        self,
+        symbol: str,
+        assessment_snapshot_id: int,
+        limit: int,
+    ) -> list[OutcomeLabelData]:
+        """Return up to ``limit`` labels for ``assessment_snapshot_id`` and ``symbol``."""
+
+        return await self._label_store.list_for_assessment(
+            assessment_snapshot_id,
+            limit,
+            symbol=symbol,
+        )
+
 
 class ResearchAssessmentStoreForLabels(Protocol):
-    async def get_by_id(self, assessment_snapshot_id: int) -> ResearchAssessmentSnapshotData | None:
-        ...
+    async def get_by_id(
+        self, assessment_snapshot_id: int
+    ) -> ResearchAssessmentSnapshotData | None: ...
 
 
 class ResearchBarReaderForLabels(Protocol):
-    async def list_recent_bars(self, symbol: str, limit: int) -> list[ResearchBarInput]:
-        ...
-
+    async def list_recent_bars(self, symbol: str, limit: int) -> list[ResearchBarInput]: ...

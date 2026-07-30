@@ -456,6 +456,30 @@ export async function getLatestOutcomeLabels(
   return body as OutcomeLabel;
 }
 
+export async function listOutcomeLabels(
+  baseUrl: string,
+  symbol: string,
+  assessmentId: number,
+  limit = 20,
+  options?: ApiRequestOptions,
+): Promise<OutcomeLabel[]> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/` +
+    `${assessmentId}/outcome-labels?limit=${encodeURIComponent(String(limit))}`;
+  const { response, body } = await requestJson(url, undefined, options);
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected GET outcome-labels status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  if (!Array.isArray(body)) {
+    throw new ApiClientError("Unexpected outcome-labels list payload", response.status, body);
+  }
+  return body as OutcomeLabel[];
+}
+
 export interface CalibrationReadiness {
   symbol: string;
   status: string;

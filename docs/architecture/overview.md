@@ -17,8 +17,8 @@ Phase 10 (second daily-bar provider), and Phase 11 (multi-source coverage weight
 Phase 12 (provider historical corrections on daily-bar observations), Phase 13 (research
 outcome labels), Phase 14 (scheduled outcome labeling after assessments), Phase 15
 (research probability calibration v1), Phase 16 (calibration corpus readiness),
-Phase 17 (NAS live verification evidence gate), Phase 18 (on-demand calibration), and
-Phase 19 (calibration history).
+Phase 17 (NAS live verification evidence gate), Phase 18 (on-demand calibration),
+Phase 19 (calibration history), and Phase 20 (outcome label history).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -49,6 +49,8 @@ readiness is `ready`, without changing the automatic-calibration default (see
 Phase 19 adds `GET .../calibrations` history (newest first) for audit of append-only rows
 (see
 [decisions/0020-phase-19-calibration-history.md](decisions/0020-phase-19-calibration-history.md)).
+Phase 20 adds the same pattern for outcome labels via `GET .../outcome-labels?limit=` (see
+[decisions/0021-phase-20-outcome-label-history.md](decisions/0021-phase-20-outcome-label-history.md)).
 
 ## System context
 
@@ -97,6 +99,7 @@ persisting rows (ADR-0017). As of Phase 18, authenticated
 `POST/GET /research/{symbol}/assessments/{id}/calibrations` persist or fetch on-demand
 `research_calibration_v1` rows without requiring the automatic flag (ADR-0019). As of
 Phase 19, `GET .../calibrations?limit=` lists append-only history newest first (ADR-0020).
+As of Phase 20, `GET .../outcome-labels?limit=` lists append-only label history (ADR-0021).
 As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
 assessments use `method_version` 2 multi-source coverage weighting (ADR-0012). See
 [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md),

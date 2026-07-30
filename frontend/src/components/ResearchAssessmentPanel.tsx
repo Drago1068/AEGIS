@@ -13,8 +13,8 @@ import {
   createResearchAssessment,
   getApiBaseUrl,
   getCalibrationReadiness,
-  getLatestOutcomeLabels,
   getLatestResearchAssessment,
+  listOutcomeLabels,
   listProbabilityCalibrations,
 } from "@/lib/api-client";
 
@@ -46,6 +46,7 @@ export function ResearchAssessmentPanel({
 }: ResearchAssessmentPanelProps) {
   const [latest, setLatest] = useState<ResearchAssessment | null>(initialLatest);
   const [outcomeLabel, setOutcomeLabel] = useState<OutcomeLabel | null>(null);
+  const [outcomeLabelHistory, setOutcomeLabelHistory] = useState<OutcomeLabel[]>([]);
   const [readiness, setReadiness] = useState<CalibrationReadiness | null>(null);
   const [calibration, setCalibration] = useState<ProbabilityCalibration | null>(null);
   const [calibrationHistory, setCalibrationHistory] = useState<ProbabilityCalibration[]>(
@@ -58,6 +59,12 @@ export function ResearchAssessmentPanel({
   async function loadReadiness() {
     const next = await getCalibrationReadiness(baseUrl, symbol);
     setReadiness(next);
+  }
+
+  async function loadOutcomeLabelHistory(assessmentId: number) {
+    const rows = await listOutcomeLabels(baseUrl, symbol, assessmentId, 20);
+    setOutcomeLabelHistory(rows);
+    setOutcomeLabel(rows[0] ?? null);
   }
 
   async function loadCalibrationHistory(assessmentId: number) {
@@ -81,10 +88,12 @@ export function ResearchAssessmentPanel({
         const snapshot = await createResearchAssessment(baseUrl, symbol);
         setLatest(snapshot);
         setOutcomeLabel(null);
+        setOutcomeLabelHistory([]);
         setCalibration(null);
         setCalibrationHistory([]);
         await loadReadiness();
         if (snapshot.id != null) {
+          await loadOutcomeLabelHistory(snapshot.id);
           await loadCalibrationHistory(snapshot.id);
         }
       } catch (err) {
@@ -100,19 +109,11 @@ export function ResearchAssessmentPanel({
         const snapshot = await getLatestResearchAssessment(baseUrl, symbol);
         setLatest(snapshot);
         setOutcomeLabel(null);
+        setOutcomeLabelHistory([]);
         setCalibration(null);
         setCalibrationHistory([]);
         if (snapshot.id != null) {
-          try {
-            const label = await getLatestOutcomeLabels(baseUrl, symbol, snapshot.id);
-            setOutcomeLabel(label);
-          } catch (labelErr) {
-            if (labelErr instanceof ApiClientError && labelErr.status === 404) {
-              setOutcomeLabel(null);
-            } else {
-              throw labelErr;
-            }
-          }
+          await loadOutcomeLabelHistory(snapshot.id);
           await loadCalibrationHistory(snapshot.id);
         }
         await loadReadiness();
@@ -120,6 +121,7 @@ export function ResearchAssessmentPanel({
         if (err instanceof ApiClientError && err.status === 404) {
           setLatest(null);
           setOutcomeLabel(null);
+          setOutcomeLabelHistory([]);
           setReadiness(null);
           setCalibration(null);
           setCalibrationHistory([]);
@@ -138,8 +140,8 @@ export function ResearchAssessmentPanel({
     startTransition(async () => {
       setError(null);
       try {
-        const label = await createOutcomeLabels(baseUrl, symbol, latest.id as number);
-        setOutcomeLabel(label);
+        await createOutcomeLabels(baseUrl, symbol, latest.id as number);
+        await loadOutcomeLabelHistory(latest.id as number);
         await loadReadiness();
       } catch (err) {
         setError(formatAssessmentError(err));
@@ -335,6 +337,25 @@ export function ResearchAssessmentPanel({
                 Bar source {outcomeLabel.bar_source}. Label method{" "}
                 {outcomeLabel.label_method_id} v{outcomeLabel.label_method_version}.
               </p>
+              {outcomeLabelHistory.length > 1 ? (
+                <div className="mt-3 border-t border-aegis-line pt-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
+                    Outcome label history (newest first)
+                  </p>
+                  <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
+                    {outcomeLabelHistory.map((row) => {
+                      const ret5 = row.labels.forward_return_5;
+                      const retLabel =
+                        typeof ret5 === "number" ? `fwd5=${ret5.toFixed(4)}` : "fwd5=n/a";
+                      return (
+                        <li key={row.id ?? `${row.computed_at}-${retLabel}`}>
+                          {row.computed_at} · {retLabel} · {row.bar_source}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           ) : null}
           {readiness ? (

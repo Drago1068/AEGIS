@@ -1,7 +1,8 @@
-"""API tests for research outcome label endpoints."""
+"""API tests for research outcome label endpoints (Phase 13/20)."""
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import UTC, date, datetime
 
 from httpx import ASGITransport, AsyncClient
@@ -54,10 +55,13 @@ class _FakeOutcomeLabelService:
         *,
         on_label: OutcomeLabelData | Exception | None = None,
         latest: OutcomeLabelData | None = None,
+        listed: list[OutcomeLabelData] | None = None,
     ) -> None:
         self._on_label = on_label
         self._latest = latest
+        self._listed = listed or []
         self.label_calls: list[tuple[str, int]] = []
+        self.list_calls: list[tuple[str, int, int]] = []
 
     async def label_assessment(self, symbol: str, assessment_id: int) -> OutcomeLabelData:
         self.label_calls.append((symbol, assessment_id))
@@ -70,6 +74,15 @@ class _FakeOutcomeLabelService:
         self, assessment_snapshot_id: int
     ) -> OutcomeLabelData | None:
         return self._latest
+
+    async def list_labels_for_assessment(
+        self,
+        symbol: str,
+        assessment_snapshot_id: int,
+        limit: int,
+    ) -> list[OutcomeLabelData]:
+        self.list_calls.append((symbol, assessment_snapshot_id, limit))
+        return self._listed[:limit]
 
 
 def _client(service: _FakeOutcomeLabelService) -> AsyncClient:
@@ -118,3 +131,35 @@ async def test_get_latest_outcome_labels() -> None:
 
     assert response.status_code == 200
     assert response.json()["assessment_snapshot_id"] == 1
+
+
+async def test_list_outcome_labels_newest_first() -> None:
+    newer = _label()
+    older = replace(
+        newer,
+        id=9,
+        computed_at=datetime(2024, 1, 9, 12, tzinfo=UTC),
+        labels={"forward_return_5": 0.04, "forward_return_20": 0.08},
+    )
+    service = _FakeOutcomeLabelService(listed=[newer, older])
+
+    async with _client(service) as client:
+        response = await client.get("/research/AAPL/assessments/1/outcome-labels?limit=10")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) == 2
+    assert body[0]["id"] == 10
+    assert body[1]["id"] == 9
+    assert body[0]["state"] == "research_only"
+    assert service.list_calls == [("AAPL", 1, 10)]
+
+
+async def test_list_outcome_labels_empty() -> None:
+    service = _FakeOutcomeLabelService(listed=[])
+
+    async with _client(service) as client:
+        response = await client.get("/research/AAPL/assessments/1/outcome-labels")
+
+    assert response.status_code == 200
+    assert response.json() == []

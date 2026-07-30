@@ -1,4 +1,4 @@
-# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44)
+# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46)
 
 This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0018](../architecture/decisions/0018-phase-17-nas-live-verification.md),
@@ -14,7 +14,8 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0040](../architecture/decisions/0040-phase-39-nas-live-verify-phase-38.md),
 [ADR-0041](../architecture/decisions/0041-phase-40-nas-lab-tls-cutover.md),
 [ADR-0043](../architecture/decisions/0043-phase-42-nas-live-verify-phase-41.md),
-[ADR-0045](../architecture/decisions/0045-phase-44-nas-live-verify-phase-43.md).
+[ADR-0045](../architecture/decisions/0045-phase-44-nas-live-verify-phase-43.md),
+[ADR-0047](../architecture/decisions/0047-phase-46-nas-live-verify-phase-45.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 
@@ -52,7 +53,7 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | --- | --- | --- |
 | 1 | `GET {API}/health` | 200 |
 | 2 | `GET {API}/ready` | 200 |
-| 3 | Unauthenticated watchlist / daily-bars / research latest / assessments list(+**export**) / calibration-readiness(+export) / outcome-labels/export / calibrations/export / evidence-summary(+export) / **outcome-labels/backfill POST** | 401 |
+| 3 | Unauthenticated watchlist / daily-bars / research latest / assessments list(+**export**) / calibration-readiness(+export) / outcome-labels/export / calibrations/export / evidence-summary(+export) / **outcome-labels/backfill POST** / **assessments/backfill POST** | 401 |
 | 4 | Frontend base URL | 200 / 302 / 307 / 308 |
 | 5 | `POST /auth/login` (uses `.env.nas` operator credentials) | 200 + session cookie |
 | 6 | Authenticated `GET /research/{symbol}/calibration-readiness` | **200**, `by_horizon` includes `forward_return_5` and `forward_return_20` |
@@ -60,15 +61,16 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 8 | Authenticated `GET /research/{symbol}/assessments/latest` | 200 or **404** (empty history OK) |
 | 9 | Authenticated `GET /research/{symbol}/assessments?limit=` | **200** JSON array (`[]` OK) |
 | 10 | Authenticated `GET /research/{symbol}/assessments/export` | **200**, attachment, JSON array (`[]` OK) |
-| 11 | Authenticated `POST /research/{symbol}/outcome-labels/backfill?limit=` | **200**, summary counts present (zeros / skips OK) |
-| 12 | Authenticated `POST .../assessments/{id}/calibrations?horizon=forward_return_5` | **200** or fail-closed **422** |
-| 13 | Authenticated `GET .../assessments/{id}/calibrations` and `.../outcome-labels` | **200** JSON array (`[]` OK) |
-| 14 | Authenticated `GET .../assessments/{id}/outcome-labels/export` | **200**, attachment, JSON array (`[]` OK) |
-| 15 | Authenticated `GET .../assessments/{id}/calibrations/export` | **200**, attachment, JSON array (`[]` OK) |
-| 16 | Authenticated `GET /research/{symbol}/evidence-summary` | **200**, `state=research_only`; log present label/end-date keys only (none OK) |
-| 17 | Authenticated `GET /research/{symbol}/evidence-summary/export` | **200**, attachment, `state=research_only` |
-| 18 | SSH `alembic current` (when SSH configured) | includes **`0009`** or `head` |
-| 19 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 11 | Authenticated `POST /research/{symbol}/assessments/backfill?limit=` | **200**, summary counts present (zeros / skips OK) |
+| 12 | Authenticated `POST /research/{symbol}/outcome-labels/backfill?limit=` | **200**, summary counts present (zeros / skips OK) |
+| 13 | Authenticated `POST .../assessments/{id}/calibrations?horizon=forward_return_5` | **200** or fail-closed **422** |
+| 14 | Authenticated `GET .../assessments/{id}/calibrations` and `.../outcome-labels` | **200** JSON array (`[]` OK) |
+| 15 | Authenticated `GET .../assessments/{id}/outcome-labels/export` | **200**, attachment, JSON array (`[]` OK) |
+| 16 | Authenticated `GET .../assessments/{id}/calibrations/export` | **200**, attachment, JSON array (`[]` OK) |
+| 17 | Authenticated `GET /research/{symbol}/evidence-summary` | **200**, `state=research_only`; log present label/end-date keys only (none OK) |
+| 18 | Authenticated `GET /research/{symbol}/evidence-summary/export` | **200**, attachment, `state=research_only` |
+| 19 | SSH `alembic current` (when SSH configured) | includes **`0009`** or `head` |
+| 20 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

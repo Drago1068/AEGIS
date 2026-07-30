@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 46 - NAS Live Verification of Phase 45
+
+Ops evidence gate: redeploy current revision under the lab TLS profile and verify
+assessment backfill on the live NAS. See
+[docs/architecture/decisions/0047-phase-46-nas-live-verify-phase-45.md](docs/architecture/decisions/0047-phase-46-nas-live-verify-phase-45.md).
+
+#### Added
+
+- ADR-0047: live verify includes unauth **401** and auth **200** summary for
+  `POST .../assessments/backfill`.
+- `verify.ps1` / `verify.sh` Phase 46 gates.
+
+#### Explicitly out of scope
+
+New assessment math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 45 - Historical Research Assessment Backfill
 
 Research-only batch creation of point-in-time assessments for past primary bar dates so

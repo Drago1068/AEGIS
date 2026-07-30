@@ -40,7 +40,7 @@ function Write-VerifyChecklist {
     Write-Host "Live verification checklist (ADR-0018):"
     Write-Host "  1. GET /health -> 200"
     Write-Host "  2. GET /ready -> 200"
-    Write-Host "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list(+export), calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export), outcome-labels/backfill POST"
+    Write-Host "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list(+export), calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export), outcome-labels/backfill POST, assessments/backfill POST"
     Write-Host "  4. Frontend base URL -> 200|302|307|308"
     Write-Host "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
     Write-Host "  6. Authenticated GET /research/$Symbol/calibration-readiness -> 200 (by_horizon includes fwd5+fwd20)"
@@ -48,15 +48,16 @@ function Write-VerifyChecklist {
     Write-Host "  8. Authenticated GET /research/$Symbol/assessments/latest -> 200|404"
     Write-Host "  9. Authenticated GET /research/$Symbol/assessments?limit= -> 200 (JSON array; [] OK)"
     Write-Host " 10. Authenticated GET /research/$Symbol/assessments/export -> 200 (attachment, JSON array; [] OK)"
-    Write-Host " 11. Authenticated POST /research/$Symbol/outcome-labels/backfill -> 200 (summary counts; zeros OK)"
-    Write-Host " 12. Authenticated POST .../assessments/{id}/calibrations?horizon=forward_return_5 -> 200|422"
-    Write-Host " 13. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
-    Write-Host " 14. Authenticated GET .../assessments/{id}/outcome-labels/export -> 200 (attachment, JSON array; [] OK)"
-    Write-Host " 15. Authenticated GET .../assessments/{id}/calibrations/export -> 200 (attachment, JSON array; [] OK)"
-    Write-Host " 16. Authenticated GET /research/$Symbol/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
-    Write-Host " 17. Authenticated GET /research/$Symbol/evidence-summary/export -> 200 (attachment, state=research_only)"
-    Write-Host " 18. SSH alembic current includes 0009|head (when SSH configured)"
-    Write-Host " 19. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 11. Authenticated POST /research/$Symbol/assessments/backfill -> 200 (summary counts; zeros OK)"
+    Write-Host " 12. Authenticated POST /research/$Symbol/outcome-labels/backfill -> 200 (summary counts; zeros OK)"
+    Write-Host " 13. Authenticated POST .../assessments/{id}/calibrations?horizon=forward_return_5 -> 200|422"
+    Write-Host " 14. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
+    Write-Host " 15. Authenticated GET .../assessments/{id}/outcome-labels/export -> 200 (attachment, JSON array; [] OK)"
+    Write-Host " 16. Authenticated GET .../assessments/{id}/calibrations/export -> 200 (attachment, JSON array; [] OK)"
+    Write-Host " 17. Authenticated GET /research/$Symbol/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
+    Write-Host " 18. Authenticated GET /research/$Symbol/evidence-summary/export -> 200 (attachment, state=research_only)"
+    Write-Host " 19. SSH alembic current includes 0009|head (when SSH configured)"
+    Write-Host " 20. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -168,6 +169,11 @@ $backfillUnauthCode = & curl.exe -sS @curlInsecure -o NUL -w "%{http_code}" --ma
     -H "Accept: application/json" -X POST $backfillUnauthUrl
 if ($LASTEXITCODE -ne 0) { throw "POST outcome-labels/backfill (unauth) failed (curl exit $LASTEXITCODE)" }
 Assert-Status -Label "POST $backfillUnauthUrl (unauth)" -Actual ([int]$backfillUnauthCode) -Expected @(401)
+$assessBackfillUnauthUrl = "$api/research/$verifySymbol/assessments/backfill?limit=20"
+$assessBackfillUnauthCode = & curl.exe -sS @curlInsecure -o NUL -w "%{http_code}" --max-time 30 `
+    -H "Accept: application/json" -X POST $assessBackfillUnauthUrl
+if ($LASTEXITCODE -ne 0) { throw "POST assessments/backfill (unauth) failed (curl exit $LASTEXITCODE)" }
+Assert-Status -Label "POST $assessBackfillUnauthUrl (unauth)" -Actual ([int]$assessBackfillUnauthCode) -Expected @(401)
 
 Write-Host "==> Frontend reachability"
 $feStatus = Get-HttpStatus $frontend
@@ -283,6 +289,25 @@ try {
             if (Test-Path -LiteralPath $p) {
                 Remove-Item -LiteralPath $p -Force -ErrorAction SilentlyContinue
             }
+        }
+    }
+
+    # Phase 46: assessment backfill (always 200 summary; zeros / skips OK).
+    $assessBackfillUrl = "$api/research/$verifySymbol/assessments/backfill?limit=20"
+    $assessBackfillPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.assess-backfill.json" -f [guid]::NewGuid().ToString("N"))
+    try {
+        $assessBackfillCode = & curl.exe -sS @curlInsecure -o $assessBackfillPath -w "%{http_code}" --max-time 120 `
+            -b $cookieJar -H "Accept: application/json" -X POST $assessBackfillUrl
+        if ($LASTEXITCODE -ne 0) { throw "POST assessments/backfill failed (curl exit $LASTEXITCODE)" }
+        Assert-Status -Label "POST $assessBackfillUrl (auth)" -Actual ([int]$assessBackfillCode) -Expected @(200)
+        $assessBackfillBody = Get-Content -LiteralPath $assessBackfillPath -Raw | ConvertFrom-Json
+        if ($null -eq $assessBackfillBody.candidate_count) { throw "assessments/backfill missing candidate_count" }
+        if ($null -eq $assessBackfillBody.persisted_count) { throw "assessments/backfill missing persisted_count" }
+        if ($null -eq $assessBackfillBody.skipped_count) { throw "assessments/backfill missing skipped_count" }
+        Write-Host "OK  assessments/backfill candidate_count=$($assessBackfillBody.candidate_count) persisted=$($assessBackfillBody.persisted_count) skipped=$($assessBackfillBody.skipped_count)"
+    } finally {
+        if (Test-Path -LiteralPath $assessBackfillPath) {
+            Remove-Item -LiteralPath $assessBackfillPath -Force -ErrorAction SilentlyContinue
         }
     }
 

@@ -19,8 +19,8 @@ outcome labels), Phase 14 (scheduled outcome labeling after assessments), Phase 
 (research probability calibration v1), Phase 16 (calibration corpus readiness),
 Phase 17 (NAS live verification evidence gate), Phase 18 (on-demand calibration),
 Phase 19 (calibration history), Phase 20 (outcome label history), Phase 21
-(NAS live verify of Phases 18–20), Phase 22 (symbol research evidence summary), and
-Phase 23 (NAS live verify of Phase 22).
+(NAS live verify of Phases 18–20), Phase 22 (symbol research evidence summary),
+Phase 23 (NAS live verify of Phase 22), and Phase 24 (evidence-summary JSON export).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -60,6 +60,9 @@ Phase 22 adds `GET /research/{symbol}/evidence-summary` as a read-only aggregate
 [decisions/0023-phase-22-research-evidence-summary.md](decisions/0023-phase-22-research-evidence-summary.md)).
 Phase 23 live-verifies that aggregate on the NAS (see
 [decisions/0024-phase-23-nas-live-verify-phase-22.md](decisions/0024-phase-23-nas-live-verify-phase-22.md)).
+Phase 24 adds `GET /research/{symbol}/evidence-summary/export` as a downloadable JSON
+attachment of the same payload (see
+[decisions/0025-phase-24-evidence-summary-export.md](decisions/0025-phase-24-evidence-summary-export.md)).
 
 ## System context
 
@@ -110,7 +113,9 @@ persisting rows (ADR-0017). As of Phase 18, authenticated
 Phase 19, `GET .../calibrations?limit=` lists append-only history newest first (ADR-0020).
 As of Phase 20, `GET .../outcome-labels?limit=` lists append-only label history (ADR-0021).
 As of Phase 22, `GET /research/{symbol}/evidence-summary` aggregates research-only evidence
-for one symbol (ADR-0023). As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
+for one symbol (ADR-0023). As of Phase 24,
+`GET /research/{symbol}/evidence-summary/export` downloads that aggregate as a JSON
+attachment (ADR-0025). As of Phase 11, when `AEGIS_RESEARCH_MULTI_SOURCE_COVERAGE_ENABLED` is true,
 assessments use `method_version` 2 multi-source coverage weighting (ADR-0012). See
 [decisions/0002-phase-1-market-data-ingestion.md](decisions/0002-phase-1-market-data-ingestion.md),
 [decisions/0003-phase-2-scheduled-watchlist.md](decisions/0003-phase-2-scheduled-watchlist.md),

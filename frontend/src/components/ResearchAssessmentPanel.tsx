@@ -12,6 +12,7 @@ import {
   createOutcomeLabels,
   createProbabilityCalibration,
   createResearchAssessment,
+  downloadResearchEvidenceSummary,
   getApiBaseUrl,
   getCalibrationReadiness,
   getLatestResearchAssessment,
@@ -198,6 +199,17 @@ export function ResearchAssessmentPanel({
     });
   }
 
+  function onDownloadEvidenceSummary() {
+    startTransition(async () => {
+      setError(null);
+      try {
+        await downloadResearchEvidenceSummary(baseUrl, symbol);
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
   function onRefreshReadiness() {
     startTransition(async () => {
       setError(null);
@@ -249,6 +261,14 @@ export function ResearchAssessmentPanel({
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Refresh evidence summary
+          </button>
+          <button
+            type="button"
+            onClick={onDownloadEvidenceSummary}
+            disabled={isPending}
+            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
+          >
+            Download evidence JSON
           </button>
           <button
             type="button"

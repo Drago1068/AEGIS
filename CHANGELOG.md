@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 24 - Research Evidence Summary JSON Export
+
+Authenticated download of the research-only evidence aggregate for offline audit. See
+[docs/architecture/decisions/0025-phase-24-evidence-summary-export.md](docs/architecture/decisions/0025-phase-24-evidence-summary-export.md).
+
+#### Added
+
+- `GET /research/{symbol}/evidence-summary/export` — same payload as evidence-summary with
+  `Content-Disposition: attachment`.
+- Operator console "Download evidence JSON" control.
+- ADR-0025.
+
+#### Explicitly out of scope
+
+Multi-horizon methods, default-on calibration, actionable promotion, orders, CSV/PDF.
+
 ### Phase 23 - NAS Live Verification of Phase 22
 
 Ops evidence gate: redeploy current revision and verify

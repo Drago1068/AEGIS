@@ -7,6 +7,7 @@ placement. Assessments are fail-closed: gate failures return HTTP 422 and persis
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi.responses import JSONResponse
 
 from aegis.api.dependencies import (
     build_outcome_label_service,
@@ -216,22 +217,15 @@ async def get_latest_probability_calibration(
     return ProbabilityCalibrationResponse.model_validate(calibration)
 
 
-@router.get(
-    "/{symbol}/evidence-summary",
-    response_model=ResearchEvidenceSummaryResponse,
-)
-async def get_research_evidence_summary(
+async def _build_research_evidence_summary(
     symbol: str,
-    assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
-    outcome_label_service: OutcomeLabelService = Depends(get_outcome_label_service),
-    calibration_service: ResearchProbabilityCalibrationService = Depends(
-        get_research_calibration_service
-    ),
-    calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
-        get_research_calibration_repository
-    ),
+    *,
+    assessment_service: ResearchAssessmentService,
+    outcome_label_service: OutcomeLabelService,
+    calibration_service: ResearchProbabilityCalibrationService,
+    calibration_repository: ResearchProbabilityCalibrationRepository,
 ) -> ResearchEvidenceSummaryResponse:
-    """Return a read-only research evidence aggregate for ``symbol`` (ADR-0023)."""
+    """Compose the Phase 22 research-only evidence aggregate (null/zero missing fields)."""
 
     snapshots = await assessment_service.list_assessments(symbol, 100)
     assessment_count = len(snapshots)
@@ -272,6 +266,60 @@ async def get_research_evidence_summary(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."
         ),
+    )
+
+
+@router.get(
+    "/{symbol}/evidence-summary",
+    response_model=ResearchEvidenceSummaryResponse,
+)
+async def get_research_evidence_summary(
+    symbol: str,
+    assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
+    outcome_label_service: OutcomeLabelService = Depends(get_outcome_label_service),
+    calibration_service: ResearchProbabilityCalibrationService = Depends(
+        get_research_calibration_service
+    ),
+    calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
+        get_research_calibration_repository
+    ),
+) -> ResearchEvidenceSummaryResponse:
+    """Return a read-only research evidence aggregate for ``symbol`` (ADR-0023)."""
+
+    return await _build_research_evidence_summary(
+        symbol,
+        assessment_service=assessment_service,
+        outcome_label_service=outcome_label_service,
+        calibration_service=calibration_service,
+        calibration_repository=calibration_repository,
+    )
+
+
+@router.get("/{symbol}/evidence-summary/export")
+async def export_research_evidence_summary(
+    symbol: str,
+    assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
+    outcome_label_service: OutcomeLabelService = Depends(get_outcome_label_service),
+    calibration_service: ResearchProbabilityCalibrationService = Depends(
+        get_research_calibration_service
+    ),
+    calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
+        get_research_calibration_repository
+    ),
+) -> JSONResponse:
+    """Download the research evidence aggregate as a JSON attachment (ADR-0025)."""
+
+    summary = await _build_research_evidence_summary(
+        symbol,
+        assessment_service=assessment_service,
+        outcome_label_service=outcome_label_service,
+        calibration_service=calibration_service,
+        calibration_repository=calibration_repository,
+    )
+    filename = f"aegis-{summary.symbol}-evidence-summary.json"
+    return JSONResponse(
+        content=summary.model_dump(mode="json"),
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 

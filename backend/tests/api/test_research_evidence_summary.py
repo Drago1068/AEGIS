@@ -230,3 +230,82 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["outcome_label_count"] == 1
     assert body["calibration_count"] == 1
     assert body["state"] == "research_only"
+
+
+async def test_evidence_summary_export_attachment() -> None:
+    async with _client(
+        assessments=[_snapshot()],
+        labels=[_label()],
+        calibrations=[_calibration()],
+    ) as client:
+        response = await client.get("/research/aapl/evidence-summary/export")
+
+    assert response.status_code == 200
+    assert "application/json" in response.headers["content-type"]
+    disposition = response.headers["content-disposition"]
+    assert "attachment" in disposition
+    assert 'filename="aegis-AAPL-evidence-summary.json"' in disposition
+    body = response.json()
+    assert body["symbol"] == "AAPL"
+    assert body["state"] == "research_only"
+    assert body["latest_assessment"]["id"] == 1
+    assert body["latest_assessment"]["probability_confidence"] is None
+    assert body["latest_calibration"]["probability_confidence"] == 0.62
+    assert body["assessment_count"] == 1
+
+
+async def test_evidence_summary_export_empty_symbol() -> None:
+    readiness = CalibrationReadinessData(
+        symbol="MSFT",
+        status=CalibrationReadinessStatus.NO_ASSESSMENT,
+        assessment_snapshot_id=None,
+        research_index=None,
+        corpus_count=0,
+        bucket_count=0,
+        min_corpus=10,
+        min_bucket=5,
+        index_bucket_width=0.15,
+        calibration_method_id=CALIBRATION_METHOD_ID,
+        detail="no assessment",
+    )
+    async with _client(readiness=readiness) as client:
+        response = await client.get("/research/MSFT/evidence-summary/export")
+
+    assert response.status_code == 200
+    assert 'filename="aegis-MSFT-evidence-summary.json"' in response.headers["content-disposition"]
+    body = response.json()
+    assert body["state"] == "research_only"
+    assert body["latest_assessment"] is None
+    assert body["assessment_count"] == 0
+    assert body["outcome_label_count"] == 0
+    assert body["calibration_count"] == 0
+
+
+async def test_evidence_summary_export_requires_auth() -> None:
+    from aegis.api.dependencies import get_operator_repository, get_session_store
+
+    class _EmptyOperators:
+        async def ensure_seeded(self, username: str, password: str) -> None:
+            return None
+
+        async def get_by_username(self, username: str) -> None:
+            return None
+
+    class _EmptySessions:
+        async def get(self, session_id: str) -> None:
+            return None
+
+        async def create(self, operator_id: int, username: str) -> str:
+            return "unused"
+
+        async def delete(self, session_id: str) -> None:
+            return None
+
+    app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
+    app.dependency_overrides[get_operator_repository] = lambda: _EmptyOperators()
+    app.dependency_overrides[get_session_store] = lambda: _EmptySessions()
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://testserver"
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary/export")
+    assert response.status_code == 401

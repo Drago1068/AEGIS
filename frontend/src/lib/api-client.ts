@@ -633,6 +633,66 @@ export async function getResearchEvidenceSummary(
   return body as ResearchEvidenceSummary;
 }
 
+/** Download the research evidence summary JSON attachment (Phase 24, ADR-0025). */
+export async function downloadResearchEvidenceSummary(
+  baseUrl: string,
+  symbol: string,
+  options?: ApiRequestOptions,
+): Promise<string> {
+  const url = `${baseUrl}/research/${encodeURIComponent(symbol)}/evidence-summary/export`;
+  const headers = new Headers();
+  if (options?.cookie) {
+    headers.set("Cookie", options.cookie);
+  }
+  if (!headers.has("Accept")) {
+    headers.set("Accept", "application/json");
+  }
+
+  const response = await fetch(url, {
+    headers,
+    credentials: "include",
+  });
+  redirectToLoginIfNeeded(response.status, options);
+  if (!response.ok) {
+    const body = await readJson(response);
+    throw new ApiClientError(
+      `Unexpected GET evidence-summary export status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+
+  const blob = await response.blob();
+  const filename =
+    parseContentDispositionFilename(response.headers.get("Content-Disposition")) ??
+    `aegis-${symbol.toUpperCase()}-evidence-summary.json`;
+
+  if (typeof window !== "undefined") {
+    const objectUrl = URL.createObjectURL(blob);
+    try {
+      const anchor = document.createElement("a");
+      anchor.href = objectUrl;
+      anchor.download = filename;
+      anchor.rel = "noopener";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  }
+
+  return filename;
+}
+
+function parseContentDispositionFilename(header: string | null): string | null {
+  if (!header) {
+    return null;
+  }
+  const match = /filename="([^"]+)"/i.exec(header);
+  return match?.[1] ?? null;
+}
+
 export function getApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 }

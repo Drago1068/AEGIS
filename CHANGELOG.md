@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 26 - Multi-Horizon Outcome Label Surfacing
+
+Operator console shows every horizon key present on outcome-label payloads (5 and 20
+session returns already computed by Phase 13). See
+[docs/architecture/decisions/0027-phase-26-multi-horizon-label-surfacing.md](docs/architecture/decisions/0027-phase-26-multi-horizon-label-surfacing.md).
+
+#### Changed
+
+- Evidence summary and outcome-label history render all API `labels` keys (sorted); no
+  invented values.
+- ADR-0027.
+
+#### Explicitly out of scope
+
+New horizons/methods, horizon-specific calibration, default-on calibration, actionable
+promotion, orders, TLS cutover.
+
 ### Phase 25 - NAS Live Verification of Phase 24
 
 Ops evidence gate: redeploy current revision and verify

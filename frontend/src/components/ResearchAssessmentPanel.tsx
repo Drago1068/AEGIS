@@ -43,6 +43,39 @@ function formatAssessmentError(err: unknown): string {
   return err.message;
 }
 
+/** Sort API label keys: forward_return_N by N ascending, then other keys. Never invent values. */
+function sortedLabelEntries(labels: Record<string, number>): [string, number][] {
+  return Object.entries(labels).sort(([a], [b]) => {
+    const na = /^forward_return_(\d+)$/.exec(a);
+    const nb = /^forward_return_(\d+)$/.exec(b);
+    if (na && nb) {
+      return Number(na[1]) - Number(nb[1]);
+    }
+    if (na) {
+      return -1;
+    }
+    if (nb) {
+      return 1;
+    }
+    return a.localeCompare(b);
+  });
+}
+
+/** Compact history line from API label payload only (Phase 26, ADR-0027). */
+function formatLabelHorizonSummary(labels: Record<string, number>): string {
+  const entries = sortedLabelEntries(labels);
+  if (entries.length === 0) {
+    return "none";
+  }
+  return entries
+    .map(([key, value]) => {
+      const match = /^forward_return_(\d+)$/.exec(key);
+      const short = match ? `fwd${match[1]}` : key;
+      return `${short}=${value.toFixed(4)}`;
+    })
+    .join(" · ");
+}
+
 export function ResearchAssessmentPanel({
   symbol,
   initialLatest,
@@ -335,14 +368,21 @@ export function ResearchAssessmentPanel({
                   : evidenceSummary.latest_calibration.probability_confidence.toFixed(4)}
               </dd>
             </div>
-            <div>
-              <dt className="text-aegis-muted">Latest forward_return_5</dt>
-              <dd className="font-mono">
-                {evidenceSummary.latest_outcome_label?.labels.forward_return_5 == null
-                  ? "null"
-                  : evidenceSummary.latest_outcome_label.labels.forward_return_5.toFixed(4)}
-              </dd>
-            </div>
+            {evidenceSummary.latest_outcome_label == null ? (
+              <div>
+                <dt className="text-aegis-muted">Latest outcome labels</dt>
+                <dd className="font-mono">null</dd>
+              </div>
+            ) : (
+              sortedLabelEntries(evidenceSummary.latest_outcome_label.labels).map(
+                ([key, value]) => (
+                  <div key={key}>
+                    <dt className="text-aegis-muted">Latest {key}</dt>
+                    <dd className="font-mono">{value.toFixed(4)}</dd>
+                  </div>
+                ),
+              )
+            )}
           </dl>
           <p className="mt-2 text-xs text-aegis-muted">{evidenceSummary.detail}</p>
         </div>
@@ -432,7 +472,7 @@ export function ResearchAssessmentPanel({
                 Outcome labels (evidence only — not calibrated probability)
               </p>
               <dl className="mt-2 grid gap-2 sm:grid-cols-2">
-                {Object.entries(outcomeLabel.labels).map(([key, value]) => (
+                {sortedLabelEntries(outcomeLabel.labels).map(([key, value]) => (
                   <div key={key}>
                     <dt className="text-aegis-muted">{key}</dt>
                     <dd className="font-mono">{value.toFixed(6)}</dd>
@@ -450,12 +490,10 @@ export function ResearchAssessmentPanel({
                   </p>
                   <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
                     {outcomeLabelHistory.map((row) => {
-                      const ret5 = row.labels.forward_return_5;
-                      const retLabel =
-                        typeof ret5 === "number" ? `fwd5=${ret5.toFixed(4)}` : "fwd5=n/a";
+                      const horizons = formatLabelHorizonSummary(row.labels);
                       return (
-                        <li key={row.id ?? `${row.computed_at}-${retLabel}`}>
-                          {row.computed_at} · {retLabel} · {row.bar_source}
+                        <li key={row.id ?? `${row.computed_at}-${horizons}`}>
+                          {row.computed_at} · {horizons} · {row.bar_source}
                         </li>
                       );
                     })}

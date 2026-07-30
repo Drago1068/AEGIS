@@ -264,8 +264,8 @@ describe("ResearchAssessmentPanel", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/outcome label history \(newest first\)/i)).toBeInTheDocument();
-      expect(screen.getByText(/fwd5=0\.0500/)).toBeInTheDocument();
-      expect(screen.getByText(/fwd5=0\.0300/)).toBeInTheDocument();
+      expect(screen.getByText(/fwd5=0\.0500 · fwd20=0\.1000/)).toBeInTheDocument();
+      expect(screen.getByText(/fwd5=0\.0300 · fwd20=0\.0800/)).toBeInTheDocument();
     });
   });
 
@@ -321,10 +321,26 @@ describe("ResearchAssessmentPanel", () => {
         calibration_method_id: "research_calibration_v1",
         detail: "corpus and bucket gates pass",
       },
-      latest_outcome_label: null,
+      latest_outcome_label: {
+        id: 20,
+        assessment_snapshot_id: 1,
+        symbol: "AAPL",
+        label_method_id: "forward_total_return_v1",
+        label_method_version: 1,
+        state: "research_only",
+        as_of_trading_date: "2024-01-26",
+        computed_at: "2024-01-26T20:00:00Z",
+        labels: { forward_return_5: 0.05, forward_return_20: 0.1 },
+        label_end_dates: {
+          forward_return_5: "2024-02-02",
+          forward_return_20: "2024-02-23",
+        },
+        schema_version: 1,
+        bar_source: "alpha_vantage",
+      },
       latest_calibration: sampleCalibration,
       assessment_count: 2,
-      outcome_label_count: 0,
+      outcome_label_count: 1,
       calibration_count: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
@@ -335,7 +351,11 @@ describe("ResearchAssessmentPanel", () => {
     await waitFor(() => {
       expect(screen.getByText(/evidence summary \(research-only/i)).toBeInTheDocument();
       expect(screen.getByText(/assessments \(≤100\)/i)).toBeInTheDocument();
-      expect(screen.getByText("0 / 1")).toBeInTheDocument();
+      expect(screen.getByText("1 / 1")).toBeInTheDocument();
+      expect(screen.getByText(/latest forward_return_5/i)).toBeInTheDocument();
+      expect(screen.getByText(/latest forward_return_20/i)).toBeInTheDocument();
+      expect(screen.getByText("0.0500")).toBeInTheDocument();
+      expect(screen.getByText("0.1000")).toBeInTheDocument();
       expect(getResearchEvidenceSummary).toHaveBeenCalledWith("http://localhost:8000", "AAPL");
     });
   });

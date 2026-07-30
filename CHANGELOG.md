@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 30 - Outcome Label End-Date Surfacing
+
+Operator console shows `label_end_dates` next to present horizon returns (API payload only).
+See
+[docs/architecture/decisions/0031-phase-30-label-end-date-surfacing.md](docs/architecture/decisions/0031-phase-30-label-end-date-surfacing.md).
+
+#### Changed
+
+- Outcome-label detail, history, and evidence summary include end trading dates when present.
+- ADR-0031.
+
+#### Explicitly out of scope
+
+New horizons/methods, horizon-specific calibration, default-on calibration, actionable
+promotion, orders, TLS cutover.
+
 ### Phase 29 - NAS Live Verification of Phase 28
 
 Ops evidence gate: redeploy current revision and verify

@@ -309,8 +309,18 @@ describe("ResearchAssessmentPanel", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/outcome label history \(newest first\)/i)).toBeInTheDocument();
-      expect(screen.getByText(/fwd5=0\.0500 · fwd20=0\.1000/)).toBeInTheDocument();
-      expect(screen.getByText(/fwd5=0\.0300 · fwd20=0\.0800/)).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /fwd5=0\.0500 end=2024-02-02 · fwd20=0\.1000 end=2024-02-23/,
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /fwd5=0\.0300 end=2024-02-02 · fwd20=0\.0800 end=2024-02-23/,
+        ),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/0\.050000 · end 2024-02-02/)).toBeInTheDocument();
+      expect(screen.getByText(/0\.100000 · end 2024-02-23/)).toBeInTheDocument();
     });
   });
 
@@ -399,8 +409,8 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText("1 / 1")).toBeInTheDocument();
       expect(screen.getByText(/latest forward_return_5/i)).toBeInTheDocument();
       expect(screen.getByText(/latest forward_return_20/i)).toBeInTheDocument();
-      expect(screen.getByText("0.0500")).toBeInTheDocument();
-      expect(screen.getByText("0.1000")).toBeInTheDocument();
+      expect(screen.getByText(/0\.0500 · end 2024-02-02/)).toBeInTheDocument();
+      expect(screen.getByText(/0\.1000 · end 2024-02-23/)).toBeInTheDocument();
       expect(getResearchEvidenceSummary).toHaveBeenCalledWith("http://localhost:8000", "AAPL");
     });
   });

@@ -62,8 +62,11 @@ function sortedLabelEntries(labels: Record<string, number>): [string, number][] 
   });
 }
 
-/** Compact history line from API label payload only (Phase 26, ADR-0027). */
-function formatLabelHorizonSummary(labels: Record<string, number>): string {
+/** Compact history line from API label payload only (Phase 26 + Phase 30). */
+function formatLabelHorizonSummary(
+  labels: Record<string, number>,
+  endDates?: Record<string, string>,
+): string {
   const entries = sortedLabelEntries(labels);
   if (entries.length === 0) {
     return "none";
@@ -72,7 +75,9 @@ function formatLabelHorizonSummary(labels: Record<string, number>): string {
     .map(([key, value]) => {
       const match = /^forward_return_(\d+)$/.exec(key);
       const short = match ? `fwd${match[1]}` : key;
-      return `${short}=${value.toFixed(4)}`;
+      const end = endDates?.[key];
+      const endPart = typeof end === "string" && end.length > 0 ? ` end=${end}` : "";
+      return `${short}=${value.toFixed(4)}${endPart}`;
     })
     .join(" · ");
 }
@@ -398,12 +403,21 @@ export function ResearchAssessmentPanel({
               </div>
             ) : (
               sortedLabelEntries(evidenceSummary.latest_outcome_label.labels).map(
-                ([key, value]) => (
-                  <div key={key}>
-                    <dt className="text-aegis-muted">Latest {key}</dt>
-                    <dd className="font-mono">{value.toFixed(4)}</dd>
-                  </div>
-                ),
+                ([key, value]) => {
+                  const end =
+                    evidenceSummary.latest_outcome_label?.label_end_dates?.[key];
+                  return (
+                    <div key={key}>
+                      <dt className="text-aegis-muted">Latest {key}</dt>
+                      <dd className="font-mono">
+                        {value.toFixed(4)}
+                        {typeof end === "string" && end.length > 0
+                          ? ` · end ${end}`
+                          : null}
+                      </dd>
+                    </div>
+                  );
+                },
               )
             )}
           </dl>
@@ -510,12 +524,20 @@ export function ResearchAssessmentPanel({
                 Outcome labels (evidence only — not calibrated probability)
               </p>
               <dl className="mt-2 grid gap-2 sm:grid-cols-2">
-                {sortedLabelEntries(outcomeLabel.labels).map(([key, value]) => (
-                  <div key={key}>
-                    <dt className="text-aegis-muted">{key}</dt>
-                    <dd className="font-mono">{value.toFixed(6)}</dd>
-                  </div>
-                ))}
+                {sortedLabelEntries(outcomeLabel.labels).map(([key, value]) => {
+                  const end = outcomeLabel.label_end_dates[key];
+                  return (
+                    <div key={key}>
+                      <dt className="text-aegis-muted">{key}</dt>
+                      <dd className="font-mono">
+                        {value.toFixed(6)}
+                        {typeof end === "string" && end.length > 0
+                          ? ` · end ${end}`
+                          : null}
+                      </dd>
+                    </div>
+                  );
+                })}
               </dl>
               <p className="mt-2 text-xs text-aegis-muted">
                 Bar source {outcomeLabel.bar_source}. Label method{" "}
@@ -528,7 +550,10 @@ export function ResearchAssessmentPanel({
                   </p>
                   <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
                     {outcomeLabelHistory.map((row) => {
-                      const horizons = formatLabelHorizonSummary(row.labels);
+                      const horizons = formatLabelHorizonSummary(
+                        row.labels,
+                        row.label_end_dates,
+                      );
                       return (
                         <li key={row.id ?? `${row.computed_at}-${horizons}`}>
                           {row.computed_at} · {horizons} · {row.bar_source}

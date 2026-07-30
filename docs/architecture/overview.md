@@ -23,7 +23,8 @@ Phase 19 (calibration history), Phase 20 (outcome label history), Phase 21
 Phase 23 (NAS live verify of Phase 22), Phase 24 (evidence-summary JSON export),
 Phase 25 (NAS live verify of Phase 24), Phase 26 (multi-horizon outcome label
 surfacing), Phase 27 (NAS live verify of Phase 26), Phase 28 (research assessment
-history in the console), and Phase 29 (NAS live verify of Phase 28).
+history in the console), Phase 29 (NAS live verify of Phase 28), and Phase 30
+(outcome label end-date surfacing).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -76,6 +77,8 @@ Phase 28 surfaces newest-first research assessment history in the operator conso
 [decisions/0029-phase-28-assessment-history-console.md](decisions/0029-phase-28-assessment-history-console.md)).
 Phase 29 live-verifies that revision on the NAS (see
 [decisions/0030-phase-29-nas-live-verify-phase-28.md](decisions/0030-phase-29-nas-live-verify-phase-28.md)).
+Phase 30 surfaces present outcome-label end trading dates in the operator console (see
+[decisions/0031-phase-30-label-end-date-surfacing.md](decisions/0031-phase-30-label-end-date-surfacing.md)).
 
 ## System context
 

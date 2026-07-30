@@ -29,15 +29,16 @@ print_checklist() {
   echo "Live verification checklist (ADR-0018):"
   echo "  1. GET /health -> 200"
   echo "  2. GET /ready -> 200"
-  echo "  3. Auth gate 401: watchlist, daily-bars, research latest, calibration-readiness, evidence-summary"
+  echo "  3. Auth gate 401: watchlist, daily-bars, research latest, calibration-readiness, evidence-summary, evidence-summary/export"
   echo "  4. Frontend base URL -> 200|302|307|308"
   echo "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
   echo "  6. Authenticated GET /research/${symbol}/calibration-readiness -> 200"
   echo "  7. Authenticated GET /research/${symbol}/assessments/latest -> 200|404"
   echo "  8. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
   echo "  9. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only)"
-  echo " 10. SSH alembic current includes 0008|head (when SSH configured)"
-  echo " 11. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 10. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
+  echo " 11. SSH alembic current includes 0008|head (when SSH configured)"
+  echo " 12. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -129,6 +130,7 @@ assert_status "GET ${API}/market-data/${VERIFY_SYMBOL}/daily-bars" "$(http_statu
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/assessments/latest" "$(http_status "${API}/research/${VERIFY_SYMBOL}/assessments/latest")" 401
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/calibration-readiness" "$(http_status "${API}/research/${VERIFY_SYMBOL}/calibration-readiness")" 401
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/evidence-summary" "$(http_status "${API}/research/${VERIFY_SYMBOL}/evidence-summary")" 401
+assert_status "GET ${API}/research/${VERIFY_SYMBOL}/evidence-summary/export" "$(http_status "${API}/research/${VERIFY_SYMBOL}/evidence-summary/export")" 401
 
 echo "==> Frontend reachability"
 fe_status="$(http_status "${FRONTEND}")"
@@ -211,6 +213,26 @@ if ! grep -q '"state"[[:space:]]*:[[:space:]]*"research_only"' "${summary_body}"
   exit 1
 fi
 echo "OK  evidence-summary state=research_only"
+
+export_url="${API}/research/${VERIFY_SYMBOL}/evidence-summary/export"
+export_body="$(mktemp)"
+export_headers="$(mktemp)"
+cleanup() { rm -f "${COOKIE_JAR}" "${calib_body}" "${label_body}" "${summary_body}" "${export_body}" "${export_headers}"; }
+trap cleanup EXIT
+export_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -D "${export_headers}" -o "${export_body}" -w "%{http_code}" --max-time 30 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" "${export_url}"
+)"
+assert_status "GET ${export_url} (auth)" "${export_code}" 200
+if ! grep -qi 'content-disposition:.*attachment' "${export_headers}"; then
+  echo "evidence-summary/export missing Content-Disposition attachment" >&2
+  exit 1
+fi
+if ! grep -q '"state"[[:space:]]*:[[:space:]]*"research_only"' "${export_body}"; then
+  echo "evidence-summary/export missing state=research_only" >&2
+  exit 1
+fi
+echo "OK  evidence-summary/export attachment state=research_only"
 
 mapfile -t COMPOSE_FILES < <(compose_nas_file_flags "${REPO_ROOT}")
 COMPOSE_FILE_ARGS="${COMPOSE_FILES[*]}"

@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 25 - NAS Live Verification of Phase 24
+
+Ops evidence gate: redeploy current revision and verify
+`GET /research/{symbol}/evidence-summary/export` on the live NAS. See
+[docs/architecture/decisions/0026-phase-25-nas-live-verify-phase-24.md](docs/architecture/decisions/0026-phase-25-nas-live-verify-phase-24.md).
+
+#### Added
+
+- ADR-0026: live verify includes evidence-summary export (401 unauth; attachment +
+  `research_only` when authenticated).
+- `verify.ps1` / `verify.sh` export auth gate + authenticated attachment check.
+
+#### Explicitly out of scope
+
+Default-on calibration, multi-horizon methods, actionable promotion, orders, TLS cutover.
+
 ### Phase 24 - Research Evidence Summary JSON Export
 
 Authenticated download of the research-only evidence aggregate for offline audit. See

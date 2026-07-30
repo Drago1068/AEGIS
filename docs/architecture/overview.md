@@ -20,7 +20,8 @@ outcome labels), Phase 14 (scheduled outcome labeling after assessments), Phase 
 Phase 17 (NAS live verification evidence gate), Phase 18 (on-demand calibration),
 Phase 19 (calibration history), Phase 20 (outcome label history), Phase 21
 (NAS live verify of Phases 18–20), Phase 22 (symbol research evidence summary),
-Phase 23 (NAS live verify of Phase 22), and Phase 24 (evidence-summary JSON export).
+Phase 23 (NAS live verify of Phase 22), Phase 24 (evidence-summary JSON export), and
+Phase 25 (NAS live verify of Phase 24).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -63,6 +64,8 @@ Phase 23 live-verifies that aggregate on the NAS (see
 Phase 24 adds `GET /research/{symbol}/evidence-summary/export` as a downloadable JSON
 attachment of the same payload (see
 [decisions/0025-phase-24-evidence-summary-export.md](decisions/0025-phase-24-evidence-summary-export.md)).
+Phase 25 live-verifies that export on the NAS (see
+[decisions/0026-phase-25-nas-live-verify-phase-24.md](decisions/0026-phase-25-nas-live-verify-phase-24.md)).
 
 ## System context
 

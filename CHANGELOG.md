@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 44 - NAS Live Verification of Phase 43
+
+Ops evidence gate: redeploy current revision under the lab TLS profile and verify
+outcome-label backfill on the live NAS. See
+[docs/architecture/decisions/0045-phase-44-nas-live-verify-phase-43.md](docs/architecture/decisions/0045-phase-44-nas-live-verify-phase-43.md).
+
+#### Added
+
+- ADR-0045: live verify includes unauth **401** and auth **200** summary for
+  `POST .../outcome-labels/backfill`.
+- `verify.ps1` / `verify.sh` Phase 44 gates.
+
+#### Explicitly out of scope
+
+New labeling math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 43 - Historical Outcome-Label Backfill
 
 Research-only batch re-attempt of `forward_total_return_v1` labels over recent assessment

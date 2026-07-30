@@ -29,7 +29,7 @@ print_checklist() {
   echo "Live verification checklist (ADR-0018):"
   echo "  1. GET /health -> 200"
   echo "  2. GET /ready -> 200"
-  echo "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list(+export), calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export)"
+  echo "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list(+export), calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export), outcome-labels/backfill POST"
   echo "  4. Frontend base URL -> 200|302|307|308"
   echo "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
   echo "  6. Authenticated GET /research/${symbol}/calibration-readiness -> 200 (by_horizon includes fwd5+fwd20)"
@@ -37,14 +37,15 @@ print_checklist() {
   echo "  8. Authenticated GET /research/${symbol}/assessments/latest -> 200|404"
   echo "  9. Authenticated GET /research/${symbol}/assessments?limit= -> 200 (JSON array; [] OK)"
   echo " 10. Authenticated GET /research/${symbol}/assessments/export -> 200 (attachment, JSON array; [] OK)"
-  echo " 11. Authenticated POST .../assessments/{id}/calibrations?horizon=forward_return_5 -> 200|422"
-  echo " 12. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
-  echo " 13. Authenticated GET .../assessments/{id}/outcome-labels/export -> 200 (attachment, JSON array; [] OK)"
-  echo " 14. Authenticated GET .../assessments/{id}/calibrations/export -> 200 (attachment, JSON array; [] OK)"
-  echo " 15. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
-  echo " 16. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
-  echo " 17. SSH alembic current includes 0009|head (when SSH configured)"
-  echo " 18. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 11. Authenticated POST /research/${symbol}/outcome-labels/backfill -> 200 (summary counts; zeros OK)"
+  echo " 12. Authenticated POST .../assessments/{id}/calibrations?horizon=forward_return_5 -> 200|422"
+  echo " 13. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
+  echo " 14. Authenticated GET .../assessments/{id}/outcome-labels/export -> 200 (attachment, JSON array; [] OK)"
+  echo " 15. Authenticated GET .../assessments/{id}/calibrations/export -> 200 (attachment, JSON array; [] OK)"
+  echo " 16. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
+  echo " 17. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
+  echo " 18. SSH alembic current includes 0009|head (when SSH configured)"
+  echo " 19. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -152,6 +153,12 @@ assert_status "GET ${API}/research/${VERIFY_SYMBOL}/assessments/1/outcome-labels
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/assessments/1/calibrations/export" "$(http_status "${API}/research/${VERIFY_SYMBOL}/assessments/1/calibrations/export")" 401
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/evidence-summary" "$(http_status "${API}/research/${VERIFY_SYMBOL}/evidence-summary")" 401
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/evidence-summary/export" "$(http_status "${API}/research/${VERIFY_SYMBOL}/evidence-summary/export")" 401
+backfill_unauth_url="${API}/research/${VERIFY_SYMBOL}/outcome-labels/backfill?limit=20"
+backfill_unauth_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -o /dev/null -w "%{http_code}" --max-time 30 \
+    -H "Accept: application/json" -X POST "${backfill_unauth_url}"
+)"
+assert_status "POST ${backfill_unauth_url} (unauth)" "${backfill_unauth_code}" 401
 
 echo "==> Frontend reachability"
 fe_status="$(http_status "${FRONTEND}")"
@@ -252,6 +259,23 @@ if ! head -c 1 "${assess_export_body}" | grep -q '\['; then
   exit 1
 fi
 echo "OK  assessments/export attachment JSON array"
+
+backfill_url="${API}/research/${VERIFY_SYMBOL}/outcome-labels/backfill?limit=20"
+backfill_body="$(mktemp)"
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_body}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${backfill_body}"; }
+trap cleanup EXIT
+backfill_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -o "${backfill_body}" -w "%{http_code}" --max-time 60 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" -X POST "${backfill_url}"
+)"
+assert_status "POST ${backfill_url} (auth)" "${backfill_code}" 200
+if ! grep -q '"assessment_count"' "${backfill_body}" \
+  || ! grep -q '"persisted_count"' "${backfill_body}" \
+  || ! grep -q '"skipped_count"' "${backfill_body}"; then
+  echo "outcome-labels/backfill missing summary count fields" >&2
+  exit 1
+fi
+echo "OK  outcome-labels/backfill summary counts present"
 
 history_assessment_id=1
 if [[ "${latest_code}" == "200" ]]; then

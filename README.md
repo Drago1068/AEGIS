@@ -7,11 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 76 (evidence-summary corpus/bucket verify assertion).** Assert nested
-readiness corpus/bucket fields on evidence-summary in `verify.ps1` / `verify.sh`
-(ADR-0077). See
-[docs/architecture/decisions/0077-phase-76-evidence-summary-corpus-bucket-verify.md](docs/architecture/decisions/0077-phase-76-evidence-summary-corpus-bucket-verify.md)
-and [CHANGELOG.md](CHANGELOG.md).
+**Current phase: Phase 77 draft (horizon mini-row detail expand).** Next: show nested
+``by_horizon.detail`` on click/expand of evidence-summary readiness mini-rows (research-only;
+no new API). Phases 75–76 live verify closed. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
 

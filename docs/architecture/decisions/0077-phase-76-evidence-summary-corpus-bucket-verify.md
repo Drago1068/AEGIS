@@ -1,6 +1,6 @@
 # ADR-0077: Phase 76 Evidence-Summary Nested Corpus/Bucket Verify Assertion
 
-- Status: Accepted
+- Status: Accepted (live verified 2026-07-30 on ``32ef4f1``; corpus=100/min 10, bucket=20/min 5)
 - Date: 2026-07-30
 
 ## Context

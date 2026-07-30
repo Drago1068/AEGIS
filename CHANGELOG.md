@@ -10,7 +10,8 @@ delivery workflow).
 ### Phase 76 - Evidence-Summary Nested Corpus/Bucket Verify Assertion
 
 Ops hardening: assert nested ``corpus_count`` / ``min_corpus`` / ``bucket_count`` /
-``min_bucket`` on authenticated evidence-summary (+ export). See
+``min_bucket`` on authenticated evidence-summary (+ export). Live verify passed 2026-07-30
+(``corpus=100/min 10``, ``bucket=20/min 5``). See
 [docs/architecture/decisions/0077-phase-76-evidence-summary-corpus-bucket-verify.md](docs/architecture/decisions/0077-phase-76-evidence-summary-corpus-bucket-verify.md).
 
 #### Added

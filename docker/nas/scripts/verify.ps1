@@ -72,7 +72,8 @@ function Write-VerifyChecklist {
     Write-Host " 32. Authenticated evidence-summary nested calibration_readiness.by_horizon includes fwd5+fwd20 (Phase 75)"
     Write-Host " 33. Authenticated evidence-summary nested corpus/bucket readiness fields (Phase 76)"
     Write-Host " 34. Phase 78: frontend redeploy includes Phase 77 horizon detail expand (unit-tested)"
-    Write-Host " 35. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 35. Authenticated evidence-summary most_recent_labeled_* fields (Phase 80)"
+    Write-Host " 36. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -667,6 +668,26 @@ try {
             $summary.calibration_readiness.min_corpus,
             $summary.calibration_readiness.bucket_count,
             $summary.calibration_readiness.min_bucket)
+        # Phase 80: most-recent labeled fields from Phase 79 (null OK when none labeled).
+        if (-not ($summary.PSObject.Properties.Name -contains "most_recent_labeled_assessment_id")) {
+            throw "evidence-summary missing most_recent_labeled_assessment_id (Phase 79/80)"
+        }
+        if (-not ($summary.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label")) {
+            throw "evidence-summary missing most_recent_labeled_outcome_label (Phase 79/80)"
+        }
+        $mrlId = $summary.most_recent_labeled_assessment_id
+        $mrlLabel = $summary.most_recent_labeled_outcome_label
+        if ($null -eq $mrlId -and $null -ne $mrlLabel) {
+            throw "Phase 80: most_recent_labeled_outcome_label set but assessment_id is null"
+        }
+        if ($null -ne $mrlId -and $null -eq $mrlLabel) {
+            throw "Phase 80: most_recent_labeled_assessment_id set but outcome_label is null"
+        }
+        if ($null -ne $mrlId -and [int]$mrlId -lt 1) {
+            throw "Phase 80: most_recent_labeled_assessment_id must be >= 1 when set"
+        }
+        $mrlPart = if ($null -eq $mrlId) { "null" } else { [string]$mrlId }
+        Write-Host "OK  Phase 80 most_recent_labeled_assessment_id=$mrlPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -737,6 +758,12 @@ try {
             if ($null -eq $exportBody.calibration_readiness.$field -or [int]$exportBody.calibration_readiness.$field -lt 1) {
                 throw "evidence-summary/export.calibration_readiness.$field must be >= 1 (Phase 76)"
             }
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_labeled_assessment_id")) {
+            throw "evidence-summary/export missing most_recent_labeled_assessment_id (Phase 79/80)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label")) {
+            throw "evidence-summary/export missing most_recent_labeled_outcome_label (Phase 79/80)"
         }
         Write-Host "OK  evidence-summary/export attachment state=research_only assessments=$($exportBody.assessment_count) provenance fields present"
     } finally {

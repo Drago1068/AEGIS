@@ -49,8 +49,8 @@ mixed labeled count on evidence summary), Phase 70 (NAS live verify of Phases 67
 summary), Phase 72 (NAS live verify of Phase 71 / pending 67–70), Phase 73 (per-horizon
 readiness mini-rows on evidence summary), Phase 74 (NAS live verify of Phase 73), Phase 75 (evidence-summary nested by_horizon verify
 assertion), Phase 76 (evidence-summary nested corpus/bucket verify assertion), Phase 77
-(evidence-summary horizon detail expand), Phase 78 (NAS live verify of Phase 77), and
-Phase 79 (most-recent labeled outcome on evidence summary).
+(evidence-summary horizon detail expand), Phase 78 (NAS live verify of Phase 77), Phase 79 (most-recent labeled outcome on evidence
+summary), and Phase 80 (NAS live verify of Phase 79).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -222,6 +222,8 @@ Phase 78 live-verifies that revision on the NAS under the lab TLS profile (see
 Phase 79 surfaces the most recent labeled outcome in the ≤100 scan when the absolute latest
 assessment is still unlabeled (see
 [decisions/0080-phase-79-most-recent-labeled-evidence-summary.md](decisions/0080-phase-79-most-recent-labeled-evidence-summary.md)).
+Phase 80 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0081-phase-80-nas-live-verify-phase-79.md](decisions/0081-phase-80-nas-live-verify-phase-79.md)).
 
 ## System context
 

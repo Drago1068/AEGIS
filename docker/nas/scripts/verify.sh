@@ -61,7 +61,8 @@ print_checklist() {
   echo " 32. Authenticated evidence-summary nested calibration_readiness.by_horizon includes fwd5+fwd20 (Phase 75)"
   echo " 33. Authenticated evidence-summary nested corpus/bucket readiness fields (Phase 76)"
   echo " 34. Phase 78: frontend redeploy includes Phase 77 horizon detail expand (unit-tested)"
-  echo " 35. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 35. Authenticated evidence-summary most_recent_labeled_* fields (Phase 80)"
+  echo " 36. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -571,6 +572,16 @@ for field in corpus_count bucket_count min_corpus min_bucket; do
   fi
 done
 echo "OK  Phase 76 evidence-summary nested corpus/bucket readiness fields present"
+# Phase 80: most-recent labeled fields from Phase 79 (null OK when none labeled).
+if ! grep -q '"most_recent_labeled_assessment_id"' "${summary_body}"; then
+  echo "evidence-summary missing most_recent_labeled_assessment_id (Phase 79/80)" >&2
+  exit 1
+fi
+if ! grep -q '"most_recent_labeled_outcome_label"' "${summary_body}"; then
+  echo "evidence-summary missing most_recent_labeled_outcome_label (Phase 79/80)" >&2
+  exit 1
+fi
+echo "OK  Phase 80 most_recent_labeled_* fields present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -624,6 +635,14 @@ for field in corpus_count bucket_count min_corpus min_bucket; do
     exit 1
   fi
 done
+if ! grep -q '"most_recent_labeled_assessment_id"' "${export_body}"; then
+  echo "evidence-summary/export missing most_recent_labeled_assessment_id (Phase 79/80)" >&2
+  exit 1
+fi
+if ! grep -q '"most_recent_labeled_outcome_label"' "${export_body}"; then
+  echo "evidence-summary/export missing most_recent_labeled_outcome_label (Phase 79/80)" >&2
+  exit 1
+fi
 echo "OK  evidence-summary/export attachment state=research_only"
 
 mapfile -t COMPOSE_FILES < <(compose_nas_file_flags "${REPO_ROOT}")

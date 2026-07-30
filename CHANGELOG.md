@@ -16,6 +16,8 @@ Ops evidence gate: redeploy backend+frontend under lab TLS and confirm
 #### Added
 
 - ADR-0081: live verify requires nested most-recent labeled fields; prior gates remain.
+- Verify checklist item for ``most_recent_labeled_assessment_id`` /
+  ``most_recent_labeled_outcome_label`` (+ export).
 
 #### Explicitly out of scope
 

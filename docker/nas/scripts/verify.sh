@@ -49,7 +49,8 @@ print_checklist() {
   echo " 20. SSH .env.nas includes AEGIS_RESEARCH_BAR_LOAD_LIMIT in bounds (Phase 52)"
   echo " 21. SSH .env.nas includes AEGIS_DAILY_BAR_OUTPUT_SIZE=full (Phase 54)"
   echo " 22. SSH .env.nas includes AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true (Phase 56)"
-  echo " 23. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 23. Authenticated POST outcome-labels/backfill?limit=100 (Phase 58 source-aware throughput)"
+  echo " 24. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -320,6 +321,40 @@ if [[ "${assess_persisted}" -gt 0 ]]; then
 else
   echo "OK  Phase 48/50 label-ready coupling skipped (assessments persisted=0; label zeros OK)"
 fi
+
+backfill100_url="${API}/research/${VERIFY_SYMBOL}/outcome-labels/backfill?limit=100"
+backfill100_body="$(mktemp)"
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_body}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${assess_backfill_body}" "${backfill_body}" "${backfill100_body}"; }
+trap cleanup EXIT
+backfill100_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -o "${backfill100_body}" -w "%{http_code}" --max-time 120 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" -X POST "${backfill100_url}"
+)"
+assert_status "POST ${backfill100_url} (auth)" "${backfill100_code}" 200
+if ! grep -q '"assessment_count"' "${backfill100_body}" \
+  || ! grep -q '"persisted_count"' "${backfill100_body}" \
+  || ! grep -q '"skipped_count"' "${backfill100_body}"; then
+  echo "outcome-labels/backfill?limit=100 missing summary count fields" >&2
+  exit 1
+fi
+label100_assess="$(
+  python3 -c 'import json,sys; print(int(json.load(open(sys.argv[1])).get("assessment_count") or 0))' \
+    "${backfill100_body}"
+)"
+label100_persisted="$(
+  python3 -c 'import json,sys; print(int(json.load(open(sys.argv[1])).get("persisted_count") or 0))' \
+    "${backfill100_body}"
+)"
+label100_skipped="$(
+  python3 -c 'import json,sys; print(int(json.load(open(sys.argv[1])).get("skipped_count") or 0))' \
+    "${backfill100_body}"
+)"
+echo "OK  outcome-labels/backfill?limit=100 assessment_count=${label100_assess} persisted=${label100_persisted} skipped=${label100_skipped}"
+if [[ "${label100_assess}" -gt 0 && "${label100_persisted}" -lt 1 ]]; then
+  echo "Phase 58: limit=100 selected ${label100_assess} candidates but persisted=${label100_persisted} (expected >=1 when source-ready candidates exist)" >&2
+  exit 1
+fi
+echo "OK  Phase 58 source-aware label backfill throughput check"
 
 history_assessment_id=1
 if [[ "${latest_code}" == "200" ]]; then

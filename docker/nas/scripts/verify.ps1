@@ -60,7 +60,8 @@ function Write-VerifyChecklist {
     Write-Host " 20. SSH .env.nas includes AEGIS_RESEARCH_BAR_LOAD_LIMIT in bounds (Phase 52)"
     Write-Host " 21. SSH .env.nas includes AEGIS_DAILY_BAR_OUTPUT_SIZE=full (Phase 54)"
     Write-Host " 22. SSH .env.nas includes AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true (Phase 56)"
-    Write-Host " 23. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 23. Authenticated POST outcome-labels/backfill?limit=100 (Phase 58 source-aware throughput)"
+    Write-Host " 24. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -342,6 +343,35 @@ try {
     } finally {
         if (Test-Path -LiteralPath $backfillPath) {
             Remove-Item -LiteralPath $backfillPath -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    # Phase 58: source-aware throughput path (ADR-0059).
+    $backfill100Url = "$api/research/$verifySymbol/outcome-labels/backfill?limit=100"
+    $backfill100Path = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.backfill100.json" -f [guid]::NewGuid().ToString("N"))
+    try {
+        $backfill100Code = & curl.exe -sS @curlInsecure -o $backfill100Path -w "%{http_code}" --max-time 120 `
+            -b $cookieJar -H "Accept: application/json" -X POST $backfill100Url
+        if ($LASTEXITCODE -ne 0) { throw "POST outcome-labels/backfill?limit=100 failed (curl exit $LASTEXITCODE)" }
+        Assert-Status -Label "POST $backfill100Url (auth)" -Actual ([int]$backfill100Code) -Expected @(200)
+        $backfill100Body = Get-Content -LiteralPath $backfill100Path -Raw | ConvertFrom-Json
+        if ($null -eq $backfill100Body.assessment_count) { throw "backfill100 missing assessment_count" }
+        if ($null -eq $backfill100Body.persisted_count) { throw "backfill100 missing persisted_count" }
+        if ($null -eq $backfill100Body.skipped_count) { throw "backfill100 missing skipped_count" }
+        $label100Assess = [int]$backfill100Body.assessment_count
+        $label100Persisted = [int]$backfill100Body.persisted_count
+        $label100Skipped = [int]$backfill100Body.skipped_count
+        Write-Host "OK  outcome-labels/backfill?limit=100 assessment_count=$label100Assess persisted=$label100Persisted skipped=$label100Skipped"
+        if ($label100Assess -gt 0 -and $label100Persisted -lt 1) {
+            throw "Phase 58: limit=100 selected $label100Assess candidates but persisted=$label100Persisted (expected >=1 when source-ready candidates exist)"
+        }
+        if ($label100Assess -gt 0 -and $label100Skipped -gt $label100Persisted) {
+            Write-Host "WARN Phase 58: skipped ($label100Skipped) exceeded persisted ($label100Persisted); source-aware selection should usually keep skips low"
+        }
+        Write-Host "OK  Phase 58 source-aware label backfill throughput check"
+    } finally {
+        if (Test-Path -LiteralPath $backfill100Path) {
+            Remove-Item -LiteralPath $backfill100Path -Force -ErrorAction SilentlyContinue
         }
     }
 

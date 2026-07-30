@@ -7,6 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 58 - NAS Live Verification of Phase 57
+
+Ops evidence gate: redeploy under lab TLS with source-aware label backfill and
+``limit=100`` throughput path. See
+[docs/architecture/decisions/0059-phase-58-nas-live-verify-phase-57.md](docs/architecture/decisions/0059-phase-58-nas-live-verify-phase-57.md).
+
+#### Added
+
+- ADR-0059: live verify requires ``outcome-labels/backfill?limit=100`` → 200 with persist
+  when source-ready candidates exist; Phase 48/50 coupling retained at ``limit=20``.
+- Verify checklist item for Phase 58 throughput backfill.
+
+#### Explicitly out of scope
+
+New label math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 57 - Source-Aware Label Backfill Throughput
 
 Grow labeling of unlabeled assessments by matching readiness to compute bar sources and

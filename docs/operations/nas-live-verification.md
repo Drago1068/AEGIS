@@ -1,4 +1,4 @@
-# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46 + Phase 48 + Phase 50 + Phase 52 + Phase 54 + Phase 56)
+# NAS Live Verification Checklist (Phase 17 + Phase 21 + Phase 23 + Phase 25 + Phase 27 + Phase 29 + Phase 31 + Phase 33 + Phase 35 + Phase 37 + Phase 39 + Phase 42 + Phase 44 + Phase 46 + Phase 48 + Phase 50 + Phase 52 + Phase 54 + Phase 56 + Phase 58)
 
 This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0018](../architecture/decisions/0018-phase-17-nas-live-verification.md),
@@ -20,7 +20,8 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0051](../architecture/decisions/0051-phase-50-nas-live-verify-phase-49.md),
 [ADR-0053](../architecture/decisions/0053-phase-52-nas-live-verify-phase-51.md),
 [ADR-0055](../architecture/decisions/0055-phase-54-nas-live-verify-phase-53.md),
-[ADR-0057](../architecture/decisions/0057-phase-56-nas-live-verify-phase-55.md).
+[ADR-0057](../architecture/decisions/0057-phase-56-nas-live-verify-phase-55.md),
+[ADR-0059](../architecture/decisions/0059-phase-58-nas-live-verify-phase-57.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 
@@ -36,10 +37,11 @@ Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
    re-run authenticated ingest so stored bars can grow beyond compact depth (ADR-0055).
 5. For Phase 56+, ensure ``AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true`` is set and
    the Phase 55 session-depth research load is deployed (ADR-0057).
-6. `package` and `deploy` completed for that revision (`alembic upgrade head` on start).
+6. For Phase 58+, deploy Phase 57 source-aware label backfill (ADR-0059).
+7. `package` and `deploy` completed for that revision (`alembic upgrade head` on start).
    On aarch64 NAS hosts, a native on-NAS `docker compose build` is an acceptable packaging
    path when workstation cross-build is impractical.
-7. Optional TLS: `AEGIS_NAS_TLS_ENABLED=true`, HTTPS verify URLs, Secure cookies.
+8. Optional TLS: `AEGIS_NAS_TLS_ENABLED=true`, HTTPS verify URLs, Secure cookies.
 
 ## Run live verify
 
@@ -84,7 +86,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 20 | SSH `.env.nas` `AEGIS_RESEARCH_BAR_LOAD_LIMIT` (Phase 52) | present and in **40–2000** |
 | 21 | SSH `.env.nas` `AEGIS_DAILY_BAR_OUTPUT_SIZE` (Phase 54) | **`full`** |
 | 22 | SSH `.env.nas` `AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL` (Phase 56) | **`true`** |
-| 23 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 23 | Authenticated `POST .../outcome-labels/backfill?limit=100` (Phase 58) | **200**; persist when source-ready candidates exist |
+| 24 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

@@ -31,8 +31,9 @@ history in the console), Phase 29 (NAS live verify of Phase 28), Phase 30
 (assessment history JSON export), Phase 39 (NAS live verify of Phase 38), Phase 40
 (NAS lab TLS cutover), Phase 41 (multi-horizon probability calibration), Phase 42
 (NAS live verify of Phase 41), Phase 43 (historical outcome-label backfill), Phase 44
-(NAS live verify of Phase 43), Phase 45 (historical research assessment backfill), and
-Phase 46 (NAS live verify of Phase 45).
+(NAS live verify of Phase 43), Phase 45 (historical research assessment backfill),
+Phase 46 (NAS live verify of Phase 45), and Phase 47 (label-ready assessment backfill
+candidates).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -125,6 +126,8 @@ Phase 45 adds research-only historical assessment backfill over primary bar date
 [decisions/0046-phase-45-assessment-backfill.md](decisions/0046-phase-45-assessment-backfill.md)).
 Phase 46 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0047-phase-46-nas-live-verify-phase-45.md](decisions/0047-phase-46-nas-live-verify-phase-45.md)).
+Phase 47 prefers label-ready as-of dates in assessment backfill (see
+[decisions/0048-phase-47-label-ready-assessment-backfill.md](decisions/0048-phase-47-label-ready-assessment-backfill.md)).
 
 ## System context
 

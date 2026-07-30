@@ -7,6 +7,7 @@ for a future calibration phase; they are not probabilities, recommendations, or 
 from __future__ import annotations
 
 import logging
+from collections.abc import Container
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
@@ -216,6 +217,34 @@ def _nth_trading_session_after(
         if is_trading_day(current, calendar_name):
             count += 1
     return current
+
+
+def forward_horizon_end_date(
+    as_of: date,
+    horizon_sessions: int,
+    calendar_name: str,
+) -> date:
+    """Return the exchange session ``horizon_sessions`` after ``as_of`` (Phase 13)."""
+
+    return _nth_trading_session_after(as_of, horizon_sessions, calendar_name)
+
+
+def has_stored_forward_horizon_close(
+    as_of: date,
+    closes_by_date: Container[date],
+    *,
+    calendar_name: str,
+    min_forward_sessions: int | None = None,
+) -> bool:
+    """True when ``closes_by_date`` has the max (or requested) forward-horizon end close."""
+
+    horizon = (
+        min_forward_sessions
+        if min_forward_sessions is not None
+        else max(FORWARD_HORIZON_SESSIONS)
+    )
+    end_date = forward_horizon_end_date(as_of, horizon, calendar_name)
+    return end_date in closes_by_date
 
 
 class OutcomeLabelService:

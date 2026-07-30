@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 47 - Label-Ready Assessment Backfill Candidates
+
+Prefer as-of dates that already have stored forward-horizon closes so Phase 43 labeling
+can persist. See
+[docs/architecture/decisions/0048-phase-47-label-ready-assessment-backfill.md](docs/architecture/decisions/0048-phase-47-label-ready-assessment-backfill.md).
+
+#### Changed
+
+- Assessment backfill candidate selection (ADR-0048): newest-first among primary dates
+  with a close on the session ``max(FORWARD_HORIZON_SESSIONS)`` after ``as_of``; tip dates
+  without forward coverage are omitted (``candidate_count=0`` when none qualify).
+
+#### Explicitly out of scope
+
+Default-on calibration, auto-label after assessment backfill, raising bar load limits,
+actionable promotion, orders, ACME.
+
 ### Phase 46 - NAS Live Verification of Phase 45
 
 Ops evidence gate: redeploy current revision under the lab TLS profile and verify

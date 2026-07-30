@@ -1,8 +1,9 @@
-"""Historical research assessment backfill (Phase 45, ADR-0046).
+"""Historical research assessment backfill (Phase 45/47, ADR-0046 / ADR-0048).
 
-Framework-free batch: pick candidate as-of dates from stored primary bars, truncate each
-series point-in-time, reuse ``assess_from_bars``, append on success, skip fail-closed
-without aborting the batch. Does not invent probability_confidence or run labeling.
+Framework-free batch: pick label-ready candidate as-of dates from stored primary bars,
+truncate each series point-in-time, reuse ``assess_from_bars``, append on success, skip
+fail-closed without aborting the batch. Does not invent probability_confidence or run
+labeling.
 """
 
 from __future__ import annotations
@@ -20,11 +21,16 @@ from aegis.domain.research_assessment import (
     ResearchMultiSourceCoverageConfig,
     assess_from_bars,
 )
+from aegis.domain.research_outcome_labels import (
+    FORWARD_HORIZON_SESSIONS,
+    has_stored_forward_horizon_close,
+)
 
 logger = logging.getLogger(__name__)
 
 REASON_ALREADY_EXISTS = "assessment_already_exists"
 REASON_UNEXPECTED = "unexpected_error"
+DEFAULT_MIN_FORWARD_SESSIONS = max(FORWARD_HORIZON_SESSIONS)
 
 SnapshotInserter = Callable[
     [ResearchAssessmentSnapshotData],
@@ -75,9 +81,21 @@ def bars_as_of(
 def candidate_as_of_dates(
     bars_newest_first: list[ResearchBarInput],
     limit: int,
+    *,
+    calendar_name: str,
+    min_forward_sessions: int = DEFAULT_MIN_FORWARD_SESSIONS,
 ) -> list[date]:
-    """Distinct primary-quality trading dates, newest first, capped at ``limit``."""
+    """Primary dates newest-first that have stored closes through the label horizon.
 
+    Phase 47 (ADR-0048): omit tip dates without a close on the trading session
+    ``min_forward_sessions`` after ``as_of`` so Phase 13 labeling can persist.
+    """
+
+    primary_close_dates = {
+        bar.trading_date
+        for bar in bars_newest_first
+        if bar.data_quality == PRIMARY_QUALITY and bar.close > 0
+    }
     seen: set[date] = set()
     dates: list[date] = []
     for bar in bars_newest_first:
@@ -86,6 +104,13 @@ def candidate_as_of_dates(
         if bar.trading_date in seen:
             continue
         seen.add(bar.trading_date)
+        if not has_stored_forward_horizon_close(
+            bar.trading_date,
+            primary_close_dates,
+            calendar_name=calendar_name,
+            min_forward_sessions=min_forward_sessions,
+        ):
+            continue
         dates.append(bar.trading_date)
         if len(dates) >= limit:
             break
@@ -102,8 +127,9 @@ async def run_assessment_backfill(
     max_latest_bar_staleness_trading_days: int,
     insert_snapshot: SnapshotInserter,
     multi_source: ResearchMultiSourceCoverageConfig | None = None,
+    min_forward_sessions: int = DEFAULT_MIN_FORWARD_SESSIONS,
 ) -> AssessmentBackfillSummary:
-    """Assess up to ``limit`` historical as-of dates; never abort the batch on one failure.
+    """Assess up to ``limit`` label-ready as-of dates; never abort the batch on one failure.
 
     ``insert_snapshot`` persists a successful snapshot (typically the assessment store
     insert). Mutates ``existing_as_of_dates`` as rows are persisted so later candidates in
@@ -111,7 +137,12 @@ async def run_assessment_backfill(
     """
 
     normalized = symbol.upper()
-    candidates = candidate_as_of_dates(bars_newest_first, limit)
+    candidates = candidate_as_of_dates(
+        bars_newest_first,
+        limit,
+        calendar_name=calendar_name,
+        min_forward_sessions=min_forward_sessions,
+    )
     outcomes: list[AssessmentBackfillOutcome] = []
 
     for as_of in candidates:

@@ -7,10 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 55 (research cross-source fill + session-depth bar load).** Default
-cross-source component fill on and load research bars by distinct trading dates so deep
-secondary history can grow corpora (ADR-0056). See
-[docs/architecture/decisions/0056-phase-55-research-cross-source-session-depth.md](docs/architecture/decisions/0056-phase-55-research-cross-source-session-depth.md)
+**Current phase: Phase 56 (NAS live verify of Phase 55).** Redeploy under lab TLS with
+cross-source fill and session-depth research loads (ADR-0057). See
+[docs/architecture/decisions/0057-phase-56-nas-live-verify-phase-55.md](docs/architecture/decisions/0057-phase-56-nas-live-verify-phase-55.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

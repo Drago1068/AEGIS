@@ -48,7 +48,8 @@ print_checklist() {
   echo " 19. SSH alembic current includes 0009|head (when SSH configured)"
   echo " 20. SSH .env.nas includes AEGIS_RESEARCH_BAR_LOAD_LIMIT in bounds (Phase 52)"
   echo " 21. SSH .env.nas includes AEGIS_DAILY_BAR_OUTPUT_SIZE=full (Phase 54)"
-  echo " 22. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 22. SSH .env.nas includes AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true (Phase 56)"
+  echo " 23. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -517,6 +518,18 @@ fi
 echo "AEGIS_DAILY_BAR_OUTPUT_SIZE=\$val"
 EOF
   echo "OK  AEGIS_DAILY_BAR_OUTPUT_SIZE=full on NAS .env.nas"
+  echo "==> Phase 56 research cross-source fill (via SSH)"
+  ssh "${SSH_ARGS[@]}" "${REMOTE}" bash -s <<EOF
+set -euo pipefail
+cd '${REMOTE_DIR}'
+if grep -E '^AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true' .env.nas >/dev/null; then
+  grep -E '^AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=' .env.nas
+else
+  echo 'AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL must be true on .env.nas' >&2
+  exit 1
+fi
+EOF
+  echo "OK  AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true on NAS .env.nas"
   if nas_tls_enabled; then
     echo "==> Caddy service (TLS profile)"
     ssh "${SSH_ARGS[@]}" "${REMOTE}" bash -s <<EOF

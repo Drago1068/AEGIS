@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 56 - NAS Live Verification of Phase 55
+
+Ops evidence gate: redeploy under lab TLS with cross-source fill enabled and session-depth
+research loads live. See
+[docs/architecture/decisions/0057-phase-56-nas-live-verify-phase-55.md](docs/architecture/decisions/0057-phase-56-nas-live-verify-phase-55.md).
+
+#### Added
+
+- ADR-0057: live verify requires ``AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true``
+  on ``.env.nas``, backend recreate, and prefer new assessment backfill persists when older
+  secondary-filled as-of dates unlock.
+- Verify checklist item for the cross-source fill flag.
+
+#### Explicitly out of scope
+
+New assessment math, default-on calibration, ACME, actionable promotion, orders.
+
 ### Phase 55 - Research Cross-Source Fill and Session-Depth Bar Load
 
 Unlock older assessment as-of dates when primary compact history is shallow but secondary

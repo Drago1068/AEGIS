@@ -59,7 +59,8 @@ function Write-VerifyChecklist {
     Write-Host " 19. SSH alembic current includes 0009|head (when SSH configured)"
     Write-Host " 20. SSH .env.nas includes AEGIS_RESEARCH_BAR_LOAD_LIMIT in bounds (Phase 52)"
     Write-Host " 21. SSH .env.nas includes AEGIS_DAILY_BAR_OUTPUT_SIZE=full (Phase 54)"
-    Write-Host " 22. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 22. SSH .env.nas includes AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true (Phase 56)"
+    Write-Host " 23. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -592,6 +593,23 @@ fi
         throw "Phase 54: AEGIS_DAILY_BAR_OUTPUT_SIZE must be full on NAS .env.nas (ADR-0055)."
     }
     Write-Host "OK  AEGIS_DAILY_BAR_OUTPUT_SIZE=full on NAS .env.nas"
+
+    Write-Host "==> Phase 56 research cross-source fill (via SSH)"
+    $crossFillCmd = @"
+set -euo pipefail
+cd '$dir'
+if grep -E '^AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true' .env.nas >/dev/null; then
+  grep -E '^AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=' .env.nas
+else
+  echo 'AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL must be true on .env.nas' >&2
+  exit 1
+fi
+"@
+    & ssh @sshArgs $remote $crossFillCmd
+    if ($LASTEXITCODE -ne 0) {
+        throw "Phase 56: AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL must be true on NAS .env.nas (ADR-0057)."
+    }
+    Write-Host "OK  AEGIS_RESEARCH_ALLOW_CROSS_SOURCE_COMPONENT_FILL=true on NAS .env.nas"
 
     if (Test-NasTlsEnabled) {
         Write-Host "==> Caddy service (TLS profile)"

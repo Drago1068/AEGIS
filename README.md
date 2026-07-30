@@ -7,9 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 41 (multi-horizon probability calibration).** Horizon-specific
-`research_calibration_v1` for `forward_return_5` / `forward_return_20` (ADR-0042). See
-[docs/architecture/decisions/0042-phase-41-multi-horizon-calibration.md](docs/architecture/decisions/0042-phase-41-multi-horizon-calibration.md)
+**Current phase: Phase 42 (NAS live verify of Phase 41).** Redeploy under lab TLS and verify
+multi-horizon readiness (`by_horizon`, alembic `0009`) on the live NAS (ADR-0043). See
+[docs/architecture/decisions/0043-phase-42-nas-live-verify-phase-41.md](docs/architecture/decisions/0043-phase-42-nas-live-verify-phase-41.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

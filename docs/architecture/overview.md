@@ -29,7 +29,8 @@ history in the console), Phase 29 (NAS live verify of Phase 28), Phase 30
 (outcome-label history JSON export), Phase 35 (NAS live verify of Phase 34), Phase 36
 (calibration history JSON export), Phase 37 (NAS live verify of Phase 36), Phase 38
 (assessment history JSON export), Phase 39 (NAS live verify of Phase 38), Phase 40
-(NAS lab TLS cutover), and Phase 41 (multi-horizon probability calibration).
+(NAS lab TLS cutover), Phase 41 (multi-horizon probability calibration), and Phase 42
+(NAS live verify of Phase 41).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -112,6 +113,8 @@ and [../operations/nas-tls-cutover.md](../operations/nas-tls-cutover.md)).
 Phase 41 adds horizon-specific probability calibration for `forward_return_5` and
 `forward_return_20` (see
 [decisions/0042-phase-41-multi-horizon-calibration.md](decisions/0042-phase-41-multi-horizon-calibration.md)).
+Phase 42 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0043-phase-42-nas-live-verify-phase-41.md](decisions/0043-phase-42-nas-live-verify-phase-41.md)).
 
 ## System context
 

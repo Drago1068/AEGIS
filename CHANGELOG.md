@@ -7,6 +7,23 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 42 - NAS Live Verification of Phase 41
+
+Ops evidence gate: redeploy current revision under the lab TLS profile and verify
+multi-horizon calibration readiness (`by_horizon`, alembic `0009`) on the live NAS. See
+[docs/architecture/decisions/0043-phase-42-nas-live-verify-phase-41.md](docs/architecture/decisions/0043-phase-42-nas-live-verify-phase-41.md).
+
+#### Added
+
+- ADR-0043: live verify asserts readiness/`export` `by_horizon` for `forward_return_5` and
+  `forward_return_20`; optional authenticated `POST .../calibrations?horizon=` (200 or
+  fail-closed 422).
+- `verify.ps1` / `verify.sh` Phase 42 gates (alembic `0009` already required).
+
+#### Explicitly out of scope
+
+ACME, new horizons, default-on calibration, actionable promotion, orders.
+
 ### Phase 41 - Multi-Horizon Probability Calibration
 
 Horizon-specific research_calibration_v1 for `forward_return_5` and `forward_return_20`. See

@@ -32,18 +32,19 @@ print_checklist() {
   echo "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list(+export), calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export)"
   echo "  4. Frontend base URL -> 200|302|307|308"
   echo "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
-  echo "  6. Authenticated GET /research/${symbol}/calibration-readiness -> 200"
-  echo "  7. Authenticated GET /research/${symbol}/calibration-readiness/export -> 200 (attachment)"
+  echo "  6. Authenticated GET /research/${symbol}/calibration-readiness -> 200 (by_horizon includes fwd5+fwd20)"
+  echo "  7. Authenticated GET /research/${symbol}/calibration-readiness/export -> 200 (attachment; by_horizon present)"
   echo "  8. Authenticated GET /research/${symbol}/assessments/latest -> 200|404"
   echo "  9. Authenticated GET /research/${symbol}/assessments?limit= -> 200 (JSON array; [] OK)"
   echo " 10. Authenticated GET /research/${symbol}/assessments/export -> 200 (attachment, JSON array; [] OK)"
-  echo " 11. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
-  echo " 12. Authenticated GET .../assessments/{id}/outcome-labels/export -> 200 (attachment, JSON array; [] OK)"
-  echo " 13. Authenticated GET .../assessments/{id}/calibrations/export -> 200 (attachment, JSON array; [] OK)"
-  echo " 14. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
-  echo " 15. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
-  echo " 16. SSH alembic current includes 0009|head (when SSH configured)"
-  echo " 17. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 11. Authenticated POST .../assessments/{id}/calibrations?horizon=forward_return_5 -> 200|422"
+  echo " 12. Authenticated GET .../assessments/{id}/calibrations and .../outcome-labels -> 200 (JSON array; [] OK)"
+  echo " 13. Authenticated GET .../assessments/{id}/outcome-labels/export -> 200 (attachment, JSON array; [] OK)"
+  echo " 14. Authenticated GET .../assessments/{id}/calibrations/export -> 200 (attachment, JSON array; [] OK)"
+  echo " 15. Authenticated GET /research/${symbol}/evidence-summary -> 200 (state=research_only; log present label + end-date keys when any)"
+  echo " 16. Authenticated GET /research/${symbol}/evidence-summary/export -> 200 (attachment, state=research_only)"
+  echo " 17. SSH alembic current includes 0009|head (when SSH configured)"
+  echo " 18. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -174,10 +175,26 @@ assert_status "POST ${API}/auth/login" "${login_code}" 200
 ready_code="$(http_status "${API}/research/${VERIFY_SYMBOL}/calibration-readiness" "${COOKIE_JAR}")"
 assert_status "GET ${API}/research/${VERIFY_SYMBOL}/calibration-readiness (auth)" "${ready_code}" 200
 
+ready_body="$(mktemp)"
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_body}"; }
+trap cleanup EXIT
+curl -sS "${CURL_INSECURE[@]}" -o "${ready_body}" --max-time 30 \
+  -b "${COOKIE_JAR}" -H "Accept: application/json" \
+  "${API}/research/${VERIFY_SYMBOL}/calibration-readiness" >/dev/null
+if ! grep -q '"by_horizon"' "${ready_body}"; then
+  echo "calibration-readiness missing by_horizon" >&2
+  exit 1
+fi
+if ! grep -q 'forward_return_5' "${ready_body}" || ! grep -q 'forward_return_20' "${ready_body}"; then
+  echo "calibration-readiness by_horizon missing forward_return_5/20" >&2
+  exit 1
+fi
+echo "OK  calibration-readiness by_horizon includes forward_return_5 and forward_return_20"
+
 ready_export_url="${API}/research/${VERIFY_SYMBOL}/calibration-readiness/export"
 ready_export_body="$(mktemp)"
 ready_export_headers="$(mktemp)"
-cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}"; }
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_body}" "${ready_export_body}" "${ready_export_headers}"; }
 trap cleanup EXIT
 ready_export_code="$(
   curl -sS "${CURL_INSECURE[@]}" -D "${ready_export_headers}" -o "${ready_export_body}" -w "%{http_code}" --max-time 30 \
@@ -192,6 +209,10 @@ if ! grep -q '"status"' "${ready_export_body}"; then
   echo "calibration-readiness/export missing status" >&2
   exit 1
 fi
+if ! grep -q '"by_horizon"' "${ready_export_body}"; then
+  echo "calibration-readiness/export missing by_horizon" >&2
+  exit 1
+fi
 echo "OK  calibration-readiness/export attachment"
 
 latest_code="$(http_status "${API}/research/${VERIFY_SYMBOL}/assessments/latest" "${COOKIE_JAR}")"
@@ -199,7 +220,7 @@ assert_status "GET ${API}/research/${VERIFY_SYMBOL}/assessments/latest (auth)" "
 
 assess_list_url="${API}/research/${VERIFY_SYMBOL}/assessments?limit=20"
 assess_body="$(mktemp)"
-cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}"; }
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_body}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}"; }
 trap cleanup EXIT
 assess_code="$(
   curl -sS "${CURL_INSECURE[@]}" -o "${assess_body}" -w "%{http_code}" --max-time 30 \
@@ -244,6 +265,14 @@ if [[ "${latest_code}" == "200" ]]; then
     history_assessment_id="${parsed_id}"
   fi
 fi
+
+calib_post_url="${API}/research/${VERIFY_SYMBOL}/assessments/${history_assessment_id}/calibrations?horizon=forward_return_5"
+calib_post_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -o /dev/null -w "%{http_code}" --max-time 30 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" -X POST "${calib_post_url}"
+)"
+assert_status "POST ${calib_post_url} (auth)" "${calib_post_code}" 200 422
+echo "OK  POST calibrations?horizon=forward_return_5 -> ${calib_post_code} (200 or fail-closed 422)"
 
 calib_list_url="${API}/research/${VERIFY_SYMBOL}/assessments/${history_assessment_id}/calibrations"
 label_list_url="${API}/research/${VERIFY_SYMBOL}/assessments/${history_assessment_id}/outcome-labels"

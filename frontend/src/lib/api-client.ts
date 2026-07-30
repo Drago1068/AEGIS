@@ -954,6 +954,8 @@ export interface ResearchEvidenceSummary {
   mixed_component_source_assessment_count: number;
   /** Mixed assessments among the scanned set that still lack a default-method label. */
   mixed_unlabeled_assessment_count: number;
+  /** Mixed assessments among the scanned set that have a default-method label. */
+  mixed_labeled_assessment_count: number;
   /** bar_source from the newest labeled mixed assessment; null when none labeled. */
   latest_mixed_label_bar_source: string | null;
   detail: string;

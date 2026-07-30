@@ -406,6 +406,11 @@ async def _build_research_evidence_summary(
     mixed_unlabeled_assessment_count = count_mixed_unlabeled_assessments(
         snapshots, labeled_ids
     )
+    if mixed_unlabeled_assessment_count > mixed_component_source_assessment_count:
+        mixed_unlabeled_assessment_count = mixed_component_source_assessment_count
+    mixed_labeled_assessment_count = (
+        mixed_component_source_assessment_count - mixed_unlabeled_assessment_count
+    )
     latest_mixed_label_bar_source = None
     for row in snapshots:
         if row.id is None or not is_mixed_component_source(row):
@@ -450,6 +455,7 @@ async def _build_research_evidence_summary(
         latest_resolved_label_bar_source=latest_resolved_label_bar_source,
         mixed_component_source_assessment_count=mixed_component_source_assessment_count,
         mixed_unlabeled_assessment_count=mixed_unlabeled_assessment_count,
+        mixed_labeled_assessment_count=mixed_labeled_assessment_count,
         latest_mixed_label_bar_source=latest_mixed_label_bar_source,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "

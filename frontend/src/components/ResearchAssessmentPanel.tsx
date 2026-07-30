@@ -644,6 +644,15 @@ export function ResearchAssessmentPanel({
               </dd>
             </div>
             <div>
+              <dt className="text-aegis-muted">Mixed labeled (scanned)</dt>
+              <dd className="font-mono">
+                {evidenceSummary.mixed_labeled_assessment_count}
+                <span className="ml-1 font-sans text-xs font-normal text-aegis-muted">
+                  of {evidenceSummary.mixed_component_source_assessment_count} mixed
+                </span>
+              </dd>
+            </div>
+            <div>
               <dt className="text-aegis-muted">Mixed unlabeled (scanned)</dt>
               <dd className="font-mono">
                 {evidenceSummary.mixed_unlabeled_assessment_count}

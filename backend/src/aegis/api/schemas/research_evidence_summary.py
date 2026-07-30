@@ -53,6 +53,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "default-method outcome label."
         ),
     )
+    mixed_labeled_assessment_count: int = Field(
+        default=0,
+        ge=0,
+        description=(
+            "Count of scanned mixed-component assessments (≤100 newest) that have a "
+            "default-method outcome label. Equals mixed count minus unlabeled."
+        ),
+    )
     latest_mixed_label_bar_source: str | None = Field(
         default=None,
         description=(

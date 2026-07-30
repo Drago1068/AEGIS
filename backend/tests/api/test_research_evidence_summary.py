@@ -235,6 +235,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_resolved_label_bar_source"] is None
     assert body["mixed_component_source_assessment_count"] == 0
     assert body["mixed_unlabeled_assessment_count"] == 0
+    assert body["mixed_labeled_assessment_count"] == 0
     assert body["latest_mixed_label_bar_source"] is None
     assert body["calibration_readiness"]["status"] == "no_assessment"
     assert "never invented" in body["detail"].lower() or "not invented" in body["detail"].lower()
@@ -263,6 +264,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_resolved_label_bar_source"] == "alpha_vantage"
     assert body["mixed_component_source_assessment_count"] == 0
     assert body["mixed_unlabeled_assessment_count"] == 0
+    assert body["mixed_labeled_assessment_count"] == 0
     assert body["latest_mixed_label_bar_source"] is None
 
 
@@ -299,6 +301,7 @@ async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:
     assert body["latest_resolved_label_bar_source"] == "polygon"
     assert body["mixed_component_source_assessment_count"] == 1
     assert body["mixed_unlabeled_assessment_count"] == 0
+    assert body["mixed_labeled_assessment_count"] == 1
     assert body["latest_mixed_label_bar_source"] == "polygon"
 
 
@@ -338,6 +341,7 @@ async def test_evidence_summary_counts_mixed_unlabeled() -> None:
     body = response.json()
     assert body["mixed_component_source_assessment_count"] == 2
     assert body["mixed_unlabeled_assessment_count"] == 1
+    assert body["mixed_labeled_assessment_count"] == 1
     assert body["latest_mixed_label_bar_source"] == "alpha_vantage"
 
     async with _client(

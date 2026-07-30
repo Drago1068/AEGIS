@@ -7,6 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 69 - Explicit Mixed Labeled Count on Evidence Summary
+
+Add ``mixed_labeled_assessment_count`` and console “N of M mixed” so labeled vs unlabeled
+cross-source coverage is auditable at a glance. See
+[docs/architecture/decisions/0070-phase-69-mixed-labeled-count-evidence-summary.md](docs/architecture/decisions/0070-phase-69-mixed-labeled-count-evidence-summary.md).
+
+#### Added
+
+- Evidence-summary field ``mixed_labeled_assessment_count`` (mixed − unlabeled).
+- Console “Mixed labeled (scanned)” row with “of N mixed”.
+
+#### Explicitly out of scope
+
+Phase 68 NAS live verify (SSH-blocked), gate/math changes, default-on calibration, orders.
+
 ### Phase 68 - NAS Live Verification of Phase 67
 
 Ops evidence gate: redeploy under lab TLS and confirm mixed label coverage fields on

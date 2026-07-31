@@ -1,6 +1,6 @@
 # ADR-0166: Phase 165 Evidence Summary Latest Schema Version
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

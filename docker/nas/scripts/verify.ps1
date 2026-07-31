@@ -115,7 +115,8 @@ function Write-VerifyChecklist {
     Write-Host " 75. Authenticated evidence-summary includes Phase 159 latest_method_version (Phase 160)"
     Write-Host " 76. Authenticated evidence-summary includes Phase 161 latest_lookback_end_date (Phase 162)"
     Write-Host " 77. Authenticated evidence-summary includes Phase 163 latest_lookback_start_date (Phase 164)"
-    Write-Host " 78. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 78. Authenticated evidence-summary includes Phase 165 latest_schema_version (Phase 166)"
+    Write-Host " 79. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -825,6 +826,16 @@ try {
         $lookbackStart = $summary.latest_lookback_start_date
         $lookbackStartPart = if ($null -eq $lookbackStart) { "null" } else { [string]$lookbackStart }
         Write-Host "OK  Phase 164 latest_lookback_start_date=$lookbackStartPart"
+        # Phase 166: latest_schema_version from Phase 165 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_schema_version")) {
+            throw "evidence-summary missing latest_schema_version (Phase 165/166)"
+        }
+        $schemaVer = $summary.latest_schema_version
+        if ($null -ne $schemaVer -and [int]$schemaVer -lt 1) {
+            throw "Phase 166: latest_schema_version must be >= 1 when set"
+        }
+        $schemaPart = if ($null -eq $schemaVer) { "null" } else { [string]$schemaVer }
+        Write-Host "OK  Phase 166 latest_schema_version=$schemaPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -901,6 +912,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_lookback_start_date")) {
             throw "evidence-summary/export missing latest_lookback_start_date (Phase 163/164)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_schema_version")) {
+            throw "evidence-summary/export missing latest_schema_version (Phase 165/166)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

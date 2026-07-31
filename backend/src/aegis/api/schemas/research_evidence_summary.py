@@ -167,4 +167,11 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Never invented."
         ),
     )
+    latest_schema_version: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "schema_version from the latest assessment. Null when no assessment. Never invented."
+        ),
+    )
     detail: str

@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 165 latest schema version field. See
 [docs/architecture/decisions/0167-phase-166-nas-live-verify-phase-165.md](docs/architecture/decisions/0167-phase-166-nas-live-verify-phase-165.md).
 
-### Phase 165 - Evidence Summary Latest Schema Version (draft)
+### Phase 165 - Evidence Summary Latest Schema Version
 
 Surface top-level ``latest_schema_version`` on evidence summary. See
 [docs/architecture/decisions/0166-phase-165-evidence-summary-latest-schema-version.md](docs/architecture/decisions/0166-phase-165-evidence-summary-latest-schema-version.md).
+
+#### Added
+
+- ``latest_schema_version`` on evidence summary (+ export); copied from latest assessment.
+- Console surfaces the field with ``data-testid="evidence-latest-schema-version"``.
+- NAS verify checklist item 78 for Phase 166.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 164 - NAS Live Verification of Phase 163
 

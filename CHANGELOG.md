@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 236 - NAS Live Verification of Phase 235 (draft)
+### Phase 238 - NAS Live Verification of Phase 237 (draft)
 
-Ops evidence gate after Phase 235 most-recent-labelable as_of diagnostic. See
+Ops evidence gate after Phase 237 unlabeled+labelable as_of diagnostic. See
+[docs/architecture/decisions/0239-phase-238-nas-live-verify-phase-237.md](docs/architecture/decisions/0239-phase-238-nas-live-verify-phase-237.md).
+
+### Phase 237 - Evidence Summary Most Recent Unlabeled Labelable As-Of (draft)
+
+Newest as_of that is both unlabeled and label-ready (backfill next-target diagnostic). See
+[docs/architecture/decisions/0238-phase-237-evidence-summary-most-recent-unlabeled-labelable-as-of.md](docs/architecture/decisions/0238-phase-237-evidence-summary-most-recent-unlabeled-labelable-as-of.md).
+
+### Phase 236 - NAS Live Verification of Phase 235
+
+Ops evidence gate after Phase 235 most-recent-labelable as_of diagnostic. Live verify passed
+2026-07-31 (``821aed1``; AAPL ``most_recent_labelable_as_of_trading_date=2026-02-05``). See
 [docs/architecture/decisions/0237-phase-236-nas-live-verify-phase-235.md](docs/architecture/decisions/0237-phase-236-nas-live-verify-phase-235.md).
+
+#### Added
+
+- ADR-0237: live verify requires backend+frontend recreate for Phase 235; checklist item 113.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 235 - Evidence Summary Most Recent Labelable As-Of Trading Date
 

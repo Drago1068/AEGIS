@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatOutcomeLabelActionAriaLabel,
+  formatOutcomeLabelActionIdChip,
   resolveOutcomeLabelHistoryLoadKind,
 } from "./research-assessment-panel-helpers";
 
@@ -42,5 +43,16 @@ describe("formatOutcomeLabelActionAriaLabel", () => {
     expect(formatOutcomeLabelActionAriaLabel("Compute outcome labels", null, "latest")).toBe(
       "Compute outcome labels",
     );
+  });
+});
+
+describe("formatOutcomeLabelActionIdChip", () => {
+  it("shows id only when load kind is unset", () => {
+    expect(formatOutcomeLabelActionIdChip(1, null)).toBe("(1)");
+  });
+
+  it("appends scan-labeled or latest when load kind is tracked", () => {
+    expect(formatOutcomeLabelActionIdChip(3, "scan_labeled")).toBe("(3 · scan-labeled)");
+    expect(formatOutcomeLabelActionIdChip(4, "latest")).toBe("(4 · latest)");
   });
 });

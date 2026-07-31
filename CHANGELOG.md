@@ -7,10 +7,37 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 118 - NAS Live Verification of Phase 117
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 117 id-chip load-kind. See
+[docs/architecture/decisions/0119-phase-118-nas-live-verify-phase-117.md](docs/architecture/decisions/0119-phase-118-nas-live-verify-phase-117.md).
+
+#### Added
+
+- ADR-0119: live verify requires frontend recreate for Phase 117; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 117 - Outcome-Label Action Id Chip Includes Load Kind
+
+Show ``({id} · scan-labeled)`` / ``({id} · latest)`` on compute/download id chips when
+load-kind is tracked. See
+[docs/architecture/decisions/0118-phase-117-outcome-label-action-id-chip-load-kind.md](docs/architecture/decisions/0118-phase-117-outcome-label-action-id-chip-load-kind.md).
+
+#### Added
+
+- ``formatOutcomeLabelActionIdChip`` for visible compute/download chips.
+
+#### Explicitly out of scope
+
+Calibration chip changes, orders.
+
 ### Phase 116 - NAS Live Verification of Phase 115
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 115 helpers module extract.
-See
+Live verify passed 2026-07-30 (``d902ff8``). See
 [docs/architecture/decisions/0117-phase-116-nas-live-verify-phase-115.md](docs/architecture/decisions/0117-phase-116-nas-live-verify-phase-115.md).
 
 #### Added

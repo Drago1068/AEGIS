@@ -566,6 +566,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.getByTestId("download-outcome-labels")).toHaveAccessibleName(
       /download outcome labels json for assessment 1/i,
     );
+    expect(screen.getByTestId("download-outcome-labels-id-chip")).toHaveTextContent("(1)");
   });
 
   it("downloads outcome labels JSON for scan-labeled assessment id", async () => {
@@ -663,6 +664,9 @@ describe("ResearchAssessmentPanel", () => {
     });
     expect(screen.getByTestId("download-outcome-labels")).toHaveAccessibleName(
       /download outcome labels json for assessment 3 \(scan-labeled\)/i,
+    );
+    expect(screen.getByTestId("download-outcome-labels-id-chip")).toHaveTextContent(
+      "(3 · scan-labeled)",
     );
   });
 
@@ -839,6 +843,9 @@ describe("ResearchAssessmentPanel", () => {
     });
     expect(screen.getByTestId("compute-outcome-labels")).toHaveAccessibleName(
       /compute outcome labels for assessment 3 \(scan-labeled\)/i,
+    );
+    expect(screen.getByTestId("compute-outcome-labels-id-chip")).toHaveTextContent(
+      "(3 · scan-labeled)",
     );
     vi.mocked(listOutcomeLabels).mockResolvedValue([
       {

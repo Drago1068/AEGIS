@@ -31,3 +31,17 @@ export function formatOutcomeLabelActionAriaLabel(
         : "";
   return `${action} for assessment ${assessmentId}${kindSuffix}`;
 }
+
+/** Visible id chip for compute/download outcome-label actions (Phase 117). */
+export function formatOutcomeLabelActionIdChip(
+  assessmentId: number,
+  loadKind: OutcomeLabelHistoryLoadKind | null,
+): string {
+  if (loadKind === "scan_labeled") {
+    return `(${assessmentId} · scan-labeled)`;
+  }
+  if (loadKind === "latest") {
+    return `(${assessmentId} · latest)`;
+  }
+  return `(${assessmentId})`;
+}

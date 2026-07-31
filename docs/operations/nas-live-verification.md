@@ -138,7 +138,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 51 | Phase 112 frontend redeploy (Phase 111 resolve load-kind helper) | Frontend recreated; load-kind helper covered by unit tests |
 | 52 | Phase 114 frontend redeploy (Phase 113 outcome-label aria load-kind) | Frontend recreated; aria load-kind UX unit-tested |
 | 53 | Phase 116 frontend redeploy (Phase 115 extract helpers module) | Frontend recreated; helpers module covered by unit tests |
-| 54 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 54 | Phase 118 frontend redeploy (Phase 117 outcome-label id-chip load-kind) | Frontend recreated; id-chip load-kind UX unit-tested |
+| 55 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

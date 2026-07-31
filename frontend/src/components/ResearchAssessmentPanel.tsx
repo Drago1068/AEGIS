@@ -32,6 +32,7 @@ import {
 
 import {
   formatOutcomeLabelActionAriaLabel,
+  formatOutcomeLabelActionIdChip,
   resolveOutcomeLabelHistoryLoadKind,
 } from "./research-assessment-panel-helpers";
 
@@ -594,8 +595,14 @@ export function ResearchAssessmentPanel({
           >
             Compute outcome labels
             {activeOutcomeLabelAssessmentId != null ? (
-              <span className="ml-1 font-mono text-xs text-aegis-muted">
-                ({activeOutcomeLabelAssessmentId})
+              <span
+                className="ml-1 font-mono text-xs text-aegis-muted"
+                data-testid="compute-outcome-labels-id-chip"
+              >
+                {formatOutcomeLabelActionIdChip(
+                  activeOutcomeLabelAssessmentId,
+                  outcomeLabelHistoryLoadKind,
+                )}
               </span>
             ) : null}
           </button>
@@ -621,8 +628,14 @@ export function ResearchAssessmentPanel({
           >
             Download outcome labels JSON
             {activeOutcomeLabelAssessmentId != null ? (
-              <span className="ml-1 font-mono text-xs text-aegis-muted">
-                ({activeOutcomeLabelAssessmentId})
+              <span
+                className="ml-1 font-mono text-xs text-aegis-muted"
+                data-testid="download-outcome-labels-id-chip"
+              >
+                {formatOutcomeLabelActionIdChip(
+                  activeOutcomeLabelAssessmentId,
+                  outcomeLabelHistoryLoadKind,
+                )}
               </span>
             ) : null}
           </button>

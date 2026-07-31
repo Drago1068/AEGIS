@@ -91,7 +91,8 @@ function Write-VerifyChecklist {
     Write-Host " 51. Phase 112: frontend redeploy includes Phase 111 resolve-outcome-label-load-kind (unit-tested)"
     Write-Host " 52. Phase 114: frontend redeploy includes Phase 113 outcome-label-aria-load-kind (unit-tested)"
     Write-Host " 53. Phase 116: frontend redeploy includes Phase 115 extract-outcome-label-helpers (unit-tested)"
-    Write-Host " 54. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 54. Phase 118: frontend redeploy includes Phase 117 outcome-label-id-chip-load-kind (unit-tested)"
+    Write-Host " 55. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {

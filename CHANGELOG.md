@@ -7,16 +7,34 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 148 - NAS Live Verification of Phase 147 (draft)
+### Phase 148 - NAS Live Verification of Phase 147
 
-Ops evidence gate after Phase 147 coverage-confidence field. See
+Ops evidence gate: redeploy backend+frontend under lab TLS after Phase 147 coverage-confidence
+field. See
 [docs/architecture/decisions/0149-phase-148-nas-live-verify-phase-147.md](docs/architecture/decisions/0149-phase-148-nas-live-verify-phase-147.md).
 
-### Phase 147 - Evidence Summary Latest Coverage Confidence (draft)
+#### Added
+
+- ADR-0149: live verify requires backend+frontend recreate for Phase 147; checklist item 69.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 147 - Evidence Summary Latest Coverage Confidence
 
 Surface top-level ``latest_coverage_confidence`` on evidence summary (keep coverage
 separate from probability). See
 [docs/architecture/decisions/0148-phase-147-evidence-summary-latest-coverage-confidence.md](docs/architecture/decisions/0148-phase-147-evidence-summary-latest-coverage-confidence.md).
+
+#### Added
+
+- ``latest_coverage_confidence`` on evidence summary (+ export); copied from latest assessment.
+- Console shows the field next to latest probability_confidence with a distinctness note.
+
+#### Explicitly out of scope
+
+New scoring math, orders, further UI structural extracts.
 
 ### Phase 146 - NAS Live Verification of Phase 145
 

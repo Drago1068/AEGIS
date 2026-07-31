@@ -458,6 +458,10 @@ async def _build_research_evidence_summary(
         if calibrations:
             latest_calibration = ProbabilityCalibrationResponse.model_validate(calibrations[0])
 
+    latest_coverage_confidence = (
+        latest_assessment.coverage_confidence if latest_assessment is not None else None
+    )
+
     return ResearchEvidenceSummaryResponse(
         symbol=symbol.upper(),
         state="research_only",
@@ -478,6 +482,7 @@ async def _build_research_evidence_summary(
         latest_mixed_label_bar_source=latest_mixed_label_bar_source,
         most_recent_labeled_assessment_id=most_recent_labeled_assessment_id,
         most_recent_labeled_outcome_label=most_recent_labeled_outcome_label,
+        latest_coverage_confidence=latest_coverage_confidence,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

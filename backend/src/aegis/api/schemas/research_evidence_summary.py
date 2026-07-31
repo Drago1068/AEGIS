@@ -100,4 +100,13 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "the label from most_recent_labeled_assessment_id. Never invented."
         ),
     )
+    latest_coverage_confidence: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "coverage_confidence from the latest assessment. Null when no assessment. "
+            "Distinct from probability_confidence; never invented."
+        ),
+    )
     detail: str

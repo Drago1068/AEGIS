@@ -966,6 +966,8 @@ export interface ResearchEvidenceSummary {
   most_recent_labeled_assessment_id: number | null;
   /** Newest labeled outcome in the ≤100 scan; never invented. */
   most_recent_labeled_outcome_label: OutcomeLabel | null;
+  /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
+  latest_coverage_confidence: number | null;
   detail: string;
 }
 

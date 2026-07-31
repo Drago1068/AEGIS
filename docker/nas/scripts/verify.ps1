@@ -106,7 +106,8 @@ function Write-VerifyChecklist {
     Write-Host " 66. Phase 142: frontend redeploy includes Phase 141 extract-panel-header (unit-tested)"
     Write-Host " 67. Phase 144: frontend redeploy includes Phase 143 extract-error-alert (unit-tested)"
     Write-Host " 68. Authenticated evidence-summary includes Phase 145 labeled/unlabeled scan counts (Phase 146)"
-    Write-Host " 69. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 69. Authenticated evidence-summary includes Phase 147 latest_coverage_confidence (Phase 148)"
+    Write-Host " 70. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -738,6 +739,19 @@ try {
             throw "Phase 146: labeled($labeledScan)+unlabeled($unlabeledScan) != assessment_count($assessScan)"
         }
         Write-Host "OK  Phase 146 scan label coverage labeled=$labeledScan unlabeled=$unlabeledScan assessments=$assessScan"
+        # Phase 148: latest_coverage_confidence from Phase 147 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_coverage_confidence")) {
+            throw "evidence-summary missing latest_coverage_confidence (Phase 147/148)"
+        }
+        $cov = $summary.latest_coverage_confidence
+        if ($null -ne $cov) {
+            $covNum = [double]$cov
+            if ($covNum -lt 0.0 -or $covNum -gt 1.0) {
+                throw "Phase 148: latest_coverage_confidence must be in [0,1] when set"
+            }
+        }
+        $covPart = if ($null -eq $cov) { "null" } else { [string]$cov }
+        Write-Host "OK  Phase 148 latest_coverage_confidence=$covPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -787,6 +801,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "unlabeled_assessment_count")) {
             throw "evidence-summary/export missing unlabeled_assessment_count (Phase 145/146)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_coverage_confidence")) {
+            throw "evidence-summary/export missing latest_coverage_confidence (Phase 147/148)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

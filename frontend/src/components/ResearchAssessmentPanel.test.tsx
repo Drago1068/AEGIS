@@ -153,6 +153,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_label_block_reason: null,
       most_recent_labelable_as_of_trading_date: null,
       most_recent_unlabeled_labelable_as_of_trading_date: null,
+      scan_unlabeled_label_ready_count: 0,
       latest_coverage_confidence: null,
       latest_research_index: null,
       latest_as_of_trading_date: null,
@@ -546,6 +547,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_label_block_reason: "insufficient_forward_bars",
       most_recent_labelable_as_of_trading_date: "2024-01-26",
       most_recent_unlabeled_labelable_as_of_trading_date: "2024-01-20",
+      scan_unlabeled_label_ready_count: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -680,6 +682,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-most-recent-unlabeled-labelable-as-of-trading-date"),
       ).toHaveTextContent("2024-01-20");
+      expect(screen.getByTestId("evidence-scan-unlabeled-label-ready-count")).toHaveTextContent(
+        "1",
+      );
       expect(screen.getByTestId("evidence-latest-outcome-label-computed-at")).toHaveTextContent(
         "2024-01-26T19:00:00Z",
       );
@@ -864,6 +869,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_label_block_reason: "insufficient_forward_bars",
       most_recent_labelable_as_of_trading_date: "2024-01-26",
       most_recent_unlabeled_labelable_as_of_trading_date: "2024-01-20",
+      scan_unlabeled_label_ready_count: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1013,6 +1019,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_label_block_reason: "insufficient_forward_bars",
       most_recent_labelable_as_of_trading_date: "2024-01-26",
       most_recent_unlabeled_labelable_as_of_trading_date: "2024-01-20",
+      scan_unlabeled_label_ready_count: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1160,6 +1167,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_label_block_reason: "insufficient_forward_bars",
       most_recent_labelable_as_of_trading_date: "2024-01-26",
       most_recent_unlabeled_labelable_as_of_trading_date: "2024-01-20",
+      scan_unlabeled_label_ready_count: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1397,6 +1405,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_label_block_reason: "insufficient_forward_bars",
       most_recent_labelable_as_of_trading_date: "2024-01-26",
       most_recent_unlabeled_labelable_as_of_trading_date: "2024-01-20",
+      scan_unlabeled_label_ready_count: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1594,6 +1603,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_label_block_reason: "insufficient_forward_bars",
       most_recent_labelable_as_of_trading_date: "2024-01-26",
       most_recent_unlabeled_labelable_as_of_trading_date: "2024-01-20",
+      scan_unlabeled_label_ready_count: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1787,6 +1797,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_label_block_reason: "insufficient_forward_bars",
       most_recent_labelable_as_of_trading_date: "2024-01-26",
       most_recent_unlabeled_labelable_as_of_trading_date: "2024-01-20",
+      scan_unlabeled_label_ready_count: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",

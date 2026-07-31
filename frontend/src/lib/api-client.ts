@@ -1007,6 +1007,11 @@ export interface ResearchEvidenceSummary {
    * Null when none. Never invented.
    */
   most_recent_unlabeled_labelable_as_of_trading_date: string | null;
+  /**
+   * Count of scanned assessments that are unlabeled and label-ready.
+   * Zero when none. Never invented.
+   */
+  scan_unlabeled_label_ready_count: number;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

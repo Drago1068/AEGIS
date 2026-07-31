@@ -419,14 +419,15 @@ class OutcomeLabelService:
         snapshots_newest_first: list[ResearchAssessmentSnapshotData],
         *,
         labeled_assessment_ids: set[int] | None = None,
-    ) -> tuple[bool | None, OutcomeLabelReason | None, date | None, date | None]:
-        """Return latest readiness, labelable as_of, and unlabeled+labelable as_of.
+    ) -> tuple[bool | None, OutcomeLabelReason | None, date | None, date | None, int]:
+        """Return latest readiness, labelable dates, and unlabeled+ready count.
 
-        Loads stored bars once (ADR-0232/0234/0236/0238). Empty scan returns all Nones.
+        Loads stored bars once (ADR-0232/0234/0236/0238/0240). Empty scan returns
+        ``(None, None, None, None, 0)``.
         """
 
         if not snapshots_newest_first:
-            return None, None, None, None
+            return None, None, None, None, 0
 
         bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
         if labeled_assessment_ids is None:
@@ -442,6 +443,7 @@ class OutcomeLabelService:
         )
         most_recent_labelable: date | None = None
         most_recent_unlabeled_labelable: date | None = None
+        unlabeled_label_ready_count = 0
         for row in snapshots_newest_first:
             if not is_snapshot_label_ready(
                 row,
@@ -451,19 +453,16 @@ class OutcomeLabelService:
                 continue
             if most_recent_labelable is None:
                 most_recent_labelable = row.as_of_trading_date
-            if (
-                most_recent_unlabeled_labelable is None
-                and row.id is not None
-                and row.id not in labeled_assessment_ids
-            ):
-                most_recent_unlabeled_labelable = row.as_of_trading_date
-            if most_recent_labelable is not None and most_recent_unlabeled_labelable is not None:
-                break
+            if row.id is not None and row.id not in labeled_assessment_ids:
+                unlabeled_label_ready_count += 1
+                if most_recent_unlabeled_labelable is None:
+                    most_recent_unlabeled_labelable = row.as_of_trading_date
         return (
             block_reason is None,
             block_reason,
             most_recent_labelable,
             most_recent_unlabeled_labelable,
+            unlabeled_label_ready_count,
         )
 
     async def assessment_ids_with_labels(

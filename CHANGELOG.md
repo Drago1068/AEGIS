@@ -7,16 +7,35 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 240 - NAS Live Verification of Phase 239 (draft)
+### Phase 240 - NAS Live Verification of Phase 239
 
 Ops evidence gate after Phase 239 unlabeled label-ready count diagnostic. See
 [docs/architecture/decisions/0241-phase-240-nas-live-verify-phase-239.md](docs/architecture/decisions/0241-phase-240-nas-live-verify-phase-239.md).
 
-### Phase 239 - Evidence Summary Scan Unlabeled Label-Ready Count (draft)
+#### Added
+
+- ADR-0241: live verify requires backend+frontend recreate for Phase 239; checklist item 115.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 239 - Evidence Summary Scan Unlabeled Label-Ready Count
 
 Count of unlabeled and label-ready assessments in the scan (explicit backfill-candidate
 cardinality). See
 [docs/architecture/decisions/0240-phase-239-evidence-summary-scan-unlabeled-label-ready-count.md](docs/architecture/decisions/0240-phase-239-evidence-summary-scan-unlabeled-label-ready-count.md).
+
+#### Added
+
+- ``scan_unlabeled_label_ready_count`` on evidence summary (+ export).
+- ``OutcomeLabelService.scan_label_diagnostics`` returns unlabeled+ready count (one bar load).
+- Console ``data-testid="evidence-scan-unlabeled-label-ready-count"``.
+- NAS verify checklist item 115 for Phase 240.
+
+#### Explicitly out of scope
+
+UI modularization, redundant nested lifts, default-on calibration, orders.
 
 ### Phase 238 - NAS Live Verification of Phase 237
 

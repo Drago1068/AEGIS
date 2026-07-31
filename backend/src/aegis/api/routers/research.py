@@ -398,12 +398,14 @@ async def _build_research_evidence_summary(
     latest_assessment_label_block_reason: str | None = None
     most_recent_labelable_as_of_trading_date: date | None = None
     most_recent_unlabeled_labelable_as_of_trading_date: date | None = None
+    scan_unlabeled_label_ready_count = 0
     if snapshots:
         (
             latest_assessment_is_label_ready,
             block_reason,
             most_recent_labelable_as_of_trading_date,
             most_recent_unlabeled_labelable_as_of_trading_date,
+            scan_unlabeled_label_ready_count,
         ) = await outcome_label_service.scan_label_diagnostics(
             symbol,
             snapshots,
@@ -675,6 +677,7 @@ async def _build_research_evidence_summary(
         most_recent_unlabeled_labelable_as_of_trading_date=(
             most_recent_unlabeled_labelable_as_of_trading_date
         ),
+        scan_unlabeled_label_ready_count=scan_unlabeled_label_ready_count,
         latest_coverage_confidence=latest_coverage_confidence,
         latest_research_index=latest_research_index,
         latest_as_of_trading_date=latest_as_of_trading_date,

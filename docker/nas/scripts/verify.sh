@@ -141,7 +141,8 @@ print_checklist() {
   echo "112. Authenticated evidence-summary includes Phase 233 latest_assessment_label_block_reason (Phase 234)"
   echo "113. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
   echo "114. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
-  echo "115. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo "115. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
+  echo "116. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -947,6 +948,12 @@ if ! grep -q '"most_recent_unlabeled_labelable_as_of_trading_date"' "${summary_b
   exit 1
 fi
 echo "OK  Phase 238 most_recent_unlabeled_labelable_as_of_trading_date field present"
+# Phase 240: scan_unlabeled_label_ready_count from Phase 239 (0 OK when none).
+if ! grep -q '"scan_unlabeled_label_ready_count"' "${summary_body}"; then
+  echo "evidence-summary missing scan_unlabeled_label_ready_count (Phase 239/240)" >&2
+  exit 1
+fi
+echo "OK  Phase 240 scan_unlabeled_label_ready_count field present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -1086,6 +1093,10 @@ if ! grep -q '"most_recent_labelable_as_of_trading_date"' "${export_body}"; then
 fi
 if ! grep -q '"most_recent_unlabeled_labelable_as_of_trading_date"' "${export_body}"; then
   echo "evidence-summary/export missing most_recent_unlabeled_labelable_as_of_trading_date (Phase 237/238)" >&2
+  exit 1
+fi
+if ! grep -q '"scan_unlabeled_label_ready_count"' "${export_body}"; then
+  echo "evidence-summary/export missing scan_unlabeled_label_ready_count (Phase 239/240)" >&2
   exit 1
 fi
 echo "OK  evidence-summary/export attachment state=research_only"

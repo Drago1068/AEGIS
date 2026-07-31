@@ -193,9 +193,9 @@ class _FakeOutcomeLabelService:
         snapshots_newest_first: list[ResearchAssessmentSnapshotData],
         *,
         labeled_assessment_ids: set[int] | None = None,
-    ) -> tuple[bool | None, OutcomeLabelReason | None, date | None, date | None]:
+    ) -> tuple[bool | None, OutcomeLabelReason | None, date | None, date | None, int]:
         if not snapshots_newest_first:
-            return None, None, None, None
+            return None, None, None, None, 0
         labeled = labeled_assessment_ids
         if labeled is None:
             labeled = {row.assessment_snapshot_id for row in self._listed}
@@ -208,13 +208,16 @@ class _FakeOutcomeLabelService:
             else self._labelable_as_of
         )
         unlabeled_labelable: date | None = None
+        unlabeled_ready_count = 0
         if ready:
             latest_id = snapshots_newest_first[0].id
             if latest_id is not None and latest_id not in labeled:
                 unlabeled_labelable = snapshots_newest_first[0].as_of_trading_date
+                unlabeled_ready_count = 1
         elif self._unlabeled_labelable_as_of is not None:
             unlabeled_labelable = self._unlabeled_labelable_as_of
-        return ready, reason, labelable, unlabeled_labelable
+            unlabeled_ready_count = 1
+        return ready, reason, labelable, unlabeled_labelable, unlabeled_ready_count
 
 
 class _FakeCalibrationService:
@@ -328,6 +331,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_assessment_label_block_reason"] is None
     assert body["most_recent_labelable_as_of_trading_date"] is None
     assert body["most_recent_unlabeled_labelable_as_of_trading_date"] is None
+    assert body["scan_unlabeled_label_ready_count"] == 0
     assert body["latest_coverage_confidence"] is None
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
@@ -383,6 +387,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_assessment_label_block_reason"] is None
     assert body["most_recent_labelable_as_of_trading_date"] == "2024-01-26"
     assert body["most_recent_unlabeled_labelable_as_of_trading_date"] is None
+    assert body["scan_unlabeled_label_ready_count"] == 0
     assert body["latest_coverage_confidence"] == 0.95
     assert body["latest_research_index"] == 0.46
     assert body["latest_as_of_trading_date"] == "2024-01-26"
@@ -579,6 +584,7 @@ async def test_evidence_summary_most_recent_unlabeled_labelable_as_of_trading_da
     body = response.json()
     assert body["most_recent_labelable_as_of_trading_date"] == "2024-01-26"
     assert body["most_recent_unlabeled_labelable_as_of_trading_date"] == "2024-01-20"
+    assert body["scan_unlabeled_label_ready_count"] == 1
 
 
 async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:

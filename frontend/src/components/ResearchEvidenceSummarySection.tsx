@@ -410,6 +410,15 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Scan unlabeled label-ready count</dt>
+          <dd
+            className="font-mono"
+            data-testid="evidence-scan-unlabeled-label-ready-count"
+          >
+            {evidenceSummary.scan_unlabeled_label_ready_count}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest outcome_label computed_at</dt>
           <dd className="font-mono" data-testid="evidence-latest-outcome-label-computed-at">
             {evidenceSummary.latest_outcome_label_computed_at ?? "null"}

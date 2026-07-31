@@ -209,6 +209,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "most_recent_labelable_as_of_trading_date. Never invented."
         ),
     )
+    scan_unlabeled_label_ready_count: int = Field(
+        default=0,
+        ge=0,
+        description=(
+            "Count of scanned assessments that are unlabeled and label-ready "
+            "(backfill-candidate cardinality). Zero when none or empty scan. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

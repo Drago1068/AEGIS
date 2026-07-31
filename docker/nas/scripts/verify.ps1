@@ -152,7 +152,8 @@ function Write-VerifyChecklist {
     Write-Host "112. Authenticated evidence-summary includes Phase 233 latest_assessment_label_block_reason (Phase 234)"
     Write-Host "113. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
     Write-Host "114. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
-    Write-Host "115. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "115. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
+    Write-Host "116. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1161,6 +1162,12 @@ try {
         $unlabeledLabelableAsOf = $summary.most_recent_unlabeled_labelable_as_of_trading_date
         $unlabeledLabelableAsOfPart = if ($null -eq $unlabeledLabelableAsOf -or $unlabeledLabelableAsOf -eq "") { "null" } else { [string]$unlabeledLabelableAsOf }
         Write-Host "OK  Phase 238 most_recent_unlabeled_labelable_as_of_trading_date=$unlabeledLabelableAsOfPart"
+        # Phase 240: scan_unlabeled_label_ready_count from Phase 239 (0 OK when none).
+        if (-not ($summary.PSObject.Properties.Name -contains "scan_unlabeled_label_ready_count")) {
+            throw "evidence-summary missing scan_unlabeled_label_ready_count (Phase 239/240)"
+        }
+        $unlabeledReadyCount = $summary.scan_unlabeled_label_ready_count
+        Write-Host "OK  Phase 240 scan_unlabeled_label_ready_count=$unlabeledReadyCount"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1348,6 +1355,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_unlabeled_labelable_as_of_trading_date")) {
             throw "evidence-summary/export missing most_recent_unlabeled_labelable_as_of_trading_date (Phase 237/238)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "scan_unlabeled_label_ready_count")) {
+            throw "evidence-summary/export missing scan_unlabeled_label_ready_count (Phase 239/240)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

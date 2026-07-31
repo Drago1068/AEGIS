@@ -1,19 +1,19 @@
-# ADR-0261: Phase 260 NAS Live Verification of Phase 259 (draft)
+# ADR-0261: Phase 260 NAS Live Verification of Phase 259
 
-- Status: Proposed (pending Phase 259 + live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
-Phase 259 would add ``latest_trading_date`` on ingest symbol results (ADR-0260). Operators
-need a verified backend redeploy under lab TLS after that lands.
+Phase 259 adds ``latest_trading_date`` on ingest symbol results (ADR-0260). Operators need
+a verified backend+frontend redeploy under lab TLS after that lands.
 
 ## Decisions
 
 ### 1. Scope
 
-1. Deploy ``HEAD`` TLS; recreate backend (frontend optional if unchanged).
-2. ``verify.ps1`` / ``verify.sh`` pass; ingest result logs ``latest_trading_date``
+1. Deploy ``HEAD`` TLS; recreate backend+frontend.
+2. ``verify.ps1`` / ``verify.sh`` pass; ingest logs ``latest_trading_date``
    (checklist item 124).
 3. Alembic ``0009`` / ``head``.
 
@@ -21,12 +21,13 @@ need a verified backend redeploy under lab TLS after that lands.
 
 Retain live verify stdout.
 
-## Resume
+## Live evidence (2026-07-31)
 
-```powershell
-# After Phase 259 on HEAD: git archive → NAS; rebuild backend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+- Revision ``f60cb0b`` (+ verify script ASCII fix); TLS recreate; verify passed.
+- AAPL ingest: ``stored=0 skipped_existing=501 latest_trading_date=2026-07-30``;
+  store tip unchanged ``pre_tip=2026-07-29 post_tip=2026-07-29``;
+  ``stored_bar_calendar_lag_trading_days=2``. Provider tip is **ahead** of store tip —
+  actionable divergence for Phase 261.
 
 ## Related documents
 

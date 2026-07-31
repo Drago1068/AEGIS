@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Verify a live AEGIS NAS deployment (Phase 7/9 + Phase 17 evidence gate).
 # Distinct from package upload / deploy start.
 # Usage: ./docker/nas/scripts/verify.sh [--dry-run]
@@ -150,7 +150,7 @@ print_checklist() {
   echo "121. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
   echo "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
   echo "123. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-  echo "124. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257–260; unchanged lag OK)"
+  echo "124. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-260; unchanged lag OK)"
   echo "125. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 

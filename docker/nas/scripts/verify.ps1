@@ -161,7 +161,7 @@ function Write-VerifyChecklist {
     Write-Host "121. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
     Write-Host "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
     Write-Host "123. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-    Write-Host "124. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257–260; unchanged lag OK)"
+    Write-Host "124. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-260; unchanged lag OK)"
     Write-Host "125. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 

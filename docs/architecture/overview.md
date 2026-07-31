@@ -644,8 +644,12 @@ Phase 258 live-verified that refresh (see
 [decisions/0259-phase-258-nas-live-verify-phase-257.md](decisions/0259-phase-258-nas-live-verify-phase-257.md)).
 Phase 259 surfaces ingest-run ``latest_trading_date`` for provider-vs-store tip (see
 [decisions/0260-phase-259-ingest-run-latest-trading-date.md](decisions/0260-phase-259-ingest-run-latest-trading-date.md)).
-Phase 260 (draft) would live-verify that field (see
+Phase 260 live-verified that field (see
 [decisions/0261-phase-260-nas-live-verify-phase-259.md](decisions/0261-phase-260-nas-live-verify-phase-259.md)).
+Phase 261 (draft) proposes reconciling provider tip ahead of store tip (see
+[decisions/0262-phase-261-provider-tip-ahead-of-store.md](decisions/0262-phase-261-provider-tip-ahead-of-store.md)).
+Phase 262 (draft) would live-verify that fix (see
+[decisions/0263-phase-262-nas-live-verify-phase-261.md](decisions/0263-phase-262-nas-live-verify-phase-261.md)).
 
 ## System context
 

@@ -263,6 +263,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "without a label row) and latest_mixed_label_bar_source. Never invented."
         ),
     )
+    latest_outcome_label_as_of_trading_date: date | None = Field(
+        default=None,
+        description=(
+            "as_of_trading_date from latest_outcome_label when the latest assessment is labeled. "
+            "Null when unlabeled. Distinct from assessment latest_as_of_trading_date. Never "
+            "invented."
+        ),
+    )
     latest_calibration_id: int | None = Field(
         default=None,
         ge=1,

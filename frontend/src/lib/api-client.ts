@@ -1017,6 +1017,8 @@ export interface ResearchEvidenceSummary {
   latest_outcome_label_state: string | null;
   /** bar_source from latest_outcome_label when latest assessment is labeled; null otherwise. Distinct from resolved/mixed label bar sources. */
   latest_outcome_label_bar_source: string | null;
+  /** as_of_trading_date from latest_outcome_label when latest assessment is labeled; null otherwise. Distinct from assessment latest_as_of_trading_date. */
+  latest_outcome_label_as_of_trading_date: string | null;
   /** id from latest_calibration when present; null otherwise. */
   latest_calibration_id: number | null;
   /** outcome_horizon_key from latest_calibration when present; null otherwise. */

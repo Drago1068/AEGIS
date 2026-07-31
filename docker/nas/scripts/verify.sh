@@ -127,7 +127,8 @@ print_checklist() {
   echo " 98. Authenticated evidence-summary includes Phase 205 latest_outcome_label_schema_version (Phase 206)"
   echo " 99. Authenticated evidence-summary includes Phase 207 latest_outcome_label_state (Phase 208)"
   echo "100. Authenticated evidence-summary includes Phase 209 latest_outcome_label_bar_source (Phase 210)"
-  echo "101. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo "101. Authenticated evidence-summary includes Phase 211 latest_outcome_label_as_of_trading_date (Phase 212)"
+  echo "102. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -849,6 +850,12 @@ if ! grep -q '"latest_outcome_label_bar_source"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 210 latest_outcome_label_bar_source field present"
+# Phase 212: latest_outcome_label_as_of_trading_date from Phase 211 (null OK).
+if ! grep -q '"latest_outcome_label_as_of_trading_date"' "${summary_body}"; then
+  echo "evidence-summary missing latest_outcome_label_as_of_trading_date (Phase 211/212)" >&2
+  exit 1
+fi
+echo "OK  Phase 212 latest_outcome_label_as_of_trading_date field present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -932,6 +939,10 @@ if ! grep -q '"latest_outcome_label_state"' "${export_body}"; then
 fi
 if ! grep -q '"latest_outcome_label_bar_source"' "${export_body}"; then
   echo "evidence-summary/export missing latest_outcome_label_bar_source (Phase 209/210)" >&2
+  exit 1
+fi
+if ! grep -q '"latest_outcome_label_as_of_trading_date"' "${export_body}"; then
+  echo "evidence-summary/export missing latest_outcome_label_as_of_trading_date (Phase 211/212)" >&2
   exit 1
 fi
 echo "OK  evidence-summary/export attachment state=research_only"

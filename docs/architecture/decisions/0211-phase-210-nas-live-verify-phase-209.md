@@ -1,6 +1,6 @@
 # ADR-0211: Phase 210 NAS Live Verification of Phase 209
 
-- Status: Proposed (pending Phase 209 + live evidence)
+- Status: Accepted (live verified 2026-07-31; backend+frontend recreate of ``2ca0311``)
 - Date: 2026-07-31
 
 ## Context
@@ -20,7 +20,9 @@ need a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after 
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-31 for ``2ca0311``
+(checklist item 100; AAPL ``latest_outcome_label_bar_source=null`` — latest assessment
+unlabeled; ``latest_outcome_label_id=null``).
 
 ### 3. Out of scope
 
@@ -29,7 +31,7 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 209 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# Deploy HEAD backend+frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
 ```
 

@@ -161,6 +161,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_schema_version: null,
       latest_outcome_label_state: null,
       latest_outcome_label_bar_source: null,
+      latest_outcome_label_as_of_trading_date: null,
       latest_calibration_id: null,
       latest_calibration_horizon_key: null,
       latest_calibration_computed_at: null,
@@ -540,6 +541,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_schema_version: 1,
       latest_outcome_label_state: "research_only",
       latest_outcome_label_bar_source: "alpha_vantage",
+      latest_outcome_label_as_of_trading_date: "2024-01-26",
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -631,6 +633,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("evidence-latest-outcome-label-bar-source")).toHaveTextContent(
         "alpha_vantage",
       );
+      expect(
+        screen.getByTestId("evidence-latest-outcome-label-as-of-trading-date"),
+      ).toHaveTextContent("2024-01-26");
       expect(screen.getByTestId("evidence-latest-calibration-id")).toHaveTextContent("7");
       expect(screen.getByTestId("evidence-latest-calibration-horizon-key")).toHaveTextContent(
         "forward_return_5",
@@ -802,6 +807,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_schema_version: 1,
       latest_outcome_label_state: "research_only",
       latest_outcome_label_bar_source: "alpha_vantage",
+      latest_outcome_label_as_of_trading_date: "2024-01-26",
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -937,6 +943,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_schema_version: 1,
       latest_outcome_label_state: "research_only",
       latest_outcome_label_bar_source: "alpha_vantage",
+      latest_outcome_label_as_of_trading_date: "2024-01-26",
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -1070,6 +1077,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_schema_version: 1,
       latest_outcome_label_state: "research_only",
       latest_outcome_label_bar_source: "alpha_vantage",
+      latest_outcome_label_as_of_trading_date: "2024-01-26",
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -1293,6 +1301,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_schema_version: 1,
       latest_outcome_label_state: "research_only",
       latest_outcome_label_bar_source: "alpha_vantage",
+      latest_outcome_label_as_of_trading_date: "2024-01-26",
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -1476,6 +1485,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_schema_version: 1,
       latest_outcome_label_state: "research_only",
       latest_outcome_label_bar_source: "alpha_vantage",
+      latest_outcome_label_as_of_trading_date: "2024-01-26",
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -1655,6 +1665,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_schema_version: 1,
       latest_outcome_label_state: "research_only",
       latest_outcome_label_bar_source: "alpha_vantage",
+      latest_outcome_label_as_of_trading_date: "2024-01-26",
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",

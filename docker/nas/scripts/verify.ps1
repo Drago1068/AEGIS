@@ -138,7 +138,8 @@ function Write-VerifyChecklist {
     Write-Host " 98. Authenticated evidence-summary includes Phase 205 latest_outcome_label_schema_version (Phase 206)"
     Write-Host " 99. Authenticated evidence-summary includes Phase 207 latest_outcome_label_state (Phase 208)"
     Write-Host "100. Authenticated evidence-summary includes Phase 209 latest_outcome_label_bar_source (Phase 210)"
-    Write-Host "101. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "101. Authenticated evidence-summary includes Phase 211 latest_outcome_label_as_of_trading_date (Phase 212)"
+    Write-Host "102. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1048,6 +1049,13 @@ try {
         $labelBarSource = $summary.latest_outcome_label_bar_source
         $labelBarPart = if ($null -eq $labelBarSource -or $labelBarSource -eq "") { "null" } else { [string]$labelBarSource }
         Write-Host "OK  Phase 210 latest_outcome_label_bar_source=$labelBarPart"
+        # Phase 212: latest_outcome_label_as_of_trading_date from Phase 211 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_outcome_label_as_of_trading_date")) {
+            throw "evidence-summary missing latest_outcome_label_as_of_trading_date (Phase 211/212)"
+        }
+        $labelAsOf = $summary.latest_outcome_label_as_of_trading_date
+        $labelAsOfPart = if ($null -eq $labelAsOf -or $labelAsOf -eq "") { "null" } else { [string]$labelAsOf }
+        Write-Host "OK  Phase 212 latest_outcome_label_as_of_trading_date=$labelAsOfPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1193,6 +1201,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_outcome_label_bar_source")) {
             throw "evidence-summary/export missing latest_outcome_label_bar_source (Phase 209/210)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_outcome_label_as_of_trading_date")) {
+            throw "evidence-summary/export missing latest_outcome_label_as_of_trading_date (Phase 211/212)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

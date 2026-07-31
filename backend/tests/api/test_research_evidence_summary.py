@@ -262,6 +262,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_outcome_label_schema_version"] is None
     assert body["latest_outcome_label_state"] is None
     assert body["latest_outcome_label_bar_source"] is None
+    assert body["latest_outcome_label_as_of_trading_date"] is None
     assert body["latest_calibration_id"] is None
     assert body["latest_calibration_horizon_key"] is None
     assert body["latest_calibration_computed_at"] is None
@@ -311,6 +312,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_outcome_label_schema_version"] == 1
     assert body["latest_outcome_label_state"] == "research_only"
     assert body["latest_outcome_label_bar_source"] == "alpha_vantage"
+    assert body["latest_outcome_label_as_of_trading_date"] == "2024-01-26"
     assert body["latest_calibration_id"] == 7
     assert body["latest_calibration_horizon_key"] == "forward_return_5"
     assert body["latest_calibration_computed_at"] == "2024-01-26T20:00:00Z"

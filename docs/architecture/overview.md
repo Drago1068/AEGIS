@@ -526,8 +526,12 @@ Phase 208 live-verified that revision (see
 [decisions/0209-phase-208-nas-live-verify-phase-207.md](decisions/0209-phase-208-nas-live-verify-phase-207.md)).
 Phase 209 surfaces top-level ``latest_outcome_label_bar_source`` on evidence summary (see
 [decisions/0210-phase-209-evidence-summary-latest-outcome-label-bar-source.md](decisions/0210-phase-209-evidence-summary-latest-outcome-label-bar-source.md)).
-Phase 210 (draft) live-verifies that revision (see
+Phase 210 live-verified that revision (see
 [decisions/0211-phase-210-nas-live-verify-phase-209.md](decisions/0211-phase-210-nas-live-verify-phase-209.md)).
+Phase 211 surfaces top-level ``latest_outcome_label_as_of_trading_date`` on evidence summary (see
+[decisions/0212-phase-211-evidence-summary-latest-outcome-label-as-of-trading-date.md](decisions/0212-phase-211-evidence-summary-latest-outcome-label-as-of-trading-date.md)).
+Phase 212 (draft) live-verifies that revision (see
+[decisions/0213-phase-212-nas-live-verify-phase-211.md](decisions/0213-phase-212-nas-live-verify-phase-211.md)).
 
 ## System context
 

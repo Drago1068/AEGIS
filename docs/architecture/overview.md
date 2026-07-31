@@ -640,8 +640,13 @@ Phase 256 live-verified that lag (see
 [decisions/0257-phase-256-nas-live-verify-phase-255.md](decisions/0257-phase-256-nas-live-verify-phase-255.md)).
 Phase 257 exercises on-demand ingest tip refresh so the store can advance (see
 [decisions/0258-phase-257-on-demand-ingest-tip-refresh.md](decisions/0258-phase-257-on-demand-ingest-tip-refresh.md)).
-Phase 258 (draft) would live-verify that refresh (see
+Phase 258 live-verified that refresh (see
 [decisions/0259-phase-258-nas-live-verify-phase-257.md](decisions/0259-phase-258-nas-live-verify-phase-257.md)).
+Phase 259 (draft) proposes ingest-run ``latest_trading_date`` for provider-vs-store tip
+(see
+[decisions/0260-phase-259-ingest-run-latest-trading-date.md](decisions/0260-phase-259-ingest-run-latest-trading-date.md)).
+Phase 260 (draft) would live-verify that field (see
+[decisions/0261-phase-260-nas-live-verify-phase-259.md](decisions/0261-phase-260-nas-live-verify-phase-259.md)).
 
 ## System context
 

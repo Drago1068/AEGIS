@@ -1,34 +1,34 @@
-# ADR-0259: Phase 258 NAS Live Verification of Phase 257 (draft)
+# ADR-0259: Phase 258 NAS Live Verification of Phase 257
 
-- Status: Proposed (pending Phase 257 + live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
-Phase 257 exercises on-demand ingest tip refresh (ADR-0258). Operators need live verify
-evidence that ingest ran and evidence-summary lag/tip were observed. Scripts-only is OK
-when runtime images are unchanged.
+Phase 257 adds on-demand ingest tip refresh to the NAS verify gate (ADR-0258). Operators
+need live evidence that authenticated ingest ran and pre/post lag/tip were observed.
 
 ## Decisions
 
 ### 1. Scope
 
-1. Deploy ``HEAD`` TLS if Phase 257 changed runtime images; otherwise scripts-only OK.
-2. ``verify.ps1`` / ``verify.sh`` pass including Phase 257 ingest checklist item 124.
-3. Retain pre/post ``stored_bar_calendar_lag_trading_days`` (and tip / as_of dates) in
-   stdout (unchanged OK).
+1. Scripts-only OK (no runtime image change).
+2. ``verify.ps1`` / ``verify.sh`` pass including checklist item 124.
+3. Retain pre/post ``stored_bar_calendar_lag_trading_days`` (and tip / as_of) in stdout
+   (unchanged OK).
 4. Alembic ``0009`` / ``head``.
 
 ### 2. Upload ≠ verified
 
 Retain live verify stdout.
 
-## Resume
+## Live evidence (2026-07-31)
 
-```powershell
-# After Phase 257 on HEAD: git archive → NAS if needed; then:
-.\docker\nas\scripts\verify.ps1
-```
+- Revision ``c84524f``; scripts-only; verify passed.
+- AAPL: authenticated ``POST /market-data/ingest`` → 200;
+  ``stored=0 skipped_existing=501``; tip refresh
+  ``pre_lag=2 post_lag=2 pre_tip=2026-07-29 post_tip=2026-07-29`` (unchanged OK —
+  providers returned no newer closes than the store tip).
 
 ## Related documents
 

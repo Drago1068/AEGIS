@@ -7,10 +7,31 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 258 - NAS Live Verification of Phase 257 (draft)
+### Phase 260 - NAS Live Verification of Phase 259 (draft)
 
-Ops evidence gate after Phase 257 on-demand ingest tip refresh. See
+Ops evidence gate after Phase 259 ingest-run latest trading date. See
+[docs/architecture/decisions/0261-phase-260-nas-live-verify-phase-259.md](docs/architecture/decisions/0261-phase-260-nas-live-verify-phase-259.md).
+
+### Phase 259 - Ingest Run Latest Trading Date (draft)
+
+Expose max trading date seen in an ingest fetch so operators can compare provider tip vs
+store tip when ``stored=0``. See
+[docs/architecture/decisions/0260-phase-259-ingest-run-latest-trading-date.md](docs/architecture/decisions/0260-phase-259-ingest-run-latest-trading-date.md).
+
+### Phase 258 - NAS Live Verification of Phase 257
+
+Ops evidence gate after Phase 257 on-demand ingest tip refresh. Live verify passed
+2026-07-31 (``c84524f``; AAPL ingest ``stored=0 skipped_existing=501``;
+``pre_lag=2 post_lag=2`` tip ``2026-07-29`` unchanged OK). See
 [docs/architecture/decisions/0259-phase-258-nas-live-verify-phase-257.md](docs/architecture/decisions/0259-phase-258-nas-live-verify-phase-257.md).
+
+#### Added
+
+- ADR-0259: live verify checklist item 124 for ingest tip refresh.
+
+#### Explicitly out of scope
+
+New evidence-summary fields, inventing closes, default-on calibration, orders.
 
 ### Phase 257 - On-Demand Ingest Tip Refresh
 

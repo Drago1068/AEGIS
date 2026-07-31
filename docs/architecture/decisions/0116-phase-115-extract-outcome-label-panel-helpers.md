@@ -1,6 +1,6 @@
 # ADR-0116: Phase 115 Extract Outcome-Label Panel Helpers Module
 
-- Status: Accepted (drafted; implement next)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -14,9 +14,8 @@ component file and makes audits harder.
 
 ### 1. Console
 
-Move those helpers (and only those pure helpers) into a dedicated module such as
-``frontend/src/components/research-assessment-panel-helpers.ts``. Re-export or import from
-the panel and tests. No behavior change.
+Move those helpers into ``frontend/src/components/research-assessment-panel-helpers.ts``.
+Panel and tests import from that module. No behavior change.
 
 ### 2. Out of scope
 

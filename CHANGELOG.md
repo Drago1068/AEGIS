@@ -29,7 +29,7 @@ See
 
 #### Added
 
-- Helpers module extract drafted (implement next).
+- ``research-assessment-panel-helpers.ts`` with load-kind + aria helpers; panel imports them.
 
 #### Explicitly out of scope
 

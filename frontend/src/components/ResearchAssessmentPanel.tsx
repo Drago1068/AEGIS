@@ -30,6 +30,11 @@ import {
   listResearchAssessments,
 } from "@/lib/api-client";
 
+import {
+  formatOutcomeLabelActionAriaLabel,
+  resolveOutcomeLabelHistoryLoadKind,
+} from "./research-assessment-panel-helpers";
+
 type ResearchAssessmentPanelProps = {
   symbol: string;
   initialLatest: ResearchAssessment | null;
@@ -88,33 +93,6 @@ function formatLabelHorizonSummary(
       return `${short}=${value.toFixed(4)}${endPart}`;
     })
     .join(" · ");
-}
-
-/** Prefer tracked load-kind; otherwise infer from whether assessment matches latest. */
-export function resolveOutcomeLabelHistoryLoadKind(
-  assessmentId: number,
-  loadKind: "latest" | "scan_labeled" | null,
-  latestId: number | null | undefined,
-): "latest" | "scan_labeled" {
-  return loadKind ?? (latestId != null && assessmentId === latestId ? "latest" : "scan_labeled");
-}
-
-/** Accessible name for compute/download outcome-label actions (Phase 113). */
-export function formatOutcomeLabelActionAriaLabel(
-  action: "Compute outcome labels" | "Download outcome labels JSON",
-  assessmentId: number | null,
-  loadKind: "latest" | "scan_labeled" | null,
-): string {
-  if (assessmentId == null) {
-    return action;
-  }
-  const kindSuffix =
-    loadKind === "scan_labeled"
-      ? " (scan-labeled)"
-      : loadKind === "latest"
-        ? " (latest)"
-        : "";
-  return `${action} for assessment ${assessmentId}${kindSuffix}`;
 }
 
 /** Compact assessment history line from API payload only (Phase 28/61). */

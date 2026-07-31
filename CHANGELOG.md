@@ -27,7 +27,7 @@ Clarify that calibration actions always use ``latest`` when the label panel is o
 assessment. See
 [docs/architecture/decisions/0104-phase-103-calibration-controls-note-scan-labeled.md](docs/architecture/decisions/0104-phase-103-calibration-controls-note-scan-labeled.md).
 
-#### Planned
+#### Added
 
 - Note near calibration controls when loaded label assessment id differs from ``latest.id``.
 

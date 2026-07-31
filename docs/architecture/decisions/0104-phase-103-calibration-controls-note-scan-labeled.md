@@ -1,6 +1,6 @@
 # ADR-0104: Phase 103 Calibration Controls Note When Scan-Labeled Differs
 
-- Status: Accepted (draft / pending implementation)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -25,11 +25,8 @@ No new API fields; do not invent calibration data.
 
 Binding calibration to scan-labeled assessments, default-on calibration, orders, ACME.
 
-## Resume
-
-Implement UI + unit tests; update CHANGELOG/README/overview; then Phase 104 NAS verify.
-
 ## Related documents
 
 - [0100-phase-99-calibrations-download-names-latest.md](0100-phase-99-calibrations-download-names-latest.md)
 - [0102-phase-101-compute-calibration-names-latest.md](0102-phase-101-compute-calibration-names-latest.md)
+- [0105-phase-104-nas-live-verify-phase-103.md](0105-phase-104-nas-live-verify-phase-103.md)

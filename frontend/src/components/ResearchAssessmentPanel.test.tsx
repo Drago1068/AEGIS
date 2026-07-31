@@ -728,6 +728,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("outcome-label-empty-state")).toHaveTextContent(
         /no outcome labels stored for assessment 3/i,
       );
+      expect(screen.getByTestId("calibration-controls-latest-note")).toHaveTextContent(
+        /calibration actions use latest assessment 1 \(panel labels are for 3\)/i,
+      );
     });
   });
 
@@ -856,6 +859,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.getByTestId("download-calibrations")).toHaveAccessibleName(
       /download calibrations json for assessment 1/i,
     );
+    expect(screen.queryByTestId("calibration-controls-latest-note")).not.toBeInTheDocument();
   });
 
   it("downloads assessments JSON via export route", async () => {

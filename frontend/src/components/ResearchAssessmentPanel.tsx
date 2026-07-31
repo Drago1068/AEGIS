@@ -646,6 +646,17 @@ export function ResearchAssessmentPanel({
             {isPending ? "Working..." : "Run assessment"}
           </button>
         </div>
+        {outcomeLabelHistoryAssessmentId != null &&
+        latest?.id != null &&
+        outcomeLabelHistoryAssessmentId !== latest.id ? (
+          <p
+            className="basis-full text-xs text-aegis-muted"
+            data-testid="calibration-controls-latest-note"
+          >
+            Calibration actions use latest assessment {latest.id} (panel labels are for{" "}
+            {outcomeLabelHistoryAssessmentId}).
+          </p>
+        ) : null}
       </header>
 
       {error ? (

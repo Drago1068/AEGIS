@@ -26,7 +26,7 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 Show which assessment id calibrations JSON download targets (always ``latest``). See
 [docs/architecture/decisions/0100-phase-99-calibrations-download-names-latest.md](docs/architecture/decisions/0100-phase-99-calibrations-download-names-latest.md).
 
-#### Planned
+#### Added
 
 - Calibrations download button shows ``({latest.id})`` and accessible name includes the id.
 

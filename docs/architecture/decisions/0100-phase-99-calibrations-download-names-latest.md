@@ -1,6 +1,6 @@
 # ADR-0100: Phase 99 Calibrations Download Names Latest Assessment Id
 
-- Status: Accepted (draft / pending implementation)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -26,11 +26,8 @@ Calibrations remain tied to ``latest`` (not scan-labeled) in this phase.
 Binding calibrations to scan-labeled assessments, new API fields, default-on calibration,
 orders, ACME.
 
-## Resume
-
-Implement UI + unit tests; update CHANGELOG/README/overview; then Phase 100 NAS verify.
-
 ## Related documents
 
 - [0090-phase-89-outcome-label-download-names-assessment.md](0090-phase-89-outcome-label-download-names-assessment.md)
 - [0098-phase-97-assessment-backfill-preserves-loaded-labels.md](0098-phase-97-assessment-backfill-preserves-loaded-labels.md)
+- [0101-phase-100-nas-live-verify-phase-99.md](0101-phase-100-nas-live-verify-phase-99.md)

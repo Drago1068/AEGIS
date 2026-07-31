@@ -615,9 +615,18 @@ export function ResearchAssessmentPanel({
             type="button"
             onClick={onDownloadCalibrations}
             disabled={isPending || latest?.id == null}
+            data-testid="download-calibrations"
+            aria-label={
+              latest?.id != null
+                ? `Download calibrations JSON for assessment ${latest.id}`
+                : "Download calibrations JSON"
+            }
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Download calibrations JSON
+            {latest?.id != null ? (
+              <span className="ml-1 font-mono text-xs text-aegis-muted">({latest.id})</span>
+            ) : null}
           </button>
           <button
             type="button"

@@ -850,6 +850,9 @@ describe("ResearchAssessmentPanel", () => {
         20,
       );
     });
+    expect(screen.getByTestId("download-calibrations")).toHaveAccessibleName(
+      /download calibrations json for assessment 1/i,
+    );
   });
 
   it("downloads assessments JSON via export route", async () => {
@@ -1291,7 +1294,14 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
     ]);
-    fireEvent.click(screen.getByRole("button", { name: /backfill assessments/i }));
+    const backfillAssessments = screen.getByRole("button", {
+      name: /^backfill assessments$/i,
+    });
+    await waitFor(() => {
+      expect(backfillAssessments).not.toBeDisabled();
+    });
+    vi.mocked(backfillResearchAssessments).mockClear();
+    fireEvent.click(backfillAssessments);
 
     await waitFor(() => {
       expect(backfillResearchAssessments).toHaveBeenCalledWith(

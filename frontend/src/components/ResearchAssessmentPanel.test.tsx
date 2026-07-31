@@ -1117,6 +1117,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(await screen.findByTestId("outcome-label-backfill-summary")).toHaveTextContent(
       /attempted=2.*labeled=1.*skipped=1/,
     );
+    expect(screen.getByTestId("backfill-status-section")).toBeInTheDocument();
   });
 
   it("refreshes outcome labels for scan-labeled assessment after backfill", async () => {

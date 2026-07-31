@@ -1,6 +1,6 @@
 # ADR-0140: Phase 139 Extract Backfill Status Banners
 
-- Status: Accepted (drafted; implement next)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -17,7 +17,8 @@ presentational surface without behavior change.
 Extract backfill status UI into ``ResearchBackfillStatusSection.tsx`` (props: optional
 outcome-label and assessment backfill summaries). Preserve
 ``data-testid="outcome-label-backfill-summary"`` and
-``data-testid="assessment-backfill-summary"``. No API changes.
+``data-testid="assessment-backfill-summary"``. Add
+``data-testid="backfill-status-section"``. No API changes.
 
 ### 2. Out of scope
 

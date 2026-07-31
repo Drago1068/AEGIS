@@ -29,7 +29,8 @@ Move outcome-label and assessment backfill summary banners into a presentational
 
 #### Added
 
-- Backfill status section extract drafted (implement next).
+- ``ResearchBackfillStatusSection.tsx`` with ``data-testid="backfill-status-section"``.
+- Existing backfill summary test ids preserved.
 
 #### Explicitly out of scope
 

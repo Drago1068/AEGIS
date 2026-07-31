@@ -33,6 +33,7 @@ import {
 import { resolveOutcomeLabelHistoryLoadKind } from "./research-assessment-panel-helpers";
 import { ResearchAssessmentActionToolbar } from "./ResearchAssessmentActionToolbar";
 import { ResearchAssessmentHistorySection } from "./ResearchAssessmentHistorySection";
+import { ResearchBackfillStatusSection } from "./ResearchBackfillStatusSection";
 import { ResearchCalibrationReadinessSection } from "./ResearchCalibrationReadinessSection";
 import { ResearchEvidenceSummarySection } from "./ResearchEvidenceSummarySection";
 import { ResearchLatestAssessmentSection } from "./ResearchLatestAssessmentSection";
@@ -493,24 +494,10 @@ export function ResearchAssessmentPanel({
         </p>
       ) : null}
 
-      {backfillSummary ? (
-        <p className="mb-3 text-sm text-aegis-muted" data-testid="outcome-label-backfill-summary">
-          Backfill (research-only): attempted={backfillSummary.assessment_count}, labeled=
-          {backfillSummary.persisted_count}, skipped={backfillSummary.skipped_count}
-        </p>
-      ) : null}
-
-      {assessmentBackfillSummary ? (
-        <p
-          className="mb-3 text-sm text-aegis-muted"
-          data-testid="assessment-backfill-summary"
-        >
-          Assessment backfill (research-only): candidates=
-          {assessmentBackfillSummary.candidate_count}, persisted=
-          {assessmentBackfillSummary.persisted_count}, skipped=
-          {assessmentBackfillSummary.skipped_count}
-        </p>
-      ) : null}
+      <ResearchBackfillStatusSection
+        backfillSummary={backfillSummary}
+        assessmentBackfillSummary={assessmentBackfillSummary}
+      />
 
       {evidenceSummary ? (
         <ResearchEvidenceSummarySection

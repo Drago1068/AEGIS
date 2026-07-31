@@ -7,10 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 148 - NAS Live Verification of Phase 147 (draft)
+
+Ops evidence gate after Phase 147 coverage-confidence field. See
+[docs/architecture/decisions/0149-phase-148-nas-live-verify-phase-147.md](docs/architecture/decisions/0149-phase-148-nas-live-verify-phase-147.md).
+
+### Phase 147 - Evidence Summary Latest Coverage Confidence (draft)
+
+Surface top-level ``latest_coverage_confidence`` on evidence summary (keep coverage
+separate from probability). See
+[docs/architecture/decisions/0148-phase-147-evidence-summary-latest-coverage-confidence.md](docs/architecture/decisions/0148-phase-147-evidence-summary-latest-coverage-confidence.md).
+
 ### Phase 146 - NAS Live Verification of Phase 145
 
 Ops evidence gate: redeploy backend+frontend under lab TLS after Phase 145 scan-wide
-label counts. See
+label counts. Live verify passed 2026-07-30 (``112dcef``). See
 [docs/architecture/decisions/0147-phase-146-nas-live-verify-phase-145.md](docs/architecture/decisions/0147-phase-146-nas-live-verify-phase-145.md).
 
 #### Added

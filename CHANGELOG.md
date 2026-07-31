@@ -7,10 +7,36 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 142 - NAS Live Verification of Phase 141
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 141 panel-header extract. See
+[docs/architecture/decisions/0143-phase-142-nas-live-verify-phase-141.md](docs/architecture/decisions/0143-phase-142-nas-live-verify-phase-141.md).
+
+#### Added
+
+- ADR-0143: live verify requires frontend recreate for Phase 141; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 141 - Extract Research Assessment Panel Header
+
+Move panel header chrome into a presentational component (no behavior change). See
+[docs/architecture/decisions/0142-phase-141-extract-research-assessment-panel-header.md](docs/architecture/decisions/0142-phase-141-extract-research-assessment-panel-header.md).
+
+#### Added
+
+- ``ResearchAssessmentPanelHeader.tsx`` with ``data-testid="research-assessment-panel-header"``.
+
+#### Explicitly out of scope
+
+New product math, orders.
+
 ### Phase 140 - NAS Live Verification of Phase 139
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 139 backfill-status section
-extract. See
+extract. Live verify passed 2026-07-30 (``ae12b45``). See
 [docs/architecture/decisions/0141-phase-140-nas-live-verify-phase-139.md](docs/architecture/decisions/0141-phase-140-nas-live-verify-phase-139.md).
 
 #### Added

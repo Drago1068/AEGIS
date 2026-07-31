@@ -146,6 +146,7 @@ describe("ResearchAssessmentPanel", () => {
     render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={null} />);
 
     expect(screen.getAllByText(/research only/i).length).toBeGreaterThan(0);
+    expect(screen.getByTestId("research-assessment-panel-header")).toBeInTheDocument();
     expect(screen.getByTestId("research-assessment-action-toolbar")).toBeInTheDocument();
     expect(screen.getByTestId("toolbar-group-diagnostics")).toBeInTheDocument();
     expect(screen.getByTestId("toolbar-group-assessments")).toBeInTheDocument();

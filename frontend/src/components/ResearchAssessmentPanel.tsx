@@ -33,6 +33,7 @@ import {
 import { resolveOutcomeLabelHistoryLoadKind } from "./research-assessment-panel-helpers";
 import { ResearchAssessmentActionToolbar } from "./ResearchAssessmentActionToolbar";
 import { ResearchAssessmentHistorySection } from "./ResearchAssessmentHistorySection";
+import { ResearchAssessmentPanelHeader } from "./ResearchAssessmentPanelHeader";
 import { ResearchBackfillStatusSection } from "./ResearchBackfillStatusSection";
 import { ResearchCalibrationReadinessSection } from "./ResearchCalibrationReadinessSection";
 import { ResearchEvidenceSummarySection } from "./ResearchEvidenceSummarySection";
@@ -451,20 +452,7 @@ export function ResearchAssessmentPanel({
 
   return (
     <section className="rounded-lg border border-aegis-line bg-aegis-panel p-5 shadow-sm">
-      <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-aegis-warn">
-            Research only
-          </p>
-          <h2 className="text-lg font-semibold tracking-tight text-aegis-ink">
-            Research assessment
-          </h2>
-          <p className="text-sm text-aegis-muted">
-            Research heuristic from stored primary daily bars (on-demand or after a successful
-            ingest when configured). Not a probability, signal, or recommendation. Values come
-            from the API only — refresh latest to see post-ingest snapshots.
-          </p>
-        </div>
+      <ResearchAssessmentPanelHeader>
         <ResearchAssessmentActionToolbar
           isPending={isPending}
           activeOutcomeLabelAssessmentId={activeOutcomeLabelAssessmentId}
@@ -486,7 +474,7 @@ export function ResearchAssessmentPanel({
           onDownloadCalibrations={onDownloadCalibrations}
           onAssess={onAssess}
         />
-      </header>
+      </ResearchAssessmentPanelHeader>
 
       {error ? (
         <p className="mb-3 text-sm text-aegis-danger" role="alert">

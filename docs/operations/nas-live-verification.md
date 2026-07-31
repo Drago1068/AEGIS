@@ -150,7 +150,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 63 | Phase 136 frontend redeploy (Phase 135 extract evidence summary section) | Frontend recreated; section extract covered by unit tests |
 | 64 | Phase 138 frontend redeploy (Phase 137 extract latest assessment detail section) | Frontend recreated; section extract covered by unit tests |
 | 65 | Phase 140 frontend redeploy (Phase 139 extract backfill status banners) | Frontend recreated; section extract covered by unit tests |
-| 66 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 66 | Phase 142 frontend redeploy (Phase 141 extract panel header) | Frontend recreated; header extract covered by unit tests |
+| 67 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

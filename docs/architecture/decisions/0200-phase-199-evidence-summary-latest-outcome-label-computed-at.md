@@ -1,6 +1,6 @@
 # ADR-0200: Phase 199 Evidence Summary Latest Outcome Label Computed At
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

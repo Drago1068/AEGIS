@@ -213,6 +213,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "no label on the absolute newest assessment. Never invented."
         ),
     )
+    latest_outcome_label_computed_at: datetime | None = Field(
+        default=None,
+        description=(
+            "computed_at from latest_outcome_label when the latest assessment is labeled. "
+            "Null when unlabeled. Distinct from assessment latest_computed_at and "
+            "latest_calibration_computed_at. Never invented."
+        ),
+    )
     latest_calibration_id: int | None = Field(
         default=None,
         ge=1,

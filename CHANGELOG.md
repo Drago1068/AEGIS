@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 199 latest outcome label computed_at field. See
 [docs/architecture/decisions/0201-phase-200-nas-live-verify-phase-199.md](docs/architecture/decisions/0201-phase-200-nas-live-verify-phase-199.md).
 
-### Phase 199 - Evidence Summary Latest Outcome Label Computed At (draft)
+### Phase 199 - Evidence Summary Latest Outcome Label Computed At
 
 Surface top-level ``latest_outcome_label_computed_at`` on evidence summary. See
 [docs/architecture/decisions/0200-phase-199-evidence-summary-latest-outcome-label-computed-at.md](docs/architecture/decisions/0200-phase-199-evidence-summary-latest-outcome-label-computed-at.md).
+
+#### Added
+
+- ``latest_outcome_label_computed_at`` on evidence summary (+ export); from latest_outcome_label.
+- Console surfaces the field with ``data-testid="evidence-latest-outcome-label-computed-at"``.
+- NAS verify checklist item 95 for Phase 200.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 198 - NAS Live Verification of Phase 197
 

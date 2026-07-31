@@ -1,6 +1,6 @@
 # ADR-0112: Phase 111 Resolve Outcome-Label History Load Kind Helper
 
-- Status: Accepted (drafted; implement next)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -13,9 +13,9 @@ Phase 109 centralized the assessment id; load-kind resolution is the remaining d
 
 ### 1. Console
 
-Extract a small ``resolveOutcomeLabelHistoryLoadKind(assessmentId)`` (or equivalent local
-helper) used by ``onComputeOutcomeLabels`` and ``onBackfillOutcomeLabels``. Prefer reusing
-it anywhere the same ternary appears without changing behavior.
+Extract ``resolveOutcomeLabelHistoryLoadKind(assessmentId, loadKind, latestId)`` and use it from
+``onComputeOutcomeLabels``, ``onBackfillOutcomeLabels``, and ``onBackfillAssessments``.
+No behavior change.
 
 ### 2. Out of scope
 

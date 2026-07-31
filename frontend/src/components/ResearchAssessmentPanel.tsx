@@ -90,6 +90,15 @@ function formatLabelHorizonSummary(
     .join(" · ");
 }
 
+/** Prefer tracked load-kind; otherwise infer from whether assessment matches latest. */
+export function resolveOutcomeLabelHistoryLoadKind(
+  assessmentId: number,
+  loadKind: "latest" | "scan_labeled" | null,
+  latestId: number | null | undefined,
+): "latest" | "scan_labeled" {
+  return loadKind ?? (latestId != null && assessmentId === latestId ? "latest" : "scan_labeled");
+}
+
 /** Compact assessment history line from API payload only (Phase 28/61). */
 function formatAssessmentHistoryRow(row: ResearchAssessment): string {
   const index = row.components.research_index;
@@ -271,9 +280,11 @@ export function ResearchAssessmentPanel({
     if (assessmentId == null) {
       return;
     }
-    const loadKind =
-      outcomeLabelHistoryLoadKind ??
-      (latest?.id != null && assessmentId === latest.id ? "latest" : "scan_labeled");
+    const loadKind = resolveOutcomeLabelHistoryLoadKind(
+      assessmentId,
+      outcomeLabelHistoryLoadKind,
+      latest?.id,
+    );
     startTransition(async () => {
       setError(null);
       try {
@@ -295,9 +306,11 @@ export function ResearchAssessmentPanel({
         setBackfillSummary(summary);
         const assessmentId = activeOutcomeLabelAssessmentId;
         if (assessmentId != null) {
-          const loadKind =
-            outcomeLabelHistoryLoadKind ??
-            (latest?.id != null && assessmentId === latest.id ? "latest" : "scan_labeled");
+          const loadKind = resolveOutcomeLabelHistoryLoadKind(
+            assessmentId,
+            outcomeLabelHistoryLoadKind,
+            latest?.id,
+          );
           await loadOutcomeLabelHistory(assessmentId, loadKind);
         }
         await loadReadiness();
@@ -322,11 +335,11 @@ export function ResearchAssessmentPanel({
           setLatest(nextLatest);
           const labelAssessmentId = trackedLabelAssessmentId ?? nextLatest.id ?? null;
           if (labelAssessmentId != null) {
-            const loadKind =
-              trackedLoadKind ??
-              (nextLatest.id != null && labelAssessmentId === nextLatest.id
-                ? "latest"
-                : "scan_labeled");
+            const loadKind = resolveOutcomeLabelHistoryLoadKind(
+              labelAssessmentId,
+              trackedLoadKind,
+              nextLatest.id,
+            );
             await loadOutcomeLabelHistory(labelAssessmentId, loadKind);
           }
           if (nextLatest.id != null) {

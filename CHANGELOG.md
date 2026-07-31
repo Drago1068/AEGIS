@@ -28,7 +28,8 @@ change). See
 
 #### Added
 
-- Shared load-kind helper drafted (implement next).
+- ``resolveOutcomeLabelHistoryLoadKind`` used by compute, label-backfill refresh, and
+  assessment-backfill label refresh.
 
 #### Explicitly out of scope
 

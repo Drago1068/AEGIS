@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ResearchAssessmentPanel } from "./ResearchAssessmentPanel";
+import { ResearchAssessmentPanel, resolveOutcomeLabelHistoryLoadKind } from "./ResearchAssessmentPanel";
 
 vi.mock("@/lib/api-client", async () => {
   const actual = await vi.importActual<typeof import("@/lib/api-client")>("@/lib/api-client");
@@ -647,7 +647,11 @@ describe("ResearchAssessmentPanel", () => {
       );
     });
     vi.mocked(downloadOutcomeLabels).mockClear();
-    fireEvent.click(screen.getByRole("button", { name: /download outcome labels json/i }));
+    const downloadBtn = screen.getByTestId("download-outcome-labels");
+    await waitFor(() => {
+      expect(downloadBtn).not.toBeDisabled();
+    });
+    fireEvent.click(downloadBtn);
 
     await waitFor(() => {
       expect(downloadOutcomeLabels).toHaveBeenCalledWith(
@@ -852,7 +856,11 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
     ]);
-    fireEvent.click(screen.getByTestId("compute-outcome-labels"));
+    const computeBtn = screen.getByTestId("compute-outcome-labels");
+    await waitFor(() => {
+      expect(computeBtn).not.toBeDisabled();
+    });
+    fireEvent.click(computeBtn);
 
     await waitFor(() => {
       expect(createOutcomeLabels).toHaveBeenCalledWith(
@@ -1390,5 +1398,22 @@ describe("ResearchAssessmentPanel", () => {
     const componentSourceRow = screen.getByText(/component source/i).closest("div");
     expect(componentSourceRow).toHaveTextContent("alpha_vantage");
     expect(screen.getByText(/0\.9000 \(18\/20 comparable\)/)).toBeInTheDocument();
+  });
+});
+
+describe("resolveOutcomeLabelHistoryLoadKind", () => {
+  it("preserves an explicit tracked load kind", () => {
+    expect(resolveOutcomeLabelHistoryLoadKind(3, "scan_labeled", 4)).toBe("scan_labeled");
+    expect(resolveOutcomeLabelHistoryLoadKind(4, "latest", 4)).toBe("latest");
+  });
+
+  it("infers latest when assessment matches latest id", () => {
+    expect(resolveOutcomeLabelHistoryLoadKind(4, null, 4)).toBe("latest");
+  });
+
+  it("infers scan_labeled when assessment differs or latest is missing", () => {
+    expect(resolveOutcomeLabelHistoryLoadKind(3, null, 4)).toBe("scan_labeled");
+    expect(resolveOutcomeLabelHistoryLoadKind(3, null, null)).toBe("scan_labeled");
+    expect(resolveOutcomeLabelHistoryLoadKind(3, null, undefined)).toBe("scan_labeled");
   });
 });

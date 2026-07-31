@@ -31,13 +31,9 @@ import {
 } from "@/lib/api-client";
 
 import {
-  formatCalibrationActionAriaLabel,
-  formatCalibrationActionIdChip,
-  formatOutcomeLabelActionAriaLabel,
-  formatOutcomeLabelActionIdChip,
-  formatOutcomeLabelBackfillAriaLabel,
   resolveOutcomeLabelHistoryLoadKind,
 } from "./research-assessment-panel-helpers";
+import { ResearchAssessmentActionToolbar } from "./ResearchAssessmentActionToolbar";
 
 type ResearchAssessmentPanelProps = {
   symbol: string;
@@ -527,199 +523,27 @@ export function ResearchAssessmentPanel({
             from the API only — refresh latest to see post-ingest snapshots.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={onRefreshLatest}
-            disabled={isPending}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Refresh latest
-          </button>
-          <button
-            type="button"
-            onClick={onRefreshReadiness}
-            disabled={isPending}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Refresh readiness
-          </button>
-          <button
-            type="button"
-            onClick={onDownloadReadiness}
-            disabled={isPending}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Download readiness JSON
-          </button>
-          <button
-            type="button"
-            onClick={onRefreshEvidenceSummary}
-            disabled={isPending}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Refresh evidence summary
-          </button>
-          <button
-            type="button"
-            onClick={onDownloadEvidenceSummary}
-            disabled={isPending}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Download evidence JSON
-          </button>
-          <button
-            type="button"
-            onClick={onDownloadAssessments}
-            disabled={isPending}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Download assessments JSON
-          </button>
-          <button
-            type="button"
-            onClick={onBackfillAssessments}
-            disabled={isPending}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Backfill assessments
-          </button>
-          <button
-            type="button"
-            onClick={onComputeOutcomeLabels}
-            disabled={isPending || activeOutcomeLabelAssessmentId == null}
-            data-testid="compute-outcome-labels"
-            aria-label={formatOutcomeLabelActionAriaLabel(
-              "Compute outcome labels",
-              activeOutcomeLabelAssessmentId,
-              outcomeLabelHistoryLoadKind,
-            )}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Compute outcome labels
-            {activeOutcomeLabelAssessmentId != null ? (
-              <span
-                className="ml-1 font-mono text-xs text-aegis-muted"
-                data-testid="compute-outcome-labels-id-chip"
-              >
-                {formatOutcomeLabelActionIdChip(
-                  activeOutcomeLabelAssessmentId,
-                  outcomeLabelHistoryLoadKind,
-                )}
-              </span>
-            ) : null}
-          </button>
-          <button
-            type="button"
-            onClick={onBackfillOutcomeLabels}
-            disabled={isPending}
-            data-testid="backfill-outcome-labels"
-            aria-label={formatOutcomeLabelBackfillAriaLabel(
-              activeOutcomeLabelAssessmentId,
-              outcomeLabelHistoryLoadKind,
-            )}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Backfill outcome labels
-            {activeOutcomeLabelAssessmentId != null ? (
-              <span
-                className="ml-1 font-mono text-xs text-aegis-muted"
-                data-testid="backfill-outcome-labels-id-chip"
-              >
-                {formatOutcomeLabelActionIdChip(
-                  activeOutcomeLabelAssessmentId,
-                  outcomeLabelHistoryLoadKind,
-                )}
-              </span>
-            ) : null}
-          </button>
-          <button
-            type="button"
-            onClick={onDownloadOutcomeLabels}
-            disabled={isPending || activeOutcomeLabelAssessmentId == null}
-            data-testid="download-outcome-labels"
-            aria-label={formatOutcomeLabelActionAriaLabel(
-              "Download outcome labels JSON",
-              activeOutcomeLabelAssessmentId,
-              outcomeLabelHistoryLoadKind,
-            )}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Download outcome labels JSON
-            {activeOutcomeLabelAssessmentId != null ? (
-              <span
-                className="ml-1 font-mono text-xs text-aegis-muted"
-                data-testid="download-outcome-labels-id-chip"
-              >
-                {formatOutcomeLabelActionIdChip(
-                  activeOutcomeLabelAssessmentId,
-                  outcomeLabelHistoryLoadKind,
-                )}
-              </span>
-            ) : null}
-          </button>
-          <button
-            type="button"
-            onClick={onComputeCalibration}
-            disabled={isPending || latest?.id == null || readiness?.status !== "ready"}
-            data-testid="compute-calibration"
-            aria-label={formatCalibrationActionAriaLabel(
-              "Compute calibration",
-              latest?.id ?? null,
-            )}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Compute calibration
-            {latest?.id != null ? (
-              <span
-                className="ml-1 font-mono text-xs text-aegis-muted"
-                data-testid="compute-calibration-id-chip"
-              >
-                {formatCalibrationActionIdChip(latest.id)}
-              </span>
-            ) : null}
-          </button>
-          <button
-            type="button"
-            onClick={onDownloadCalibrations}
-            disabled={isPending || latest?.id == null}
-            data-testid="download-calibrations"
-            aria-label={formatCalibrationActionAriaLabel(
-              "Download calibrations JSON",
-              latest?.id ?? null,
-            )}
-            className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
-          >
-            Download calibrations JSON
-            {latest?.id != null ? (
-              <span
-                className="ml-1 font-mono text-xs text-aegis-muted"
-                data-testid="download-calibrations-id-chip"
-              >
-                {formatCalibrationActionIdChip(latest.id)}
-              </span>
-            ) : null}
-          </button>
-          <button
-            type="button"
-            onClick={onAssess}
-            disabled={isPending}
-            className="rounded bg-aegis-ink px-4 py-2 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-60"
-          >
-            {isPending ? "Working..." : "Run assessment"}
-          </button>
-        </div>
-        {outcomeLabelHistoryAssessmentId != null &&
-        latest?.id != null &&
-        outcomeLabelHistoryAssessmentId !== latest.id ? (
-          <p
-            className="basis-full text-xs text-aegis-muted"
-            data-testid="calibration-controls-latest-note"
-          >
-            Calibration actions use latest assessment {latest.id} (panel labels are for{" "}
-            {outcomeLabelHistoryAssessmentId}).
-          </p>
-        ) : null}
+        <ResearchAssessmentActionToolbar
+          isPending={isPending}
+          activeOutcomeLabelAssessmentId={activeOutcomeLabelAssessmentId}
+          outcomeLabelHistoryLoadKind={outcomeLabelHistoryLoadKind}
+          outcomeLabelHistoryAssessmentId={outcomeLabelHistoryAssessmentId}
+          latestId={latest?.id ?? null}
+          readinessStatus={readiness?.status}
+          onRefreshLatest={onRefreshLatest}
+          onRefreshReadiness={onRefreshReadiness}
+          onDownloadReadiness={onDownloadReadiness}
+          onRefreshEvidenceSummary={onRefreshEvidenceSummary}
+          onDownloadEvidenceSummary={onDownloadEvidenceSummary}
+          onDownloadAssessments={onDownloadAssessments}
+          onBackfillAssessments={onBackfillAssessments}
+          onComputeOutcomeLabels={onComputeOutcomeLabels}
+          onBackfillOutcomeLabels={onBackfillOutcomeLabels}
+          onDownloadOutcomeLabels={onDownloadOutcomeLabels}
+          onComputeCalibration={onComputeCalibration}
+          onDownloadCalibrations={onDownloadCalibrations}
+          onAssess={onAssess}
+        />
       </header>
 
       {error ? (

@@ -29,7 +29,7 @@ See
 
 #### Added
 
-- Action toolbar extract drafted (implement next).
+- ``ResearchAssessmentActionToolbar.tsx`` with ``data-testid="research-assessment-action-toolbar"``.
 
 #### Explicitly out of scope
 

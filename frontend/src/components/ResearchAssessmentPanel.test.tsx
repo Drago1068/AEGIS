@@ -146,6 +146,7 @@ describe("ResearchAssessmentPanel", () => {
     render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={null} />);
 
     expect(screen.getAllByText(/research only/i).length).toBeGreaterThan(0);
+    expect(screen.getByTestId("research-assessment-action-toolbar")).toBeInTheDocument();
     expect(screen.getByText(/no research assessment stored yet/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /compute calibration/i })).toBeDisabled();
   });

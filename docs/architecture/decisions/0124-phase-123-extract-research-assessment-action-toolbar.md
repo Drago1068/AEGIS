@@ -1,6 +1,6 @@
 # ADR-0124: Phase 123 Extract Research Assessment Action Toolbar
 
-- Status: Accepted (drafted; implement next)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -14,10 +14,9 @@ isolating control wiring.
 
 ### 1. Console
 
-Extract the header action button cluster into a dedicated component such as
-``ResearchAssessmentActionToolbar.tsx`` (props: pending flag, ids, load-kind, readiness
-status, and click handlers). Keep helpers in ``research-assessment-panel-helpers.ts``.
-No behavior or API changes.
+Extract the header action button cluster into ``ResearchAssessmentActionToolbar.tsx``
+(props: pending flag, ids, load-kind, readiness status, and click handlers). Keep helpers
+in ``research-assessment-panel-helpers.ts``. No behavior or API changes.
 
 ### 2. Out of scope
 

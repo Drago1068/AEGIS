@@ -136,7 +136,8 @@ function Write-VerifyChecklist {
     Write-Host " 96. Authenticated evidence-summary includes Phase 201 latest_outcome_label_method_id (Phase 202)"
     Write-Host " 97. Authenticated evidence-summary includes Phase 203 latest_outcome_label_method_version (Phase 204)"
     Write-Host " 98. Authenticated evidence-summary includes Phase 205 latest_outcome_label_schema_version (Phase 206)"
-    Write-Host " 99. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 99. Authenticated evidence-summary includes Phase 207 latest_outcome_label_state (Phase 208)"
+    Write-Host "100. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1032,6 +1033,13 @@ try {
         $labelSchemaVersion = $summary.latest_outcome_label_schema_version
         $labelSchemaPart = if ($null -eq $labelSchemaVersion -or $labelSchemaVersion -eq "") { "null" } else { [string]$labelSchemaVersion }
         Write-Host "OK  Phase 206 latest_outcome_label_schema_version=$labelSchemaPart"
+        # Phase 208: latest_outcome_label_state from Phase 207 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_outcome_label_state")) {
+            throw "evidence-summary missing latest_outcome_label_state (Phase 207/208)"
+        }
+        $labelState = $summary.latest_outcome_label_state
+        $labelStatePart = if ($null -eq $labelState -or $labelState -eq "") { "null" } else { [string]$labelState }
+        Write-Host "OK  Phase 208 latest_outcome_label_state=$labelStatePart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1171,6 +1179,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_outcome_label_schema_version")) {
             throw "evidence-summary/export missing latest_outcome_label_schema_version (Phase 205/206)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_outcome_label_state")) {
+            throw "evidence-summary/export missing latest_outcome_label_state (Phase 207/208)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

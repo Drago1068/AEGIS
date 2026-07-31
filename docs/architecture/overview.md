@@ -87,7 +87,9 @@ Phase 140 (NAS live verify of Phase 139), Phase 141 (extract research assessment
 header), Phase 142 (NAS live verify of Phase 141), Phase 143 (extract research assessment
 error alert), Phase 144 (NAS live verify of Phase 143), Phase 145 (evidence summary
 scan-wide label counts), Phase 146 (NAS live verify of Phase 145), Phase 147 (evidence
-summary latest coverage confidence), and Phase 148 (NAS live verify of Phase 147).
+summary latest coverage confidence), Phase 148 (NAS live verify of Phase 147), Phase 149
+(draft: evidence summary latest research index), and Phase 150 (draft: NAS live verify of
+Phase 149).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -399,6 +401,10 @@ Phase 147 surfaces top-level ``latest_coverage_confidence`` on evidence summary 
 [decisions/0148-phase-147-evidence-summary-latest-coverage-confidence.md](decisions/0148-phase-147-evidence-summary-latest-coverage-confidence.md)).
 Phase 148 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0149-phase-148-nas-live-verify-phase-147.md](decisions/0149-phase-148-nas-live-verify-phase-147.md)).
+Phase 149 (draft) surfaces top-level ``latest_research_index`` on evidence summary (see
+[decisions/0150-phase-149-evidence-summary-latest-research-index.md](decisions/0150-phase-149-evidence-summary-latest-research-index.md)).
+Phase 150 (draft) live-verifies that revision (see
+[decisions/0151-phase-150-nas-live-verify-phase-149.md](decisions/0151-phase-150-nas-live-verify-phase-149.md)).
 
 ## System context
 

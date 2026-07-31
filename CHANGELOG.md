@@ -7,10 +7,20 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 150 - NAS Live Verification of Phase 149 (draft)
+
+Ops evidence gate after Phase 149 latest research index field. See
+[docs/architecture/decisions/0151-phase-150-nas-live-verify-phase-149.md](docs/architecture/decisions/0151-phase-150-nas-live-verify-phase-149.md).
+
+### Phase 149 - Evidence Summary Latest Research Index (draft)
+
+Surface top-level ``latest_research_index`` on evidence summary. See
+[docs/architecture/decisions/0150-phase-149-evidence-summary-latest-research-index.md](docs/architecture/decisions/0150-phase-149-evidence-summary-latest-research-index.md).
+
 ### Phase 148 - NAS Live Verification of Phase 147
 
 Ops evidence gate: redeploy backend+frontend under lab TLS after Phase 147 coverage-confidence
-field. See
+field. Live verify passed 2026-07-30 (``cab03a4``). See
 [docs/architecture/decisions/0149-phase-148-nas-live-verify-phase-147.md](docs/architecture/decisions/0149-phase-148-nas-live-verify-phase-147.md).
 
 #### Added

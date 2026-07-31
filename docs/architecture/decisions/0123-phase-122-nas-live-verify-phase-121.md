@@ -1,6 +1,6 @@
 # ADR-0123: Phase 122 NAS Live Verification of Phase 121
 
-- Status: Accepted (pending Phase 121 + live evidence)
+- Status: Accepted (live verified 2026-07-30; frontend recreate of ``b0cf94d``)
 - Date: 2026-07-30
 
 ## Context
@@ -29,7 +29,7 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 121 is on HEAD: git archive → NAS; rebuild frontend TLS; then:
+# Deploy HEAD frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
 ```
 

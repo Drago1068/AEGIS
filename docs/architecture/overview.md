@@ -73,7 +73,9 @@ load kind), Phase 114 (NAS live verify of Phase 113), Phase 115 (extract outcome
 panel helpers module), Phase 116 (NAS live verify of Phase 115), Phase 117 (outcome-label
 action id chip includes load kind), Phase 118 (NAS live verify of Phase 117), Phase 119
 (calibration action chips name latest), Phase 120 (NAS live verify of Phase 119), Phase 121
-(outcome-label backfill names refresh target), and Phase 122 (NAS live verify of Phase 121).
+(outcome-label backfill names refresh target), Phase 122 (NAS live verify of Phase 121),
+Phase 123 (extract research assessment action toolbar), and Phase 124 (NAS live verify of
+Phase 123).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see

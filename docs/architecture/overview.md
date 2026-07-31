@@ -324,6 +324,10 @@ Phase 117 adds load-kind to outcome-label action id chips (see
 [decisions/0118-phase-117-outcome-label-action-id-chip-load-kind.md](decisions/0118-phase-117-outcome-label-action-id-chip-load-kind.md)).
 Phase 118 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0119-phase-118-nas-live-verify-phase-117.md](decisions/0119-phase-118-nas-live-verify-phase-117.md)).
+Phase 119 names calibration action chips/aria with explicit latest (see
+[decisions/0120-phase-119-calibration-action-chips-name-latest.md](decisions/0120-phase-119-calibration-action-chips-name-latest.md)).
+Phase 120 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0121-phase-120-nas-live-verify-phase-119.md](decisions/0121-phase-120-nas-live-verify-phase-119.md)).
 
 ## System context
 

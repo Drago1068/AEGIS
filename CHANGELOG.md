@@ -7,10 +7,41 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 216 - NAS Live Verification of Phase 215 (draft)
+### Phase 218 - NAS Live Verification of Phase 217 (draft)
 
-Ops evidence gate after Phase 215 most recent labeled outcome label method id field. See
+Ops evidence gate after Phase 217 most recent labeled outcome label method version field. See
+[docs/architecture/decisions/0219-phase-218-nas-live-verify-phase-217.md](docs/architecture/decisions/0219-phase-218-nas-live-verify-phase-217.md).
+
+### Phase 217 - Evidence Summary Most Recent Labeled Outcome Label Method Version
+
+Surface top-level ``most_recent_labeled_outcome_label_method_version`` on evidence summary for
+scan-labeled provenance. See
+[docs/architecture/decisions/0218-phase-217-evidence-summary-most-recent-labeled-outcome-label-method-version.md](docs/architecture/decisions/0218-phase-217-evidence-summary-most-recent-labeled-outcome-label-method-version.md).
+
+#### Added
+
+- ``most_recent_labeled_outcome_label_method_version`` on evidence summary (+ export); from scan-labeled label.
+- Console surfaces the field with ``data-testid="evidence-most-recent-labeled-outcome-label-method-version"``.
+- NAS verify checklist item 104 for Phase 218.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 216 - NAS Live Verification of Phase 215
+
+Ops evidence gate after Phase 215 most recent labeled outcome label method id field. Live verify
+passed 2026-07-31 (``058f0c5``; AAPL ``most_recent_labeled_outcome_label_method_id=forward_total_return_v1``
+with ``most_recent_labeled_outcome_label_id=82``). See
 [docs/architecture/decisions/0217-phase-216-nas-live-verify-phase-215.md](docs/architecture/decisions/0217-phase-216-nas-live-verify-phase-215.md).
+
+#### Added
+
+- ADR-0217: live verify requires backend+frontend recreate for Phase 215; checklist item 103.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 215 - Evidence Summary Most Recent Labeled Outcome Label Method Id
 

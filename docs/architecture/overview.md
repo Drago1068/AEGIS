@@ -581,10 +581,10 @@ absolute latest row can be labeled with stored forward bars (see
 [decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md](decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md)).
 Phase 232 live-verified that diagnostic (see
 [decisions/0233-phase-232-nas-live-verify-phase-231.md](decisions/0233-phase-232-nas-live-verify-phase-231.md)).
-Phase 233 (draft) proposes ``latest_assessment_label_block_reason`` for the fail-closed gate
-code when not ready (see
+Phase 233 surfaces ``latest_assessment_label_block_reason`` for the fail-closed gate code when
+not ready (see
 [decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md](decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md)).
-Phase 234 (draft) would live-verify that reason field (see
+Phase 234 (draft) live-verifies that reason field (see
 [decisions/0235-phase-234-nas-live-verify-phase-233.md](decisions/0235-phase-234-nas-live-verify-phase-233.md)).
 
 ## System context

@@ -992,6 +992,11 @@ export interface ResearchEvidenceSummary {
    * Null when no latest assessment. Never invented.
    */
   latest_assessment_is_label_ready: boolean | null;
+  /**
+   * Fail-closed OutcomeLabelReason when latest is not label-ready.
+   * Null when no assessment or when ready. Never invented.
+   */
+  latest_assessment_label_block_reason: string | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

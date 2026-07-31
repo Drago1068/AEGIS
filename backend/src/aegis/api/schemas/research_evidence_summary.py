@@ -184,6 +184,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "assessment. Never invented."
         ),
     )
+    latest_assessment_label_block_reason: str | None = Field(
+        default=None,
+        description=(
+            "Fail-closed OutcomeLabelReason code when latest assessment is not label-ready "
+            "(no_as_of_bar | insufficient_forward_bars). Null when no latest assessment or "
+            "when label-ready. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

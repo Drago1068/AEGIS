@@ -16,7 +16,11 @@ from aegis.api.dependencies import (
 from aegis.api.main import create_app
 from aegis.config.settings import Settings
 from aegis.domain.research_assessment import ResearchAssessmentSnapshotData
-from aegis.domain.research_outcome_labels import LABEL_METHOD_ID, OutcomeLabelData
+from aegis.domain.research_outcome_labels import (
+    LABEL_METHOD_ID,
+    OutcomeLabelData,
+    OutcomeLabelReason,
+)
 from aegis.domain.research_probability_calibration import (
     CALIBRATION_METHOD_ID,
     CalibrationReadinessData,
@@ -133,9 +137,11 @@ class _FakeOutcomeLabelService:
         listed: list[OutcomeLabelData] | None = None,
         *,
         label_ready: bool = False,
+        label_block_reason: str | None = "insufficient_forward_bars",
     ) -> None:
         self._listed = listed or []
         self._label_ready = label_ready
+        self._label_block_reason = None if label_ready else label_block_reason
 
     async def list_labels_for_assessment(
         self, symbol: str, assessment_snapshot_id: int, limit: int
@@ -161,8 +167,21 @@ class _FakeOutcomeLabelService:
     async def is_assessment_label_ready(
         self, symbol: str, snapshot: ResearchAssessmentSnapshotData
     ) -> bool:
+        ready, _reason = await self.label_readiness_for_assessment(symbol, snapshot)
+        return ready
+
+    async def label_readiness_for_assessment(
+        self, symbol: str, snapshot: ResearchAssessmentSnapshotData
+    ) -> tuple[bool, OutcomeLabelReason | None]:
         _ = symbol, snapshot
-        return self._label_ready
+        if self._label_ready:
+            return True, None
+        reason = (
+            OutcomeLabelReason(self._label_block_reason)
+            if self._label_block_reason is not None
+            else OutcomeLabelReason.INSUFFICIENT_FORWARD_BARS
+        )
+        return False, reason
 
 
 class _FakeCalibrationService:
@@ -200,6 +219,7 @@ def _client(
     calibrations: list[ProbabilityCalibrationData] | None = None,
     readiness: CalibrationReadinessData | None = None,
     label_ready: bool = False,
+    label_block_reason: str | None = "insufficient_forward_bars",
 ) -> AsyncClient:
     app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
     app.dependency_overrides[require_operator] = _operator
@@ -207,7 +227,7 @@ def _client(
         assessments
     )
     app.dependency_overrides[get_outcome_label_service] = lambda: _FakeOutcomeLabelService(
-        labels, label_ready=label_ready
+        labels, label_ready=label_ready, label_block_reason=label_block_reason
     )
     app.dependency_overrides[get_research_calibration_service] = lambda: _FakeCalibrationService(
         readiness=readiness or _readiness(),
@@ -266,6 +286,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["most_recent_labeled_outcome_label_as_of_trading_date"] is None
     assert body["scan_labeled_freshness_lag_trading_days"] is None
     assert body["latest_assessment_is_label_ready"] is None
+    assert body["latest_assessment_label_block_reason"] is None
     assert body["latest_coverage_confidence"] is None
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
@@ -318,6 +339,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_assessment"]["id"] == 1
     assert body["latest_assessment"]["probability_confidence"] is None
     assert body["latest_assessment_is_label_ready"] is True
+    assert body["latest_assessment_label_block_reason"] is None
     assert body["latest_coverage_confidence"] == 0.95
     assert body["latest_research_index"] == 0.46
     assert body["latest_as_of_trading_date"] == "2024-01-26"
@@ -428,6 +450,22 @@ async def test_evidence_summary_latest_assessment_is_label_ready_false() -> None
     assert body["latest_assessment_id"] == 1
     assert body["latest_outcome_label_id"] is None
     assert body["latest_assessment_is_label_ready"] is False
+    assert body["latest_assessment_label_block_reason"] == "insufficient_forward_bars"
+
+
+async def test_evidence_summary_latest_assessment_label_block_reason_no_as_of() -> None:
+    async with _client(
+        assessments=[_snapshot()],
+        labels=[],
+        label_ready=False,
+        label_block_reason="no_as_of_bar",
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["latest_assessment_is_label_ready"] is False
+    assert body["latest_assessment_label_block_reason"] == "no_as_of_bar"
 
 
 async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:

@@ -138,7 +138,8 @@ print_checklist() {
   echo "109. Authenticated evidence-summary includes Phase 227 most_recent_labeled_outcome_label_as_of_trading_date (Phase 228)"
   echo "110. Authenticated evidence-summary includes Phase 229 scan_labeled_freshness_lag_trading_days (Phase 230)"
   echo "111. Authenticated evidence-summary includes Phase 231 latest_assessment_is_label_ready (Phase 232)"
-  echo "112. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo "112. Authenticated evidence-summary includes Phase 233 latest_assessment_label_block_reason (Phase 234)"
+  echo "113. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -926,6 +927,12 @@ if ! grep -q '"latest_assessment_is_label_ready"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 232 latest_assessment_is_label_ready field present"
+# Phase 234: latest_assessment_label_block_reason from Phase 233 (null OK when ready / no assessment).
+if ! grep -q '"latest_assessment_label_block_reason"' "${summary_body}"; then
+  echo "evidence-summary missing latest_assessment_label_block_reason (Phase 233/234)" >&2
+  exit 1
+fi
+echo "OK  Phase 234 latest_assessment_label_block_reason field present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -1053,6 +1060,10 @@ if ! grep -q '"scan_labeled_freshness_lag_trading_days"' "${export_body}"; then
 fi
 if ! grep -q '"latest_assessment_is_label_ready"' "${export_body}"; then
   echo "evidence-summary/export missing latest_assessment_is_label_ready (Phase 231/232)" >&2
+  exit 1
+fi
+if ! grep -q '"latest_assessment_label_block_reason"' "${export_body}"; then
+  echo "evidence-summary/export missing latest_assessment_label_block_reason (Phase 233/234)" >&2
   exit 1
 fi
 echo "OK  evidence-summary/export attachment state=research_only"

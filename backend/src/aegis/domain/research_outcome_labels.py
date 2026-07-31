@@ -301,6 +301,30 @@ def has_stored_forward_horizon_close(
     return end_date in closes_by_date
 
 
+def snapshot_label_block_reason(
+    snapshot: ResearchAssessmentSnapshotData,
+    bars: Sequence[ResearchBarInput],
+    *,
+    calendar_name: str,
+    horizons: tuple[int, ...] = FORWARD_HORIZON_SESSIONS,
+) -> OutcomeLabelReason | None:
+    """Return the fail-closed label gate reason for ``snapshot``, or None when ready.
+
+    Aligns with :func:`compute_forward_total_return_labels` / :func:`is_snapshot_label_ready`
+    (ADR-0234). Never invents closes.
+    """
+
+    bar_source = _resolve_label_bar_source(snapshot, bars)
+    closes_by_date = _index_closes(list(bars), bar_source)
+    if snapshot.as_of_trading_date not in closes_by_date:
+        return OutcomeLabelReason.NO_AS_OF_BAR
+    for horizon in horizons:
+        end_date = forward_horizon_end_date(snapshot.as_of_trading_date, horizon, calendar_name)
+        if end_date not in closes_by_date:
+            return OutcomeLabelReason.INSUFFICIENT_FORWARD_BARS
+    return None
+
+
 def is_snapshot_label_ready(
     snapshot: ResearchAssessmentSnapshotData,
     bars: Sequence[ResearchBarInput],
@@ -315,15 +339,15 @@ def is_snapshot_label_ready(
     as-of or forward-horizon closes.
     """
 
-    bar_source = _resolve_label_bar_source(snapshot, bars)
-    closes_by_date = _index_closes(list(bars), bar_source)
-    if snapshot.as_of_trading_date not in closes_by_date:
-        return False
-    for horizon in horizons:
-        end_date = forward_horizon_end_date(snapshot.as_of_trading_date, horizon, calendar_name)
-        if end_date not in closes_by_date:
-            return False
-    return True
+    return (
+        snapshot_label_block_reason(
+            snapshot,
+            bars,
+            calendar_name=calendar_name,
+            horizons=horizons,
+        )
+        is None
+    )
 
 
 class OutcomeLabelService:
@@ -373,12 +397,21 @@ class OutcomeLabelService:
     ) -> bool:
         """Return whether ``snapshot`` has stored forward closes needed to label (ADR-0232)."""
 
+        ready, _reason = await self.label_readiness_for_assessment(symbol, snapshot)
+        return ready
+
+    async def label_readiness_for_assessment(
+        self, symbol: str, snapshot: ResearchAssessmentSnapshotData
+    ) -> tuple[bool, OutcomeLabelReason | None]:
+        """Return ``(ready, block_reason)`` using stored bars (ADR-0232 / ADR-0234)."""
+
         bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
-        return is_snapshot_label_ready(
+        reason = snapshot_label_block_reason(
             snapshot,
             bars,
             calendar_name=self._calendar_name,
         )
+        return reason is None, reason
 
     async def assessment_ids_with_labels(
         self,

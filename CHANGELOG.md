@@ -12,11 +12,22 @@ delivery workflow).
 Ops evidence gate after Phase 233 latest-assessment label block reason. See
 [docs/architecture/decisions/0235-phase-234-nas-live-verify-phase-233.md](docs/architecture/decisions/0235-phase-234-nas-live-verify-phase-233.md).
 
-### Phase 233 - Evidence Summary Latest Assessment Label Block Reason (draft)
+### Phase 233 - Evidence Summary Latest Assessment Label Block Reason
 
 Fail-closed reason code when latest assessment is not label-ready (aligned with
 ``OutcomeLabelReason``). See
 [docs/architecture/decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md](docs/architecture/decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md).
+
+#### Added
+
+- ``latest_assessment_label_block_reason`` on evidence summary (+ export).
+- ``snapshot_label_block_reason`` + ``label_readiness_for_assessment`` domain helpers.
+- Console ``data-testid="evidence-latest-assessment-label-block-reason"``.
+- NAS verify checklist item 112 for Phase 234.
+
+#### Explicitly out of scope
+
+``already_labeled`` reason, new scoring math, orders, UI structural extracts.
 
 ### Phase 232 - NAS Live Verification of Phase 231
 

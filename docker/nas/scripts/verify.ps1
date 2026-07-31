@@ -149,7 +149,8 @@ function Write-VerifyChecklist {
     Write-Host "109. Authenticated evidence-summary includes Phase 227 most_recent_labeled_outcome_label_as_of_trading_date (Phase 228)"
     Write-Host "110. Authenticated evidence-summary includes Phase 229 scan_labeled_freshness_lag_trading_days (Phase 230)"
     Write-Host "111. Authenticated evidence-summary includes Phase 231 latest_assessment_is_label_ready (Phase 232)"
-    Write-Host "112. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "112. Authenticated evidence-summary includes Phase 233 latest_assessment_label_block_reason (Phase 234)"
+    Write-Host "113. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1137,6 +1138,13 @@ try {
         # Do not treat $false as empty: in PowerShell `$false -eq ""` is $true.
         $labelReadyPart = if ($null -eq $labelReady) { "null" } else { [string]$labelReady }
         Write-Host "OK  Phase 232 latest_assessment_is_label_ready=$labelReadyPart"
+        # Phase 234: latest_assessment_label_block_reason from Phase 233 (null OK when ready / no assessment).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_assessment_label_block_reason")) {
+            throw "evidence-summary missing latest_assessment_label_block_reason (Phase 233/234)"
+        }
+        $blockReason = $summary.latest_assessment_label_block_reason
+        $blockReasonPart = if ($null -eq $blockReason -or $blockReason -eq "") { "null" } else { [string]$blockReason }
+        Write-Host "OK  Phase 234 latest_assessment_label_block_reason=$blockReasonPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1315,6 +1323,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_assessment_is_label_ready")) {
             throw "evidence-summary/export missing latest_assessment_is_label_ready (Phase 231/232)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_assessment_label_block_reason")) {
+            throw "evidence-summary/export missing latest_assessment_label_block_reason (Phase 233/234)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

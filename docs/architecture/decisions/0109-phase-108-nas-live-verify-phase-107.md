@@ -1,6 +1,6 @@
 # ADR-0109: Phase 108 NAS Live Verification of Phase 107
 
-- Status: Accepted (pending Phase 107 + live evidence)
+- Status: Accepted (live verified 2026-07-30; frontend recreate of ``0979a9c``)
 - Date: 2026-07-30
 
 ## Context
@@ -29,7 +29,7 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 107 is on HEAD: git archive → NAS; rebuild frontend TLS; then:
+# Deploy HEAD frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
 ```
 

@@ -263,8 +263,11 @@ export function ResearchAssessmentPanel({
     });
   }
 
+  const activeOutcomeLabelAssessmentId =
+    outcomeLabelHistoryAssessmentId ?? latest?.id ?? null;
+
   function onComputeOutcomeLabels() {
-    const assessmentId = outcomeLabelHistoryAssessmentId ?? latest?.id ?? null;
+    const assessmentId = activeOutcomeLabelAssessmentId;
     if (assessmentId == null) {
       return;
     }
@@ -290,7 +293,7 @@ export function ResearchAssessmentPanel({
       try {
         const summary = await backfillOutcomeLabels(baseUrl, symbol, 100);
         setBackfillSummary(summary);
-        const assessmentId = outcomeLabelHistoryAssessmentId ?? latest?.id ?? null;
+        const assessmentId = activeOutcomeLabelAssessmentId;
         if (assessmentId != null) {
           const loadKind =
             outcomeLabelHistoryLoadKind ??
@@ -343,7 +346,7 @@ export function ResearchAssessmentPanel({
   }
 
   function onDownloadOutcomeLabels() {
-    const assessmentId = outcomeLabelHistoryAssessmentId ?? latest?.id ?? null;
+    const assessmentId = activeOutcomeLabelAssessmentId;
     if (assessmentId == null) {
       return;
     }
@@ -494,9 +497,6 @@ export function ResearchAssessmentPanel({
       }
     });
   }
-
-  const activeOutcomeLabelAssessmentId =
-    outcomeLabelHistoryAssessmentId ?? latest?.id ?? null;
 
   return (
     <section className="rounded-lg border border-aegis-line bg-aegis-panel p-5 shadow-sm">

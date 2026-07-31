@@ -65,8 +65,9 @@ assessment id), Phase 100 (NAS live verify of Phase 99), Phase 101 (compute cali
 names latest assessment id), and Phase 102 (NAS live verify of Phase 101). Phase 103
 (calibration controls note when scan-labeled differs), Phase 104 (NAS live verify of
 Phase 103), Phase 105 (load labels for latest), and Phase 106 (NAS live verify of Phase 105).
-Phase 107 (rename active outcome-label assessment id helper) and Phase 108 (NAS live verify
-of Phase 107) are drafted.
+Phase 107 (rename active outcome-label assessment id helper), Phase 108 (NAS live verify
+of Phase 107), Phase 109 (handlers use active outcome-label assessment id), and Phase 110
+(NAS live verify of Phase 109).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -298,6 +299,10 @@ Phase 107 renames the shared active outcome-label assessment id helper (see
 [decisions/0108-phase-107-rename-active-outcome-label-assessment-id.md](decisions/0108-phase-107-rename-active-outcome-label-assessment-id.md)).
 Phase 108 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0109-phase-108-nas-live-verify-phase-107.md](decisions/0109-phase-108-nas-live-verify-phase-107.md)).
+Phase 109 routes outcome-label action handlers through that helper (see
+[decisions/0110-phase-109-handlers-use-active-outcome-label-assessment-id.md](decisions/0110-phase-109-handlers-use-active-outcome-label-assessment-id.md)).
+Phase 110 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0111-phase-110-nas-live-verify-phase-109.md](decisions/0111-phase-110-nas-live-verify-phase-109.md)).
 
 ## System context
 

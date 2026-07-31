@@ -7,9 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 110 - NAS Live Verification of Phase 109
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 109 handler single-source
+cleanup. See
+[docs/architecture/decisions/0111-phase-110-nas-live-verify-phase-109.md](docs/architecture/decisions/0111-phase-110-nas-live-verify-phase-109.md).
+
+#### Added
+
+- ADR-0111: live verify requires frontend recreate for Phase 109; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 109 - Handlers Use Active Outcome-Label Assessment Id
+
+Route compute/download/label-backfill refresh through ``activeOutcomeLabelAssessmentId``
+(no behavior change). See
+[docs/architecture/decisions/0110-phase-109-handlers-use-active-outcome-label-assessment-id.md](docs/architecture/decisions/0110-phase-109-handlers-use-active-outcome-label-assessment-id.md).
+
+#### Added
+
+- Shared helper used by outcome-label action handlers (single derivation).
+
+#### Explicitly out of scope
+
+UX copy changes, new API fields, changing assessment-backfill tracking, orders.
+
 ### Phase 108 - NAS Live Verification of Phase 107
 
-Ops evidence gate: redeploy frontend under lab TLS after Phase 107 helper rename. See
+Ops evidence gate: redeploy frontend under lab TLS after Phase 107 helper rename. Live
+verify passed 2026-07-30 (``0979a9c``). See
 [docs/architecture/decisions/0109-phase-108-nas-live-verify-phase-107.md](docs/architecture/decisions/0109-phase-108-nas-live-verify-phase-107.md).
 
 #### Added

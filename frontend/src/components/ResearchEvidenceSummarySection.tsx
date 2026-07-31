@@ -290,6 +290,14 @@ export function ResearchEvidenceSummarySection({
               : evidenceSummary.latest_assessment_id}
           </dd>
         </div>
+        <div>
+          <dt className="text-aegis-muted">Latest outcome_label id</dt>
+          <dd className="font-mono" data-testid="evidence-latest-outcome-label-id">
+            {evidenceSummary.latest_outcome_label_id == null
+              ? "null"
+              : evidenceSummary.latest_outcome_label_id}
+          </dd>
+        </div>
         {evidenceSummary.latest_outcome_label == null ? (
           <div>
             <dt className="text-aegis-muted">Latest outcome labels</dt>

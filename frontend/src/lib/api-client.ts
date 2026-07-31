@@ -1003,6 +1003,8 @@ export interface ResearchEvidenceSummary {
    * Distinct from most_recent_labeled_assessment_id when newest is unlabeled.
    */
   latest_assessment_id: number | null;
+  /** id from latest_outcome_label when latest assessment is labeled; null otherwise. */
+  latest_outcome_label_id: number | null;
   detail: string;
 }
 

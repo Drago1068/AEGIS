@@ -205,4 +205,12 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Never invented."
         ),
     )
+    latest_outcome_label_id: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "id from latest_outcome_label when the latest assessment is labeled. Null when "
+            "no label on the absolute newest assessment. Never invented."
+        ),
+    )
     detail: str

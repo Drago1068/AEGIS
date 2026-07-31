@@ -454,8 +454,12 @@ Phase 172 live-verified that revision (see
 [decisions/0173-phase-172-nas-live-verify-phase-171.md](decisions/0173-phase-172-nas-live-verify-phase-171.md)).
 Phase 173 surfaces top-level ``latest_assessment_id`` on evidence summary (see
 [decisions/0174-phase-173-evidence-summary-latest-assessment-id.md](decisions/0174-phase-173-evidence-summary-latest-assessment-id.md)).
-Phase 174 (draft) live-verifies that revision (see
+Phase 174 live-verified that revision (see
 [decisions/0175-phase-174-nas-live-verify-phase-173.md](decisions/0175-phase-174-nas-live-verify-phase-173.md)).
+Phase 175 surfaces top-level ``latest_outcome_label_id`` on evidence summary (see
+[decisions/0176-phase-175-evidence-summary-latest-outcome-label-id.md](decisions/0176-phase-175-evidence-summary-latest-outcome-label-id.md)).
+Phase 176 (draft) live-verifies that revision (see
+[decisions/0177-phase-176-nas-live-verify-phase-175.md](decisions/0177-phase-176-nas-live-verify-phase-175.md)).
 
 ## System context
 

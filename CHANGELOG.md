@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 174 - NAS Live Verification of Phase 173 (draft)
+### Phase 176 - NAS Live Verification of Phase 175 (draft)
 
-Ops evidence gate after Phase 173 latest assessment id field. See
+Ops evidence gate after Phase 175 latest outcome label id field. See
+[docs/architecture/decisions/0177-phase-176-nas-live-verify-phase-175.md](docs/architecture/decisions/0177-phase-176-nas-live-verify-phase-175.md).
+
+### Phase 175 - Evidence Summary Latest Outcome Label Id
+
+Surface top-level ``latest_outcome_label_id`` on evidence summary. See
+[docs/architecture/decisions/0176-phase-175-evidence-summary-latest-outcome-label-id.md](docs/architecture/decisions/0176-phase-175-evidence-summary-latest-outcome-label-id.md).
+
+#### Added
+
+- ``latest_outcome_label_id`` on evidence summary (+ export); from latest_outcome_label when set.
+- Console surfaces the field with ``data-testid="evidence-latest-outcome-label-id"``.
+- NAS verify checklist item 83 for Phase 176.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 174 - NAS Live Verification of Phase 173
+
+Ops evidence gate after Phase 173 latest assessment id field. Live verify passed
+2026-07-31 (``64fce25``; AAPL assessment_id=126, most_recent_labeled=125). See
 [docs/architecture/decisions/0175-phase-174-nas-live-verify-phase-173.md](docs/architecture/decisions/0175-phase-174-nas-live-verify-phase-173.md).
+
+#### Added
+
+- ADR-0175: live verify requires backend+frontend recreate for Phase 173; checklist item 82.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 173 - Evidence Summary Latest Assessment Id
 

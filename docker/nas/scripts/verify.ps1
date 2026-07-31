@@ -120,7 +120,8 @@ function Write-VerifyChecklist {
     Write-Host " 80. Authenticated evidence-summary includes Phase 169 latest_event_time (Phase 170)"
     Write-Host " 81. Authenticated evidence-summary includes Phase 171 latest_probability_confidence (Phase 172)"
     Write-Host " 82. Authenticated evidence-summary includes Phase 173 latest_assessment_id (Phase 174)"
-    Write-Host " 83. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 83. Authenticated evidence-summary includes Phase 175 latest_outcome_label_id (Phase 176)"
+    Write-Host " 84. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -877,6 +878,16 @@ try {
         }
         $assessIdPart = if ($null -eq $assessId) { "null" } else { [string]$assessId }
         Write-Host "OK  Phase 174 latest_assessment_id=$assessIdPart"
+        # Phase 176: latest_outcome_label_id from Phase 175 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_outcome_label_id")) {
+            throw "evidence-summary missing latest_outcome_label_id (Phase 175/176)"
+        }
+        $labelId = $summary.latest_outcome_label_id
+        if ($null -ne $labelId -and [int]$labelId -lt 1) {
+            throw "Phase 176: latest_outcome_label_id must be >= 1 when set"
+        }
+        $labelIdPart = if ($null -eq $labelId) { "null" } else { [string]$labelId }
+        Write-Host "OK  Phase 176 latest_outcome_label_id=$labelIdPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -968,6 +979,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_assessment_id")) {
             throw "evidence-summary/export missing latest_assessment_id (Phase 173/174)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_outcome_label_id")) {
+            throw "evidence-summary/export missing latest_outcome_label_id (Phase 175/176)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

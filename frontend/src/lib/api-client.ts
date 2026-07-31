@@ -972,6 +972,8 @@ export interface ResearchEvidenceSummary {
   latest_research_index: number | null;
   /** as_of_trading_date from latest assessment (ISO date); null when none. */
   latest_as_of_trading_date: string | null;
+  /** bar_count from latest assessment; null when none. */
+  latest_bar_count: number | null;
   detail: string;
 }
 

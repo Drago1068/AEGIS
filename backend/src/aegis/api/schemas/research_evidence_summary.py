@@ -125,4 +125,11 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Never invented."
         ),
     )
+    latest_bar_count: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "bar_count from the latest assessment. Null when no assessment. Never invented."
+        ),
+    )
     detail: str

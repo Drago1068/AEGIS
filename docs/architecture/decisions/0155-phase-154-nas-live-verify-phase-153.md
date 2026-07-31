@@ -1,6 +1,6 @@
 # ADR-0155: Phase 154 NAS Live Verification of Phase 153
 
-- Status: Proposed (pending Phase 153 + live evidence)
+- Status: Accepted (pending Phase 153 + live evidence)
 - Date: 2026-07-30
 
 ## Context
@@ -14,7 +14,7 @@ verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that la
 
 1. Deploy current ``HEAD`` with TLS overlay; recreate **backend** and **frontend**.
 2. Run `verify.ps1` / `verify.sh` successfully (prior gates remain).
-3. Authenticated evidence-summary includes ``latest_bar_count`` (null OK).
+3. Authenticated evidence-summary includes ``latest_bar_count`` (null OK; checklist item 72).
 4. SSH `alembic current` includes **`0009`** or `head`.
 
 ### 2. Upload ≠ verified

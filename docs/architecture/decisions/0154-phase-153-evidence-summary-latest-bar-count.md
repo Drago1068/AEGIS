@@ -1,6 +1,6 @@
 # ADR-0154: Phase 153 Evidence Summary Latest Bar Count
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -19,7 +19,8 @@ Copy from ``latest_assessment.bar_count`` when present; otherwise null. Never in
 
 ### 2. Console
 
-Show the field on ``ResearchEvidenceSummarySection`` near as-of / research index rows.
+Show the field on ``ResearchEvidenceSummarySection`` near as-of / research index rows
+(``data-testid="evidence-latest-bar-count"``).
 
 ### 3. Out of scope
 

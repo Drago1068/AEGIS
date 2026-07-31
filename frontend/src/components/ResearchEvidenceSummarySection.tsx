@@ -190,6 +190,14 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Latest bar_count</dt>
+          <dd className="font-mono" data-testid="evidence-latest-bar-count">
+            {evidenceSummary.latest_bar_count == null
+              ? "null"
+              : evidenceSummary.latest_bar_count}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest coverage_confidence</dt>
           <dd className="font-mono" data-testid="evidence-latest-coverage-confidence">
             {evidenceSummary.latest_coverage_confidence == null

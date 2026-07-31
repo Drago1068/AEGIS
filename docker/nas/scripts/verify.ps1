@@ -109,7 +109,8 @@ function Write-VerifyChecklist {
     Write-Host " 69. Authenticated evidence-summary includes Phase 147 latest_coverage_confidence (Phase 148)"
     Write-Host " 70. Authenticated evidence-summary includes Phase 149 latest_research_index (Phase 150)"
     Write-Host " 71. Authenticated evidence-summary includes Phase 151 latest_as_of_trading_date (Phase 152)"
-    Write-Host " 72. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 72. Authenticated evidence-summary includes Phase 153 latest_bar_count (Phase 154)"
+    Write-Host " 73. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -771,6 +772,16 @@ try {
         $asOf = $summary.latest_as_of_trading_date
         $asOfPart = if ($null -eq $asOf) { "null" } else { [string]$asOf }
         Write-Host "OK  Phase 152 latest_as_of_trading_date=$asOfPart"
+        # Phase 154: latest_bar_count from Phase 153 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_bar_count")) {
+            throw "evidence-summary missing latest_bar_count (Phase 153/154)"
+        }
+        $bars = $summary.latest_bar_count
+        if ($null -ne $bars -and [int]$bars -lt 0) {
+            throw "Phase 154: latest_bar_count must be >= 0 when set"
+        }
+        $barsPart = if ($null -eq $bars) { "null" } else { [string]$bars }
+        Write-Host "OK  Phase 154 latest_bar_count=$barsPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -829,6 +840,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_as_of_trading_date")) {
             throw "evidence-summary/export missing latest_as_of_trading_date (Phase 151/152)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_bar_count")) {
+            throw "evidence-summary/export missing latest_bar_count (Phase 153/154)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

@@ -7,15 +7,32 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 154 - NAS Live Verification of Phase 153 (draft)
+### Phase 154 - NAS Live Verification of Phase 153
 
 Ops evidence gate after Phase 153 latest bar count field. See
 [docs/architecture/decisions/0155-phase-154-nas-live-verify-phase-153.md](docs/architecture/decisions/0155-phase-154-nas-live-verify-phase-153.md).
 
-### Phase 153 - Evidence Summary Latest Bar Count (draft)
+#### Added
+
+- ADR-0155: live verify requires backend+frontend recreate for Phase 153; checklist item 72.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 153 - Evidence Summary Latest Bar Count
 
 Surface top-level ``latest_bar_count`` on evidence summary. See
 [docs/architecture/decisions/0154-phase-153-evidence-summary-latest-bar-count.md](docs/architecture/decisions/0154-phase-153-evidence-summary-latest-bar-count.md).
+
+#### Added
+
+- ``latest_bar_count`` on evidence summary (+ export); copied from latest assessment.
+- Console surfaces the field with ``data-testid="evidence-latest-bar-count"``.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 152 - NAS Live Verification of Phase 151
 

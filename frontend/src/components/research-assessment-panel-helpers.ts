@@ -116,3 +116,37 @@ export function formatOutcomeLabelBackfillAriaLabel(
         : "";
   return `Backfill outcome labels then refresh assessment ${assessmentId}${kindSuffix}`;
 }
+
+/** Compact assessment history line from API payload only (Phase 28/61). */
+export function formatAssessmentHistoryRow(row: {
+  computed_at: string;
+  coverage_confidence: number;
+  probability_confidence: number | null;
+  input_source: string;
+  components: {
+    research_index?: number | null;
+    component_source?: string | null;
+  };
+}): string {
+  const index = row.components.research_index;
+  const indexLabel =
+    typeof index === "number" ? `index=${index.toFixed(4)}` : "index=n/a";
+  const cov = `cov=${row.coverage_confidence.toFixed(4)}`;
+  const p =
+    row.probability_confidence === null
+      ? "p=null"
+      : `p=${row.probability_confidence.toFixed(4)}`;
+  const srcRaw = row.components.component_source;
+  const src =
+    typeof srcRaw === "string" && srcRaw.trim()
+      ? srcRaw
+      : row.input_source;
+  return `${row.computed_at} · ${indexLabel} · ${cov} · ${p} · src=${src}`;
+}
+
+export const ASSESSMENT_SOURCE_FILTER_OPTIONS = [
+  { value: "", label: "All sources" },
+  { value: "mixed", label: "mixed (cross-source fill)" },
+  { value: "alpha_vantage", label: "alpha_vantage" },
+  { value: "polygon", label: "polygon" },
+] as const;

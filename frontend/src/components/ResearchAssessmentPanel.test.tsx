@@ -293,6 +293,7 @@ describe("ResearchAssessmentPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: /refresh latest/i }));
 
     await waitFor(() => {
+      expect(screen.getByTestId("assessment-history-section")).toBeInTheDocument();
       expect(screen.getByText(/assessment history \(newest first\)/i)).toBeInTheDocument();
       expect(
         screen.getByText(/2024-01-26T18:00:00Z · index=0\.4600 · cov=0\.9500 · p=0\.6200 · src=alpha_vantage/),

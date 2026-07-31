@@ -16,9 +16,8 @@ without behavior change.
 
 Extract the assessment history UI into ``ResearchAssessmentHistorySection.tsx``. Move
 shared ``formatAssessmentHistoryRow`` / ``ASSESSMENT_SOURCE_FILTER_OPTIONS`` into
-``research-assessment-panel-helpers.ts`` (or keep options co-located with the section if
-section-private). Preserve ``id="assessment-history"`` and existing filter/list behavior.
-No API changes.
+``research-assessment-panel-helpers.ts``. Preserve ``id="assessment-history"`` and existing
+filter/list behavior. No API changes.
 
 ### 2. Out of scope
 

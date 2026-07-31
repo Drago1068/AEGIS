@@ -35,6 +35,7 @@ import {
   sortedLabelEntries,
 } from "./research-assessment-panel-helpers";
 import { ResearchAssessmentActionToolbar } from "./ResearchAssessmentActionToolbar";
+import { ResearchAssessmentHistorySection } from "./ResearchAssessmentHistorySection";
 import { ResearchOutcomeLabelHistorySection } from "./ResearchOutcomeLabelHistorySection";
 
 type ResearchAssessmentPanelProps = {
@@ -58,31 +59,6 @@ function formatAssessmentError(err: unknown): string {
   }
   return err.message;
 }
-
-/** Compact assessment history line from API payload only (Phase 28/61). */
-function formatAssessmentHistoryRow(row: ResearchAssessment): string {
-  const index = row.components.research_index;
-  const indexLabel =
-    typeof index === "number" ? `index=${index.toFixed(4)}` : "index=n/a";
-  const cov = `cov=${row.coverage_confidence.toFixed(4)}`;
-  const p =
-    row.probability_confidence === null
-      ? "p=null"
-      : `p=${row.probability_confidence.toFixed(4)}`;
-  const srcRaw = row.components.component_source;
-  const src =
-    typeof srcRaw === "string" && srcRaw.trim()
-      ? srcRaw
-      : row.input_source;
-  return `${row.computed_at} · ${indexLabel} · ${cov} · ${p} · src=${src}`;
-}
-
-const ASSESSMENT_SOURCE_FILTER_OPTIONS = [
-  { value: "", label: "All sources" },
-  { value: "mixed", label: "mixed (cross-source fill)" },
-  { value: "alpha_vantage", label: "alpha_vantage" },
-  { value: "polygon", label: "polygon" },
-] as const;
 
 export function ResearchAssessmentPanel({
   symbol,
@@ -839,52 +815,12 @@ export function ResearchAssessmentPanel({
             Computed at {latest.computed_at} from source {latest.input_source}. Research
             only — not actionable.
           </p>
-          <div
-            id="assessment-history"
-            className="rounded border border-aegis-line bg-white/60 p-3"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
-                Assessment history (newest first)
-              </p>
-              <label
-                htmlFor="assessment-history-source-filter"
-                className="flex items-center gap-2 text-xs text-aegis-muted"
-              >
-                History source filter
-                <select
-                  id="assessment-history-source-filter"
-                  aria-label="History source filter"
-                  value={assessmentSourceFilter}
-                  onChange={(event) => onAssessmentSourceFilterChange(event.target.value)}
-                  disabled={isPending}
-                  className="rounded border border-aegis-line bg-white px-2 py-1 font-mono text-aegis-ink"
-                >
-                  {ASSESSMENT_SOURCE_FILTER_OPTIONS.map((option) => (
-                    <option key={option.value || "all"} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            {assessmentHistory.length === 0 ? (
-              <p className="mt-2 font-mono text-xs text-aegis-muted">
-                {assessmentSourceFilter
-                  ? "No assessments match this source filter."
-                  : "Refresh or assess to load history."}
-              </p>
-            ) : (
-              <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
-                {assessmentHistory.map((row) => {
-                  const line = formatAssessmentHistoryRow(row);
-                  return (
-                    <li key={row.id ?? `${row.computed_at}-${line}`}>{line}</li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
+          <ResearchAssessmentHistorySection
+            assessmentHistory={assessmentHistory}
+            assessmentSourceFilter={assessmentSourceFilter}
+            isPending={isPending}
+            onAssessmentSourceFilterChange={onAssessmentSourceFilterChange}
+          />
           <ResearchOutcomeLabelHistorySection
             outcomeLabel={outcomeLabel}
             outcomeLabelHistory={outcomeLabelHistory}

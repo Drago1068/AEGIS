@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  formatAssessmentHistoryRow,
   formatCalibrationActionAriaLabel,
   formatCalibrationActionIdChip,
   formatLabelHorizonSummary,
@@ -125,5 +126,21 @@ describe("formatLabelHorizonSummary", () => {
         { forward_return_5: "2024-02-02", forward_return_20: "2024-02-23" },
       ),
     ).toBe("fwd5=0.0500 end=2024-02-02 · fwd20=0.1000 end=2024-02-23");
+  });
+});
+
+describe("formatAssessmentHistoryRow", () => {
+  it("formats compact assessment history lines from API fields only", () => {
+    expect(
+      formatAssessmentHistoryRow({
+        computed_at: "2024-01-01T00:00:00Z",
+        coverage_confidence: 0.5,
+        probability_confidence: null,
+        input_source: "alpha_vantage",
+        components: { research_index: 0.1234, component_source: "mixed" },
+      }),
+    ).toBe(
+      "2024-01-01T00:00:00Z · index=0.1234 · cov=0.5000 · p=null · src=mixed",
+    );
   });
 });

@@ -29,7 +29,9 @@ See
 
 #### Added
 
-- Assessment history section extract drafted (implement next).
+- ``ResearchAssessmentHistorySection.tsx`` with ``data-testid="assessment-history-section"``.
+- Shared ``formatAssessmentHistoryRow`` / ``ASSESSMENT_SOURCE_FILTER_OPTIONS`` moved into
+  ``research-assessment-panel-helpers.ts``.
 
 #### Explicitly out of scope
 

@@ -593,8 +593,13 @@ Phase 236 live-verified that field (see
 Phase 237 surfaces ``most_recent_unlabeled_labelable_as_of_trading_date`` for the next
 backfill target (see
 [decisions/0238-phase-237-evidence-summary-most-recent-unlabeled-labelable-as-of.md](decisions/0238-phase-237-evidence-summary-most-recent-unlabeled-labelable-as-of.md)).
-Phase 238 live-verifies that field (see
+Phase 238 live-verified that field (see
 [decisions/0239-phase-238-nas-live-verify-phase-237.md](decisions/0239-phase-238-nas-live-verify-phase-237.md)).
+Phase 239 (draft) proposes ``scan_unlabeled_label_ready_count`` for explicit backfill-candidate
+cardinality (see
+[decisions/0240-phase-239-evidence-summary-scan-unlabeled-label-ready-count.md](decisions/0240-phase-239-evidence-summary-scan-unlabeled-label-ready-count.md)).
+Phase 240 (draft) would live-verify that count (see
+[decisions/0241-phase-240-nas-live-verify-phase-239.md](decisions/0241-phase-240-nas-live-verify-phase-239.md)).
 
 ## System context
 

@@ -1,6 +1,6 @@
 # ADR-0239: Phase 238 NAS Live Verification of Phase 237
 
-- Status: Accepted (pending live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -23,12 +23,14 @@ that lands.
 
 Retain live verify stdout.
 
-## Resume
+## Live evidence (2026-07-31)
 
-```powershell
-# After Phase 237 on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+- Revision ``c76b75c``; TLS recreate backend+frontend; verify passed.
+- AAPL: ``most_recent_labelable_as_of_trading_date=2026-02-05``;
+  ``most_recent_unlabeled_labelable_as_of_trading_date=null``;
+  ``unlabeled_assessment_count=3``; ``latest_assessment_label_block_reason=insufficient_forward_bars``.
+- Interpretation: newest labelable row is already labeled; remaining unlabeled rows are not
+  label-ready (backfill next-target empty until forward bars exist).
 
 ## Related documents
 

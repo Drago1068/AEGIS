@@ -7,9 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 114 - NAS Live Verification of Phase 113
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 113 aria load-kind suffixes.
+See
+[docs/architecture/decisions/0115-phase-114-nas-live-verify-phase-113.md](docs/architecture/decisions/0115-phase-114-nas-live-verify-phase-113.md).
+
+#### Added
+
+- ADR-0115: live verify requires frontend recreate for Phase 113; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 113 - Outcome-Label Action Aria Includes Load Kind
+
+Append ``(scan-labeled)`` / ``(latest)`` to compute/download outcome-label accessible names
+when load-kind is tracked. See
+[docs/architecture/decisions/0114-phase-113-outcome-label-action-aria-load-kind.md](docs/architecture/decisions/0114-phase-113-outcome-label-action-aria-load-kind.md).
+
+#### Added
+
+- ``formatOutcomeLabelActionAriaLabel`` for compute/download outcome-label buttons.
+
+#### Explicitly out of scope
+
+Visible button copy changes, calibration aria changes, orders.
+
 ### Phase 112 - NAS Live Verification of Phase 111
 
-Ops evidence gate: redeploy frontend under lab TLS after Phase 111 load-kind helper. See
+Ops evidence gate: redeploy frontend under lab TLS after Phase 111 load-kind helper. Live
+verify passed 2026-07-30 (``b73512f``). See
 [docs/architecture/decisions/0113-phase-112-nas-live-verify-phase-111.md](docs/architecture/decisions/0113-phase-112-nas-live-verify-phase-111.md).
 
 #### Added

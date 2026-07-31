@@ -78,7 +78,8 @@ print_checklist() {
   echo " 49. Phase 108: frontend redeploy includes Phase 107 active-assessment-id-rename (unit-tested)"
   echo " 50. Phase 110: frontend redeploy includes Phase 109 handlers-use-active-assessment-id (unit-tested)"
   echo " 51. Phase 112: frontend redeploy includes Phase 111 resolve-outcome-label-load-kind (unit-tested)"
-  echo " 52. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 52. Phase 114: frontend redeploy includes Phase 113 outcome-label-aria-load-kind (unit-tested)"
+  echo " 53. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then

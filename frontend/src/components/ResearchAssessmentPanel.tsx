@@ -99,6 +99,24 @@ export function resolveOutcomeLabelHistoryLoadKind(
   return loadKind ?? (latestId != null && assessmentId === latestId ? "latest" : "scan_labeled");
 }
 
+/** Accessible name for compute/download outcome-label actions (Phase 113). */
+export function formatOutcomeLabelActionAriaLabel(
+  action: "Compute outcome labels" | "Download outcome labels JSON",
+  assessmentId: number | null,
+  loadKind: "latest" | "scan_labeled" | null,
+): string {
+  if (assessmentId == null) {
+    return action;
+  }
+  const kindSuffix =
+    loadKind === "scan_labeled"
+      ? " (scan-labeled)"
+      : loadKind === "latest"
+        ? " (latest)"
+        : "";
+  return `${action} for assessment ${assessmentId}${kindSuffix}`;
+}
+
 /** Compact assessment history line from API payload only (Phase 28/61). */
 function formatAssessmentHistoryRow(row: ResearchAssessment): string {
   const index = row.components.research_index;
@@ -589,11 +607,11 @@ export function ResearchAssessmentPanel({
             onClick={onComputeOutcomeLabels}
             disabled={isPending || activeOutcomeLabelAssessmentId == null}
             data-testid="compute-outcome-labels"
-            aria-label={
-              activeOutcomeLabelAssessmentId != null
-                ? `Compute outcome labels for assessment ${activeOutcomeLabelAssessmentId}`
-                : "Compute outcome labels"
-            }
+            aria-label={formatOutcomeLabelActionAriaLabel(
+              "Compute outcome labels",
+              activeOutcomeLabelAssessmentId,
+              outcomeLabelHistoryLoadKind,
+            )}
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Compute outcome labels
@@ -616,11 +634,11 @@ export function ResearchAssessmentPanel({
             onClick={onDownloadOutcomeLabels}
             disabled={isPending || activeOutcomeLabelAssessmentId == null}
             data-testid="download-outcome-labels"
-            aria-label={
-              activeOutcomeLabelAssessmentId != null
-                ? `Download outcome labels JSON for assessment ${activeOutcomeLabelAssessmentId}`
-                : "Download outcome labels JSON"
-            }
+            aria-label={formatOutcomeLabelActionAriaLabel(
+              "Download outcome labels JSON",
+              activeOutcomeLabelAssessmentId,
+              outcomeLabelHistoryLoadKind,
+            )}
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Download outcome labels JSON

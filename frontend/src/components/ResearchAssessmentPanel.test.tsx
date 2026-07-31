@@ -1,7 +1,11 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ResearchAssessmentPanel, resolveOutcomeLabelHistoryLoadKind } from "./ResearchAssessmentPanel";
+import {
+  formatOutcomeLabelActionAriaLabel,
+  ResearchAssessmentPanel,
+  resolveOutcomeLabelHistoryLoadKind,
+} from "./ResearchAssessmentPanel";
 
 vi.mock("@/lib/api-client", async () => {
   const actual = await vi.importActual<typeof import("@/lib/api-client")>("@/lib/api-client");
@@ -662,7 +666,7 @@ describe("ResearchAssessmentPanel", () => {
       );
     });
     expect(screen.getByTestId("download-outcome-labels")).toHaveAccessibleName(
-      /download outcome labels json for assessment 3/i,
+      /download outcome labels json for assessment 3 \(scan-labeled\)/i,
     );
   });
 
@@ -838,7 +842,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("outcome-label-empty-state")).toBeInTheDocument();
     });
     expect(screen.getByTestId("compute-outcome-labels")).toHaveAccessibleName(
-      /compute outcome labels for assessment 3/i,
+      /compute outcome labels for assessment 3 \(scan-labeled\)/i,
     );
     vi.mocked(listOutcomeLabels).mockResolvedValue([
       {
@@ -1415,5 +1419,28 @@ describe("resolveOutcomeLabelHistoryLoadKind", () => {
     expect(resolveOutcomeLabelHistoryLoadKind(3, null, 4)).toBe("scan_labeled");
     expect(resolveOutcomeLabelHistoryLoadKind(3, null, null)).toBe("scan_labeled");
     expect(resolveOutcomeLabelHistoryLoadKind(3, null, undefined)).toBe("scan_labeled");
+  });
+});
+
+describe("formatOutcomeLabelActionAriaLabel", () => {
+  it("omits kind suffix when load kind is unset", () => {
+    expect(formatOutcomeLabelActionAriaLabel("Compute outcome labels", 1, null)).toBe(
+      "Compute outcome labels for assessment 1",
+    );
+  });
+
+  it("appends scan-labeled or latest when load kind is tracked", () => {
+    expect(
+      formatOutcomeLabelActionAriaLabel("Download outcome labels JSON", 3, "scan_labeled"),
+    ).toBe("Download outcome labels JSON for assessment 3 (scan-labeled)");
+    expect(formatOutcomeLabelActionAriaLabel("Compute outcome labels", 4, "latest")).toBe(
+      "Compute outcome labels for assessment 4 (latest)",
+    );
+  });
+
+  it("returns the bare action when assessment id is null", () => {
+    expect(formatOutcomeLabelActionAriaLabel("Compute outcome labels", null, "latest")).toBe(
+      "Compute outcome labels",
+    );
   });
 });

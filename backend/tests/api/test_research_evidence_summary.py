@@ -253,6 +253,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_schema_version"] is None
     assert body["latest_computed_at"] is None
     assert body["latest_event_time"] is None
+    assert body["latest_probability_confidence"] is None
     assert body["calibration_readiness"]["status"] == "no_assessment"
     assert "never invented" in body["detail"].lower() or "not invented" in body["detail"].lower()
 
@@ -282,6 +283,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_schema_version"] == 1
     assert body["latest_computed_at"] == "2024-01-26T18:00:00Z"
     assert body["latest_event_time"] == "2024-01-26T23:59:59Z"
+    assert body["latest_probability_confidence"] is None
     assert body["latest_outcome_label"]["labels"]["forward_return_5"] == 0.05
     assert body["latest_calibration"]["probability_confidence"] == 0.62
     assert body["assessment_count"] == 1

@@ -993,6 +993,11 @@ export interface ResearchEvidenceSummary {
   latest_computed_at: string | null;
   /** event_time from latest assessment (ISO datetime); null when none. */
   latest_event_time: string | null;
+  /**
+   * probability_confidence from latest assessment when calibrated; null when none.
+   * Distinct from latest_coverage_confidence.
+   */
+  latest_probability_confidence: number | null;
   detail: string;
 }
 

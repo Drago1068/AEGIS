@@ -152,6 +152,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_schema_version: null,
       latest_computed_at: null,
       latest_event_time: null,
+      latest_probability_confidence: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
   });
@@ -511,6 +512,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_schema_version: 1,
       latest_computed_at: "2024-01-26T18:00:00Z",
       latest_event_time: "2024-01-26T23:59:59Z",
+      latest_probability_confidence: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
 
@@ -567,6 +569,9 @@ describe("ResearchAssessmentPanel", () => {
       );
       expect(screen.getByTestId("evidence-latest-event-time")).toHaveTextContent(
         "2024-01-26T23:59:59Z",
+      );
+      expect(screen.getByTestId("evidence-latest-probability-confidence")).toHaveTextContent(
+        "null",
       );
       expect(screen.getByText(/mixed unlabeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed labeled \(scanned\)/i)).toBeInTheDocument();
@@ -699,6 +704,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_schema_version: 1,
       latest_computed_at: "2024-01-26T18:00:00Z",
       latest_event_time: "2024-01-26T23:59:59Z",
+      latest_probability_confidence: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([
@@ -814,6 +820,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_schema_version: 1,
       latest_computed_at: "2024-01-26T18:00:00Z",
       latest_event_time: "2024-01-26T23:59:59Z",
+      latest_probability_confidence: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -927,6 +934,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_schema_version: 1,
       latest_computed_at: "2024-01-26T18:00:00Z",
       latest_event_time: "2024-01-26T23:59:59Z",
+      latest_probability_confidence: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1130,6 +1138,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_schema_version: 1,
       latest_computed_at: "2024-01-26T18:00:00Z",
       latest_event_time: "2024-01-26T23:59:59Z",
+      latest_probability_confidence: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listResearchAssessments).mockResolvedValue([mixedRow]);
@@ -1293,6 +1302,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_schema_version: 1,
       latest_computed_at: "2024-01-26T18:00:00Z",
       latest_event_time: "2024-01-26T23:59:59Z",
+      latest_probability_confidence: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1452,6 +1462,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_schema_version: 1,
       latest_computed_at: "2024-01-26T18:00:00Z",
       latest_event_time: "2024-01-26T23:59:59Z",
+      latest_probability_confidence: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([

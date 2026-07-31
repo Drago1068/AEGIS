@@ -446,8 +446,12 @@ Phase 168 live-verified that revision (see
 [decisions/0169-phase-168-nas-live-verify-phase-167.md](decisions/0169-phase-168-nas-live-verify-phase-167.md)).
 Phase 169 surfaces top-level ``latest_event_time`` on evidence summary (see
 [decisions/0170-phase-169-evidence-summary-latest-event-time.md](decisions/0170-phase-169-evidence-summary-latest-event-time.md)).
-Phase 170 (draft) live-verifies that revision (see
+Phase 170 live-verified that revision (see
 [decisions/0171-phase-170-nas-live-verify-phase-169.md](decisions/0171-phase-170-nas-live-verify-phase-169.md)).
+Phase 171 surfaces top-level ``latest_probability_confidence`` on evidence summary (see
+[decisions/0172-phase-171-evidence-summary-latest-probability-confidence.md](decisions/0172-phase-171-evidence-summary-latest-probability-confidence.md)).
+Phase 172 (draft) live-verifies that revision (see
+[decisions/0173-phase-172-nas-live-verify-phase-171.md](decisions/0173-phase-172-nas-live-verify-phase-171.md)).
 
 ## System context
 

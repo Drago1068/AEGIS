@@ -7,10 +7,40 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 170 - NAS Live Verification of Phase 169 (draft)
+### Phase 172 - NAS Live Verification of Phase 171 (draft)
 
-Ops evidence gate after Phase 169 latest event_time field. See
+Ops evidence gate after Phase 171 latest probability confidence field. See
+[docs/architecture/decisions/0173-phase-172-nas-live-verify-phase-171.md](docs/architecture/decisions/0173-phase-172-nas-live-verify-phase-171.md).
+
+### Phase 171 - Evidence Summary Latest Probability Confidence
+
+Surface top-level ``latest_probability_confidence`` on evidence summary. See
+[docs/architecture/decisions/0172-phase-171-evidence-summary-latest-probability-confidence.md](docs/architecture/decisions/0172-phase-171-evidence-summary-latest-probability-confidence.md).
+
+#### Added
+
+- ``latest_probability_confidence`` on evidence summary (+ export); copied from latest
+  assessment; null when unset; distinct from coverage confidence.
+- Console surfaces the field with ``data-testid="evidence-latest-probability-confidence"``.
+- NAS verify checklist item 81 for Phase 172.
+
+#### Explicitly out of scope
+
+New scoring math, default-on calibration, orders, UI structural extracts.
+
+### Phase 170 - NAS Live Verification of Phase 169
+
+Ops evidence gate after Phase 169 latest event_time field. Live verify passed
+2026-07-31 (``fcf4123``; AAPL event_time=2026-07-29T23:59:59Z). See
 [docs/architecture/decisions/0171-phase-170-nas-live-verify-phase-169.md](docs/architecture/decisions/0171-phase-170-nas-live-verify-phase-169.md).
+
+#### Added
+
+- ADR-0171: live verify requires backend+frontend recreate for Phase 169; checklist item 80.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 169 - Evidence Summary Latest Event Time
 

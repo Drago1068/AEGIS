@@ -265,7 +265,18 @@ export function ResearchEvidenceSummarySection({
         </div>
         <div>
           <dt className="text-aegis-muted">Latest probability_confidence</dt>
-          <dd className="font-mono">
+          <dd className="font-mono" data-testid="evidence-latest-probability-confidence">
+            {evidenceSummary.latest_probability_confidence == null
+              ? "null"
+              : evidenceSummary.latest_probability_confidence.toFixed(4)}
+            <span className="ml-1 font-sans text-xs font-normal text-aegis-muted">
+              (distinct from coverage)
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-aegis-muted">Latest calibration.probability_confidence</dt>
+          <dd className="font-mono" data-testid="evidence-latest-calibration-probability-confidence">
             {evidenceSummary.latest_calibration == null
               ? "null"
               : evidenceSummary.latest_calibration.probability_confidence.toFixed(4)}

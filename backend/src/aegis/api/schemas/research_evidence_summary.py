@@ -186,4 +186,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "event_time from the latest assessment. Null when no assessment. Never invented."
         ),
     )
+    latest_probability_confidence: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "probability_confidence from the latest assessment when a calibration is attached. "
+            "Null when no assessment or no calibrated probability. Distinct from "
+            "latest_coverage_confidence; never invented."
+        ),
+    )
     detail: str

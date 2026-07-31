@@ -107,7 +107,8 @@ print_checklist() {
   echo " 78. Authenticated evidence-summary includes Phase 165 latest_schema_version (Phase 166)"
   echo " 79. Authenticated evidence-summary includes Phase 167 latest_computed_at (Phase 168)"
   echo " 80. Authenticated evidence-summary includes Phase 169 latest_event_time (Phase 170)"
-  echo " 81. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 81. Authenticated evidence-summary includes Phase 171 latest_probability_confidence (Phase 172)"
+  echo " 82. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -709,6 +710,12 @@ if ! grep -q '"latest_event_time"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 170 latest_event_time field present"
+# Phase 172: latest_probability_confidence from Phase 171 (null OK).
+if ! grep -q '"latest_probability_confidence"' "${summary_body}"; then
+  echo "evidence-summary missing latest_probability_confidence (Phase 171/172)" >&2
+  exit 1
+fi
+echo "OK  Phase 172 latest_probability_confidence field present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"

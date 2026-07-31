@@ -118,7 +118,8 @@ function Write-VerifyChecklist {
     Write-Host " 78. Authenticated evidence-summary includes Phase 165 latest_schema_version (Phase 166)"
     Write-Host " 79. Authenticated evidence-summary includes Phase 167 latest_computed_at (Phase 168)"
     Write-Host " 80. Authenticated evidence-summary includes Phase 169 latest_event_time (Phase 170)"
-    Write-Host " 81. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 81. Authenticated evidence-summary includes Phase 171 latest_probability_confidence (Phase 172)"
+    Write-Host " 82. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -852,6 +853,19 @@ try {
         $eventTime = $summary.latest_event_time
         $eventPart = if ($null -eq $eventTime -or $eventTime -eq "") { "null" } else { [string]$eventTime }
         Write-Host "OK  Phase 170 latest_event_time=$eventPart"
+        # Phase 172: latest_probability_confidence from Phase 171 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_probability_confidence")) {
+            throw "evidence-summary missing latest_probability_confidence (Phase 171/172)"
+        }
+        $probConf = $summary.latest_probability_confidence
+        if ($null -ne $probConf) {
+            $pc = [double]$probConf
+            if ($pc -lt 0.0 -or $pc -gt 1.0) {
+                throw "Phase 172: latest_probability_confidence must be in [0,1] when set"
+            }
+        }
+        $probPart = if ($null -eq $probConf) { "null" } else { [string]$probConf }
+        Write-Host "OK  Phase 172 latest_probability_confidence=$probPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -937,6 +951,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_event_time")) {
             throw "evidence-summary/export missing latest_event_time (Phase 169/170)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_probability_confidence")) {
+            throw "evidence-summary/export missing latest_probability_confidence (Phase 171/172)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

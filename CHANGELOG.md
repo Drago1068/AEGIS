@@ -7,9 +7,20 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 152 - NAS Live Verification of Phase 151 (draft)
+
+Ops evidence gate after Phase 151 as-of trading date field. See
+[docs/architecture/decisions/0153-phase-152-nas-live-verify-phase-151.md](docs/architecture/decisions/0153-phase-152-nas-live-verify-phase-151.md).
+
+### Phase 151 - Evidence Summary Latest As-Of Trading Date (draft)
+
+Surface top-level ``latest_as_of_trading_date`` on evidence summary. See
+[docs/architecture/decisions/0152-phase-151-evidence-summary-latest-as-of-date.md](docs/architecture/decisions/0152-phase-151-evidence-summary-latest-as-of-date.md).
+
 ### Phase 150 - NAS Live Verification of Phase 149
 
-Ops evidence gate after Phase 149 latest research index field. See
+Ops evidence gate after Phase 149 latest research index field. Live verify passed 2026-07-30
+(``16ce17a``; AAPL research_index≈0.483). See
 [docs/architecture/decisions/0151-phase-150-nas-live-verify-phase-149.md](docs/architecture/decisions/0151-phase-150-nas-live-verify-phase-149.md).
 
 #### Added

@@ -72,7 +72,8 @@ Phase 112 (NAS live verify of Phase 111), Phase 113 (outcome-label action aria i
 load kind), Phase 114 (NAS live verify of Phase 113), Phase 115 (extract outcome-label
 panel helpers module), Phase 116 (NAS live verify of Phase 115), Phase 117 (outcome-label
 action id chip includes load kind), Phase 118 (NAS live verify of Phase 117), Phase 119
-(calibration action chips name latest), and Phase 120 (NAS live verify of Phase 119).
+(calibration action chips name latest), Phase 120 (NAS live verify of Phase 119), Phase 121
+(outcome-label backfill names refresh target), and Phase 122 (NAS live verify of Phase 121).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -328,6 +329,10 @@ Phase 119 names calibration action chips/aria with explicit latest (see
 [decisions/0120-phase-119-calibration-action-chips-name-latest.md](decisions/0120-phase-119-calibration-action-chips-name-latest.md)).
 Phase 120 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0121-phase-120-nas-live-verify-phase-119.md](decisions/0121-phase-120-nas-live-verify-phase-119.md)).
+Phase 121 names outcome-label backfill with its refresh-target assessment (see
+[decisions/0122-phase-121-outcome-label-backfill-names-refresh-target.md](decisions/0122-phase-121-outcome-label-backfill-names-refresh-target.md)).
+Phase 122 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0123-phase-122-nas-live-verify-phase-121.md](decisions/0123-phase-122-nas-live-verify-phase-121.md)).
 
 ## System context
 

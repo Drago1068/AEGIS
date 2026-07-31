@@ -1194,12 +1194,16 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
     ]);
-    const backfillLabels = screen.getByRole("button", {
-      name: /^backfill outcome labels$/i,
-    });
+    const backfillLabels = screen.getByTestId("backfill-outcome-labels");
     await waitFor(() => {
       expect(backfillLabels).not.toBeDisabled();
     });
+    expect(backfillLabels).toHaveAccessibleName(
+      /backfill outcome labels then refresh assessment 3 \(scan-labeled\)/i,
+    );
+    expect(screen.getByTestId("backfill-outcome-labels-id-chip")).toHaveTextContent(
+      "(3 · scan-labeled)",
+    );
     vi.mocked(backfillOutcomeLabels).mockClear();
     fireEvent.click(backfillLabels);
 

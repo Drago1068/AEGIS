@@ -35,6 +35,7 @@ import {
   formatCalibrationActionIdChip,
   formatOutcomeLabelActionAriaLabel,
   formatOutcomeLabelActionIdChip,
+  formatOutcomeLabelBackfillAriaLabel,
   resolveOutcomeLabelHistoryLoadKind,
 } from "./research-assessment-panel-helpers";
 
@@ -612,9 +613,25 @@ export function ResearchAssessmentPanel({
             type="button"
             onClick={onBackfillOutcomeLabels}
             disabled={isPending}
+            data-testid="backfill-outcome-labels"
+            aria-label={formatOutcomeLabelBackfillAriaLabel(
+              activeOutcomeLabelAssessmentId,
+              outcomeLabelHistoryLoadKind,
+            )}
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Backfill outcome labels
+            {activeOutcomeLabelAssessmentId != null ? (
+              <span
+                className="ml-1 font-mono text-xs text-aegis-muted"
+                data-testid="backfill-outcome-labels-id-chip"
+              >
+                {formatOutcomeLabelActionIdChip(
+                  activeOutcomeLabelAssessmentId,
+                  outcomeLabelHistoryLoadKind,
+                )}
+              </span>
+            ) : null}
           </button>
           <button
             type="button"

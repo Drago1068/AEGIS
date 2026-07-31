@@ -5,6 +5,7 @@ import {
   formatCalibrationActionIdChip,
   formatOutcomeLabelActionAriaLabel,
   formatOutcomeLabelActionIdChip,
+  formatOutcomeLabelBackfillAriaLabel,
   resolveOutcomeLabelHistoryLoadKind,
 } from "./research-assessment-panel-helpers";
 
@@ -79,5 +80,23 @@ describe("formatCalibrationActionAriaLabel", () => {
 describe("formatCalibrationActionIdChip", () => {
   it("always includes latest", () => {
     expect(formatCalibrationActionIdChip(1)).toBe("(1 · latest)");
+  });
+});
+
+describe("formatOutcomeLabelBackfillAriaLabel", () => {
+  it("returns the bare action when assessment id is null", () => {
+    expect(formatOutcomeLabelBackfillAriaLabel(null, null)).toBe("Backfill outcome labels");
+  });
+
+  it("names the refresh target assessment and load kind", () => {
+    expect(formatOutcomeLabelBackfillAriaLabel(3, "scan_labeled")).toBe(
+      "Backfill outcome labels then refresh assessment 3 (scan-labeled)",
+    );
+    expect(formatOutcomeLabelBackfillAriaLabel(4, "latest")).toBe(
+      "Backfill outcome labels then refresh assessment 4 (latest)",
+    );
+    expect(formatOutcomeLabelBackfillAriaLabel(1, null)).toBe(
+      "Backfill outcome labels then refresh assessment 1",
+    );
   });
 });

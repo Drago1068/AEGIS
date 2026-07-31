@@ -61,3 +61,20 @@ export function formatCalibrationActionAriaLabel(
 export function formatCalibrationActionIdChip(assessmentId: number): string {
   return `(${assessmentId} · latest)`;
 }
+
+/** Accessible name for outcome-label backfill when a refresh target is known (Phase 121). */
+export function formatOutcomeLabelBackfillAriaLabel(
+  assessmentId: number | null,
+  loadKind: OutcomeLabelHistoryLoadKind | null,
+): string {
+  if (assessmentId == null) {
+    return "Backfill outcome labels";
+  }
+  const kindSuffix =
+    loadKind === "scan_labeled"
+      ? " (scan-labeled)"
+      : loadKind === "latest"
+        ? " (latest)"
+        : "";
+  return `Backfill outcome labels then refresh assessment ${assessmentId}${kindSuffix}`;
+}

@@ -7,10 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 122 - NAS Live Verification of Phase 121
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 121 backfill refresh naming.
+See
+[docs/architecture/decisions/0123-phase-122-nas-live-verify-phase-121.md](docs/architecture/decisions/0123-phase-122-nas-live-verify-phase-121.md).
+
+#### Added
+
+- ADR-0123: live verify requires frontend recreate for Phase 121; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 121 - Outcome-Label Backfill Names Refresh Target
+
+Show active assessment id chip + aria on **Backfill outcome labels** (refresh target only).
+See
+[docs/architecture/decisions/0122-phase-121-outcome-label-backfill-names-refresh-target.md](docs/architecture/decisions/0122-phase-121-outcome-label-backfill-names-refresh-target.md).
+
+#### Added
+
+- ``formatOutcomeLabelBackfillAriaLabel`` and id chip on backfill outcome labels.
+
+#### Explicitly out of scope
+
+Changing backfill API scope, orders.
+
 ### Phase 120 - NAS Live Verification of Phase 119
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 119 calibration chip naming.
-See
+Live verify passed 2026-07-30 (``01cdb75``). See
 [docs/architecture/decisions/0121-phase-120-nas-live-verify-phase-119.md](docs/architecture/decisions/0121-phase-120-nas-live-verify-phase-119.md).
 
 #### Added

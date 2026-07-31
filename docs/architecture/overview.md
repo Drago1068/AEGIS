@@ -335,6 +335,10 @@ Phase 121 names outcome-label backfill with its refresh-target assessment (see
 [decisions/0122-phase-121-outcome-label-backfill-names-refresh-target.md](decisions/0122-phase-121-outcome-label-backfill-names-refresh-target.md)).
 Phase 122 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0123-phase-122-nas-live-verify-phase-121.md](decisions/0123-phase-122-nas-live-verify-phase-121.md)).
+Phase 123 extracts the research assessment action toolbar component (see
+[decisions/0124-phase-123-extract-research-assessment-action-toolbar.md](decisions/0124-phase-123-extract-research-assessment-action-toolbar.md)).
+Phase 124 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0125-phase-124-nas-live-verify-phase-123.md](decisions/0125-phase-124-nas-live-verify-phase-123.md)).
 
 ## System context
 

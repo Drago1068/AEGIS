@@ -495,7 +495,7 @@ export function ResearchAssessmentPanel({
     });
   }
 
-  const downloadOutcomeLabelsAssessmentId =
+  const activeOutcomeLabelAssessmentId =
     outcomeLabelHistoryAssessmentId ?? latest?.id ?? null;
 
   return (
@@ -574,19 +574,19 @@ export function ResearchAssessmentPanel({
           <button
             type="button"
             onClick={onComputeOutcomeLabels}
-            disabled={isPending || downloadOutcomeLabelsAssessmentId == null}
+            disabled={isPending || activeOutcomeLabelAssessmentId == null}
             data-testid="compute-outcome-labels"
             aria-label={
-              downloadOutcomeLabelsAssessmentId != null
-                ? `Compute outcome labels for assessment ${downloadOutcomeLabelsAssessmentId}`
+              activeOutcomeLabelAssessmentId != null
+                ? `Compute outcome labels for assessment ${activeOutcomeLabelAssessmentId}`
                 : "Compute outcome labels"
             }
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Compute outcome labels
-            {downloadOutcomeLabelsAssessmentId != null ? (
+            {activeOutcomeLabelAssessmentId != null ? (
               <span className="ml-1 font-mono text-xs text-aegis-muted">
-                ({downloadOutcomeLabelsAssessmentId})
+                ({activeOutcomeLabelAssessmentId})
               </span>
             ) : null}
           </button>
@@ -601,19 +601,19 @@ export function ResearchAssessmentPanel({
           <button
             type="button"
             onClick={onDownloadOutcomeLabels}
-            disabled={isPending || downloadOutcomeLabelsAssessmentId == null}
+            disabled={isPending || activeOutcomeLabelAssessmentId == null}
             data-testid="download-outcome-labels"
             aria-label={
-              downloadOutcomeLabelsAssessmentId != null
-                ? `Download outcome labels JSON for assessment ${downloadOutcomeLabelsAssessmentId}`
+              activeOutcomeLabelAssessmentId != null
+                ? `Download outcome labels JSON for assessment ${activeOutcomeLabelAssessmentId}`
                 : "Download outcome labels JSON"
             }
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Download outcome labels JSON
-            {downloadOutcomeLabelsAssessmentId != null ? (
+            {activeOutcomeLabelAssessmentId != null ? (
               <span className="ml-1 font-mono text-xs text-aegis-muted">
-                ({downloadOutcomeLabelsAssessmentId})
+                ({activeOutcomeLabelAssessmentId})
               </span>
             ) : null}
           </button>

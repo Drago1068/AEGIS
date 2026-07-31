@@ -26,9 +26,9 @@ Rename ``downloadOutcomeLabelsAssessmentId`` to ``activeOutcomeLabelAssessmentId
 behavior change). See
 [docs/architecture/decisions/0108-phase-107-rename-active-outcome-label-assessment-id.md](docs/architecture/decisions/0108-phase-107-rename-active-outcome-label-assessment-id.md).
 
-#### Planned
+#### Added
 
-- Shared helper rename across compute/download bindings and tests.
+- Shared helper rename across compute/download bindings.
 
 #### Explicitly out of scope
 

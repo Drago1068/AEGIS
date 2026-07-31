@@ -1,6 +1,6 @@
 # ADR-0108: Phase 107 Rename Active Outcome-Label Assessment Id Helper
 
-- Status: Accepted (draft / pending implementation)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -20,11 +20,8 @@ bindings and tests accordingly. No behavior change.
 
 New API fields, UX copy changes beyond the rename, default-on calibration, orders, ACME.
 
-## Resume
-
-Implement rename + unit tests; update CHANGELOG/README/overview; then Phase 108 NAS verify.
-
 ## Related documents
 
 - [0088-phase-87-outcome-label-download-loaded-assessment.md](0088-phase-87-outcome-label-download-loaded-assessment.md)
 - [0094-phase-93-compute-outcome-labels-loaded-assessment.md](0094-phase-93-compute-outcome-labels-loaded-assessment.md)
+- [0109-phase-108-nas-live-verify-phase-107.md](0109-phase-108-nas-live-verify-phase-107.md)

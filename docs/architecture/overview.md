@@ -530,8 +530,13 @@ Phase 210 live-verified that revision (see
 [decisions/0211-phase-210-nas-live-verify-phase-209.md](decisions/0211-phase-210-nas-live-verify-phase-209.md)).
 Phase 211 surfaces top-level ``latest_outcome_label_as_of_trading_date`` on evidence summary (see
 [decisions/0212-phase-211-evidence-summary-latest-outcome-label-as-of-trading-date.md](decisions/0212-phase-211-evidence-summary-latest-outcome-label-as-of-trading-date.md)).
-Phase 212 (draft) live-verifies that revision (see
+Phase 212 live-verified that revision and closed the absolute-latest outcome-label scalar series (see
 [decisions/0213-phase-212-nas-live-verify-phase-211.md](decisions/0213-phase-212-nas-live-verify-phase-211.md)).
+Phase 213 surfaces top-level ``most_recent_labeled_outcome_label_id`` for scan-labeled provenance when
+the absolute latest assessment is unlabeled (see
+[decisions/0214-phase-213-evidence-summary-most-recent-labeled-outcome-label-id.md](decisions/0214-phase-213-evidence-summary-most-recent-labeled-outcome-label-id.md)).
+Phase 214 (draft) live-verifies that revision (see
+[decisions/0215-phase-214-nas-live-verify-phase-213.md](decisions/0215-phase-214-nas-live-verify-phase-213.md)).
 
 ## System context
 

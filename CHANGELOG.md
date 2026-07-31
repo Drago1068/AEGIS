@@ -7,10 +7,41 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 212 - NAS Live Verification of Phase 211 (draft)
+### Phase 214 - NAS Live Verification of Phase 213 (draft)
 
-Ops evidence gate after Phase 211 latest outcome label as-of trading date field. See
+Ops evidence gate after Phase 213 most recent labeled outcome label id field. See
+[docs/architecture/decisions/0215-phase-214-nas-live-verify-phase-213.md](docs/architecture/decisions/0215-phase-214-nas-live-verify-phase-213.md).
+
+### Phase 213 - Evidence Summary Most Recent Labeled Outcome Label Id
+
+Surface top-level ``most_recent_labeled_outcome_label_id`` on evidence summary after completing
+the absolute-latest ``latest_outcome_label_*`` scalar series. See
+[docs/architecture/decisions/0214-phase-213-evidence-summary-most-recent-labeled-outcome-label-id.md](docs/architecture/decisions/0214-phase-213-evidence-summary-most-recent-labeled-outcome-label-id.md).
+
+#### Added
+
+- ``most_recent_labeled_outcome_label_id`` on evidence summary (+ export); from scan-labeled label.
+- Console surfaces the field with ``data-testid="evidence-most-recent-labeled-outcome-label-id"``.
+- NAS verify checklist item 102 for Phase 214.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts, redundant ``latest_outcome_label_assessment_snapshot_id``.
+
+### Phase 212 - NAS Live Verification of Phase 211
+
+Ops evidence gate after Phase 211 latest outcome label as-of trading date field. Live verify
+passed 2026-07-31 (``d0f8bb8``; AAPL ``latest_outcome_label_as_of_trading_date=null`` — latest
+unlabeled). Closes absolute-latest outcome-label scalar provenance lift. See
 [docs/architecture/decisions/0213-phase-212-nas-live-verify-phase-211.md](docs/architecture/decisions/0213-phase-212-nas-live-verify-phase-211.md).
+
+#### Added
+
+- ADR-0213: live verify requires backend+frontend recreate for Phase 211; checklist item 101.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 211 - Evidence Summary Latest Outcome Label As-Of Trading Date
 

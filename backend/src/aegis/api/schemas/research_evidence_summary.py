@@ -102,6 +102,15 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "the label from most_recent_labeled_assessment_id. Never invented."
         ),
     )
+    most_recent_labeled_outcome_label_id: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "id from most_recent_labeled_outcome_label when present. Null when no scan-labeled "
+            "rows. Distinct from latest_outcome_label_id (null when absolute newest is "
+            "unlabeled) and most_recent_labeled_assessment_id. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

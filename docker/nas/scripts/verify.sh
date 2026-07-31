@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 # Verify a live AEGIS NAS deployment (Phase 7/9 + Phase 17 evidence gate).
 # Distinct from package upload / deploy start.
 # Usage: ./docker/nas/scripts/verify.sh [--dry-run]
@@ -29,7 +29,7 @@ print_checklist() {
   echo "Live verification checklist (ADR-0018):"
   echo "  1. GET /health -> 200"
   echo "  2. GET /ready -> 200"
-  echo "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list(+export), calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export), outcome-labels/backfill POST, assessments/backfill POST"
+  echo "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list(+export), calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export), outcome-labels/backfill POST, assessments/backfill POST, market-data/ingest POST"
   echo "  4. Frontend base URL -> 200|302|307|308"
   echo "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
   echo "  6. Authenticated GET /research/${symbol}/calibration-readiness -> 200 (by_horizon includes fwd5+fwd20)"
@@ -150,11 +150,12 @@ print_checklist() {
   echo "121. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
   echo "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
   echo "123. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-  echo "124. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo "124. Authenticated POST /market-data/ingest tip refresh; re-read evidence-summary lag/tip (Phase 257/258; unchanged OK)"
+  echo "125. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
-  echo "==> DRY RUN — checklist only; NOT live verification evidence"
+  echo "==> DRY RUN â€” checklist only; NOT live verification evidence"
   print_checklist "${VERIFY_SYMBOL}"
   echo
   echo "Dry-run complete. Run without --dry-run against a live NAS for acceptance evidence."
@@ -189,13 +190,13 @@ if nas_tls_enabled; then
     echo "error: TLS profile requires AEGIS_SESSION_COOKIE_SECURE=true." >&2
     exit 1
   fi
-  echo "==> TLS profile enabled — verifying over HTTPS"
+  echo "==> TLS profile enabled â€” verifying over HTTPS"
 fi
 
 CURL_INSECURE=()
 insecure="$(printf '%s' "${AEGIS_NAS_VERIFY_CURL_INSECURE:-false}" | tr '[:upper:]' '[:lower:]')"
 if [[ "${insecure}" == "true" || "${insecure}" == "1" || "${insecure}" == "yes" ]]; then
-  echo "NOTE: AEGIS_NAS_VERIFY_CURL_INSECURE set — curl will skip TLS certificate verification (lab only)."
+  echo "NOTE: AEGIS_NAS_VERIFY_CURL_INSECURE set â€” curl will skip TLS certificate verification (lab only)."
   CURL_INSECURE=(-k)
 fi
 if [[ -n "${AEGIS_NAS_VERIFY_CURL_RESOLVE:-}" ]]; then
@@ -206,7 +207,7 @@ if [[ -n "${AEGIS_NAS_VERIFY_CURL_RESOLVE:-}" ]]; then
       CURL_INSECURE+=(--resolve "${entry}")
     fi
   done
-  echo "NOTE: AEGIS_NAS_VERIFY_CURL_RESOLVE set — curl --resolve overrides for lab DNS."
+  echo "NOTE: AEGIS_NAS_VERIFY_CURL_RESOLVE set â€” curl --resolve overrides for lab DNS."
 fi
 
 http_status() {
@@ -270,6 +271,12 @@ assess_backfill_unauth_code="$(
     -H "Accept: application/json" -X POST "${assess_backfill_unauth_url}"
 )"
 assert_status "POST ${assess_backfill_unauth_url} (unauth)" "${assess_backfill_unauth_code}" 401
+ingest_unauth_url="${API}/market-data/ingest"
+ingest_unauth_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -o /dev/null -w "%{http_code}" --max-time 30 \
+    -H "Accept: application/json" -X POST "${ingest_unauth_url}"
+)"
+assert_status "POST ${ingest_unauth_url} (unauth)" "${ingest_unauth_code}" 401
 
 echo "==> Frontend reachability"
 fe_status="$(http_status "${FRONTEND}")"
@@ -1010,6 +1017,45 @@ if ! grep -q '"stored_bar_calendar_lag_trading_days"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 256 stored_bar_calendar_lag_trading_days field present"
+# Phase 258: on-demand ingest tip refresh (Phase 257). Unchanged lag/tip OK.
+pre_lag="$(printf '%s' "${summary_body}" | grep -oE '"stored_bar_calendar_lag_trading_days"[[:space:]]*:[[:space:]]*[0-9]+|"stored_bar_calendar_lag_trading_days"[[:space:]]*:[[:space:]]*null' | head -1 || true)"
+pre_tip="$(printf '%s' "${summary_body}" | grep -oE '"latest_assessment_last_available_label_bar_date"[[:space:]]*:[[:space:]]*"[^"]+"|"latest_assessment_last_available_label_bar_date"[[:space:]]*:[[:space:]]*null' | head -1 || true)"
+pre_as_of="$(printf '%s' "${summary_body}" | grep -oE '"latest_as_of_trading_date"[[:space:]]*:[[:space:]]*"[^"]+"|"latest_as_of_trading_date"[[:space:]]*:[[:space:]]*null' | head -1 || true)"
+ingest_url="${API}/market-data/ingest"
+ingest_body="$(mktemp)"
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}" "${calib_export_body}" "${calib_export_headers}" "${summary_body}" "${ingest_body}"; }
+trap cleanup EXIT
+ingest_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -o "${ingest_body}" -w "%{http_code}" --max-time 300 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" -X POST "${ingest_url}"
+)"
+assert_status "POST ${ingest_url} (auth)" "${ingest_code}" 200
+if ! grep -q '"results"' "${ingest_body}"; then
+  echo "market-data/ingest missing results array (Phase 257/258)" >&2
+  exit 1
+fi
+echo "OK  Phase 258 ingest HTTP 200 results present"
+post_summary_body="$(mktemp)"
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}" "${calib_export_body}" "${calib_export_headers}" "${summary_body}" "${ingest_body}" "${post_summary_body}"; }
+trap cleanup EXIT
+post_summary_code="$(
+  curl -sS "${CURL_INSECURE[@]}" -o "${post_summary_body}" -w "%{http_code}" --max-time 60 \
+    -b "${COOKIE_JAR}" -H "Accept: application/json" \
+    "${API}/research/${VERIFY_SYMBOL}/evidence-summary"
+)"
+assert_status "GET evidence-summary (post-ingest)" "${post_summary_code}" 200
+if ! grep -q '"stored_bar_calendar_lag_trading_days"' "${post_summary_body}"; then
+  echo "post-ingest evidence-summary missing stored_bar_calendar_lag_trading_days (Phase 257/258)" >&2
+  exit 1
+fi
+if ! grep -q '"latest_assessment_last_available_label_bar_date"' "${post_summary_body}"; then
+  echo "post-ingest evidence-summary missing latest_assessment_last_available_label_bar_date (Phase 257/258)" >&2
+  exit 1
+fi
+post_lag="$(printf '%s' "$(cat "${post_summary_body}")" | grep -oE '"stored_bar_calendar_lag_trading_days"[[:space:]]*:[[:space:]]*[0-9]+|"stored_bar_calendar_lag_trading_days"[[:space:]]*:[[:space:]]*null' | head -1 || true)"
+post_tip="$(printf '%s' "$(cat "${post_summary_body}")" | grep -oE '"latest_assessment_last_available_label_bar_date"[[:space:]]*:[[:space:]]*"[^"]+"|"latest_assessment_last_available_label_bar_date"[[:space:]]*:[[:space:]]*null' | head -1 || true)"
+post_as_of="$(printf '%s' "$(cat "${post_summary_body}")" | grep -oE '"latest_as_of_trading_date"[[:space:]]*:[[:space:]]*"[^"]+"|"latest_as_of_trading_date"[[:space:]]*:[[:space:]]*null' | head -1 || true)"
+echo "OK  Phase 258 ingest tip refresh pre=${pre_lag:-unknown} post=${post_lag:-unknown} pre_tip=${pre_tip:-unknown} post_tip=${post_tip:-unknown} pre_as_of=${pre_as_of:-unknown} post_as_of=${post_as_of:-unknown} (unchanged OK)"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -1034,7 +1080,7 @@ fi
 export_url="${API}/research/${VERIFY_SYMBOL}/evidence-summary/export"
 export_body="$(mktemp)"
 export_headers="$(mktemp)"
-cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}" "${calib_export_body}" "${calib_export_headers}" "${summary_body}" "${export_body}" "${export_headers}"; }
+cleanup() { rm -f "${COOKIE_JAR}" "${ready_export_body}" "${ready_export_headers}" "${assess_body}" "${assess_export_body}" "${assess_export_headers}" "${calib_body}" "${label_body}" "${label_export_body}" "${label_export_headers}" "${calib_export_body}" "${calib_export_headers}" "${summary_body}" "${ingest_body}" "${post_summary_body}" "${export_body}" "${export_headers}"; }
 trap cleanup EXIT
 export_code="$(
   curl -sS "${CURL_INSECURE[@]}" -D "${export_headers}" -o "${export_body}" -w "%{http_code}" --max-time 30 \

@@ -638,7 +638,7 @@ session calendar (see
 [decisions/0256-phase-255-evidence-summary-stored-bar-calendar-lag.md](decisions/0256-phase-255-evidence-summary-stored-bar-calendar-lag.md)).
 Phase 256 live-verified that lag (see
 [decisions/0257-phase-256-nas-live-verify-phase-255.md](decisions/0257-phase-256-nas-live-verify-phase-255.md)).
-Phase 257 (draft) proposes on-demand ingest tip refresh so the store can advance (see
+Phase 257 exercises on-demand ingest tip refresh so the store can advance (see
 [decisions/0258-phase-257-on-demand-ingest-tip-refresh.md](decisions/0258-phase-257-on-demand-ingest-tip-refresh.md)).
 Phase 258 (draft) would live-verify that refresh (see
 [decisions/0259-phase-258-nas-live-verify-phase-257.md](decisions/0259-phase-258-nas-live-verify-phase-257.md)).

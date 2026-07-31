@@ -1,6 +1,6 @@
-# ADR-0258: Phase 257 On-Demand Ingest Tip Refresh (draft)
+# ADR-0258: Phase 257 On-Demand Ingest Tip Refresh
 
-- Status: Proposed (ready after Phase 256; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -13,7 +13,7 @@ scalar.
 
 Prefer this ops/product refresh over UI modularization or redundant tip dates.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. Scope
 
@@ -35,6 +35,8 @@ weakening fail-closed gates.
 
 Calendar lag diagnosed the gap. Tip refresh is the actionable next step so unlock
 shortfall/last-available can move without more diagnostics.
+
+Gate approved by standing instruction ("Proceed and approve from here on out").
 
 ## Resume (after Phase 256 gate)
 

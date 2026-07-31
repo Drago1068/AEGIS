@@ -40,7 +40,7 @@ function Write-VerifyChecklist {
     Write-Host "Live verification checklist (ADR-0018):"
     Write-Host "  1. GET /health -> 200"
     Write-Host "  2. GET /ready -> 200"
-    Write-Host "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list(+export), calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export), outcome-labels/backfill POST, assessments/backfill POST"
+    Write-Host "  3. Auth gate 401: watchlist, daily-bars, research latest, assessments list(+export), calibration-readiness(+export), outcome-labels/export, calibrations/export, evidence-summary(+export), outcome-labels/backfill POST, assessments/backfill POST, market-data/ingest POST"
     Write-Host "  4. Frontend base URL -> 200|302|307|308"
     Write-Host "  5. POST /auth/login (operator credentials from .env.nas) -> 200 + cookie"
     Write-Host "  6. Authenticated GET /research/$Symbol/calibration-readiness -> 200 (by_horizon includes fwd5+fwd20)"
@@ -161,7 +161,8 @@ function Write-VerifyChecklist {
     Write-Host "121. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
     Write-Host "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
     Write-Host "123. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-    Write-Host "124. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "124. Authenticated POST /market-data/ingest tip refresh; re-read evidence-summary lag/tip (Phase 257/258; unchanged OK)"
+    Write-Host "125. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -278,6 +279,11 @@ $assessBackfillUnauthCode = & curl.exe -sS @curlInsecure -o NUL -w "%{http_code}
     -H "Accept: application/json" -X POST $assessBackfillUnauthUrl
 if ($LASTEXITCODE -ne 0) { throw "POST assessments/backfill (unauth) failed (curl exit $LASTEXITCODE)" }
 Assert-Status -Label "POST $assessBackfillUnauthUrl (unauth)" -Actual ([int]$assessBackfillUnauthCode) -Expected @(401)
+$ingestUnauthUrl = "$api/market-data/ingest"
+$ingestUnauthCode = & curl.exe -sS @curlInsecure -o NUL -w "%{http_code}" --max-time 30 `
+    -H "Accept: application/json" -X POST $ingestUnauthUrl
+if ($LASTEXITCODE -ne 0) { throw "POST market-data/ingest (unauth) failed (curl exit $LASTEXITCODE)" }
+Assert-Status -Label "POST $ingestUnauthUrl (unauth)" -Actual ([int]$ingestUnauthCode) -Expected @(401)
 
 Write-Host "==> Frontend reachability"
 $feStatus = Get-HttpStatus $frontend
@@ -1232,6 +1238,58 @@ try {
         $barLag = $summary.stored_bar_calendar_lag_trading_days
         $barLagPart = if ($null -eq $barLag -or $barLag -eq "") { "null" } else { [string]$barLag }
         Write-Host "OK  Phase 256 stored_bar_calendar_lag_trading_days=$barLagPart"
+        # Phase 258: on-demand ingest tip refresh (Phase 257). Unchanged lag/tip OK when
+        # providers have no newer closes — never invent; fail only on HTTP/contract errors.
+        $preLagPart = $barLagPart
+        $preTipPart = $lastAvailPart
+        $preAsOfPart = $asOfPart
+        $ingestUrl = "$api/market-data/ingest"
+        $ingestPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.ingest.json" -f [guid]::NewGuid().ToString("N"))
+        $postSummaryPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.summary-post.json" -f [guid]::NewGuid().ToString("N"))
+        try {
+            $ingestCode = & curl.exe -sS @curlInsecure -o $ingestPath -w "%{http_code}" --max-time 300 `
+                -b $cookieJar -H "Accept: application/json" -X POST $ingestUrl
+            if ($LASTEXITCODE -ne 0) { throw "POST market-data/ingest failed (curl exit $LASTEXITCODE)" }
+            Assert-Status -Label "POST $ingestUrl (auth)" -Actual ([int]$ingestCode) -Expected @(200)
+            $ingestBody = Get-Content -LiteralPath $ingestPath -Raw | ConvertFrom-Json
+            if ($null -eq $ingestBody.results) {
+                throw "market-data/ingest missing results array (Phase 257/258)"
+            }
+            $verifyRow = @($ingestBody.results | Where-Object { [string]$_.symbol -eq $verifySymbol }) | Select-Object -First 1
+            if ($null -ne $verifyRow) {
+                Write-Host ("OK  Phase 258 ingest {0} stored={1} skipped_existing={2} corrected={3} rejected={4} error={5}" -f `
+                    $verifySymbol, $verifyRow.stored_count, $verifyRow.skipped_existing_count, `
+                    $verifyRow.corrected_count, $verifyRow.rejected_count, `
+                    $(if ($null -eq $verifyRow.error -or $verifyRow.error -eq "") { "null" } else { [string]$verifyRow.error }))
+            } else {
+                Write-Host "OK  Phase 258 ingest results_count=$(@($ingestBody.results).Count) (verify symbol not in run; watchlist OK)"
+            }
+            $postCode = & curl.exe -sS @curlInsecure -o $postSummaryPath -w "%{http_code}" --max-time 60 `
+                -b $cookieJar -H "Accept: application/json" "$api/research/$verifySymbol/evidence-summary"
+            if ($LASTEXITCODE -ne 0) { throw "GET evidence-summary (post-ingest) failed (curl exit $LASTEXITCODE)" }
+            Assert-Status -Label "GET evidence-summary (post-ingest)" -Actual ([int]$postCode) -Expected @(200)
+            $postSummary = Get-Content -LiteralPath $postSummaryPath -Raw | ConvertFrom-Json
+            if (-not ($postSummary.PSObject.Properties.Name -contains "stored_bar_calendar_lag_trading_days")) {
+                throw "post-ingest evidence-summary missing stored_bar_calendar_lag_trading_days (Phase 257/258)"
+            }
+            if (-not ($postSummary.PSObject.Properties.Name -contains "latest_assessment_last_available_label_bar_date")) {
+                throw "post-ingest evidence-summary missing latest_assessment_last_available_label_bar_date (Phase 257/258)"
+            }
+            $postLag = $postSummary.stored_bar_calendar_lag_trading_days
+            $postLagPart = if ($null -eq $postLag -or $postLag -eq "") { "null" } else { [string]$postLag }
+            $postTip = $postSummary.latest_assessment_last_available_label_bar_date
+            $postTipPart = if ($null -eq $postTip -or $postTip -eq "") { "null" } else { [string]$postTip }
+            $postAsOf = $postSummary.latest_as_of_trading_date
+            $postAsOfPart = if ($null -eq $postAsOf -or $postAsOf -eq "") { "null" } else { [string]$postAsOf }
+            Write-Host "OK  Phase 258 ingest tip refresh pre_lag=$preLagPart post_lag=$postLagPart pre_tip=$preTipPart post_tip=$postTipPart pre_as_of=$preAsOfPart post_as_of=$postAsOfPart (unchanged OK)"
+        } finally {
+            if (Test-Path -LiteralPath $ingestPath) {
+                Remove-Item -LiteralPath $ingestPath -Force -ErrorAction SilentlyContinue
+            }
+            if (Test-Path -LiteralPath $postSummaryPath) {
+                Remove-Item -LiteralPath $postSummaryPath -Force -ErrorAction SilentlyContinue
+            }
+        }
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue

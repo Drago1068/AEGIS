@@ -12,11 +12,22 @@ delivery workflow).
 Ops evidence gate after Phase 257 on-demand ingest tip refresh. See
 [docs/architecture/decisions/0259-phase-258-nas-live-verify-phase-257.md](docs/architecture/decisions/0259-phase-258-nas-live-verify-phase-257.md).
 
-### Phase 257 - On-Demand Ingest Tip Refresh (draft)
+### Phase 257 - On-Demand Ingest Tip Refresh
 
 Exercise authenticated ingest so the stored tip / calendar lag can advance when providers
 have newer closes. See
 [docs/architecture/decisions/0258-phase-257-on-demand-ingest-tip-refresh.md](docs/architecture/decisions/0258-phase-257-on-demand-ingest-tip-refresh.md).
+
+#### Added
+
+- NAS verify checklist item 124: authenticated ``POST /market-data/ingest`` + re-read
+  evidence-summary lag/tip (unchanged OK; never invent).
+- Auth gate expects unauthenticated ingest POST → 401.
+
+#### Explicitly out of scope
+
+New evidence-summary fields, new providers, inventing closes, default-on calibration,
+orders, UI modularization.
 
 ### Phase 256 - NAS Live Verification of Phase 255
 

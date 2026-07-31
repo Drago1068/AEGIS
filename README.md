@@ -7,11 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 256 closed (stored-bar calendar lag live-verified).** Next (draft):
-Phase 257 on-demand ingest tip refresh (ADR-0258), then Phase 258 NAS verify. Prefer
-advancing the store over further unlock scalars / UI modularization. See
-[docs/architecture/decisions/0257-phase-256-nas-live-verify-phase-255.md](docs/architecture/decisions/0257-phase-256-nas-live-verify-phase-255.md),
+**Current phase: Phase 257 closed (on-demand ingest tip refresh).** Next (draft): Phase 258
+NAS live verify of Phase 257 (ADR-0259). Prefer advancing the store over further unlock
+scalars / UI modularization. See
 [docs/architecture/decisions/0258-phase-257-on-demand-ingest-tip-refresh.md](docs/architecture/decisions/0258-phase-257-on-demand-ingest-tip-refresh.md),
+[docs/architecture/decisions/0259-phase-258-nas-live-verify-phase-257.md](docs/architecture/decisions/0259-phase-258-nas-live-verify-phase-257.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

@@ -1,6 +1,6 @@
 # ADR-0153: Phase 152 NAS Live Verification of Phase 151
 
-- Status: Accepted (pending Phase 151 + live evidence)
+- Status: Accepted (live verified 2026-07-30; backend+frontend recreate of ``3c44966``)
 - Date: 2026-07-30
 
 ## Context
@@ -20,7 +20,8 @@ a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that 
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-30 for ``3c44966``
+(checklist item 71; AAPL ``latest_as_of_trading_date=2026-07-29``).
 
 ### 3. Out of scope
 
@@ -29,7 +30,7 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 151 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# Deploy HEAD backend+frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
 ```
 

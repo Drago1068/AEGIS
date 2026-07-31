@@ -7,9 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 128 - NAS Live Verification of Phase 127
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 127 outcome-label section
+extract. See
+[docs/architecture/decisions/0129-phase-128-nas-live-verify-phase-127.md](docs/architecture/decisions/0129-phase-128-nas-live-verify-phase-127.md).
+
+#### Added
+
+- ADR-0129: live verify requires frontend recreate for Phase 127; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 127 - Extract Outcome-Label History Panel Section
+
+Move outcome-label history UI into a presentational section component (no behavior change).
+See
+[docs/architecture/decisions/0128-phase-127-extract-outcome-label-history-section.md](docs/architecture/decisions/0128-phase-127-extract-outcome-label-history-section.md).
+
+#### Added
+
+- Outcome-label history section extract drafted (implement next).
+
+#### Explicitly out of scope
+
+New label math, orders.
+
 ### Phase 126 - NAS Live Verification of Phase 125
 
-Ops evidence gate: redeploy frontend under lab TLS after Phase 125 toolbar grouping. See
+Ops evidence gate: redeploy frontend under lab TLS after Phase 125 toolbar grouping. Live
+verify passed 2026-07-30 (``9a06fde``). See
 [docs/architecture/decisions/0127-phase-126-nas-live-verify-phase-125.md](docs/architecture/decisions/0127-phase-126-nas-live-verify-phase-125.md).
 
 #### Added

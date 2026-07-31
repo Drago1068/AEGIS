@@ -1,12 +1,13 @@
-# ADR-0127: Phase 126 NAS Live Verification of Phase 125
+# ADR-0129: Phase 128 NAS Live Verification of Phase 127
 
-- Status: Accepted (live verified 2026-07-30; frontend recreate of ``9a06fde``)
+- Status: Accepted (pending Phase 127 + live evidence)
 - Date: 2026-07-30
 
 ## Context
 
-Phase 125 groups research assessment action toolbar controls (ADR-0126). Operators need a
-verified frontend redeploy on the UGREEN NAS under lab TLS after that lands.
+Phase 127 extracts the outcome-label history panel section (ADR-0128). Operators need a
+verified frontend redeploy on the UGREEN NAS under lab TLS after that lands
+(behavior-preserving).
 
 ## Decisions
 
@@ -14,7 +15,7 @@ verified frontend redeploy on the UGREEN NAS under lab TLS after that lands.
 
 1. Deploy current ``HEAD`` with TLS overlay; recreate **frontend**.
 2. Run `verify.ps1` / `verify.sh` successfully (prior gates remain).
-3. Phase 125 UX accepted via unit tests; live verify does not automate browser clicks.
+3. Phase 127 accepted via unit tests; live verify does not automate browser clicks.
 4. SSH `alembic current` includes **`0009`** or `head`.
 
 ### 2. Upload ≠ verified
@@ -28,11 +29,11 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# Deploy HEAD frontend to NAS under TLS, then:
+# After Phase 127 is on HEAD: git archive → NAS; rebuild frontend TLS; then:
 .\docker\nas\scripts\verify.ps1
 ```
 
 ## Related documents
 
-- [0126-phase-125-group-research-assessment-action-toolbar.md](0126-phase-125-group-research-assessment-action-toolbar.md)
+- [0128-phase-127-extract-outcome-label-history-section.md](0128-phase-127-extract-outcome-label-history-section.md)
 - [../../operations/nas-live-verification.md](../../operations/nas-live-verification.md)

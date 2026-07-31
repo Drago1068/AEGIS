@@ -143,7 +143,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 56 | Phase 122 frontend redeploy (Phase 121 backfill names refresh target) | Frontend recreated; backfill naming UX unit-tested |
 | 57 | Phase 124 frontend redeploy (Phase 123 extract action toolbar) | Frontend recreated; toolbar extract covered by unit tests |
 | 58 | Phase 126 frontend redeploy (Phase 125 group action toolbar) | Frontend recreated; toolbar grouping UX unit-tested |
-| 59 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 59 | Phase 128 frontend redeploy (Phase 127 extract outcome-label history section) | Frontend recreated; section extract covered by unit tests |
+| 60 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

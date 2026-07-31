@@ -221,4 +221,11 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Never invented."
         ),
     )
+    latest_calibration_horizon_key: str | None = Field(
+        default=None,
+        description=(
+            "outcome_horizon_key from latest_calibration when present. Null when none. "
+            "Never invented."
+        ),
+    )
     detail: str

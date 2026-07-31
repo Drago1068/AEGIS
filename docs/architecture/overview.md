@@ -462,8 +462,12 @@ Phase 176 live-verified that revision (see
 [decisions/0177-phase-176-nas-live-verify-phase-175.md](decisions/0177-phase-176-nas-live-verify-phase-175.md)).
 Phase 177 surfaces top-level ``latest_calibration_id`` on evidence summary (see
 [decisions/0178-phase-177-evidence-summary-latest-calibration-id.md](decisions/0178-phase-177-evidence-summary-latest-calibration-id.md)).
-Phase 178 (draft) live-verifies that revision (see
+Phase 178 live-verified that revision (see
 [decisions/0179-phase-178-nas-live-verify-phase-177.md](decisions/0179-phase-178-nas-live-verify-phase-177.md)).
+Phase 179 surfaces top-level ``latest_calibration_horizon_key`` on evidence summary (see
+[decisions/0180-phase-179-evidence-summary-latest-calibration-horizon-key.md](decisions/0180-phase-179-evidence-summary-latest-calibration-horizon-key.md)).
+Phase 180 (draft) live-verifies that revision (see
+[decisions/0181-phase-180-nas-live-verify-phase-179.md](decisions/0181-phase-180-nas-live-verify-phase-179.md)).
 
 ## System context
 

@@ -390,11 +390,13 @@ async def _build_research_evidence_summary(
     readiness = await calibration_service.evaluate_readiness(symbol, snapshot)
     latest_assessment_is_label_ready: bool | None = None
     latest_assessment_label_block_reason: str | None = None
-    if snapshot is not None:
+    most_recent_labelable_as_of_trading_date: date | None = None
+    if snapshots:
         (
             latest_assessment_is_label_ready,
             block_reason,
-        ) = await outcome_label_service.label_readiness_for_assessment(symbol, snapshot)
+            most_recent_labelable_as_of_trading_date,
+        ) = await outcome_label_service.scan_label_diagnostics(symbol, snapshots)
         latest_assessment_label_block_reason = (
             None if block_reason is None else block_reason.value
         )
@@ -663,6 +665,7 @@ async def _build_research_evidence_summary(
         scan_labeled_freshness_lag_trading_days=scan_labeled_freshness_lag_trading_days,
         latest_assessment_is_label_ready=latest_assessment_is_label_ready,
         latest_assessment_label_block_reason=latest_assessment_label_block_reason,
+        most_recent_labelable_as_of_trading_date=most_recent_labelable_as_of_trading_date,
         latest_coverage_confidence=latest_coverage_confidence,
         latest_research_index=latest_research_index,
         latest_as_of_trading_date=latest_as_of_trading_date,

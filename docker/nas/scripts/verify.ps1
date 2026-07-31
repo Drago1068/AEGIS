@@ -150,7 +150,8 @@ function Write-VerifyChecklist {
     Write-Host "110. Authenticated evidence-summary includes Phase 229 scan_labeled_freshness_lag_trading_days (Phase 230)"
     Write-Host "111. Authenticated evidence-summary includes Phase 231 latest_assessment_is_label_ready (Phase 232)"
     Write-Host "112. Authenticated evidence-summary includes Phase 233 latest_assessment_label_block_reason (Phase 234)"
-    Write-Host "113. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "113. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
+    Write-Host "114. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1145,6 +1146,13 @@ try {
         $blockReason = $summary.latest_assessment_label_block_reason
         $blockReasonPart = if ($null -eq $blockReason -or $blockReason -eq "") { "null" } else { [string]$blockReason }
         Write-Host "OK  Phase 234 latest_assessment_label_block_reason=$blockReasonPart"
+        # Phase 236: most_recent_labelable_as_of_trading_date from Phase 235 (null OK when none label-ready).
+        if (-not ($summary.PSObject.Properties.Name -contains "most_recent_labelable_as_of_trading_date")) {
+            throw "evidence-summary missing most_recent_labelable_as_of_trading_date (Phase 235/236)"
+        }
+        $labelableAsOf = $summary.most_recent_labelable_as_of_trading_date
+        $labelableAsOfPart = if ($null -eq $labelableAsOf -or $labelableAsOf -eq "") { "null" } else { [string]$labelableAsOf }
+        Write-Host "OK  Phase 236 most_recent_labelable_as_of_trading_date=$labelableAsOfPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1326,6 +1334,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_assessment_label_block_reason")) {
             throw "evidence-summary/export missing latest_assessment_label_block_reason (Phase 233/234)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_labelable_as_of_trading_date")) {
+            throw "evidence-summary/export missing most_recent_labelable_as_of_trading_date (Phase 235/236)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

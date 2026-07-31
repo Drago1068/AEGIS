@@ -413,6 +413,37 @@ class OutcomeLabelService:
         )
         return reason is None, reason
 
+    async def scan_label_diagnostics(
+        self,
+        symbol: str,
+        snapshots_newest_first: list[ResearchAssessmentSnapshotData],
+    ) -> tuple[bool | None, OutcomeLabelReason | None, date | None]:
+        """Return latest readiness plus most-recent labelable as_of (ADR-0232/0234/0236).
+
+        Loads stored bars once. ``(None, None, None)`` when the scan is empty.
+        """
+
+        if not snapshots_newest_first:
+            return None, None, None
+
+        bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
+        latest = snapshots_newest_first[0]
+        block_reason = snapshot_label_block_reason(
+            latest,
+            bars,
+            calendar_name=self._calendar_name,
+        )
+        most_recent_labelable: date | None = None
+        for row in snapshots_newest_first:
+            if is_snapshot_label_ready(
+                row,
+                bars,
+                calendar_name=self._calendar_name,
+            ):
+                most_recent_labelable = row.as_of_trading_date
+                break
+        return block_reason is None, block_reason, most_recent_labelable
+
     async def assessment_ids_with_labels(
         self,
         symbol: str,

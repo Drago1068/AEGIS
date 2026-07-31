@@ -12,18 +12,37 @@ delivery workflow).
 Ops evidence gate after Phase 235 most-recent-labelable as_of diagnostic. See
 [docs/architecture/decisions/0237-phase-236-nas-live-verify-phase-235.md](docs/architecture/decisions/0237-phase-236-nas-live-verify-phase-235.md).
 
-### Phase 235 - Evidence Summary Most Recent Labelable As-Of Trading Date (draft)
+### Phase 235 - Evidence Summary Most Recent Labelable As-Of Trading Date
 
 Newest assessment as_of that is label-ready with stored bars (backfill targeting diagnostic).
 See
 [docs/architecture/decisions/0236-phase-235-evidence-summary-most-recent-labelable-as-of-trading-date.md](docs/architecture/decisions/0236-phase-235-evidence-summary-most-recent-labelable-as-of-trading-date.md).
 
-### Phase 234 - NAS Live Verification of Phase 233 (blocked on NAS SSH)
+#### Added
 
-Ops evidence gate after Phase 233 label block reason. Implementation is on ``main``
-(``9dee476``); live deploy/verify **blocked 2026-07-31** while NAS SSH port 22 refuses
-connections (host still pings). See
+- ``most_recent_labelable_as_of_trading_date`` on evidence summary (+ export).
+- ``OutcomeLabelService.scan_label_diagnostics`` (one bar load for readiness + labelable as_of).
+- Console ``data-testid="evidence-most-recent-labelable-as-of-trading-date"``.
+- NAS verify checklist item 113 for Phase 236.
+
+#### Explicitly out of scope
+
+Companion assessment id, UI modularization, orders, new scoring math.
+
+### Phase 234 - NAS Live Verification of Phase 233
+
+Ops evidence gate after Phase 233 label block reason. Live verify passed 2026-07-31
+(``bc554c7``; AAPL ``latest_assessment_label_block_reason=insufficient_forward_bars`` with
+``latest_assessment_is_label_ready=False``, lag=119). See
 [docs/architecture/decisions/0235-phase-234-nas-live-verify-phase-233.md](docs/architecture/decisions/0235-phase-234-nas-live-verify-phase-233.md).
+
+#### Added
+
+- ADR-0235: live verify requires backend+frontend recreate for Phase 233; checklist item 112.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 233 - Evidence Summary Latest Assessment Label Block Reason
 

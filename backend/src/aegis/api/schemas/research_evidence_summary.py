@@ -192,6 +192,15 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "when label-ready. Never invented."
         ),
     )
+    most_recent_labelable_as_of_trading_date: date | None = Field(
+        default=None,
+        description=(
+            "as_of_trading_date of the newest scanned assessment that is label-ready with "
+            "stored forward bars. Null when none are label-ready. Distinct from "
+            "latest_as_of_trading_date and most_recent_labeled_outcome_label_as_of_trading_date. "
+            "Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

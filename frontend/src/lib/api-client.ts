@@ -997,6 +997,11 @@ export interface ResearchEvidenceSummary {
    * Null when no assessment or when ready. Never invented.
    */
   latest_assessment_label_block_reason: string | null;
+  /**
+   * Newest scanned assessment as_of that is label-ready with stored bars.
+   * Null when none are label-ready. Never invented.
+   */
+  most_recent_labelable_as_of_trading_date: string | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

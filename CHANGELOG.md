@@ -7,10 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 116 - NAS Live Verification of Phase 115
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 115 helpers module extract.
+See
+[docs/architecture/decisions/0117-phase-116-nas-live-verify-phase-115.md](docs/architecture/decisions/0117-phase-116-nas-live-verify-phase-115.md).
+
+#### Added
+
+- ADR-0117: live verify requires frontend recreate for Phase 115; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 115 - Extract Outcome-Label Panel Helpers Module
+
+Move pure outcome-label helpers out of ``ResearchAssessmentPanel.tsx`` (no behavior change).
+See
+[docs/architecture/decisions/0116-phase-115-extract-outcome-label-panel-helpers.md](docs/architecture/decisions/0116-phase-115-extract-outcome-label-panel-helpers.md).
+
+#### Added
+
+- Helpers module extract drafted (implement next).
+
+#### Explicitly out of scope
+
+Broader panel splits, UX copy changes, orders.
+
 ### Phase 114 - NAS Live Verification of Phase 113
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 113 aria load-kind suffixes.
-See
+Live verify passed 2026-07-30 (``aba787e``). See
 [docs/architecture/decisions/0115-phase-114-nas-live-verify-phase-113.md](docs/architecture/decisions/0115-phase-114-nas-live-verify-phase-113.md).
 
 #### Added

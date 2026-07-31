@@ -1,13 +1,13 @@
-# ADR-0115: Phase 114 NAS Live Verification of Phase 113
+# ADR-0117: Phase 116 NAS Live Verification of Phase 115
 
-- Status: Accepted (live verified 2026-07-30; frontend recreate of ``aba787e``)
+- Status: Accepted (pending Phase 115 + live evidence)
 - Date: 2026-07-30
 
 ## Context
 
-Phase 113 adds load-kind suffixes to outcome-label action accessible names (ADR-0114).
+Phase 115 extracts outcome-label panel helpers into a dedicated module (ADR-0116).
 Operators need a verified frontend redeploy on the UGREEN NAS under lab TLS after that
-lands.
+lands (behavior-preserving).
 
 ## Decisions
 
@@ -15,7 +15,7 @@ lands.
 
 1. Deploy current ``HEAD`` with TLS overlay; recreate **frontend**.
 2. Run `verify.ps1` / `verify.sh` successfully (prior gates remain).
-3. Phase 113 UX accepted via unit tests; live verify does not automate browser clicks.
+3. Phase 115 accepted via unit tests; live verify does not automate browser clicks.
 4. SSH `alembic current` includes **`0009`** or `head`.
 
 ### 2. Upload ≠ verified
@@ -29,11 +29,11 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# Deploy HEAD frontend to NAS under TLS, then:
+# After Phase 115 is on HEAD: git archive → NAS; rebuild frontend TLS; then:
 .\docker\nas\scripts\verify.ps1
 ```
 
 ## Related documents
 
-- [0114-phase-113-outcome-label-action-aria-load-kind.md](0114-phase-113-outcome-label-action-aria-load-kind.md)
+- [0116-phase-115-extract-outcome-label-panel-helpers.md](0116-phase-115-extract-outcome-label-panel-helpers.md)
 - [../../operations/nas-live-verification.md](../../operations/nas-live-verification.md)

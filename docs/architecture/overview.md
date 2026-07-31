@@ -69,7 +69,8 @@ Phase 107 (rename active outcome-label assessment id helper), Phase 108 (NAS liv
 of Phase 107), Phase 109 (handlers use active outcome-label assessment id), Phase 110
 (NAS live verify of Phase 109), Phase 111 (resolve outcome-label history load-kind helper),
 Phase 112 (NAS live verify of Phase 111), Phase 113 (outcome-label action aria includes
-load kind), and Phase 114 (NAS live verify of Phase 113).
+load kind), Phase 114 (NAS live verify of Phase 113), Phase 115 (extract outcome-label
+panel helpers module), and Phase 116 (NAS live verify of Phase 115).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -313,6 +314,10 @@ Phase 113 adds load-kind suffixes to outcome-label action accessible names (see
 [decisions/0114-phase-113-outcome-label-action-aria-load-kind.md](decisions/0114-phase-113-outcome-label-action-aria-load-kind.md)).
 Phase 114 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0115-phase-114-nas-live-verify-phase-113.md](decisions/0115-phase-114-nas-live-verify-phase-113.md)).
+Phase 115 extracts outcome-label panel helpers into a dedicated module (see
+[decisions/0116-phase-115-extract-outcome-label-panel-helpers.md](decisions/0116-phase-115-extract-outcome-label-panel-helpers.md)).
+Phase 116 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0117-phase-116-nas-live-verify-phase-115.md](decisions/0117-phase-116-nas-live-verify-phase-115.md)).
 
 ## System context
 

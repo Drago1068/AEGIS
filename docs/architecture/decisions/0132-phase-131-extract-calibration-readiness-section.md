@@ -1,6 +1,6 @@
 # ADR-0132: Phase 131 Extract Calibration Readiness Panel Section
 
-- Status: Accepted (drafted; implement next)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -16,7 +16,7 @@ behavior change.
 
 Extract the calibration readiness UI into ``ResearchCalibrationReadinessSection.tsx``
 (props: readiness object). Preserve existing labels and ``by_horizon`` list rendering.
-No API changes.
+Add ``data-testid="calibration-readiness-section"``. No API changes.
 
 ### 2. Out of scope
 

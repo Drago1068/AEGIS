@@ -180,6 +180,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/state: research only/i)).toBeInTheDocument();
     });
     await waitFor(() => {
+      expect(screen.getByTestId("calibration-readiness-section")).toBeInTheDocument();
       expect(screen.getByText(/calibration readiness/i)).toBeInTheDocument();
       expect(screen.getAllByText("insufficient_labeled_corpus").length).toBeGreaterThan(0);
     });

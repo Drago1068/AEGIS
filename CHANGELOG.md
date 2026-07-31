@@ -29,7 +29,7 @@ behavior change). See
 
 #### Added
 
-- Calibration readiness section extract drafted (implement next).
+- ``ResearchCalibrationReadinessSection.tsx`` with ``data-testid="calibration-readiness-section"``.
 
 #### Explicitly out of scope
 

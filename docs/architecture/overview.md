@@ -576,10 +576,10 @@ freshness diagnostic between latest assessment as_of and scan-labeled outcome_la
 [decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md](decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md)).
 Phase 230 live-verified that diagnostic (see
 [decisions/0231-phase-230-nas-live-verify-phase-229.md](decisions/0231-phase-230-nas-live-verify-phase-229.md)).
-Phase 231 (draft) proposes ``latest_assessment_is_label_ready`` so operators can see whether
-the absolute latest row can be labeled today (see
+Phase 231 surfaces ``latest_assessment_is_label_ready`` so operators can see whether the
+absolute latest row can be labeled with stored forward bars (see
 [decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md](decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md)).
-Phase 232 (draft) would live-verify that diagnostic (see
+Phase 232 (draft) live-verifies that diagnostic (see
 [decisions/0233-phase-232-nas-live-verify-phase-231.md](decisions/0233-phase-232-nas-live-verify-phase-231.md)).
 
 ## System context

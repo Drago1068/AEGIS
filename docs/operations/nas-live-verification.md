@@ -195,7 +195,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 108 | Phase 226 backend+frontend redeploy (Phase 225 most recent labeled outcome label computed_at) | Evidence-summary includes most_recent_labeled_outcome_label_computed_at (null OK when no scan labels) |
 | 109 | Phase 228 backend+frontend redeploy (Phase 227 most recent labeled outcome label as-of trading date) | Evidence-summary includes most_recent_labeled_outcome_label_as_of_trading_date (null OK when no scan labels) |
 | 110 | Phase 230 backend+frontend redeploy (Phase 229 scan-labeled freshness lag) | Evidence-summary includes scan_labeled_freshness_lag_trading_days (null OK when either as_of missing) |
-| 111 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 111 | Phase 232 backend+frontend redeploy (Phase 231 latest assessment is label ready) | Evidence-summary includes latest_assessment_is_label_ready (null OK when no assessment) |
+| 112 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

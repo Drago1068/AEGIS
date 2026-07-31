@@ -12,11 +12,22 @@ delivery workflow).
 Ops evidence gate after Phase 231 latest-assessment label-ready diagnostic. See
 [docs/architecture/decisions/0233-phase-232-nas-live-verify-phase-231.md](docs/architecture/decisions/0233-phase-232-nas-live-verify-phase-231.md).
 
-### Phase 231 - Evidence Summary Latest Assessment Is Label Ready (draft)
+### Phase 231 - Evidence Summary Latest Assessment Is Label Ready
 
 Boolean evidence diagnostic: whether the absolute latest assessment has stored forward bars
 needed to label (reuse ``is_snapshot_label_ready``). See
 [docs/architecture/decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md](docs/architecture/decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md).
+
+#### Added
+
+- ``latest_assessment_is_label_ready`` on evidence summary (+ export); null when no assessment.
+- ``OutcomeLabelService.is_assessment_label_ready`` wraps stored-bar ``is_snapshot_label_ready``.
+- Console surfaces the field with ``data-testid="evidence-latest-assessment-is-label-ready"``.
+- NAS verify checklist item 111 for Phase 232.
+
+#### Explicitly out of scope
+
+Label block reason string, new scoring math, orders, UI structural extracts.
 
 ### Phase 230 - NAS Live Verification of Phase 229
 

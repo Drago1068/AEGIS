@@ -987,6 +987,11 @@ export interface ResearchEvidenceSummary {
    * latest_as_of_trading_date. Null when either date is missing. Never invented.
    */
   scan_labeled_freshness_lag_trading_days: number | null;
+  /**
+   * True when latest assessment has stored forward closes needed to label.
+   * Null when no latest assessment. Never invented.
+   */
+  latest_assessment_is_label_ready: boolean | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

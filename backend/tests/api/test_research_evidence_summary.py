@@ -128,8 +128,14 @@ class _FakeAssessmentService:
 
 
 class _FakeOutcomeLabelService:
-    def __init__(self, listed: list[OutcomeLabelData] | None = None) -> None:
+    def __init__(
+        self,
+        listed: list[OutcomeLabelData] | None = None,
+        *,
+        label_ready: bool = False,
+    ) -> None:
         self._listed = listed or []
+        self._label_ready = label_ready
 
     async def list_labels_for_assessment(
         self, symbol: str, assessment_snapshot_id: int, limit: int
@@ -151,6 +157,12 @@ class _FakeOutcomeLabelService:
         _ = label_method_id
         labeled = {row.assessment_snapshot_id for row in self._listed}
         return {item for item in assessment_ids if item in labeled}
+
+    async def is_assessment_label_ready(
+        self, symbol: str, snapshot: ResearchAssessmentSnapshotData
+    ) -> bool:
+        _ = symbol, snapshot
+        return self._label_ready
 
 
 class _FakeCalibrationService:
@@ -187,13 +199,16 @@ def _client(
     labels: list[OutcomeLabelData] | None = None,
     calibrations: list[ProbabilityCalibrationData] | None = None,
     readiness: CalibrationReadinessData | None = None,
+    label_ready: bool = False,
 ) -> AsyncClient:
     app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
     app.dependency_overrides[require_operator] = _operator
     app.dependency_overrides[get_research_assessment_service] = lambda: _FakeAssessmentService(
         assessments
     )
-    app.dependency_overrides[get_outcome_label_service] = lambda: _FakeOutcomeLabelService(labels)
+    app.dependency_overrides[get_outcome_label_service] = lambda: _FakeOutcomeLabelService(
+        labels, label_ready=label_ready
+    )
     app.dependency_overrides[get_research_calibration_service] = lambda: _FakeCalibrationService(
         readiness=readiness or _readiness(),
         listed=calibrations,
@@ -250,6 +265,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["most_recent_labeled_outcome_label_computed_at"] is None
     assert body["most_recent_labeled_outcome_label_as_of_trading_date"] is None
     assert body["scan_labeled_freshness_lag_trading_days"] is None
+    assert body["latest_assessment_is_label_ready"] is None
     assert body["latest_coverage_confidence"] is None
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
@@ -292,6 +308,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
         assessments=[_snapshot()],
         labels=[_label()],
         calibrations=[_calibration()],
+        label_ready=True,
     ) as client:
         response = await client.get("/research/aapl/evidence-summary")
 
@@ -300,6 +317,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["symbol"] == "AAPL"
     assert body["latest_assessment"]["id"] == 1
     assert body["latest_assessment"]["probability_confidence"] is None
+    assert body["latest_assessment_is_label_ready"] is True
     assert body["latest_coverage_confidence"] == 0.95
     assert body["latest_research_index"] == 0.46
     assert body["latest_as_of_trading_date"] == "2024-01-26"
@@ -395,6 +413,21 @@ async def test_evidence_summary_scan_labeled_freshness_lag_trading_days() -> Non
     assert body["most_recent_labeled_outcome_label_as_of_trading_date"] == "2024-01-26"
     assert body["latest_outcome_label_id"] is None
     assert body["scan_labeled_freshness_lag_trading_days"] == 10
+
+
+async def test_evidence_summary_latest_assessment_is_label_ready_false() -> None:
+    async with _client(
+        assessments=[_snapshot()],
+        labels=[],
+        label_ready=False,
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["latest_assessment_id"] == 1
+    assert body["latest_outcome_label_id"] is None
+    assert body["latest_assessment_is_label_ready"] is False
 
 
 async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:

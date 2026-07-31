@@ -1,13 +1,12 @@
-# ADR-0233: Phase 232 NAS Live Verification of Phase 231 (draft)
+# ADR-0233: Phase 232 NAS Live Verification of Phase 231
 
 - Status: Proposed (pending Phase 231 + live evidence)
 - Date: 2026-07-31
 
 ## Context
 
-Phase 231 would add ``latest_assessment_is_label_ready`` on evidence summary (ADR-0232).
-Operators need a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after
-that lands.
+Phase 231 adds ``latest_assessment_is_label_ready`` on evidence summary (ADR-0232). Operators
+need a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that lands.
 
 ## Decisions
 
@@ -16,7 +15,7 @@ that lands.
 1. Deploy current ``HEAD`` with TLS overlay; recreate **backend** and **frontend**.
 2. Run `verify.ps1` / `verify.sh` successfully (prior gates remain).
 3. Authenticated evidence-summary includes ``latest_assessment_is_label_ready``
-   (null OK when no latest assessment; checklist item TBD).
+   (null OK when no latest assessment; checklist item 111).
 4. SSH `alembic current` includes **`0009`** or `head`.
 
 ### 2. Upload ≠ verified
@@ -32,6 +31,7 @@ New scoring math, default-on calibration, ACME, actionable promotion, orders.
 ```powershell
 # After Phase 231 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
 .\docker\nas\scripts\verify.ps1
+# Expect: OK Phase 232 latest_assessment_is_label_ready=False (AAPL latest unlabeled for forward bars)
 ```
 
 ## Related documents

@@ -148,7 +148,8 @@ function Write-VerifyChecklist {
     Write-Host "108. Authenticated evidence-summary includes Phase 225 most_recent_labeled_outcome_label_computed_at (Phase 226)"
     Write-Host "109. Authenticated evidence-summary includes Phase 227 most_recent_labeled_outcome_label_as_of_trading_date (Phase 228)"
     Write-Host "110. Authenticated evidence-summary includes Phase 229 scan_labeled_freshness_lag_trading_days (Phase 230)"
-    Write-Host "111. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "111. Authenticated evidence-summary includes Phase 231 latest_assessment_is_label_ready (Phase 232)"
+    Write-Host "112. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1128,6 +1129,13 @@ try {
         $scanLag = $summary.scan_labeled_freshness_lag_trading_days
         $scanLagPart = if ($null -eq $scanLag -or $scanLag -eq "") { "null" } else { [string]$scanLag }
         Write-Host "OK  Phase 230 scan_labeled_freshness_lag_trading_days=$scanLagPart"
+        # Phase 232: latest_assessment_is_label_ready from Phase 231 (null OK when no assessment).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_assessment_is_label_ready")) {
+            throw "evidence-summary missing latest_assessment_is_label_ready (Phase 231/232)"
+        }
+        $labelReady = $summary.latest_assessment_is_label_ready
+        $labelReadyPart = if ($null -eq $labelReady -or $labelReady -eq "") { "null" } else { [string]$labelReady }
+        Write-Host "OK  Phase 232 latest_assessment_is_label_ready=$labelReadyPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1303,6 +1311,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "scan_labeled_freshness_lag_trading_days")) {
             throw "evidence-summary/export missing scan_labeled_freshness_lag_trading_days (Phase 229/230)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_assessment_is_label_ready")) {
+            throw "evidence-summary/export missing latest_assessment_is_label_ready (Phase 231/232)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

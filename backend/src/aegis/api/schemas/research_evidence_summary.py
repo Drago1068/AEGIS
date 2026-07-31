@@ -176,6 +176,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Null when either date is missing. Clamped to 0 if inverted. Never invented."
         ),
     )
+    latest_assessment_is_label_ready: bool | None = Field(
+        default=None,
+        description=(
+            "True when the latest assessment has stored forward-horizon closes needed to "
+            "compute outcome labels (same gates as label backfill). Null when no latest "
+            "assessment. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

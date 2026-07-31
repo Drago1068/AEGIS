@@ -368,6 +368,18 @@ class OutcomeLabelService:
         )
         return await self._label_store.insert(label)
 
+    async def is_assessment_label_ready(
+        self, symbol: str, snapshot: ResearchAssessmentSnapshotData
+    ) -> bool:
+        """Return whether ``snapshot`` has stored forward closes needed to label (ADR-0232)."""
+
+        bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
+        return is_snapshot_label_ready(
+            snapshot,
+            bars,
+            calendar_name=self._calendar_name,
+        )
+
     async def assessment_ids_with_labels(
         self,
         symbol: str,

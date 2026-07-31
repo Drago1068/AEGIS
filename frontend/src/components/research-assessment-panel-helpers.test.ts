@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  formatCalibrationActionAriaLabel,
+  formatCalibrationActionIdChip,
   formatOutcomeLabelActionAriaLabel,
   formatOutcomeLabelActionIdChip,
   resolveOutcomeLabelHistoryLoadKind,
@@ -54,5 +56,28 @@ describe("formatOutcomeLabelActionIdChip", () => {
   it("appends scan-labeled or latest when load kind is tracked", () => {
     expect(formatOutcomeLabelActionIdChip(3, "scan_labeled")).toBe("(3 · scan-labeled)");
     expect(formatOutcomeLabelActionIdChip(4, "latest")).toBe("(4 · latest)");
+  });
+});
+
+describe("formatCalibrationActionAriaLabel", () => {
+  it("appends latest when assessment id is set", () => {
+    expect(formatCalibrationActionAriaLabel("Compute calibration", 1)).toBe(
+      "Compute calibration for assessment 1 (latest)",
+    );
+    expect(formatCalibrationActionAriaLabel("Download calibrations JSON", 2)).toBe(
+      "Download calibrations JSON for assessment 2 (latest)",
+    );
+  });
+
+  it("returns the bare action when assessment id is null", () => {
+    expect(formatCalibrationActionAriaLabel("Compute calibration", null)).toBe(
+      "Compute calibration",
+    );
+  });
+});
+
+describe("formatCalibrationActionIdChip", () => {
+  it("always includes latest", () => {
+    expect(formatCalibrationActionIdChip(1)).toBe("(1 · latest)");
   });
 });

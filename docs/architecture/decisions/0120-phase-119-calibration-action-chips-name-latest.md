@@ -1,6 +1,6 @@
 # ADR-0120: Phase 119 Calibration Action Chips Name Latest Explicitly
 
-- Status: Accepted (drafted; implement next)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -14,8 +14,8 @@ even though calibration always targets latest (Phase 103 note).
 ### 1. Console
 
 When ``latest.id`` is set, show ``({id} · latest)`` on compute/download calibration id chips
-and append `` (latest)`` to their accessible names (mirror outcome-label helpers; keep
-calibration targeting ``latest`` only). No API changes.
+and append `` (latest)`` to their accessible names via ``formatCalibrationActionAriaLabel`` /
+``formatCalibrationActionIdChip``. Keep calibration targeting ``latest`` only. No API changes.
 
 ### 2. Out of scope
 

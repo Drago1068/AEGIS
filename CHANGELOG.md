@@ -28,7 +28,8 @@ Show ``({id} · latest)`` / aria ``(latest)`` on compute/download calibration co
 
 #### Added
 
-- Calibration chip/aria ``latest`` naming drafted (implement next).
+- ``formatCalibrationActionAriaLabel`` / ``formatCalibrationActionIdChip`` for compute/download
+  calibration controls.
 
 #### Explicitly out of scope
 

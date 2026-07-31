@@ -221,8 +221,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(compute).not.toBeDisabled();
     });
     expect(screen.getByTestId("compute-calibration")).toHaveAccessibleName(
-      /compute calibration for assessment 1/i,
+      /compute calibration for assessment 1 \(latest\)/i,
     );
+    expect(screen.getByTestId("compute-calibration-id-chip")).toHaveTextContent("(1 · latest)");
     fireEvent.click(compute);
 
     await waitFor(() => {
@@ -899,8 +900,9 @@ describe("ResearchAssessmentPanel", () => {
       );
     });
     expect(screen.getByTestId("download-calibrations")).toHaveAccessibleName(
-      /download calibrations json for assessment 1/i,
+      /download calibrations json for assessment 1 \(latest\)/i,
     );
+    expect(screen.getByTestId("download-calibrations-id-chip")).toHaveTextContent("(1 · latest)");
     expect(screen.queryByTestId("calibration-controls-latest-note")).not.toBeInTheDocument();
   });
 

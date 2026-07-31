@@ -31,6 +31,8 @@ import {
 } from "@/lib/api-client";
 
 import {
+  formatCalibrationActionAriaLabel,
+  formatCalibrationActionIdChip,
   formatOutcomeLabelActionAriaLabel,
   formatOutcomeLabelActionIdChip,
   resolveOutcomeLabelHistoryLoadKind,
@@ -644,16 +646,20 @@ export function ResearchAssessmentPanel({
             onClick={onComputeCalibration}
             disabled={isPending || latest?.id == null || readiness?.status !== "ready"}
             data-testid="compute-calibration"
-            aria-label={
-              latest?.id != null
-                ? `Compute calibration for assessment ${latest.id}`
-                : "Compute calibration"
-            }
+            aria-label={formatCalibrationActionAriaLabel(
+              "Compute calibration",
+              latest?.id ?? null,
+            )}
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Compute calibration
             {latest?.id != null ? (
-              <span className="ml-1 font-mono text-xs text-aegis-muted">({latest.id})</span>
+              <span
+                className="ml-1 font-mono text-xs text-aegis-muted"
+                data-testid="compute-calibration-id-chip"
+              >
+                {formatCalibrationActionIdChip(latest.id)}
+              </span>
             ) : null}
           </button>
           <button
@@ -661,16 +667,20 @@ export function ResearchAssessmentPanel({
             onClick={onDownloadCalibrations}
             disabled={isPending || latest?.id == null}
             data-testid="download-calibrations"
-            aria-label={
-              latest?.id != null
-                ? `Download calibrations JSON for assessment ${latest.id}`
-                : "Download calibrations JSON"
-            }
+            aria-label={formatCalibrationActionAriaLabel(
+              "Download calibrations JSON",
+              latest?.id ?? null,
+            )}
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Download calibrations JSON
             {latest?.id != null ? (
-              <span className="ml-1 font-mono text-xs text-aegis-muted">({latest.id})</span>
+              <span
+                className="ml-1 font-mono text-xs text-aegis-muted"
+                data-testid="download-calibrations-id-chip"
+              >
+                {formatCalibrationActionIdChip(latest.id)}
+              </span>
             ) : null}
           </button>
           <button

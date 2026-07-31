@@ -39,7 +39,8 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0097](../architecture/decisions/0097-phase-96-nas-live-verify-phase-95.md),
 [ADR-0099](../architecture/decisions/0099-phase-98-nas-live-verify-phase-97.md),
 [ADR-0101](../architecture/decisions/0101-phase-100-nas-live-verify-phase-99.md),
-[ADR-0103](../architecture/decisions/0103-phase-102-nas-live-verify-phase-101.md).
+[ADR-0103](../architecture/decisions/0103-phase-102-nas-live-verify-phase-101.md),
+[ADR-0105](../architecture/decisions/0105-phase-104-nas-live-verify-phase-103.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 

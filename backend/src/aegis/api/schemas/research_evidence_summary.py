@@ -159,6 +159,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "assessment/calibration computed_at. Never invented."
         ),
     )
+    most_recent_labeled_outcome_label_as_of_trading_date: date | None = Field(
+        default=None,
+        description=(
+            "as_of_trading_date from most_recent_labeled_outcome_label when present. Null when "
+            "no scan-labeled rows. Distinct from latest_outcome_label_as_of_trading_date and "
+            "assessment latest_as_of_trading_date. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

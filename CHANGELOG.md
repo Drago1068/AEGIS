@@ -7,16 +7,37 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 230 - NAS Live Verification of Phase 229 (draft)
+
+Ops evidence gate after Phase 229 scan-labeled freshness lag diagnostic. See
+[docs/architecture/decisions/0231-phase-230-nas-live-verify-phase-229.md](docs/architecture/decisions/0231-phase-230-nas-live-verify-phase-229.md).
+
+### Phase 229 - Evidence Summary Scan-Labeled Freshness Lag (draft)
+
+Derived evidence diagnostic: trading-day lag between latest assessment as_of and most recent
+labeled outcome_label as_of. See
+[docs/architecture/decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md](docs/architecture/decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md).
+
 ### Phase 228 - NAS Live Verification of Phase 227 (draft)
 
 Ops evidence gate after Phase 227 most recent labeled outcome label as-of trading date field. See
 [docs/architecture/decisions/0229-phase-228-nas-live-verify-phase-227.md](docs/architecture/decisions/0229-phase-228-nas-live-verify-phase-227.md).
 
-### Phase 227 - Evidence Summary Most Recent Labeled Outcome Label As-Of Trading Date (draft)
+### Phase 227 - Evidence Summary Most Recent Labeled Outcome Label As-Of Trading Date
 
-Surface top-level ``most_recent_labeled_outcome_label_as_of_trading_date`` on evidence summary for
-scan-labeled provenance. See
+Surface top-level ``most_recent_labeled_outcome_label_as_of_trading_date`` on evidence summary;
+completes the planned scan-labeled scalar provenance series. See
 [docs/architecture/decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md](docs/architecture/decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md).
+
+#### Added
+
+- ``most_recent_labeled_outcome_label_as_of_trading_date`` on evidence summary (+ export); from scan-labeled label.
+- Console surfaces the field with ``data-testid="evidence-most-recent-labeled-outcome-label-as-of-trading-date"``.
+- NAS verify checklist item 109 for Phase 228.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts, further redundant nested field lifts.
 
 ### Phase 226 - NAS Live Verification of Phase 225
 

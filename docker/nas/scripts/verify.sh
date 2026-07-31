@@ -135,7 +135,8 @@ print_checklist() {
   echo "106. Authenticated evidence-summary includes Phase 221 most_recent_labeled_outcome_label_state (Phase 222)"
   echo "107. Authenticated evidence-summary includes Phase 223 most_recent_labeled_outcome_label_bar_source (Phase 224)"
   echo "108. Authenticated evidence-summary includes Phase 225 most_recent_labeled_outcome_label_computed_at (Phase 226)"
-  echo "109. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo "109. Authenticated evidence-summary includes Phase 227 most_recent_labeled_outcome_label_as_of_trading_date (Phase 228)"
+  echo "110. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -905,6 +906,12 @@ if ! grep -q '"most_recent_labeled_outcome_label_computed_at"' "${summary_body}"
   exit 1
 fi
 echo "OK  Phase 226 most_recent_labeled_outcome_label_computed_at field present"
+# Phase 228: most_recent_labeled_outcome_label_as_of_trading_date from Phase 227 (null OK when no scan labels).
+if ! grep -q '"most_recent_labeled_outcome_label_as_of_trading_date"' "${summary_body}"; then
+  echo "evidence-summary missing most_recent_labeled_outcome_label_as_of_trading_date (Phase 227/228)" >&2
+  exit 1
+fi
+echo "OK  Phase 228 most_recent_labeled_outcome_label_as_of_trading_date field present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -1020,6 +1027,10 @@ if ! grep -q '"most_recent_labeled_outcome_label_bar_source"' "${export_body}"; 
 fi
 if ! grep -q '"most_recent_labeled_outcome_label_computed_at"' "${export_body}"; then
   echo "evidence-summary/export missing most_recent_labeled_outcome_label_computed_at (Phase 225/226)" >&2
+  exit 1
+fi
+if ! grep -q '"most_recent_labeled_outcome_label_as_of_trading_date"' "${export_body}"; then
+  echo "evidence-summary/export missing most_recent_labeled_outcome_label_as_of_trading_date (Phase 227/228)" >&2
   exit 1
 fi
 echo "OK  evidence-summary/export attachment state=research_only"

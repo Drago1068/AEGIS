@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 134 - NAS Live Verification of Phase 133
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 133 probability-calibration
+section extract. See
+[docs/architecture/decisions/0135-phase-134-nas-live-verify-phase-133.md](docs/architecture/decisions/0135-phase-134-nas-live-verify-phase-133.md).
+
+#### Added
+
+- ADR-0135: live verify requires frontend recreate for Phase 133; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 133 - Extract Probability Calibration Panel Section
+
+Move probability calibration result UI into a presentational section component (no behavior
+change). See
+[docs/architecture/decisions/0134-phase-133-extract-probability-calibration-section.md](docs/architecture/decisions/0134-phase-133-extract-probability-calibration-section.md).
+
+#### Added
+
+- ``ResearchProbabilityCalibrationSection.tsx`` with
+  ``data-testid="probability-calibration-section"``.
+
+#### Explicitly out of scope
+
+New calibration math, orders.
+
 ### Phase 132 - NAS Live Verification of Phase 131
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 131 calibration-readiness
-section extract. See
+section extract. Live verify passed 2026-07-30 (``1169852``). See
 [docs/architecture/decisions/0133-phase-132-nas-live-verify-phase-131.md](docs/architecture/decisions/0133-phase-132-nas-live-verify-phase-131.md).
 
 #### Added

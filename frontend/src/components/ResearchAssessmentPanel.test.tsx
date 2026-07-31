@@ -242,6 +242,7 @@ describe("ResearchAssessmentPanel", () => {
     });
     await waitFor(() => {
       expect(listProbabilityCalibrations).toHaveBeenCalled();
+      expect(screen.getByTestId("probability-calibration-section")).toBeInTheDocument();
       expect(screen.getByText(/probability calibration \(research-only/i)).toBeInTheDocument();
       expect(screen.getByText(/0\.6200 \(calibrated research-only\)/)).toBeInTheDocument();
     });
@@ -261,6 +262,7 @@ describe("ResearchAssessmentPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: /refresh latest/i }));
 
     await waitFor(() => {
+      expect(screen.getByTestId("probability-calibration-section")).toBeInTheDocument();
       expect(screen.getByText(/calibration history \(newest first\)/i)).toBeInTheDocument();
       expect(screen.getByText(/p=0\.6200/)).toBeInTheDocument();
       expect(screen.getByText(/p=0\.5000/)).toBeInTheDocument();

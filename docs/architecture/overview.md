@@ -78,8 +78,9 @@ Phase 123 (extract research assessment action toolbar), Phase 124 (NAS live veri
 Phase 123), Phase 125 (group research assessment action toolbar), Phase 126 (NAS live
 verify of Phase 125), Phase 127 (extract outcome-label history section), Phase 128
 (NAS live verify of Phase 127), Phase 129 (extract assessment history section), Phase 130
-(NAS live verify of Phase 129), Phase 131 (extract calibration readiness section), and
-Phase 132 (NAS live verify of Phase 131).
+(NAS live verify of Phase 129), Phase 131 (extract calibration readiness section), Phase 132
+(NAS live verify of Phase 131), Phase 133 (extract probability calibration section), and
+Phase 134 (NAS live verify of Phase 133).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -359,6 +360,10 @@ Phase 131 extracts the calibration readiness panel section (see
 [decisions/0132-phase-131-extract-calibration-readiness-section.md](decisions/0132-phase-131-extract-calibration-readiness-section.md)).
 Phase 132 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0133-phase-132-nas-live-verify-phase-131.md](decisions/0133-phase-132-nas-live-verify-phase-131.md)).
+Phase 133 extracts the probability calibration panel section (see
+[decisions/0134-phase-133-extract-probability-calibration-section.md](decisions/0134-phase-133-extract-probability-calibration-section.md)).
+Phase 134 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0135-phase-134-nas-live-verify-phase-133.md](decisions/0135-phase-134-nas-live-verify-phase-133.md)).
 
 ## System context
 

@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 172 - NAS Live Verification of Phase 171 (draft)
+### Phase 174 - NAS Live Verification of Phase 173 (draft)
 
-Ops evidence gate after Phase 171 latest probability confidence field. See
+Ops evidence gate after Phase 173 latest assessment id field. See
+[docs/architecture/decisions/0175-phase-174-nas-live-verify-phase-173.md](docs/architecture/decisions/0175-phase-174-nas-live-verify-phase-173.md).
+
+### Phase 173 - Evidence Summary Latest Assessment Id (draft)
+
+Surface top-level ``latest_assessment_id`` on evidence summary. See
+[docs/architecture/decisions/0174-phase-173-evidence-summary-latest-assessment-id.md](docs/architecture/decisions/0174-phase-173-evidence-summary-latest-assessment-id.md).
+
+### Phase 172 - NAS Live Verification of Phase 171
+
+Ops evidence gate after Phase 171 latest probability confidence field. Live verify passed
+2026-07-31 (``004d1f5``; AAPL probability_confidence=0.75). See
 [docs/architecture/decisions/0173-phase-172-nas-live-verify-phase-171.md](docs/architecture/decisions/0173-phase-172-nas-live-verify-phase-171.md).
+
+#### Added
+
+- ADR-0173: live verify requires backend+frontend recreate for Phase 171; checklist item 81.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 171 - Evidence Summary Latest Probability Confidence
 

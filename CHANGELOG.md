@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 195 latest calibration probability confidence field. See
 [docs/architecture/decisions/0197-phase-196-nas-live-verify-phase-195.md](docs/architecture/decisions/0197-phase-196-nas-live-verify-phase-195.md).
 
-### Phase 195 - Evidence Summary Latest Calibration Probability Confidence (draft)
+### Phase 195 - Evidence Summary Latest Calibration Probability Confidence
 
 Surface top-level ``latest_calibration_probability_confidence`` on evidence summary. See
 [docs/architecture/decisions/0196-phase-195-evidence-summary-latest-calibration-probability-confidence.md](docs/architecture/decisions/0196-phase-195-evidence-summary-latest-calibration-probability-confidence.md).
+
+#### Added
+
+- ``latest_calibration_probability_confidence`` on evidence summary (+ export); from latest_calibration.
+- Console surfaces the field with ``data-testid="evidence-latest-calibration-probability-confidence"``.
+- NAS verify checklist item 93 for Phase 196.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 194 - NAS Live Verification of Phase 193
 

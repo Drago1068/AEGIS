@@ -1023,6 +1023,8 @@ export interface ResearchEvidenceSummary {
   latest_calibration_schema_version: number | null;
   /** state from latest_calibration when present; null otherwise. */
   latest_calibration_state: string | null;
+  /** probability_confidence from latest_calibration when present; null otherwise. Distinct from assessment latest_probability_confidence. */
+  latest_calibration_probability_confidence: number | null;
   detail: string;
 }
 

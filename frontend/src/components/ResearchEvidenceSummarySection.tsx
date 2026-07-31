@@ -270,16 +270,8 @@ export function ResearchEvidenceSummarySection({
               ? "null"
               : evidenceSummary.latest_probability_confidence.toFixed(4)}
             <span className="ml-1 font-sans text-xs font-normal text-aegis-muted">
-              (distinct from coverage)
+              (assessment; distinct from coverage / calibration row)
             </span>
-          </dd>
-        </div>
-        <div>
-          <dt className="text-aegis-muted">Latest calibration.probability_confidence</dt>
-          <dd className="font-mono" data-testid="evidence-latest-calibration-probability-confidence">
-            {evidenceSummary.latest_calibration == null
-              ? "null"
-              : evidenceSummary.latest_calibration.probability_confidence.toFixed(4)}
           </dd>
         </div>
         <div>
@@ -360,6 +352,20 @@ export function ResearchEvidenceSummarySection({
           <dt className="text-aegis-muted">Latest calibration state</dt>
           <dd className="font-mono" data-testid="evidence-latest-calibration-state">
             {evidenceSummary.latest_calibration_state ?? "null"}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-aegis-muted">Latest calibration probability_confidence</dt>
+          <dd
+            className="font-mono"
+            data-testid="evidence-latest-calibration-probability-confidence"
+          >
+            {evidenceSummary.latest_calibration_probability_confidence == null
+              ? "null"
+              : evidenceSummary.latest_calibration_probability_confidence.toFixed(4)}
+            <span className="ml-1 font-sans text-xs font-normal text-aegis-muted">
+              (calibration row; distinct from assessment)
+            </span>
           </dd>
         </div>
         {evidenceSummary.latest_outcome_label == null ? (

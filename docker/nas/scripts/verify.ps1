@@ -130,7 +130,8 @@ function Write-VerifyChecklist {
     Write-Host " 90. Authenticated evidence-summary includes Phase 189 latest_calibration_method_version (Phase 190)"
     Write-Host " 91. Authenticated evidence-summary includes Phase 191 latest_calibration_schema_version (Phase 192)"
     Write-Host " 92. Authenticated evidence-summary includes Phase 193 latest_calibration_state (Phase 194)"
-    Write-Host " 93. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 93. Authenticated evidence-summary includes Phase 195 latest_calibration_probability_confidence (Phase 196)"
+    Write-Host " 94. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -975,6 +976,19 @@ try {
         $calState = $summary.latest_calibration_state
         $calStatePart = if ($null -eq $calState -or $calState -eq "") { "null" } else { [string]$calState }
         Write-Host "OK  Phase 194 latest_calibration_state=$calStatePart"
+        # Phase 196: latest_calibration_probability_confidence from Phase 195 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_calibration_probability_confidence")) {
+            throw "evidence-summary missing latest_calibration_probability_confidence (Phase 195/196)"
+        }
+        $calProbConf = $summary.latest_calibration_probability_confidence
+        if ($null -ne $calProbConf) {
+            $cpf = [double]$calProbConf
+            if ($cpf -lt 0 -or $cpf -gt 1) {
+                throw "Phase 196: latest_calibration_probability_confidence must be in [0,1] when set"
+            }
+        }
+        $calProbPart = if ($null -eq $calProbConf) { "null" } else { [string]$calProbConf }
+        Write-Host "OK  Phase 196 latest_calibration_probability_confidence=$calProbPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1096,6 +1110,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_state")) {
             throw "evidence-summary/export missing latest_calibration_state (Phase 193/194)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_probability_confidence")) {
+            throw "evidence-summary/export missing latest_calibration_probability_confidence (Phase 195/196)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

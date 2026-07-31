@@ -7,9 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phases 177–194 closed on ``main``.** Next: Phase 195
-``latest_calibration_probability_confidence`` (ADR-0196), then Phase 196 NAS verify (ADR-0197).
-See [CHANGELOG.md](CHANGELOG.md).
+**Current phase: Phase 195 implemented (evidence summary latest calibration probability confidence).** Next:
+Phase 196 NAS backend+frontend verify (ADR-0197). Phases 177–194 closed; Phase 195 on HEAD
+pending NAS verify. See
+[docs/architecture/decisions/0196-phase-195-evidence-summary-latest-calibration-probability-confidence.md](docs/architecture/decisions/0196-phase-195-evidence-summary-latest-calibration-probability-confidence.md)
+and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
 

@@ -281,4 +281,13 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "never invented."
         ),
     )
+    latest_calibration_probability_confidence: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "probability_confidence from latest_calibration when present. Null when none. "
+            "Distinct from assessment latest_probability_confidence. Never invented."
+        ),
+    )
     detail: str

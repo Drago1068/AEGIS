@@ -1,6 +1,6 @@
 # ADR-0196: Phase 195 Evidence Summary Latest Calibration Probability Confidence
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

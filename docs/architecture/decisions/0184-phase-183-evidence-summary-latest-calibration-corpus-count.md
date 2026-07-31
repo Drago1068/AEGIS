@@ -1,6 +1,6 @@
 # ADR-0184: Phase 183 Evidence Summary Latest Calibration Corpus Count
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

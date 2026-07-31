@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 183 latest calibration corpus count field. See
 [docs/architecture/decisions/0185-phase-184-nas-live-verify-phase-183.md](docs/architecture/decisions/0185-phase-184-nas-live-verify-phase-183.md).
 
-### Phase 183 - Evidence Summary Latest Calibration Corpus Count (draft)
+### Phase 183 - Evidence Summary Latest Calibration Corpus Count
 
 Surface top-level ``latest_calibration_corpus_count`` on evidence summary. See
 [docs/architecture/decisions/0184-phase-183-evidence-summary-latest-calibration-corpus-count.md](docs/architecture/decisions/0184-phase-183-evidence-summary-latest-calibration-corpus-count.md).
+
+#### Added
+
+- ``latest_calibration_corpus_count`` on evidence summary (+ export); from latest_calibration.
+- Console surfaces the field with ``data-testid="evidence-latest-calibration-corpus-count"``.
+- NAS verify checklist item 87 for Phase 184.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 182 - NAS Live Verification of Phase 181
 

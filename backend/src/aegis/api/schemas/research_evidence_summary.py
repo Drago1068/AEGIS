@@ -235,4 +235,12 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "assessment latest_computed_at. Never invented."
         ),
     )
+    latest_calibration_corpus_count: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "corpus_count from latest_calibration when present. Null when none. Distinct from "
+            "calibration_readiness corpus thresholds. Never invented."
+        ),
+    )
     detail: str

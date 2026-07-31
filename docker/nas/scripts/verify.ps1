@@ -124,7 +124,8 @@ function Write-VerifyChecklist {
     Write-Host " 84. Authenticated evidence-summary includes Phase 177 latest_calibration_id (Phase 178)"
     Write-Host " 85. Authenticated evidence-summary includes Phase 179 latest_calibration_horizon_key (Phase 180)"
     Write-Host " 86. Authenticated evidence-summary includes Phase 181 latest_calibration_computed_at (Phase 182)"
-    Write-Host " 87. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 87. Authenticated evidence-summary includes Phase 183 latest_calibration_corpus_count (Phase 184)"
+    Write-Host " 88. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -915,6 +916,16 @@ try {
         $calComputedAt = $summary.latest_calibration_computed_at
         $calComputedPart = if ($null -eq $calComputedAt -or $calComputedAt -eq "") { "null" } else { [string]$calComputedAt }
         Write-Host "OK  Phase 182 latest_calibration_computed_at=$calComputedPart"
+        # Phase 184: latest_calibration_corpus_count from Phase 183 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_calibration_corpus_count")) {
+            throw "evidence-summary missing latest_calibration_corpus_count (Phase 183/184)"
+        }
+        $corpusCount = $summary.latest_calibration_corpus_count
+        if ($null -ne $corpusCount -and [int]$corpusCount -lt 0) {
+            throw "Phase 184: latest_calibration_corpus_count must be >= 0 when set"
+        }
+        $corpusPart = if ($null -eq $corpusCount) { "null" } else { [string]$corpusCount }
+        Write-Host "OK  Phase 184 latest_calibration_corpus_count=$corpusPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1018,6 +1029,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_computed_at")) {
             throw "evidence-summary/export missing latest_calibration_computed_at (Phase 181/182)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_corpus_count")) {
+            throw "evidence-summary/export missing latest_calibration_corpus_count (Phase 183/184)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

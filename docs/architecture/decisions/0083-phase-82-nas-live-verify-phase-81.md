@@ -1,6 +1,6 @@
 # ADR-0083: Phase 82 NAS Live Verification of Phase 81
 
-- Status: Accepted (pending live evidence)
+- Status: Accepted (live verified 2026-07-30; frontend recreate of ``b4ea227``)
 - Date: 2026-07-30
 
 ## Context

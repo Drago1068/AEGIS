@@ -123,6 +123,9 @@ export function ResearchAssessmentPanel({
   const [assessmentHistory, setAssessmentHistory] = useState<ResearchAssessment[]>([]);
   const [outcomeLabel, setOutcomeLabel] = useState<OutcomeLabel | null>(null);
   const [outcomeLabelHistory, setOutcomeLabelHistory] = useState<OutcomeLabel[]>([]);
+  const [outcomeLabelHistoryAssessmentId, setOutcomeLabelHistoryAssessmentId] = useState<
+    number | null
+  >(null);
   const [readiness, setReadiness] = useState<CalibrationReadiness | null>(null);
   const [calibration, setCalibration] = useState<ProbabilityCalibration | null>(null);
   const [calibrationHistory, setCalibrationHistory] = useState<ProbabilityCalibration[]>(
@@ -165,6 +168,7 @@ export function ResearchAssessmentPanel({
     const rows = await listOutcomeLabels(baseUrl, symbol, assessmentId, 20);
     setOutcomeLabelHistory(rows);
     setOutcomeLabel(rows[0] ?? null);
+    setOutcomeLabelHistoryAssessmentId(assessmentId);
   }
 
   async function loadCalibrationHistory(assessmentId: number) {
@@ -189,6 +193,7 @@ export function ResearchAssessmentPanel({
         setLatest(snapshot);
         setOutcomeLabel(null);
         setOutcomeLabelHistory([]);
+        setOutcomeLabelHistoryAssessmentId(null);
         setCalibration(null);
         setCalibrationHistory([]);
         setEvidenceSummary(null);
@@ -213,6 +218,7 @@ export function ResearchAssessmentPanel({
         setLatest(snapshot);
         setOutcomeLabel(null);
         setOutcomeLabelHistory([]);
+        setOutcomeLabelHistoryAssessmentId(null);
         setCalibration(null);
         setCalibrationHistory([]);
         setEvidenceSummary(null);
@@ -229,6 +235,7 @@ export function ResearchAssessmentPanel({
           setAssessmentHistory([]);
           setOutcomeLabel(null);
           setOutcomeLabelHistory([]);
+          setOutcomeLabelHistoryAssessmentId(null);
           setReadiness(null);
           setCalibration(null);
           setCalibrationHistory([]);
@@ -949,6 +956,14 @@ export function ResearchAssessmentPanel({
               <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
                 Outcome labels (evidence only — not calibrated probability)
               </p>
+              {outcomeLabelHistoryAssessmentId != null ? (
+                <p
+                  className="mt-1 font-mono text-xs text-aegis-muted"
+                  data-testid="outcome-label-history-assessment-id"
+                >
+                  Assessment id {outcomeLabelHistoryAssessmentId}
+                </p>
+              ) : null}
               <dl className="mt-2 grid gap-2 sm:grid-cols-2">
                 {sortedLabelEntries(outcomeLabel.labels).map(([key, value]) => {
                   const end = outcomeLabel.label_end_dates[key];

@@ -51,7 +51,8 @@ readiness mini-rows on evidence summary), Phase 74 (NAS live verify of Phase 73)
 assertion), Phase 76 (evidence-summary nested corpus/bucket verify assertion), Phase 77
 (evidence-summary horizon detail expand), Phase 78 (NAS live verify of Phase 77), Phase 79 (most-recent labeled outcome on evidence
 summary), Phase 80 (NAS live verify of Phase 79), Phase 81 (load scan-labeled outcome
-labels), and Phase 82 (NAS live verify of Phase 81).
+labels), Phase 82 (NAS live verify of Phase 81), Phase 83 (outcome-label history assessment
+id caption), and Phase 84 (NAS live verify of Phase 83).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -229,6 +230,10 @@ Phase 81 adds one-click load of outcome labels for the scan-labeled assessment i
 [decisions/0082-phase-81-load-scan-labeled-labels.md](decisions/0082-phase-81-load-scan-labeled-labels.md)).
 Phase 82 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0083-phase-82-nas-live-verify-phase-81.md](decisions/0083-phase-82-nas-live-verify-phase-81.md)).
+Phase 83 captions the outcome-label panel with the assessment id it was loaded for (see
+[decisions/0084-phase-83-outcome-label-history-assessment-id.md](decisions/0084-phase-83-outcome-label-history-assessment-id.md)).
+Phase 84 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0085-phase-84-nas-live-verify-phase-83.md](decisions/0085-phase-84-nas-live-verify-phase-83.md)).
 
 ## System context
 

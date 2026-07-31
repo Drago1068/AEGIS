@@ -29,7 +29,8 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0077](../architecture/decisions/0077-phase-76-evidence-summary-corpus-bucket-verify.md),
 [ADR-0079](../architecture/decisions/0079-phase-78-nas-live-verify-phase-77.md),
 [ADR-0081](../architecture/decisions/0081-phase-80-nas-live-verify-phase-79.md),
-[ADR-0083](../architecture/decisions/0083-phase-82-nas-live-verify-phase-81.md).
+[ADR-0083](../architecture/decisions/0083-phase-82-nas-live-verify-phase-81.md),
+[ADR-0085](../architecture/decisions/0085-phase-84-nas-live-verify-phase-83.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 
@@ -108,7 +109,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 34 | Phase 78 frontend redeploy (Phase 77 horizon detail expand) | Frontend recreated; expand UX unit-tested |
 | 35 | Authenticated evidence-summary most_recent_labeled_* (Phase 80) | ``most_recent_labeled_assessment_id`` + ``most_recent_labeled_outcome_label`` present (+ export; null OK) |
 | 36 | Phase 82 frontend redeploy (Phase 81 load-scan-labeled) | Frontend recreated; load-labels UX unit-tested |
-| 37 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 37 | Phase 84 frontend redeploy (Phase 83 assessment-id caption) | Frontend recreated; caption UX unit-tested |
+| 38 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

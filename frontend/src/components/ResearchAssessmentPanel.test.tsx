@@ -331,6 +331,9 @@ describe("ResearchAssessmentPanel", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/outcome label history \(newest first\)/i)).toBeInTheDocument();
+      expect(screen.getByTestId("outcome-label-history-assessment-id")).toHaveTextContent(
+        /assessment id 1/i,
+      );
       expect(
         screen.getByText(
           /fwd5=0\.0500 end=2024-02-02 · fwd20=0\.1000 end=2024-02-23/,
@@ -683,6 +686,10 @@ describe("ResearchAssessmentPanel", () => {
       name: /filter assessment history to mixed component source/i,
     });
     expect(showMixed).toHaveTextContent("19");
+    await waitFor(() => {
+      expect(showMixed).not.toBeDisabled();
+    });
+    vi.mocked(listResearchAssessments).mockClear();
     fireEvent.click(showMixed);
 
     await waitFor(() => {
@@ -703,6 +710,22 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("load-scan-labeled-labels")).not.toBeDisabled();
     });
     vi.mocked(listOutcomeLabels).mockClear();
+    vi.mocked(listOutcomeLabels).mockResolvedValue([
+      {
+        id: 30,
+        assessment_snapshot_id: 3,
+        symbol: "AAPL",
+        label_method_id: "forward_total_return_v1",
+        label_method_version: 1,
+        state: "research_only",
+        as_of_trading_date: "2024-01-26",
+        computed_at: "2024-01-26T20:00:00Z",
+        labels: { forward_return_5: 0.02 },
+        label_end_dates: { forward_return_5: "2024-02-02" },
+        schema_version: 1,
+        bar_source: "polygon",
+      },
+    ]);
     fireEvent.click(screen.getByTestId("load-scan-labeled-labels"));
     await waitFor(() => {
       expect(listOutcomeLabels).toHaveBeenCalledWith(
@@ -710,6 +733,9 @@ describe("ResearchAssessmentPanel", () => {
         "AAPL",
         3,
         20,
+      );
+      expect(screen.getByTestId("outcome-label-history-assessment-id")).toHaveTextContent(
+        /assessment id 3/i,
       );
     });
   });

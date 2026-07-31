@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 194 - NAS Live Verification of Phase 193 (draft)
+### Phase 196 - NAS Live Verification of Phase 195 (draft)
 
-Ops evidence gate after Phase 193 latest calibration state field. See
+Ops evidence gate after Phase 195 latest calibration probability confidence field. See
+[docs/architecture/decisions/0197-phase-196-nas-live-verify-phase-195.md](docs/architecture/decisions/0197-phase-196-nas-live-verify-phase-195.md).
+
+### Phase 195 - Evidence Summary Latest Calibration Probability Confidence (draft)
+
+Surface top-level ``latest_calibration_probability_confidence`` on evidence summary. See
+[docs/architecture/decisions/0196-phase-195-evidence-summary-latest-calibration-probability-confidence.md](docs/architecture/decisions/0196-phase-195-evidence-summary-latest-calibration-probability-confidence.md).
+
+### Phase 194 - NAS Live Verification of Phase 193
+
+Ops evidence gate after Phase 193 latest calibration state field. Live verify passed
+2026-07-31 (``c72ec84``; AAPL state=research_only; schema_version=1). See
 [docs/architecture/decisions/0195-phase-194-nas-live-verify-phase-193.md](docs/architecture/decisions/0195-phase-194-nas-live-verify-phase-193.md).
+
+#### Added
+
+- ADR-0195: live verify requires backend+frontend recreate for Phase 193; checklist item 92.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 193 - Evidence Summary Latest Calibration State
 

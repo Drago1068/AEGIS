@@ -1,6 +1,6 @@
 # ADR-0195: Phase 194 NAS Live Verification of Phase 193
 
-- Status: Proposed (pending Phase 193 + live evidence)
+- Status: Accepted (live verified 2026-07-31; backend+frontend recreate of ``c72ec84``)
 - Date: 2026-07-31
 
 ## Context
@@ -20,7 +20,9 @@ verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that la
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-31 for ``c72ec84``
+(checklist item 92; AAPL ``latest_calibration_state=research_only``;
+``latest_calibration_schema_version=1``).
 
 ### 3. Out of scope
 
@@ -29,7 +31,7 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 193 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# Deploy HEAD backend+frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
 ```
 

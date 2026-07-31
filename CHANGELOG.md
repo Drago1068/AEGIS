@@ -12,11 +12,22 @@ delivery workflow).
 Ops evidence gate after Phase 251 min-horizon forward-bar shortfall diagnostic. See
 [docs/architecture/decisions/0253-phase-252-nas-live-verify-phase-251.md](docs/architecture/decisions/0253-phase-252-nas-live-verify-phase-251.md).
 
-### Phase 251 - Evidence Summary Min-Horizon Forward Bar Shortfall (draft)
+### Phase 251 - Evidence Summary Min-Horizon Forward Bar Shortfall
 
 Sessions still needed before the earliest forward horizon becomes labelable (partial unlock
 ahead of max). See
 [docs/architecture/decisions/0252-phase-251-evidence-summary-min-horizon-forward-bar-shortfall.md](docs/architecture/decisions/0252-phase-251-evidence-summary-min-horizon-forward-bar-shortfall.md).
+
+#### Added
+
+- ``latest_assessment_min_horizon_forward_bar_shortfall`` on evidence summary (+ export).
+- Reuses ``snapshot_forward_bar_shortfall`` with ``horizons=(min(...),)``.
+- Console ``data-testid="evidence-latest-assessment-min-horizon-forward-bar-shortfall"``.
+- NAS verify checklist item 121 for Phase 252.
+
+#### Explicitly out of scope
+
+UI modularization, inventing closes, default-on calibration, orders, multi-horizon maps.
 
 ### Phase 250 - NAS Live Verification of Phase 249
 

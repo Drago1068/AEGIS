@@ -402,6 +402,7 @@ async def _build_research_evidence_summary(
     latest_assessment_forward_bar_shortfall: int | None = None
     latest_assessment_required_label_end_date: date | None = None
     latest_assessment_last_available_label_bar_date: date | None = None
+    latest_assessment_min_horizon_forward_bar_shortfall: int | None = None
     if snapshots:
         (
             latest_assessment_is_label_ready,
@@ -412,6 +413,7 @@ async def _build_research_evidence_summary(
             latest_assessment_forward_bar_shortfall,
             latest_assessment_required_label_end_date,
             latest_assessment_last_available_label_bar_date,
+            latest_assessment_min_horizon_forward_bar_shortfall,
         ) = await outcome_label_service.scan_label_diagnostics(
             symbol,
             snapshots,
@@ -696,6 +698,7 @@ async def _build_research_evidence_summary(
         latest_assessment_forward_bar_shortfall=latest_assessment_forward_bar_shortfall,
         latest_assessment_required_label_end_date=latest_assessment_required_label_end_date,
         latest_assessment_last_available_label_bar_date=latest_assessment_last_available_label_bar_date,
+        latest_assessment_min_horizon_forward_bar_shortfall=latest_assessment_min_horizon_forward_bar_shortfall,
         latest_coverage_confidence=latest_coverage_confidence,
         latest_research_index=latest_research_index,
         latest_as_of_trading_date=latest_as_of_trading_date,

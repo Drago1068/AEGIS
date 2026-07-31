@@ -106,6 +106,35 @@ def test_snapshot_forward_bar_shortfall_full_horizon_from_as_of_only() -> None:
     assert shortfall == 5
 
 
+def test_snapshot_forward_bar_shortfall_min_horizon_differs_from_max() -> None:
+    bars = [
+        _bar(_AS_OF, Decimal("100")),
+        _bar(date(2024, 1, 3), Decimal("101")),
+        _bar(date(2024, 1, 4), Decimal("102")),
+        _bar(date(2024, 1, 5), Decimal("103")),
+        _bar(date(2024, 1, 8), Decimal("104")),
+        _bar(date(2024, 1, 9), Decimal("105")),
+    ]
+    assert (
+        snapshot_forward_bar_shortfall(
+            _snapshot(),
+            bars,
+            calendar_name="NYSE",
+            horizons=(5,),
+        )
+        == 0
+    )
+    assert (
+        snapshot_forward_bar_shortfall(
+            _snapshot(),
+            bars,
+            calendar_name="NYSE",
+            horizons=(5, 20),
+        )
+        == 15
+    )
+
+
 def test_snapshot_forward_bar_shortfall_partial_progress() -> None:
     bars = [
         _bar(_AS_OF, Decimal("100")),

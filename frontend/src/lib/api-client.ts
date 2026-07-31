@@ -1037,6 +1037,11 @@ export interface ResearchEvidenceSummary {
    * Null when no assessment or no as_of bar. Never invents closes.
    */
   latest_assessment_last_available_label_bar_date: string | null;
+  /**
+   * Sessions still needed for the minimum forward horizon (earliest partial unlock).
+   * 0 when that horizon is ready; null when no assessment or no as_of bar. Never invented.
+   */
+  latest_assessment_min_horizon_forward_bar_shortfall: number | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

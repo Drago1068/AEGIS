@@ -1,6 +1,6 @@
-# ADR-0252: Phase 251 Evidence Summary Min-Horizon Forward Bar Shortfall (draft)
+# ADR-0252: Phase 251 Evidence Summary Min-Horizon Forward Bar Shortfall
 
-- Status: Proposed (ready after Phase 250; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -13,7 +13,7 @@ currently 5) becomes labelable — partial unlock precedes full max-horizon read
 Further tip id/as_of scalars are low value; min-horizon shortfall is the next actionable
 unlock signal.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. API
 
@@ -37,10 +37,12 @@ UI modularization, inventing closes, default-on calibration, orders, multi-horiz
 Max triad answered full unlock. Min shortfall answers “when can *any* horizon label?” —
 earlier backfill signal without redundant tip scalars.
 
+Gate approved by standing instruction ("Proceed and approve from here on out").
+
 ## Resume (after Phase 250 gate)
 
 ```powershell
-# Implement latest_assessment_min_horizon_forward_bar_shortfall (ADR-0252); tests; commit+push; then Phase 252:
+# Implement latest_assessment_min_horizon_forward_bar_shortfall (ADR-0252); tests; commit+push; then:
 # git archive HEAD → NAS; rebuild backend+frontend TLS; then:
 .\docker\nas\scripts\verify.ps1
 ```

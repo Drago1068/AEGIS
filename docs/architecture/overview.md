@@ -623,7 +623,7 @@ toward unlock (see
 [decisions/0250-phase-249-evidence-summary-latest-last-available-label-bar-date.md](decisions/0250-phase-249-evidence-summary-latest-last-available-label-bar-date.md)).
 Phase 250 live-verified that date (see
 [decisions/0251-phase-250-nas-live-verify-phase-249.md](decisions/0251-phase-250-nas-live-verify-phase-249.md)).
-Phase 251 (draft) proposes ``latest_assessment_min_horizon_forward_bar_shortfall`` for
+Phase 251 surfaces ``latest_assessment_min_horizon_forward_bar_shortfall`` for
 earliest-horizon unlock (see
 [decisions/0252-phase-251-evidence-summary-min-horizon-forward-bar-shortfall.md](decisions/0252-phase-251-evidence-summary-min-horizon-forward-bar-shortfall.md)).
 Phase 252 (draft) would live-verify that shortfall (see

@@ -261,6 +261,15 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Null when no assessment or no as_of bar. Never invents closes."
         ),
     )
+    latest_assessment_min_horizon_forward_bar_shortfall: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Trading sessions still needed before the latest assessment satisfies the "
+            "minimum forward horizon (earliest partial unlock). 0 when that horizon is "
+            "label-ready; null when no assessment or no as_of bar. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

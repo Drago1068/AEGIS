@@ -7,11 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 244 closed (most recent unlabeled as_of live-verified).** Next
-(draft): Phase 245 ``latest_assessment_forward_bar_shortfall`` (ADR-0246), then Phase 246
-NAS verify. Prefer backfill-unlock shortfall over more tip scalars. See
-[docs/architecture/decisions/0245-phase-244-nas-live-verify-phase-243.md](docs/architecture/decisions/0245-phase-244-nas-live-verify-phase-243.md),
+**Current phase: Phase 245 closed (latest forward-bar shortfall).** Next (draft): Phase 246
+NAS live verify of ``latest_assessment_forward_bar_shortfall`` (ADR-0247). Prefer actionable
+backfill-unlock evidence over more tip scalars. See
 [docs/architecture/decisions/0246-phase-245-evidence-summary-latest-forward-bar-shortfall.md](docs/architecture/decisions/0246-phase-245-evidence-summary-latest-forward-bar-shortfall.md),
+[docs/architecture/decisions/0247-phase-246-nas-live-verify-phase-245.md](docs/architecture/decisions/0247-phase-246-nas-live-verify-phase-245.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

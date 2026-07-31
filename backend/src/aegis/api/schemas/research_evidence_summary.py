@@ -236,6 +236,15 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Never invented."
         ),
     )
+    latest_assessment_forward_bar_shortfall: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Trading sessions of stored bars still needed before the latest assessment "
+            "satisfies the max forward horizon (backfill unlock). 0 when label-ready; "
+            "null when no assessment or no as_of bar. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

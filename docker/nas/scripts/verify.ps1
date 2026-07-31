@@ -155,7 +155,8 @@ function Write-VerifyChecklist {
     Write-Host "115. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
     Write-Host "116. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
     Write-Host "117. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
-    Write-Host "118. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "118. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
+    Write-Host "119. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1184,6 +1185,13 @@ try {
         $unlabeledAsOf = $summary.most_recent_unlabeled_as_of_trading_date
         $unlabeledAsOfPart = if ($null -eq $unlabeledAsOf -or $unlabeledAsOf -eq "") { "null" } else { [string]$unlabeledAsOf }
         Write-Host "OK  Phase 244 most_recent_unlabeled_as_of_trading_date=$unlabeledAsOfPart"
+        # Phase 246: latest_assessment_forward_bar_shortfall from Phase 245 (null OK when N/A; 0 OK when ready).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_assessment_forward_bar_shortfall")) {
+            throw "evidence-summary missing latest_assessment_forward_bar_shortfall (Phase 245/246)"
+        }
+        $forwardShortfall = $summary.latest_assessment_forward_bar_shortfall
+        $forwardShortfallPart = if ($null -eq $forwardShortfall -or $forwardShortfall -eq "") { "null" } else { [string]$forwardShortfall }
+        Write-Host "OK  Phase 246 latest_assessment_forward_bar_shortfall=$forwardShortfallPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1380,6 +1388,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_unlabeled_as_of_trading_date")) {
             throw "evidence-summary/export missing most_recent_unlabeled_as_of_trading_date (Phase 243/244)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_assessment_forward_bar_shortfall")) {
+            throw "evidence-summary/export missing latest_assessment_forward_bar_shortfall (Phase 245/246)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

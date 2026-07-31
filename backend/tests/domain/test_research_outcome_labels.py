@@ -17,6 +17,8 @@ from aegis.domain.research_outcome_labels import (
     OutcomeLabelReason,
     OutcomeLabelUnavailableError,
     compute_forward_total_return_labels,
+    forward_horizon_end_date,
+    snapshot_forward_bar_shortfall,
 )
 
 _AS_OF = date(2024, 1, 2)
@@ -89,6 +91,64 @@ def test_insufficient_forward_bars_fail_closed() -> None:
             horizons=(5,),
         )
     assert exc_info.value.reason == OutcomeLabelReason.INSUFFICIENT_FORWARD_BARS
+
+
+def test_snapshot_forward_bar_shortfall_full_horizon_from_as_of_only() -> None:
+    bars = [_bar(_AS_OF, Decimal("100"))]
+    shortfall = snapshot_forward_bar_shortfall(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    assert shortfall == 5
+
+
+def test_snapshot_forward_bar_shortfall_partial_progress() -> None:
+    bars = [
+        _bar(_AS_OF, Decimal("100")),
+        _bar(date(2024, 1, 3), Decimal("101")),
+        _bar(date(2024, 1, 4), Decimal("102")),
+        _bar(date(2024, 1, 5), Decimal("103")),
+    ]
+    shortfall = snapshot_forward_bar_shortfall(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    # Have 3 sessions after as_of; need end = 5th session (2024-01-09) → shortfall 2
+    assert shortfall == 2
+    assert forward_horizon_end_date(_AS_OF, 5, "NYSE") == date(2024, 1, 9)
+
+
+def test_snapshot_forward_bar_shortfall_ready_is_zero() -> None:
+    bars = [
+        _bar(_AS_OF, Decimal("100")),
+        _bar(date(2024, 1, 3), Decimal("101")),
+        _bar(date(2024, 1, 4), Decimal("102")),
+        _bar(date(2024, 1, 5), Decimal("103")),
+        _bar(date(2024, 1, 8), Decimal("104")),
+        _bar(date(2024, 1, 9), Decimal("105")),
+    ]
+    shortfall = snapshot_forward_bar_shortfall(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    assert shortfall == 0
+
+
+def test_snapshot_forward_bar_shortfall_no_as_of_is_null() -> None:
+    bars = [_bar(date(2024, 1, 3), Decimal("101"))]
+    shortfall = snapshot_forward_bar_shortfall(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    assert shortfall is None
 
 
 def test_missing_snapshot_id_fail_closed() -> None:

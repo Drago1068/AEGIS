@@ -14,7 +14,7 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Protocol
 
-from aegis.domain.calendars import is_trading_day
+from aegis.domain.calendars import count_trading_days_strictly_between, is_trading_day
 from aegis.domain.research_assessment import (
     COMPONENT_SOURCE_MIXED,
     STATE_RESEARCH_ONLY,
@@ -325,6 +325,45 @@ def snapshot_label_block_reason(
     return None
 
 
+def snapshot_forward_bar_shortfall(
+    snapshot: ResearchAssessmentSnapshotData,
+    bars: Sequence[ResearchBarInput],
+    *,
+    calendar_name: str,
+    horizons: tuple[int, ...] = FORWARD_HORIZON_SESSIONS,
+) -> int | None:
+    """Return trading sessions still needed for the max forward horizon (ADR-0246).
+
+    Returns ``0`` when label-ready, ``None`` when there is no as_of close (shortfall not
+    applicable). Never invents closes.
+    """
+
+    bar_source = _resolve_label_bar_source(snapshot, bars)
+    closes_by_date = _index_closes(list(bars), bar_source)
+    as_of = snapshot.as_of_trading_date
+    if as_of not in closes_by_date:
+        return None
+    max_horizon = max(horizons)
+    required_end = forward_horizon_end_date(as_of, max_horizon, calendar_name)
+    if all(
+        forward_horizon_end_date(as_of, horizon, calendar_name) in closes_by_date
+        for horizon in horizons
+    ):
+        return 0
+    forward_or_as_of = [day for day in closes_by_date if day >= as_of]
+    last_available = max(forward_or_as_of)
+    if last_available >= required_end:
+        # Gap: later bars exist but required end close is missing.
+        before_required = [day for day in forward_or_as_of if day < required_end]
+        last_before = max(before_required) if before_required else as_of
+        return count_trading_days_strictly_between(
+            last_before, required_end, calendar_name
+        )
+    return count_trading_days_strictly_between(
+        last_available, required_end, calendar_name
+    )
+
+
 def is_snapshot_label_ready(
     snapshot: ResearchAssessmentSnapshotData,
     bars: Sequence[ResearchBarInput],
@@ -419,15 +458,22 @@ class OutcomeLabelService:
         snapshots_newest_first: list[ResearchAssessmentSnapshotData],
         *,
         labeled_assessment_ids: set[int] | None = None,
-    ) -> tuple[bool | None, OutcomeLabelReason | None, date | None, date | None, int]:
-        """Return latest readiness, labelable dates, and unlabeled+ready count.
+    ) -> tuple[
+        bool | None,
+        OutcomeLabelReason | None,
+        date | None,
+        date | None,
+        int,
+        int | None,
+    ]:
+        """Return latest readiness, labelable dates, unlabeled+ready count, shortfall.
 
-        Loads stored bars once (ADR-0232/0234/0236/0238/0240). Empty scan returns
-        ``(None, None, None, None, 0)``.
+        Loads stored bars once (ADR-0232/0234/0236/0238/0240/0246). Empty scan returns
+        ``(None, None, None, None, 0, None)``.
         """
 
         if not snapshots_newest_first:
-            return None, None, None, None, 0
+            return None, None, None, None, 0, None
 
         bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
         if labeled_assessment_ids is None:
@@ -437,6 +483,11 @@ class OutcomeLabelService:
             )
         latest = snapshots_newest_first[0]
         block_reason = snapshot_label_block_reason(
+            latest,
+            bars,
+            calendar_name=self._calendar_name,
+        )
+        forward_bar_shortfall = snapshot_forward_bar_shortfall(
             latest,
             bars,
             calendar_name=self._calendar_name,
@@ -463,6 +514,7 @@ class OutcomeLabelService:
             most_recent_labelable,
             most_recent_unlabeled_labelable,
             unlabeled_label_ready_count,
+            forward_bar_shortfall,
         )
 
     async def assessment_ids_with_labels(

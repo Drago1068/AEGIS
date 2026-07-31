@@ -1022,6 +1022,11 @@ export interface ResearchEvidenceSummary {
    * Null when none unlabeled. Never invented.
    */
   most_recent_unlabeled_as_of_trading_date: string | null;
+  /**
+   * Trading sessions still needed before latest is label-ready (max forward horizon).
+   * 0 when ready; null when no assessment or no as_of bar. Never invented.
+   */
+  latest_assessment_forward_bar_shortfall: number | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

@@ -1,6 +1,6 @@
-# ADR-0246: Phase 245 Evidence Summary Latest Label Forward Bar Shortfall (draft)
+# ADR-0246: Phase 245 Evidence Summary Latest Label Forward Bar Shortfall
 
-- Status: Proposed (ready after Phase 244; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -13,7 +13,7 @@ the tip (or latest) becomes label-ready — the unlock signal for outcome-label 
 
 Further tip scalars (duplicate as_of lifts) are low value; shortfall is actionable.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. API
 

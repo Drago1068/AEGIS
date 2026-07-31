@@ -156,6 +156,7 @@ describe("ResearchAssessmentPanel", () => {
       scan_unlabeled_label_ready_count: 0,
       most_recent_unlabeled_assessment_id: null,
       most_recent_unlabeled_as_of_trading_date: null,
+      latest_assessment_forward_bar_shortfall: null,
       latest_coverage_confidence: null,
       latest_research_index: null,
       latest_as_of_trading_date: null,
@@ -552,6 +553,7 @@ describe("ResearchAssessmentPanel", () => {
       scan_unlabeled_label_ready_count: 1,
       most_recent_unlabeled_assessment_id: 2,
       most_recent_unlabeled_as_of_trading_date: "2024-02-09",
+      latest_assessment_forward_bar_shortfall: 20,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -695,6 +697,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-most-recent-unlabeled-as-of-trading-date"),
       ).toHaveTextContent("2024-02-09");
+      expect(
+        screen.getByTestId("evidence-latest-assessment-forward-bar-shortfall"),
+      ).toHaveTextContent("20");
       expect(screen.getByTestId("evidence-latest-outcome-label-computed-at")).toHaveTextContent(
         "2024-01-26T19:00:00Z",
       );
@@ -882,6 +887,7 @@ describe("ResearchAssessmentPanel", () => {
       scan_unlabeled_label_ready_count: 1,
       most_recent_unlabeled_assessment_id: 2,
       most_recent_unlabeled_as_of_trading_date: "2024-02-09",
+      latest_assessment_forward_bar_shortfall: 20,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1034,6 +1040,7 @@ describe("ResearchAssessmentPanel", () => {
       scan_unlabeled_label_ready_count: 1,
       most_recent_unlabeled_assessment_id: 2,
       most_recent_unlabeled_as_of_trading_date: "2024-02-09",
+      latest_assessment_forward_bar_shortfall: 20,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1184,6 +1191,7 @@ describe("ResearchAssessmentPanel", () => {
       scan_unlabeled_label_ready_count: 1,
       most_recent_unlabeled_assessment_id: 2,
       most_recent_unlabeled_as_of_trading_date: "2024-02-09",
+      latest_assessment_forward_bar_shortfall: 20,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1424,6 +1432,7 @@ describe("ResearchAssessmentPanel", () => {
       scan_unlabeled_label_ready_count: 1,
       most_recent_unlabeled_assessment_id: 2,
       most_recent_unlabeled_as_of_trading_date: "2024-02-09",
+      latest_assessment_forward_bar_shortfall: 20,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1624,6 +1633,7 @@ describe("ResearchAssessmentPanel", () => {
       scan_unlabeled_label_ready_count: 1,
       most_recent_unlabeled_assessment_id: 2,
       most_recent_unlabeled_as_of_trading_date: "2024-02-09",
+      latest_assessment_forward_bar_shortfall: 20,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1820,6 +1830,7 @@ describe("ResearchAssessmentPanel", () => {
       scan_unlabeled_label_ready_count: 1,
       most_recent_unlabeled_assessment_id: 2,
       most_recent_unlabeled_as_of_trading_date: "2024-02-09",
+      latest_assessment_forward_bar_shortfall: 20,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",

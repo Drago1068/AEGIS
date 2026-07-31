@@ -437,6 +437,15 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Latest assessment forward bar shortfall</dt>
+          <dd
+            className="font-mono"
+            data-testid="evidence-latest-assessment-forward-bar-shortfall"
+          >
+            {evidenceSummary.latest_assessment_forward_bar_shortfall ?? "null"}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest outcome_label computed_at</dt>
           <dd className="font-mono" data-testid="evidence-latest-outcome-label-computed-at">
             {evidenceSummary.latest_outcome_label_computed_at ?? "null"}

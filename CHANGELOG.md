@@ -12,11 +12,24 @@ delivery workflow).
 Ops evidence gate after Phase 245 latest forward-bar shortfall diagnostic. See
 [docs/architecture/decisions/0247-phase-246-nas-live-verify-phase-245.md](docs/architecture/decisions/0247-phase-246-nas-live-verify-phase-245.md).
 
-### Phase 245 - Evidence Summary Latest Label Forward Bar Shortfall (draft)
+### Phase 245 - Evidence Summary Latest Label Forward Bar Shortfall
 
 How many additional forward trading sessions are needed before latest becomes label-ready
 (backfill unlock signal). See
 [docs/architecture/decisions/0246-phase-245-evidence-summary-latest-forward-bar-shortfall.md](docs/architecture/decisions/0246-phase-245-evidence-summary-latest-forward-bar-shortfall.md).
+
+#### Added
+
+- ``latest_assessment_forward_bar_shortfall`` on evidence summary (+ export): sessions still
+  needed for max forward horizon; ``0`` when ready; null when N/A (no assessment /
+  ``no_as_of_bar``).
+- Domain ``snapshot_forward_bar_shortfall``; console
+  ``data-testid="evidence-latest-assessment-forward-bar-shortfall"``.
+- NAS verify checklist item 118 for Phase 246.
+
+#### Explicitly out of scope
+
+UI modularization, inventing ready targets, default-on calibration, orders.
 
 ### Phase 244 - NAS Live Verification of Phase 243
 

@@ -588,8 +588,13 @@ Phase 234 live-verified that reason field (see
 [decisions/0235-phase-234-nas-live-verify-phase-233.md](decisions/0235-phase-234-nas-live-verify-phase-233.md)).
 Phase 235 surfaces ``most_recent_labelable_as_of_trading_date`` for backfill targeting (see
 [decisions/0236-phase-235-evidence-summary-most-recent-labelable-as-of-trading-date.md](decisions/0236-phase-235-evidence-summary-most-recent-labelable-as-of-trading-date.md)).
-Phase 236 (draft) live-verifies that field (see
+Phase 236 live-verified that field (see
 [decisions/0237-phase-236-nas-live-verify-phase-235.md](decisions/0237-phase-236-nas-live-verify-phase-235.md)).
+Phase 237 (draft) proposes ``most_recent_unlabeled_labelable_as_of_trading_date`` for the next
+backfill target (see
+[decisions/0238-phase-237-evidence-summary-most-recent-unlabeled-labelable-as-of.md](decisions/0238-phase-237-evidence-summary-most-recent-unlabeled-labelable-as-of.md)).
+Phase 238 (draft) would live-verify that field (see
+[decisions/0239-phase-238-nas-live-verify-phase-237.md](decisions/0239-phase-238-nas-live-verify-phase-237.md)).
 
 ## System context
 

@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 168 - NAS Live Verification of Phase 167 (draft)
+### Phase 170 - NAS Live Verification of Phase 169 (draft)
 
-Ops evidence gate after Phase 167 latest computed_at field. See
+Ops evidence gate after Phase 169 latest event_time field. See
+[docs/architecture/decisions/0171-phase-170-nas-live-verify-phase-169.md](docs/architecture/decisions/0171-phase-170-nas-live-verify-phase-169.md).
+
+### Phase 169 - Evidence Summary Latest Event Time (draft)
+
+Surface top-level ``latest_event_time`` on evidence summary. See
+[docs/architecture/decisions/0170-phase-169-evidence-summary-latest-event-time.md](docs/architecture/decisions/0170-phase-169-evidence-summary-latest-event-time.md).
+
+### Phase 168 - NAS Live Verification of Phase 167
+
+Ops evidence gate after Phase 167 latest computed_at field. Live verify passed
+2026-07-31 (``4fecc07``; AAPL computed_at=2026-07-30T22:00:01.230802Z). See
 [docs/architecture/decisions/0169-phase-168-nas-live-verify-phase-167.md](docs/architecture/decisions/0169-phase-168-nas-live-verify-phase-167.md).
+
+#### Added
+
+- ADR-0169: live verify requires backend+frontend recreate for Phase 167; checklist item 79.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 167 - Evidence Summary Latest Computed At
 

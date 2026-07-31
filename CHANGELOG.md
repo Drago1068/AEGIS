@@ -18,10 +18,21 @@ Surface top-level ``most_recent_labeled_outcome_label_as_of_trading_date`` on ev
 scan-labeled provenance. See
 [docs/architecture/decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md](docs/architecture/decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md).
 
-### Phase 226 - NAS Live Verification of Phase 225 (draft)
+### Phase 226 - NAS Live Verification of Phase 225
 
-Ops evidence gate after Phase 225 most recent labeled outcome label computed_at field. See
+Ops evidence gate after Phase 225 most recent labeled outcome label computed_at field. Live
+verify passed 2026-07-31 (``1a4091f``; AAPL
+``most_recent_labeled_outcome_label_computed_at=2026-07-30T21:25:15.962739Z`` with
+``most_recent_labeled_outcome_label_id=82``). See
 [docs/architecture/decisions/0227-phase-226-nas-live-verify-phase-225.md](docs/architecture/decisions/0227-phase-226-nas-live-verify-phase-225.md).
+
+#### Added
+
+- ADR-0227: live verify requires backend+frontend recreate for Phase 225; checklist item 108.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 225 - Evidence Summary Most Recent Labeled Outcome Label Computed At
 

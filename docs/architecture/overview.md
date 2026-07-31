@@ -564,12 +564,13 @@ Phase 224 live-verified that revision (see
 Phase 225 surfaces top-level ``most_recent_labeled_outcome_label_computed_at`` for scan-labeled
 computed_at (see
 [decisions/0226-phase-225-evidence-summary-most-recent-labeled-outcome-label-computed-at.md](decisions/0226-phase-225-evidence-summary-most-recent-labeled-outcome-label-computed-at.md)).
-Phase 226 (draft) live-verifies that revision (see
+Phase 226 live-verified that revision (see
 [decisions/0227-phase-226-nas-live-verify-phase-225.md](decisions/0227-phase-226-nas-live-verify-phase-225.md)).
 Phase 227 (draft) surfaces top-level ``most_recent_labeled_outcome_label_as_of_trading_date`` (see
 [decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md](decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md)).
 Phase 228 (draft) live-verifies that revision (see
 [decisions/0229-phase-228-nas-live-verify-phase-227.md](decisions/0229-phase-228-nas-live-verify-phase-227.md)).
+This closes the planned scan-labeled scalar series after Phase 228.
 
 ## System context
 

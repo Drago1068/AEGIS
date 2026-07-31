@@ -1,6 +1,6 @@
 # ADR-0201: Phase 200 NAS Live Verification of Phase 199
 
-- Status: Proposed (pending Phase 199 + live evidence)
+- Status: Accepted (live verified 2026-07-31; backend+frontend recreate of ``c15f605``)
 - Date: 2026-07-31
 
 ## Context
@@ -15,12 +15,14 @@ need a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after 
 1. Deploy current ``HEAD`` with TLS overlay; recreate **backend** and **frontend**.
 2. Run `verify.ps1` / `verify.sh` successfully (prior gates remain).
 3. Authenticated evidence-summary includes ``latest_outcome_label_computed_at`` (null OK;
-   checklist item 95 after Phase 199 lands).
+   checklist item 95).
 4. SSH `alembic current` includes **`0009`** or `head`.
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-31 for ``c15f605``
+(checklist item 95; AAPL ``latest_outcome_label_computed_at=null`` — latest assessment
+unlabeled; ``latest_outcome_label_id=null``).
 
 ### 3. Out of scope
 
@@ -29,7 +31,7 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 199 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# Deploy HEAD backend+frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
 ```
 

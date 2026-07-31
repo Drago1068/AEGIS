@@ -257,6 +257,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_assessment_id"] is None
     assert body["latest_outcome_label_id"] is None
     assert body["latest_outcome_label_computed_at"] is None
+    assert body["latest_outcome_label_method_id"] is None
     assert body["latest_calibration_id"] is None
     assert body["latest_calibration_horizon_key"] is None
     assert body["latest_calibration_computed_at"] is None
@@ -301,6 +302,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_assessment_id"] == 1
     assert body["latest_outcome_label_id"] == 10
     assert body["latest_outcome_label_computed_at"] == "2024-01-26T19:00:00Z"
+    assert body["latest_outcome_label_method_id"] == "forward_total_return_v1"
     assert body["latest_calibration_id"] == 7
     assert body["latest_calibration_horizon_key"] == "forward_return_5"
     assert body["latest_calibration_computed_at"] == "2024-01-26T20:00:00Z"

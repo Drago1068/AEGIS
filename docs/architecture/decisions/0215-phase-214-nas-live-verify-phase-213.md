@@ -1,6 +1,6 @@
 # ADR-0215: Phase 214 NAS Live Verification of Phase 213
 
-- Status: Proposed (pending Phase 213 + live evidence)
+- Status: Accepted (live verified 2026-07-31; backend+frontend recreate of ``a723fed``)
 - Date: 2026-07-31
 
 ## Context
@@ -21,7 +21,9 @@ that lands.
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-31 for ``a723fed``
+(checklist item 102; AAPL ``most_recent_labeled_outcome_label_id=82`` with
+``most_recent_labeled_assessment_id=125``; ``latest_outcome_label_id=null``).
 
 ### 3. Out of scope
 
@@ -30,7 +32,7 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 213 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# Deploy HEAD backend+frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
 ```
 

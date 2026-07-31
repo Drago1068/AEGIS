@@ -535,8 +535,13 @@ Phase 212 live-verified that revision and closed the absolute-latest outcome-lab
 Phase 213 surfaces top-level ``most_recent_labeled_outcome_label_id`` for scan-labeled provenance when
 the absolute latest assessment is unlabeled (see
 [decisions/0214-phase-213-evidence-summary-most-recent-labeled-outcome-label-id.md](decisions/0214-phase-213-evidence-summary-most-recent-labeled-outcome-label-id.md)).
-Phase 214 (draft) live-verifies that revision (see
+Phase 214 live-verified that revision (see
 [decisions/0215-phase-214-nas-live-verify-phase-213.md](decisions/0215-phase-214-nas-live-verify-phase-213.md)).
+Phase 215 surfaces top-level ``most_recent_labeled_outcome_label_method_id`` for scan-labeled method
+identity (see
+[decisions/0216-phase-215-evidence-summary-most-recent-labeled-outcome-label-method-id.md](decisions/0216-phase-215-evidence-summary-most-recent-labeled-outcome-label-method-id.md)).
+Phase 216 (draft) live-verifies that revision (see
+[decisions/0217-phase-216-nas-live-verify-phase-215.md](decisions/0217-phase-216-nas-live-verify-phase-215.md)).
 
 ## System context
 

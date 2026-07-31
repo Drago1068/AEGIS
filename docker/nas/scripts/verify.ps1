@@ -140,7 +140,8 @@ function Write-VerifyChecklist {
     Write-Host "100. Authenticated evidence-summary includes Phase 209 latest_outcome_label_bar_source (Phase 210)"
     Write-Host "101. Authenticated evidence-summary includes Phase 211 latest_outcome_label_as_of_trading_date (Phase 212)"
     Write-Host "102. Authenticated evidence-summary includes Phase 213 most_recent_labeled_outcome_label_id (Phase 214)"
-    Write-Host "103. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "103. Authenticated evidence-summary includes Phase 215 most_recent_labeled_outcome_label_method_id (Phase 216)"
+    Write-Host "104. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1064,6 +1065,13 @@ try {
         $scanLabelId = $summary.most_recent_labeled_outcome_label_id
         $scanLabelPart = if ($null -eq $scanLabelId -or $scanLabelId -eq "") { "null" } else { [string]$scanLabelId }
         Write-Host "OK  Phase 214 most_recent_labeled_outcome_label_id=$scanLabelPart"
+        # Phase 216: most_recent_labeled_outcome_label_method_id from Phase 215 (null OK when no scan labels).
+        if (-not ($summary.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label_method_id")) {
+            throw "evidence-summary missing most_recent_labeled_outcome_label_method_id (Phase 215/216)"
+        }
+        $scanLabelMethodId = $summary.most_recent_labeled_outcome_label_method_id
+        $scanLabelMethodPart = if ($null -eq $scanLabelMethodId -or $scanLabelMethodId -eq "") { "null" } else { [string]$scanLabelMethodId }
+        Write-Host "OK  Phase 216 most_recent_labeled_outcome_label_method_id=$scanLabelMethodPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1215,6 +1223,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label_id")) {
             throw "evidence-summary/export missing most_recent_labeled_outcome_label_id (Phase 213/214)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label_method_id")) {
+            throw "evidence-summary/export missing most_recent_labeled_outcome_label_method_id (Phase 215/216)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

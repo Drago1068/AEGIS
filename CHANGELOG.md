@@ -7,10 +7,41 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 214 - NAS Live Verification of Phase 213 (draft)
+### Phase 216 - NAS Live Verification of Phase 215 (draft)
 
-Ops evidence gate after Phase 213 most recent labeled outcome label id field. See
+Ops evidence gate after Phase 215 most recent labeled outcome label method id field. See
+[docs/architecture/decisions/0217-phase-216-nas-live-verify-phase-215.md](docs/architecture/decisions/0217-phase-216-nas-live-verify-phase-215.md).
+
+### Phase 215 - Evidence Summary Most Recent Labeled Outcome Label Method Id
+
+Surface top-level ``most_recent_labeled_outcome_label_method_id`` on evidence summary for
+scan-labeled provenance. See
+[docs/architecture/decisions/0216-phase-215-evidence-summary-most-recent-labeled-outcome-label-method-id.md](docs/architecture/decisions/0216-phase-215-evidence-summary-most-recent-labeled-outcome-label-method-id.md).
+
+#### Added
+
+- ``most_recent_labeled_outcome_label_method_id`` on evidence summary (+ export); from scan-labeled label.
+- Console surfaces the field with ``data-testid="evidence-most-recent-labeled-outcome-label-method-id"``.
+- NAS verify checklist item 103 for Phase 216.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts, redundant nested-only access patterns.
+
+### Phase 214 - NAS Live Verification of Phase 213
+
+Ops evidence gate after Phase 213 most recent labeled outcome label id field. Live verify
+passed 2026-07-31 (``a723fed``; AAPL ``most_recent_labeled_outcome_label_id=82`` with
+``most_recent_labeled_assessment_id=125``; ``latest_outcome_label_id=null``). See
 [docs/architecture/decisions/0215-phase-214-nas-live-verify-phase-213.md](docs/architecture/decisions/0215-phase-214-nas-live-verify-phase-213.md).
+
+#### Added
+
+- ADR-0215: live verify requires backend+frontend recreate for Phase 213; checklist item 102.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 213 - Evidence Summary Most Recent Labeled Outcome Label Id
 

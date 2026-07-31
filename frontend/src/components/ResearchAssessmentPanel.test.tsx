@@ -141,6 +141,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_assessment_id: null,
       most_recent_labeled_outcome_label: null,
       most_recent_labeled_outcome_label_id: null,
+      most_recent_labeled_outcome_label_method_id: null,
       latest_coverage_confidence: null,
       latest_research_index: null,
       latest_as_of_trading_date: null,
@@ -522,6 +523,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "alpha_vantage",
       },
       most_recent_labeled_outcome_label_id: 20,
+      most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -620,6 +622,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("evidence-most-recent-labeled-outcome-label-id")).toHaveTextContent(
         "20",
       );
+      expect(
+        screen.getByTestId("evidence-most-recent-labeled-outcome-label-method-id"),
+      ).toHaveTextContent("forward_total_return_v1");
       expect(screen.getByTestId("evidence-latest-outcome-label-computed-at")).toHaveTextContent(
         "2024-01-26T19:00:00Z",
       );
@@ -792,6 +797,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       most_recent_labeled_outcome_label_id: 30,
+      most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -929,6 +935,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       most_recent_labeled_outcome_label_id: 30,
+      most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1064,6 +1071,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       most_recent_labeled_outcome_label_id: 30,
+      most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1289,6 +1297,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       most_recent_labeled_outcome_label_id: 30,
+      most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1474,6 +1483,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       most_recent_labeled_outcome_label_id: 30,
+      most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1655,6 +1665,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       most_recent_labeled_outcome_label_id: 30,
+      most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",

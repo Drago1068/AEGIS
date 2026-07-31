@@ -1,6 +1,6 @@
 # ADR-0152: Phase 151 Evidence Summary Latest As-Of Trading Date
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -21,7 +21,7 @@ Never invent.
 ### 2. Console
 
 Show the field on ``ResearchEvidenceSummarySection`` near research index / coverage rows
-(ISO date string or ``null``).
+(``data-testid="evidence-latest-as-of-trading-date"``; ISO date or ``null``).
 
 ### 3. Out of scope
 

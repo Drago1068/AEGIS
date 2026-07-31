@@ -184,6 +184,12 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Latest as_of_trading_date</dt>
+          <dd className="font-mono" data-testid="evidence-latest-as-of-trading-date">
+            {evidenceSummary.latest_as_of_trading_date ?? "null"}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest coverage_confidence</dt>
           <dd className="font-mono" data-testid="evidence-latest-coverage-confidence">
             {evidenceSummary.latest_coverage_confidence == null

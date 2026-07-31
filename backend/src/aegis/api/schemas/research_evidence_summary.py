@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from aegis.api.schemas.research import ResearchAssessmentResponse
@@ -114,6 +116,13 @@ class ResearchEvidenceSummaryResponse(BaseModel):
         description=(
             "research_index from latest assessment components when present and numeric. "
             "Null when no assessment or the component is missing/non-numeric. Never invented."
+        ),
+    )
+    latest_as_of_trading_date: date | None = Field(
+        default=None,
+        description=(
+            "as_of_trading_date from the latest assessment. Null when no assessment. "
+            "Never invented."
         ),
     )
     detail: str

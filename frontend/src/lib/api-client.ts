@@ -970,6 +970,8 @@ export interface ResearchEvidenceSummary {
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */
   latest_research_index: number | null;
+  /** as_of_trading_date from latest assessment (ISO date); null when none. */
+  latest_as_of_trading_date: string | null;
   detail: string;
 }
 

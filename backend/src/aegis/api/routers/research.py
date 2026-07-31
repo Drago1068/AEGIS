@@ -468,6 +468,9 @@ async def _build_research_evidence_summary(
             latest_research_index = None
         elif isinstance(raw_index, (int, float)):
             latest_research_index = float(raw_index)
+    latest_as_of_trading_date = (
+        latest_assessment.as_of_trading_date if latest_assessment is not None else None
+    )
 
     return ResearchEvidenceSummaryResponse(
         symbol=symbol.upper(),
@@ -491,6 +494,7 @@ async def _build_research_evidence_summary(
         most_recent_labeled_outcome_label=most_recent_labeled_outcome_label,
         latest_coverage_confidence=latest_coverage_confidence,
         latest_research_index=latest_research_index,
+        latest_as_of_trading_date=latest_as_of_trading_date,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

@@ -7,15 +7,32 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 152 - NAS Live Verification of Phase 151 (draft)
+### Phase 152 - NAS Live Verification of Phase 151
 
 Ops evidence gate after Phase 151 as-of trading date field. See
 [docs/architecture/decisions/0153-phase-152-nas-live-verify-phase-151.md](docs/architecture/decisions/0153-phase-152-nas-live-verify-phase-151.md).
 
-### Phase 151 - Evidence Summary Latest As-Of Trading Date (draft)
+#### Added
+
+- ADR-0153: live verify requires backend+frontend recreate for Phase 151; checklist item 71.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 151 - Evidence Summary Latest As-Of Trading Date
 
 Surface top-level ``latest_as_of_trading_date`` on evidence summary. See
 [docs/architecture/decisions/0152-phase-151-evidence-summary-latest-as-of-date.md](docs/architecture/decisions/0152-phase-151-evidence-summary-latest-as-of-date.md).
+
+#### Added
+
+- ``latest_as_of_trading_date`` on evidence summary (+ export); copied from latest assessment.
+- Console surfaces the field with ``data-testid="evidence-latest-as-of-trading-date"``.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 150 - NAS Live Verification of Phase 149
 

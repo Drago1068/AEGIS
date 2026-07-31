@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 157 latest method id field. See
 [docs/architecture/decisions/0159-phase-158-nas-live-verify-phase-157.md](docs/architecture/decisions/0159-phase-158-nas-live-verify-phase-157.md).
 
-### Phase 157 - Evidence Summary Latest Method Id (draft)
+### Phase 157 - Evidence Summary Latest Method Id
 
 Surface top-level ``latest_method_id`` on evidence summary. See
 [docs/architecture/decisions/0158-phase-157-evidence-summary-latest-method-id.md](docs/architecture/decisions/0158-phase-157-evidence-summary-latest-method-id.md).
+
+#### Added
+
+- ``latest_method_id`` on evidence summary (+ export); copied from latest assessment.
+- Console surfaces the field with ``data-testid="evidence-latest-method-id"``.
+- NAS verify checklist item 74 for Phase 158.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts, ``method_version``.
 
 ### Phase 156 - NAS Live Verification of Phase 155
 

@@ -979,6 +979,8 @@ export interface ResearchEvidenceSummary {
    * Distinct from latest_component_source (which may be "mixed"). Null when none.
    */
   latest_input_source: string | null;
+  /** method_id from latest assessment; null when none. */
+  latest_method_id: string | null;
   detail: string;
 }
 

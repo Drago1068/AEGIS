@@ -111,7 +111,8 @@ function Write-VerifyChecklist {
     Write-Host " 71. Authenticated evidence-summary includes Phase 151 latest_as_of_trading_date (Phase 152)"
     Write-Host " 72. Authenticated evidence-summary includes Phase 153 latest_bar_count (Phase 154)"
     Write-Host " 73. Authenticated evidence-summary includes Phase 155 latest_input_source (Phase 156)"
-    Write-Host " 74. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 74. Authenticated evidence-summary includes Phase 157 latest_method_id (Phase 158)"
+    Write-Host " 75. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -790,6 +791,13 @@ try {
         $inSrc = $summary.latest_input_source
         $inSrcPart = if ($null -eq $inSrc) { "null" } else { [string]$inSrc }
         Write-Host "OK  Phase 156 latest_input_source=$inSrcPart"
+        # Phase 158: latest_method_id from Phase 157 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_method_id")) {
+            throw "evidence-summary missing latest_method_id (Phase 157/158)"
+        }
+        $methodId = $summary.latest_method_id
+        $methodPart = if ($null -eq $methodId) { "null" } else { [string]$methodId }
+        Write-Host "OK  Phase 158 latest_method_id=$methodPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -854,6 +862,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_input_source")) {
             throw "evidence-summary/export missing latest_input_source (Phase 155/156)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_method_id")) {
+            throw "evidence-summary/export missing latest_method_id (Phase 157/158)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

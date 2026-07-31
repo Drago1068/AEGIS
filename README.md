@@ -7,9 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 157 drafted (evidence summary latest method id).** Next: implement
-ADR-0158, then Phase 158 NAS backend+frontend verify. Phases 143–156 closed on ``cecb8b4``
-(+ verify Alembic stderr harden). See
+**Current phase: Phase 157 implemented (evidence summary latest method id).** Next: Phase 158
+NAS backend+frontend verify (ADR-0159). Phases 143–156 closed; Phase 157 on HEAD pending NAS
+verify. See
 [docs/architecture/decisions/0158-phase-157-evidence-summary-latest-method-id.md](docs/architecture/decisions/0158-phase-157-evidence-summary-latest-method-id.md)
 and [CHANGELOG.md](CHANGELOG.md).
 

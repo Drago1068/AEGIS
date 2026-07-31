@@ -140,4 +140,10 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "'mixed'). Never invented."
         ),
     )
+    latest_method_id: str | None = Field(
+        default=None,
+        description=(
+            "method_id from the latest assessment. Null when no assessment. Never invented."
+        ),
+    )
     detail: str

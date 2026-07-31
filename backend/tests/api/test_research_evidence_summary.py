@@ -139,11 +139,13 @@ class _FakeOutcomeLabelService:
         label_ready: bool = False,
         label_block_reason: str | None = "insufficient_forward_bars",
         labelable_as_of: date | None = None,
+        unlabeled_labelable_as_of: date | None = None,
     ) -> None:
         self._listed = listed or []
         self._label_ready = label_ready
         self._label_block_reason = None if label_ready else label_block_reason
         self._labelable_as_of = labelable_as_of
+        self._unlabeled_labelable_as_of = unlabeled_labelable_as_of
 
     async def list_labels_for_assessment(
         self, symbol: str, assessment_snapshot_id: int, limit: int
@@ -189,10 +191,14 @@ class _FakeOutcomeLabelService:
         self,
         symbol: str,
         snapshots_newest_first: list[ResearchAssessmentSnapshotData],
-    ) -> tuple[bool | None, OutcomeLabelReason | None, date | None]:
-        _ = symbol
+        *,
+        labeled_assessment_ids: set[int] | None = None,
+    ) -> tuple[bool | None, OutcomeLabelReason | None, date | None, date | None]:
         if not snapshots_newest_first:
-            return None, None, None
+            return None, None, None, None
+        labeled = labeled_assessment_ids
+        if labeled is None:
+            labeled = {row.assessment_snapshot_id for row in self._listed}
         ready, reason = await self.label_readiness_for_assessment(
             symbol, snapshots_newest_first[0]
         )
@@ -201,7 +207,14 @@ class _FakeOutcomeLabelService:
             if ready
             else self._labelable_as_of
         )
-        return ready, reason, labelable
+        unlabeled_labelable: date | None = None
+        if ready:
+            latest_id = snapshots_newest_first[0].id
+            if latest_id is not None and latest_id not in labeled:
+                unlabeled_labelable = snapshots_newest_first[0].as_of_trading_date
+        elif self._unlabeled_labelable_as_of is not None:
+            unlabeled_labelable = self._unlabeled_labelable_as_of
+        return ready, reason, labelable, unlabeled_labelable
 
 
 class _FakeCalibrationService:
@@ -241,6 +254,7 @@ def _client(
     label_ready: bool = False,
     label_block_reason: str | None = "insufficient_forward_bars",
     labelable_as_of: date | None = None,
+    unlabeled_labelable_as_of: date | None = None,
 ) -> AsyncClient:
     app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
     app.dependency_overrides[require_operator] = _operator
@@ -252,6 +266,7 @@ def _client(
         label_ready=label_ready,
         label_block_reason=label_block_reason,
         labelable_as_of=labelable_as_of,
+        unlabeled_labelable_as_of=unlabeled_labelable_as_of,
     )
     app.dependency_overrides[get_research_calibration_service] = lambda: _FakeCalibrationService(
         readiness=readiness or _readiness(),
@@ -312,6 +327,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_assessment_is_label_ready"] is None
     assert body["latest_assessment_label_block_reason"] is None
     assert body["most_recent_labelable_as_of_trading_date"] is None
+    assert body["most_recent_unlabeled_labelable_as_of_trading_date"] is None
     assert body["latest_coverage_confidence"] is None
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
@@ -366,6 +382,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_assessment_is_label_ready"] is True
     assert body["latest_assessment_label_block_reason"] is None
     assert body["most_recent_labelable_as_of_trading_date"] == "2024-01-26"
+    assert body["most_recent_unlabeled_labelable_as_of_trading_date"] is None
     assert body["latest_coverage_confidence"] == 0.95
     assert body["latest_research_index"] == 0.46
     assert body["latest_as_of_trading_date"] == "2024-01-26"
@@ -526,6 +543,42 @@ async def test_evidence_summary_most_recent_labelable_as_of_trading_date() -> No
     assert body["latest_as_of_trading_date"] == "2024-02-09"
     assert body["latest_assessment_is_label_ready"] is False
     assert body["most_recent_labelable_as_of_trading_date"] == "2024-01-26"
+
+
+async def test_evidence_summary_most_recent_unlabeled_labelable_as_of_trading_date() -> None:
+    """Labelable may already be labeled; unlabeled+labelable is the backfill next-target."""
+
+    unlabeled_latest = ResearchAssessmentSnapshotData(
+        id=2,
+        symbol="AAPL",
+        method_id="daily_bar_research_v1",
+        method_version=1,
+        state="research_only",
+        as_of_trading_date=date(2024, 2, 9),
+        event_time=datetime(2024, 2, 9, 23, 59, 59, tzinfo=UTC),
+        computed_at=datetime(2024, 2, 9, 18, 0, tzinfo=UTC),
+        coverage_confidence=0.95,
+        probability_confidence=None,
+        components={"research_index": 0.5},
+        schema_version=1,
+        input_source="alpha_vantage",
+        lookback_start_date=date(2024, 1, 12),
+        lookback_end_date=date(2024, 2, 9),
+        bar_count=20,
+    )
+    async with _client(
+        assessments=[unlabeled_latest, _snapshot(snapshot_id=1)],
+        labels=[],
+        label_ready=False,
+        labelable_as_of=date(2024, 1, 26),
+        unlabeled_labelable_as_of=date(2024, 1, 20),
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["most_recent_labelable_as_of_trading_date"] == "2024-01-26"
+    assert body["most_recent_unlabeled_labelable_as_of_trading_date"] == "2024-01-20"
 
 
 async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:

@@ -7,15 +7,34 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 238 - NAS Live Verification of Phase 237 (draft)
+### Phase 238 - NAS Live Verification of Phase 237
 
 Ops evidence gate after Phase 237 unlabeled+labelable as_of diagnostic. See
 [docs/architecture/decisions/0239-phase-238-nas-live-verify-phase-237.md](docs/architecture/decisions/0239-phase-238-nas-live-verify-phase-237.md).
 
-### Phase 237 - Evidence Summary Most Recent Unlabeled Labelable As-Of (draft)
+#### Added
+
+- ADR-0239: live verify requires backend+frontend recreate for Phase 237; checklist item 114.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 237 - Evidence Summary Most Recent Unlabeled Labelable As-Of
 
 Newest as_of that is both unlabeled and label-ready (backfill next-target diagnostic). See
 [docs/architecture/decisions/0238-phase-237-evidence-summary-most-recent-unlabeled-labelable-as-of.md](docs/architecture/decisions/0238-phase-237-evidence-summary-most-recent-unlabeled-labelable-as-of.md).
+
+#### Added
+
+- ``most_recent_unlabeled_labelable_as_of_trading_date`` on evidence summary (+ export).
+- ``OutcomeLabelService.scan_label_diagnostics`` returns unlabeled+labelable as_of (one bar load).
+- Console ``data-testid="evidence-most-recent-unlabeled-labelable-as-of-trading-date"``.
+- NAS verify checklist item 114 for Phase 238.
+
+#### Explicitly out of scope
+
+UI modularization, redundant nested lifts, default-on calibration, orders.
 
 ### Phase 236 - NAS Live Verification of Phase 235
 

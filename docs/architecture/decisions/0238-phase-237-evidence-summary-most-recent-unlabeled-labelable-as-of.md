@@ -1,18 +1,18 @@
-# ADR-0238: Phase 237 Evidence Summary Most Recent Unlabeled Labelable As-Of (draft)
+# ADR-0238: Phase 237 Evidence Summary Most Recent Unlabeled Labelable As-Of
 
-- Status: Proposed (ready after Phase 236; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
 Phases 235–236 added ``most_recent_labelable_as_of_trading_date`` (any label-ready row,
-labeled or not). Live AAPL shows that date equal to
+labeled or not). Live AAPL showed that date equal to
 ``most_recent_labeled_outcome_label_as_of_trading_date`` (``2026-02-05``) while latest remains
 blocked (``insufficient_forward_bars``). Operators targeting **outcome-label backfill** need
 the newest as_of that is **both unlabeled and label-ready** — otherwise the labelable date
 points at work already done.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. API
 
@@ -21,7 +21,7 @@ Add ``most_recent_unlabeled_labelable_as_of_trading_date: date | null`` (+ expor
 - Walk assessments newest-first; first with ``is_snapshot_label_ready`` and no existing
   outcome label for the method wins.
 - Null when none. Never invent.
-- Reuse bars from ``scan_label_diagnostics`` (extend return) to avoid double loads.
+- Extend ``OutcomeLabelService.scan_label_diagnostics`` (one bar load) to return the field.
 
 ### 2. Console
 
@@ -36,13 +36,10 @@ UI modularization, redundant nested lifts, default-on calibration, orders.
 Labelable answered "what could be labeled." Unlabeled+labelable answers "what should backfill
 do next?" — the remaining operator gap from live AAPL evidence.
 
-## Resume (after Phase 236 gate)
+## Consequences
 
-```powershell
-# Implement most_recent_unlabeled_labelable_as_of_trading_date (ADR-0238); tests; commit+push; then Phase 238:
-# git archive HEAD → NAS; rebuild backend+frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+- Evidence summary and export expose the backfill next-target as_of.
+- Phase 238 live-verifies the field on NAS (checklist item 114).
 
 ## Related documents
 

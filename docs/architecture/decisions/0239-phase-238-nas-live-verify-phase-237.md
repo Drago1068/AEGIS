@@ -1,11 +1,11 @@
-# ADR-0239: Phase 238 NAS Live Verification of Phase 237 (draft)
+# ADR-0239: Phase 238 NAS Live Verification of Phase 237
 
-- Status: Proposed (pending Phase 237 + live evidence)
+- Status: Accepted (pending live evidence)
 - Date: 2026-07-31
 
 ## Context
 
-Phase 237 would add ``most_recent_unlabeled_labelable_as_of_trading_date`` (ADR-0238).
+Phase 237 adds ``most_recent_unlabeled_labelable_as_of_trading_date`` (ADR-0238).
 Operators need a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after
 that lands.
 
@@ -15,7 +15,8 @@ that lands.
 
 1. Deploy ``HEAD`` TLS; recreate backend+frontend.
 2. ``verify.ps1`` / ``verify.sh`` pass.
-3. Evidence-summary includes the new field (null OK when none; checklist TBD).
+3. Evidence-summary includes ``most_recent_unlabeled_labelable_as_of_trading_date`` (null OK;
+   checklist item 114).
 4. Alembic ``0009`` / ``head``.
 
 ### 2. Upload ≠ verified

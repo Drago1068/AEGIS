@@ -401,6 +401,15 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Most recent unlabeled labelable as_of_trading_date</dt>
+          <dd
+            className="font-mono"
+            data-testid="evidence-most-recent-unlabeled-labelable-as-of-trading-date"
+          >
+            {evidenceSummary.most_recent_unlabeled_labelable_as_of_trading_date ?? "null"}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest outcome_label computed_at</dt>
           <dd className="font-mono" data-testid="evidence-latest-outcome-label-computed-at">
             {evidenceSummary.latest_outcome_label_computed_at ?? "null"}

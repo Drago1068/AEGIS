@@ -201,6 +201,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Never invented."
         ),
     )
+    most_recent_unlabeled_labelable_as_of_trading_date: date | None = Field(
+        default=None,
+        description=(
+            "as_of_trading_date of the newest scanned assessment that is unlabeled and "
+            "label-ready (backfill next-target). Null when none. Distinct from "
+            "most_recent_labelable_as_of_trading_date. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

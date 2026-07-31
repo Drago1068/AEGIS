@@ -388,15 +388,27 @@ async def _build_research_evidence_summary(
     assessment_count = len(snapshots)
     snapshot = snapshots[0] if snapshots else None
     readiness = await calibration_service.evaluate_readiness(symbol, snapshot)
+    scanned_ids = [row.id for row in snapshots if row.id is not None]
+    labeled_ids = (
+        await outcome_label_service.assessment_ids_with_labels(symbol, scanned_ids)
+        if scanned_ids
+        else set()
+    )
     latest_assessment_is_label_ready: bool | None = None
     latest_assessment_label_block_reason: str | None = None
     most_recent_labelable_as_of_trading_date: date | None = None
+    most_recent_unlabeled_labelable_as_of_trading_date: date | None = None
     if snapshots:
         (
             latest_assessment_is_label_ready,
             block_reason,
             most_recent_labelable_as_of_trading_date,
-        ) = await outcome_label_service.scan_label_diagnostics(symbol, snapshots)
+            most_recent_unlabeled_labelable_as_of_trading_date,
+        ) = await outcome_label_service.scan_label_diagnostics(
+            symbol,
+            snapshots,
+            labeled_assessment_ids=labeled_ids,
+        )
         latest_assessment_label_block_reason = (
             None if block_reason is None else block_reason.value
         )
@@ -410,12 +422,6 @@ async def _build_research_evidence_summary(
     latest_resolved_label_bar_source = None
     mixed_component_source_assessment_count = sum(
         1 for row in snapshots if is_mixed_component_source(row)
-    )
-    scanned_ids = [row.id for row in snapshots if row.id is not None]
-    labeled_ids = (
-        await outcome_label_service.assessment_ids_with_labels(symbol, scanned_ids)
-        if scanned_ids
-        else set()
     )
     labeled_assessment_count = sum(1 for row_id in scanned_ids if row_id in labeled_ids)
     unlabeled_assessment_count = max(0, assessment_count - labeled_assessment_count)
@@ -666,6 +672,9 @@ async def _build_research_evidence_summary(
         latest_assessment_is_label_ready=latest_assessment_is_label_ready,
         latest_assessment_label_block_reason=latest_assessment_label_block_reason,
         most_recent_labelable_as_of_trading_date=most_recent_labelable_as_of_trading_date,
+        most_recent_unlabeled_labelable_as_of_trading_date=(
+            most_recent_unlabeled_labelable_as_of_trading_date
+        ),
         latest_coverage_confidence=latest_coverage_confidence,
         latest_research_index=latest_research_index,
         latest_as_of_trading_date=latest_as_of_trading_date,

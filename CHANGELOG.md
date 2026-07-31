@@ -7,10 +7,32 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 232 - NAS Live Verification of Phase 231 (draft)
+### Phase 234 - NAS Live Verification of Phase 233 (draft)
 
-Ops evidence gate after Phase 231 latest-assessment label-ready diagnostic. See
+Ops evidence gate after Phase 233 latest-assessment label block reason. See
+[docs/architecture/decisions/0235-phase-234-nas-live-verify-phase-233.md](docs/architecture/decisions/0235-phase-234-nas-live-verify-phase-233.md).
+
+### Phase 233 - Evidence Summary Latest Assessment Label Block Reason (draft)
+
+Fail-closed reason code when latest assessment is not label-ready (aligned with
+``OutcomeLabelReason``). See
+[docs/architecture/decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md](docs/architecture/decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md).
+
+### Phase 232 - NAS Live Verification of Phase 231
+
+Ops evidence gate after Phase 231 latest-assessment label-ready diagnostic. Live verify passed
+2026-07-31 (``d594387``; AAPL ``latest_assessment_is_label_ready=False`` with
+``latest_assessment_id=126``, lag=119). See
 [docs/architecture/decisions/0233-phase-232-nas-live-verify-phase-231.md](docs/architecture/decisions/0233-phase-232-nas-live-verify-phase-231.md).
+
+#### Added
+
+- ADR-0233: live verify requires backend+frontend recreate for Phase 231; checklist item 111.
+- verify.ps1: print boolean ``False`` correctly (avoid PowerShell ``$false -eq ""`` trap).
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 231 - Evidence Summary Latest Assessment Is Label Ready
 

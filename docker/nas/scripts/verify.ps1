@@ -1134,7 +1134,8 @@ try {
             throw "evidence-summary missing latest_assessment_is_label_ready (Phase 231/232)"
         }
         $labelReady = $summary.latest_assessment_is_label_ready
-        $labelReadyPart = if ($null -eq $labelReady -or $labelReady -eq "") { "null" } else { [string]$labelReady }
+        # Do not treat $false as empty: in PowerShell `$false -eq ""` is $true.
+        $labelReadyPart = if ($null -eq $labelReady) { "null" } else { [string]$labelReady }
         Write-Host "OK  Phase 232 latest_assessment_is_label_ready=$labelReadyPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {

@@ -1,6 +1,6 @@
 # ADR-0233: Phase 232 NAS Live Verification of Phase 231
 
-- Status: Proposed (pending Phase 231 + live evidence)
+- Status: Accepted (live verified 2026-07-31; backend+frontend recreate of ``d594387``)
 - Date: 2026-07-31
 
 ## Context
@@ -20,7 +20,10 @@ need a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after 
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-31 for ``d594387``
+(checklist item 111; AAPL ``latest_assessment_is_label_ready=False`` with
+``latest_assessment_id=126``, ``latest_outcome_label_id=null``,
+``scan_labeled_freshness_lag_trading_days=119``).
 
 ### 3. Out of scope
 
@@ -29,12 +32,12 @@ New scoring math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 231 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# Deploy HEAD backend+frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
-# Expect: OK Phase 232 latest_assessment_is_label_ready=False (AAPL latest unlabeled for forward bars)
 ```
 
 ## Related documents
 
 - [0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md](0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md)
+- [0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md](0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md)
 - [../../operations/nas-live-verification.md](../../operations/nas-live-verification.md)

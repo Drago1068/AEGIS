@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 166 - NAS Live Verification of Phase 165 (draft)
+### Phase 168 - NAS Live Verification of Phase 167 (draft)
 
-Ops evidence gate after Phase 165 latest schema version field. See
+Ops evidence gate after Phase 167 latest computed_at field. See
+[docs/architecture/decisions/0169-phase-168-nas-live-verify-phase-167.md](docs/architecture/decisions/0169-phase-168-nas-live-verify-phase-167.md).
+
+### Phase 167 - Evidence Summary Latest Computed At
+
+Surface top-level ``latest_computed_at`` on evidence summary. See
+[docs/architecture/decisions/0168-phase-167-evidence-summary-latest-computed-at.md](docs/architecture/decisions/0168-phase-167-evidence-summary-latest-computed-at.md).
+
+#### Added
+
+- ``latest_computed_at`` on evidence summary (+ export); copied from latest assessment.
+- Console surfaces the field with ``data-testid="evidence-latest-computed-at"``.
+- NAS verify checklist item 79 for Phase 168.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 166 - NAS Live Verification of Phase 165
+
+Ops evidence gate after Phase 165 latest schema version field. Live verify passed
+2026-07-31 (``41c359e``; AAPL schema_version=2). See
 [docs/architecture/decisions/0167-phase-166-nas-live-verify-phase-165.md](docs/architecture/decisions/0167-phase-166-nas-live-verify-phase-165.md).
+
+#### Added
+
+- ADR-0167: live verify requires backend+frontend recreate for Phase 165; checklist item 78.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 165 - Evidence Summary Latest Schema Version
 

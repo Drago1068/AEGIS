@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -172,6 +172,12 @@ class ResearchEvidenceSummaryResponse(BaseModel):
         ge=1,
         description=(
             "schema_version from the latest assessment. Null when no assessment. Never invented."
+        ),
+    )
+    latest_computed_at: datetime | None = Field(
+        default=None,
+        description=(
+            "computed_at from the latest assessment. Null when no assessment. Never invented."
         ),
     )
     detail: str

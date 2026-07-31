@@ -989,6 +989,8 @@ export interface ResearchEvidenceSummary {
   latest_lookback_start_date: string | null;
   /** schema_version from latest assessment; null when none. */
   latest_schema_version: number | null;
+  /** computed_at from latest assessment (ISO datetime); null when none. */
+  latest_computed_at: string | null;
   detail: string;
 }
 

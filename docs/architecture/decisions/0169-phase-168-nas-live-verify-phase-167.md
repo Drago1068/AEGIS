@@ -1,11 +1,11 @@
-# ADR-0167: Phase 166 NAS Live Verification of Phase 165
+# ADR-0169: Phase 168 NAS Live Verification of Phase 167
 
-- Status: Accepted (live verified 2026-07-31; backend+frontend recreate of ``41c359e``)
+- Status: Proposed (pending Phase 167 + live evidence)
 - Date: 2026-07-31
 
 ## Context
 
-Phase 165 adds ``latest_schema_version`` on evidence summary (ADR-0166). Operators need a
+Phase 167 adds ``latest_computed_at`` on evidence summary (ADR-0168). Operators need a
 verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that lands.
 
 ## Decisions
@@ -14,14 +14,12 @@ verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that la
 
 1. Deploy current ``HEAD`` with TLS overlay; recreate **backend** and **frontend**.
 2. Run `verify.ps1` / `verify.sh` successfully (prior gates remain).
-3. Authenticated evidence-summary includes ``latest_schema_version`` (null OK;
-   checklist item 78).
+3. Authenticated evidence-summary includes ``latest_computed_at`` (null OK).
 4. SSH `alembic current` includes **`0009`** or `head`.
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence. Live verify passed 2026-07-31 for ``41c359e``
-(checklist item 78; AAPL ``latest_schema_version=2``).
+Retain live verify stdout as evidence.
 
 ### 3. Out of scope
 
@@ -30,11 +28,11 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# Deploy HEAD backend+frontend to NAS under TLS, then:
+# After Phase 167 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
 .\docker\nas\scripts\verify.ps1
 ```
 
 ## Related documents
 
-- [0166-phase-165-evidence-summary-latest-schema-version.md](0166-phase-165-evidence-summary-latest-schema-version.md)
+- [0168-phase-167-evidence-summary-latest-computed-at.md](0168-phase-167-evidence-summary-latest-computed-at.md)
 - [../../operations/nas-live-verification.md](../../operations/nas-live-verification.md)

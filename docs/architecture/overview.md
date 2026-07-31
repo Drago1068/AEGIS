@@ -438,8 +438,12 @@ Phase 164 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0165-phase-164-nas-live-verify-phase-163.md](decisions/0165-phase-164-nas-live-verify-phase-163.md)).
 Phase 165 surfaces top-level ``latest_schema_version`` on evidence summary (see
 [decisions/0166-phase-165-evidence-summary-latest-schema-version.md](decisions/0166-phase-165-evidence-summary-latest-schema-version.md)).
-Phase 166 (draft) live-verifies that revision (see
+Phase 166 live-verified that revision (see
 [decisions/0167-phase-166-nas-live-verify-phase-165.md](decisions/0167-phase-166-nas-live-verify-phase-165.md)).
+Phase 167 surfaces top-level ``latest_computed_at`` on evidence summary (see
+[decisions/0168-phase-167-evidence-summary-latest-computed-at.md](decisions/0168-phase-167-evidence-summary-latest-computed-at.md)).
+Phase 168 (draft) live-verifies that revision (see
+[decisions/0169-phase-168-nas-live-verify-phase-167.md](decisions/0169-phase-168-nas-live-verify-phase-167.md)).
 
 ## System context
 

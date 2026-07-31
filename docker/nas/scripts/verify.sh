@@ -72,7 +72,8 @@ print_checklist() {
   echo " 43. Phase 96: frontend redeploy includes Phase 95 backfill-refresh-loaded-assessment (unit-tested)"
   echo " 44. Phase 98: frontend redeploy includes Phase 97 assessment-backfill-preserves-labels (unit-tested)"
   echo " 45. Phase 100: frontend redeploy includes Phase 99 calibrations-download-names-latest (unit-tested)"
-  echo " 46. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 46. Phase 102: frontend redeploy includes Phase 101 compute-calibration-names-latest (unit-tested)"
+  echo " 47. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then

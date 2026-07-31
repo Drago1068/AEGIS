@@ -1,6 +1,6 @@
 # ADR-0101: Phase 100 NAS Live Verification of Phase 99
 
-- Status: Accepted (pending Phase 99 + live evidence)
+- Status: Accepted (live verified 2026-07-30; frontend recreate of ``545c13e``)
 - Date: 2026-07-30
 
 ## Context

@@ -220,6 +220,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText("ready")).toBeInTheDocument();
       expect(compute).not.toBeDisabled();
     });
+    expect(screen.getByTestId("compute-calibration")).toHaveAccessibleName(
+      /compute calibration for assessment 1/i,
+    );
     fireEvent.click(compute);
 
     await waitFor(() => {
@@ -1143,7 +1146,14 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
     ]);
-    fireEvent.click(screen.getByRole("button", { name: /backfill outcome labels/i }));
+    const backfillLabels = screen.getByRole("button", {
+      name: /^backfill outcome labels$/i,
+    });
+    await waitFor(() => {
+      expect(backfillLabels).not.toBeDisabled();
+    });
+    vi.mocked(backfillOutcomeLabels).mockClear();
+    fireEvent.click(backfillLabels);
 
     await waitFor(() => {
       expect(backfillOutcomeLabels).toHaveBeenCalledWith("http://localhost:8000", "AAPL", 100);

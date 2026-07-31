@@ -607,9 +607,18 @@ export function ResearchAssessmentPanel({
             type="button"
             onClick={onComputeCalibration}
             disabled={isPending || latest?.id == null || readiness?.status !== "ready"}
+            data-testid="compute-calibration"
+            aria-label={
+              latest?.id != null
+                ? `Compute calibration for assessment ${latest.id}`
+                : "Compute calibration"
+            }
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Compute calibration
+            {latest?.id != null ? (
+              <span className="ml-1 font-mono text-xs text-aegis-muted">({latest.id})</span>
+            ) : null}
           </button>
           <button
             type="button"

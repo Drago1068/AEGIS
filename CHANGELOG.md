@@ -7,9 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 246 - NAS Live Verification of Phase 245 (draft)
+
+Ops evidence gate after Phase 245 latest forward-bar shortfall diagnostic. See
+[docs/architecture/decisions/0247-phase-246-nas-live-verify-phase-245.md](docs/architecture/decisions/0247-phase-246-nas-live-verify-phase-245.md).
+
+### Phase 245 - Evidence Summary Latest Label Forward Bar Shortfall (draft)
+
+How many additional forward trading sessions are needed before latest becomes label-ready
+(backfill unlock signal). See
+[docs/architecture/decisions/0246-phase-245-evidence-summary-latest-forward-bar-shortfall.md](docs/architecture/decisions/0246-phase-245-evidence-summary-latest-forward-bar-shortfall.md).
+
 ### Phase 244 - NAS Live Verification of Phase 243
 
-Ops evidence gate after Phase 243 most-recent-unlabeled as_of diagnostic. See
+Ops evidence gate after Phase 243 most-recent-unlabeled as_of diagnostic. Live verify passed
+2026-07-31 (``22a8339``; AAPL ``most_recent_unlabeled_as_of_trading_date=2026-07-29``). See
 [docs/architecture/decisions/0245-phase-244-nas-live-verify-phase-243.md](docs/architecture/decisions/0245-phase-244-nas-live-verify-phase-243.md).
 
 #### Added

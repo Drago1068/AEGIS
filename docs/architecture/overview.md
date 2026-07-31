@@ -606,8 +606,13 @@ Phase 242 live-verified that id (see
 [decisions/0243-phase-242-nas-live-verify-phase-241.md](decisions/0243-phase-242-nas-live-verify-phase-241.md)).
 Phase 243 surfaces ``most_recent_unlabeled_as_of_trading_date`` for tip freshness (see
 [decisions/0244-phase-243-evidence-summary-most-recent-unlabeled-as-of.md](decisions/0244-phase-243-evidence-summary-most-recent-unlabeled-as-of.md)).
-Phase 244 live-verifies that as_of (see
+Phase 244 live-verified that as_of (see
 [decisions/0245-phase-244-nas-live-verify-phase-243.md](decisions/0245-phase-244-nas-live-verify-phase-243.md)).
+Phase 245 (draft) proposes ``latest_assessment_forward_bar_shortfall`` for backfill unlock
+timing (see
+[decisions/0246-phase-245-evidence-summary-latest-forward-bar-shortfall.md](decisions/0246-phase-245-evidence-summary-latest-forward-bar-shortfall.md)).
+Phase 246 (draft) would live-verify that shortfall (see
+[decisions/0247-phase-246-nas-live-verify-phase-245.md](decisions/0247-phase-246-nas-live-verify-phase-245.md)).
 
 ## System context
 

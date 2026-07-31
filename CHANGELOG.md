@@ -7,10 +7,37 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 100 - NAS Live Verification of Phase 99
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 99 calibrations download
+naming. See
+[docs/architecture/decisions/0101-phase-100-nas-live-verify-phase-99.md](docs/architecture/decisions/0101-phase-100-nas-live-verify-phase-99.md).
+
+#### Added
+
+- ADR-0101: live verify requires frontend recreate for Phase 99; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 99 - Calibrations Download Names Latest Assessment Id
+
+Show which assessment id calibrations JSON download targets (always ``latest``). See
+[docs/architecture/decisions/0100-phase-99-calibrations-download-names-latest.md](docs/architecture/decisions/0100-phase-99-calibrations-download-names-latest.md).
+
+#### Planned
+
+- Calibrations download button shows ``({latest.id})`` and accessible name includes the id.
+
+#### Explicitly out of scope
+
+Binding calibrations to scan-labeled assessments, new API fields, orders.
+
 ### Phase 98 - NAS Live Verification of Phase 97
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 97 assessment-backfill
-label preserve. See
+label preserve. Live verify passed 2026-07-30 (``bce9be3``). See
 [docs/architecture/decisions/0099-phase-98-nas-live-verify-phase-97.md](docs/architecture/decisions/0099-phase-98-nas-live-verify-phase-97.md).
 
 #### Added

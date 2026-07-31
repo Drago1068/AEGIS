@@ -925,7 +925,7 @@ if (
     $cmd = @"
 set -euo pipefail
 cd '$dir'
-out=`$(docker compose $composeFileArgs --env-file .env.nas --project-directory . exec -T backend alembic current)
+out=`$(docker compose $composeFileArgs --env-file .env.nas --project-directory . exec -T backend alembic current 2>&1)
 echo "`$out"
 echo "`$out" | grep -E '0009|head' >/dev/null
 "@

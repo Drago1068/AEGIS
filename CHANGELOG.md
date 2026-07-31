@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 156 - NAS Live Verification of Phase 155 (draft)
+### Phase 158 - NAS Live Verification of Phase 157 (draft)
 
-Ops evidence gate after Phase 155 latest input source field. See
+Ops evidence gate after Phase 157 latest method id field. See
+[docs/architecture/decisions/0159-phase-158-nas-live-verify-phase-157.md](docs/architecture/decisions/0159-phase-158-nas-live-verify-phase-157.md).
+
+### Phase 157 - Evidence Summary Latest Method Id (draft)
+
+Surface top-level ``latest_method_id`` on evidence summary. See
+[docs/architecture/decisions/0158-phase-157-evidence-summary-latest-method-id.md](docs/architecture/decisions/0158-phase-157-evidence-summary-latest-method-id.md).
+
+### Phase 156 - NAS Live Verification of Phase 155
+
+Ops evidence gate after Phase 155 latest input source field. Live verify passed 2026-07-30
+(``cecb8b4``; AAPL input_source=alpha_vantage). See
 [docs/architecture/decisions/0157-phase-156-nas-live-verify-phase-155.md](docs/architecture/decisions/0157-phase-156-nas-live-verify-phase-155.md).
+
+#### Added
+
+- ADR-0157: live verify requires backend+frontend recreate for Phase 155; checklist item 73.
+- ``verify.ps1`` Alembic SSH capture merges remote stderr so INFO logs do not abort Stop.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 155 - Evidence Summary Latest Input Source
 

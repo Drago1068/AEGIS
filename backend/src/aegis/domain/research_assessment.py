@@ -643,7 +643,12 @@ def _select_component_bars(
     secondary_source: str | None,
     allow_cross_source_fill: bool,
 ) -> list[ResearchBarInput]:
-    """Select 20 usable primary-quality bars, preferring ``primary_source``."""
+    """Select 20 usable primary-quality bars, preferring ``primary_source``.
+
+    When cross-source fill is enabled, always union primary and secondary session dates
+    (prefer primary per date). That lets a fresher secondary tip advance ``lookback_end``
+    even when primary already has enough older sessions (ADR-0262).
+    """
 
     primary_usable = [
         bar
@@ -652,10 +657,10 @@ def _select_component_bars(
         and bar.data_quality == PRIMARY_QUALITY
         and is_usable_ohlcv(bar)
     ]
-    if len(primary_usable) >= LOOKBACK_SESSIONS:
-        return primary_usable[-LOOKBACK_SESSIONS:]
 
     if not allow_cross_source_fill or secondary_source is None:
+        if len(primary_usable) >= LOOKBACK_SESSIONS:
+            return primary_usable[-LOOKBACK_SESSIONS:]
         raise ResearchAssessmentUnavailableError(
             ResearchAssessmentReason.INSUFFICIENT_PRIMARY_BARS,
             (

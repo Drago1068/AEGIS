@@ -1,45 +1,62 @@
-# ADR-0262: Phase 261 Provider Tip Ahead of Store Tip (draft)
+# ADR-0262: Phase 261 Provider Tip Ahead of Store Tip
 
-- Status: Proposed (ready after Phase 260; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
 Phases 259–260 exposed ingest ``latest_trading_date``. Live AAPL showed provider tip
 ``2026-07-30`` while store / evidence tip stayed ``2026-07-29`` with ``stored=0`` and
-``skipped_existing=501``. Operators can now see divergence; the product gap is
-**explaining and closing** why a newer provider close does not advance
-``latest_assessment_last_available_label_bar_date`` / calendar lag.
+``skipped_existing=501``. NAS inspection showed:
 
-Prefer a fail-closed root-cause fix (validation, source selection, or persist path) over
-another tip scalar or UI modularization.
+- ``alpha_vantage`` tip ``2026-07-29`` (label / assessment ``input_source``)
+- ``polygon`` tip ``2026-07-30`` (failover / secondary history)
+- Backend logs ``market_data_ingestion_failover``
 
-## Decisions (proposed)
+Root causes:
 
-### 1. Investigate and fix
+1. **Ingest:** secondary was only fetched on primary failover, so a successful but lagging
+   primary could hide a fresher secondary tip; failover attributed tip to polygon while
+   label source remained alpha_vantage.
+2. **Research:** with cross-source fill enabled, ``_select_component_bars`` short-circuited
+   once primary had 20 sessions, so a newer secondary tip never advanced ``lookback_end``.
 
-1. Reproduce with AAPL ingest + bar inspect: confirm whether ``2026-07-30`` exists for the
-   resolved label source, was rejected, or was written under a different ``source``.
-2. Implement the smallest fail-closed fix so a successful provider tip at or after store tip
-   either persists into the label source or is explicitly counted/rejected with a clear
-   reason (never invent closes).
-3. Extend verify logging only if needed to show rejection reason for the provider tip date.
+Prefer a fail-closed root-cause fix (never invent closes / never rewrite provenance).
 
-### 2. Out of scope
+## Decisions
 
-New evidence-summary fields, inventing closes, default-on calibration, orders, UI
-modularization.
+### 1. Dual-source tip catch-up
 
-### 3. Why this next
+When a secondary provider is configured, ingest refreshes **primary and secondary
+independently** per symbol. Each write keeps the producing adapter's ``source`` (ADR-0011).
+``latest_trading_date`` is the max tip across successful providers;
+``latest_trading_date_source`` attributes that tip. One-sided provider failure is logged;
+overall symbol success if either side stores/skips without error.
 
-Provider tip ahead of store tip is the blocker for tip advancement; diagnostics already
-prove the gap.
+### 2. Cross-source fill extends stale primary tip
 
-## Resume (after Phase 260 gate)
+When ``allow_cross_source_component_fill`` is true, component selection always unions
+primary and secondary session dates (prefer primary per date). A fresher secondary tip
+advances ``lookback_end`` / ``as_of`` even when primary already has a full lookback.
+Post-ingest research can then append a newer assessment so evidence tip / calendar lag
+reflect stored secondary closes without inventing primary rows.
+
+### 3. Out of scope
+
+Inventing alpha_vantage closes from polygon, default-on calibration, orders, UI
+modularization beyond tip-source attribution.
+
+## Consequences
+
+- ADR-0011 “secondary only on failover” is superseded for tip catch-up; provenance rules
+  unchanged.
+- Operators see tip source on ingest results / verify logs.
+- Phase 262 NAS verifies tip advancement or explicit dual-source attribution.
+
+## Resume (Phase 262)
 
 ```powershell
-# Investigate provider tip 2026-07-30 vs store tip 2026-07-29 (ADR-0262); fix; tests; commit+push; then Phase 262:
-# git archive HEAD → NAS; rebuild backend TLS; then:
+# git archive HEAD → NAS; rebuild backend(+frontend) TLS; then:
 .\docker\nas\scripts\verify.ps1
 ```
 
@@ -48,4 +65,5 @@ prove the gap.
 - [0260-phase-259-ingest-run-latest-trading-date.md](0260-phase-259-ingest-run-latest-trading-date.md)
 - [0261-phase-260-nas-live-verify-phase-259.md](0261-phase-260-nas-live-verify-phase-259.md)
 - [0263-phase-262-nas-live-verify-phase-261.md](0263-phase-262-nas-live-verify-phase-261.md)
-- [0013-phase-12-provider-historical-corrections.md](0013-phase-12-provider-historical-corrections.md)
+- [0011-phase-10-second-market-data-provider.md](0011-phase-10-second-market-data-provider.md)
+- [0056-phase-55-research-cross-source-session-depth.md](0056-phase-55-research-cross-source-session-depth.md)

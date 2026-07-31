@@ -12,11 +12,21 @@ delivery workflow).
 Ops evidence gate after Phase 261 provider-tip-ahead-of-store fix. See
 [docs/architecture/decisions/0263-phase-262-nas-live-verify-phase-261.md](docs/architecture/decisions/0263-phase-262-nas-live-verify-phase-261.md).
 
-### Phase 261 - Provider Tip Ahead of Store Tip (draft)
+### Phase 261 - Provider Tip Ahead of Store Tip
 
-Reconcile live AAPL provider tip ``2026-07-30`` vs store tip ``2026-07-29`` when ingest
-reports ``stored=0``. See
+Dual-source ingest tip catch-up and cross-source fill that extends a stale primary tip so
+post-ingest research can advance evidence tip without inventing closes. See
 [docs/architecture/decisions/0262-phase-261-provider-tip-ahead-of-store.md](docs/architecture/decisions/0262-phase-261-provider-tip-ahead-of-store.md).
+
+#### Changed
+
+- Ingest refreshes primary and secondary independently when secondary is configured;
+  expose ``latest_trading_date_source``.
+- Cross-source component fill unions session dates even when primary already has 20 bars.
+
+#### Explicitly out of scope
+
+Inventing primary closes from secondary, calibration default-on, orders.
 
 ### Phase 260 - NAS Live Verification of Phase 259
 

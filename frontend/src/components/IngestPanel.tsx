@@ -63,6 +63,7 @@ export function IngestPanel() {
                 <th className="py-2 pr-4 font-medium">Skipped</th>
                 <th className="py-2 pr-4 font-medium">Rejected</th>
                 <th className="py-2 pr-4 font-medium">Provider tip</th>
+                <th className="py-2 pr-4 font-medium">Tip source</th>
                 <th className="py-2 font-medium">Error</th>
               </tr>
             </thead>
@@ -78,6 +79,12 @@ export function IngestPanel() {
                     data-testid={`ingest-latest-trading-date-${row.symbol}`}
                   >
                     {row.latest_trading_date ?? "—"}
+                  </td>
+                  <td
+                    className="py-2 pr-4 font-mono"
+                    data-testid={`ingest-latest-trading-date-source-${row.symbol}`}
+                  >
+                    {row.latest_trading_date_source ?? "—"}
                   </td>
                   <td className="py-2 text-aegis-warn">{row.error ?? "—"}</td>
                 </tr>

@@ -6,8 +6,10 @@ in ``docs/architecture/overview.md``: no FastAPI or SQLAlchemy import belongs in
 The concrete repository (``aegis.persistence.repositories.market_data``) satisfies this
 protocol structurally without either module importing the other.
 
-Optional secondary-provider failover (ADR-0011) stays in this service so each successful write
-uses the producing adapter's ``source`` without silent provenance swaps.
+Optional secondary-provider tip catch-up (ADR-0011 / ADR-0262) stays in this service so each
+successful write uses the producing adapter's ``source`` without silent provenance swaps.
+When a secondary is configured, both providers are refreshed independently per symbol so a
+primary rate-limit or lagging primary tip cannot hide a fresher secondary tip.
 
 Provider historical corrections (ADR-0013) insert append-only ``correction`` rows when a
 re-ingest materially differs from the current stored bar for the same trading date.
@@ -23,11 +25,7 @@ from typing import Protocol
 
 from aegis.domain.market_data_corrections import StoredBarSnapshot, bars_materially_differ
 from aegis.domain.market_data_validation import RejectionReason, validate_daily_bar
-from aegis.providers.errors import (
-    ProviderError,
-    ProviderRateLimitError,
-    ProviderUnavailableError,
-)
+from aegis.providers.errors import ProviderError
 from aegis.providers.market_data import DailyBar, DailyBarProvider
 
 logger = logging.getLogger(__name__)
@@ -62,12 +60,6 @@ def _empty_rejections() -> dict[RejectionReason, int]:
     return {}
 
 
-def _is_failover_trigger(exc: ProviderError) -> bool:
-    """Return whether ``exc`` should attempt a configured secondary provider (ADR-0011)."""
-
-    return isinstance(exc, (ProviderRateLimitError, ProviderUnavailableError))
-
-
 @dataclass(frozen=True, slots=True)
 class SymbolIngestionResult:
     """Per-symbol outcome of one ingestion run."""
@@ -80,6 +72,7 @@ class SymbolIngestionResult:
     rejections: dict[RejectionReason, int] = field(default_factory=_empty_rejections)
     error: str | None = None
     latest_trading_date: date | None = None
+    latest_trading_date_source: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -94,8 +87,8 @@ class MarketDataIngestionService:
 
     A single symbol's provider failure is isolated (recorded on that symbol's result) and does
     not abort the run for the remaining symbols. When a secondary provider is configured,
-    rate-limit and unavailable errors from the primary trigger one secondary attempt per
-    symbol; successful writes always use that adapter's ``source`` (ADR-0011).
+    both primary and secondary are refreshed independently per symbol; successful writes
+    always use that adapter's ``source`` (ADR-0011 / ADR-0262).
 
     Re-ingest of an identical stored bar is a silent skip; material provider revisions insert
   a new ``correction`` row (ADR-0013).
@@ -131,19 +124,43 @@ class MarketDataIngestionService:
         return IngestionRunResult(results=results)
 
     async def _ingest_symbol(self, symbol: str) -> SymbolIngestionResult:
-        fetch = await self._fetch_bars_with_optional_failover(symbol)
-        if fetch.error is not None:
+        primary = await self._ingest_from_provider(symbol, self._provider, self._source)
+        if self._secondary_provider is None or self._secondary_source is None:
+            return primary
+
+        secondary = await self._ingest_from_provider(
+            symbol,
+            self._secondary_provider,
+            self._secondary_source,
+        )
+        return _merge_symbol_results(symbol, primary, secondary)
+
+    async def _ingest_from_provider(
+        self,
+        symbol: str,
+        provider: DailyBarProvider,
+        source: str,
+    ) -> SymbolIngestionResult:
+        try:
+            bars = await provider.fetch_daily_bars(symbol)
+        except ProviderError as exc:
+            logger.warning(
+                "market_data_ingestion_provider_error",
+                extra={
+                    "symbol": symbol,
+                    "source": source,
+                    "error": str(exc),
+                },
+            )
             return SymbolIngestionResult(
                 symbol=symbol,
                 stored_count=0,
                 skipped_existing_count=0,
                 corrected_count=0,
                 rejected_count=0,
-                error=fetch.error,
+                error=str(exc),
             )
 
-        bars = fetch.bars
-        source = fetch.source
         if not bars:
             return SymbolIngestionResult(
                 symbol=symbol,
@@ -240,62 +257,86 @@ class MarketDataIngestionService:
             rejected_count=sum(rejections.values()),
             rejections=rejections,
             latest_trading_date=latest_trading_date,
+            latest_trading_date_source=source,
         )
 
-    async def _fetch_bars_with_optional_failover(
-        self, symbol: str
-    ) -> _FetchedBars:
-        try:
-            bars = await self._provider.fetch_daily_bars(symbol)
-        except ProviderError as primary_exc:
-            if (
-                self._secondary_provider is None
-                or self._secondary_source is None
-                or not _is_failover_trigger(primary_exc)
-            ):
-                logger.warning(
-                    "market_data_ingestion_provider_error",
-                    extra={
-                        "symbol": symbol,
-                        "source": self._source,
-                        "error": str(primary_exc),
-                    },
-                )
-                return _FetchedBars(bars=[], source=self._source, error=str(primary_exc))
 
-            logger.warning(
-                "market_data_ingestion_failover",
-                extra={
-                    "symbol": symbol,
-                    "primary_source": self._source,
-                    "secondary_source": self._secondary_source,
-                    "primary_error": str(primary_exc),
-                },
-            )
-            try:
-                bars = await self._secondary_provider.fetch_daily_bars(symbol)
-            except ProviderError as secondary_exc:
-                logger.warning(
-                    "market_data_ingestion_provider_error",
-                    extra={
-                        "symbol": symbol,
-                        "source": self._secondary_source,
-                        "error": str(secondary_exc),
-                        "primary_source": self._source,
-                        "primary_error": str(primary_exc),
-                    },
-                )
-                return _FetchedBars(
-                    bars=[],
-                    source=self._secondary_source,
-                    error=(
-                        f"primary ({self._source}): {primary_exc}; "
-                        f"secondary ({self._secondary_source}): {secondary_exc}"
-                    ),
-                )
-            return _FetchedBars(bars=bars, source=self._secondary_source, error=None)
+def _merge_symbol_results(
+    symbol: str,
+    primary: SymbolIngestionResult,
+    secondary: SymbolIngestionResult,
+) -> SymbolIngestionResult:
+    """Combine independent primary/secondary outcomes for one symbol (ADR-0262)."""
 
-        return _FetchedBars(bars=bars, source=self._source, error=None)
+    primary_ok = primary.error is None
+    secondary_ok = secondary.error is None
+    if not primary_ok and not secondary_ok:
+        return SymbolIngestionResult(
+            symbol=symbol,
+            stored_count=0,
+            skipped_existing_count=0,
+            corrected_count=0,
+            rejected_count=0,
+            error=(
+                f"primary ({primary.error}); secondary ({secondary.error})"
+                if primary.error and secondary.error
+                else (primary.error or secondary.error)
+            ),
+        )
+
+    parts = [part for part in (primary, secondary) if part.error is None]
+    rejections: dict[RejectionReason, int] = {}
+    for part in parts:
+        for reason, count in part.rejections.items():
+            rejections[reason] = rejections.get(reason, 0) + count
+
+    latest_trading_date: date | None = None
+    latest_trading_date_source: str | None = None
+    for part in parts:
+        tip = part.latest_trading_date
+        if tip is None:
+            continue
+        if latest_trading_date is None or tip > latest_trading_date:
+            latest_trading_date = tip
+            latest_trading_date_source = part.latest_trading_date_source
+        elif tip == latest_trading_date and latest_trading_date_source is None:
+            latest_trading_date_source = part.latest_trading_date_source
+
+    if not primary_ok:
+        logger.warning(
+            "market_data_ingestion_primary_failed_secondary_used",
+            extra={
+                "symbol": symbol,
+                "primary_error": primary.error,
+                "latest_trading_date": (
+                    latest_trading_date.isoformat() if latest_trading_date else None
+                ),
+                "latest_trading_date_source": latest_trading_date_source,
+            },
+        )
+    elif not secondary_ok:
+        logger.warning(
+            "market_data_ingestion_secondary_failed_primary_used",
+            extra={
+                "symbol": symbol,
+                "secondary_error": secondary.error,
+                "latest_trading_date": (
+                    latest_trading_date.isoformat() if latest_trading_date else None
+                ),
+                "latest_trading_date_source": latest_trading_date_source,
+            },
+        )
+
+    return SymbolIngestionResult(
+        symbol=symbol,
+        stored_count=sum(part.stored_count for part in parts),
+        skipped_existing_count=sum(part.skipped_existing_count for part in parts),
+        corrected_count=sum(part.corrected_count for part in parts),
+        rejected_count=sum(part.rejected_count for part in parts),
+        rejections=rejections,
+        latest_trading_date=latest_trading_date,
+        latest_trading_date_source=latest_trading_date_source,
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -348,10 +389,3 @@ def _record_rejection(
             "source": source,
         },
     )
-
-
-@dataclass(frozen=True, slots=True)
-class _FetchedBars:
-    bars: list[DailyBar]
-    source: str
-    error: str | None

@@ -420,3 +420,31 @@ def test_multi_source_cross_source_fill_when_enabled() -> None:
     assert snapshot.method_version == METHOD_VERSION_V2
     assert snapshot.components["component_source"] == "mixed"
     assert snapshot.probability_confidence is None
+
+
+def test_cross_source_fill_extends_stale_primary_tip() -> None:
+    """Primary has a full lookback but secondary tip is one session newer (ADR-0262)."""
+
+    primary = _closes_to_bars(
+        _twenty_rising_closes(),
+        end_date=date(2024, 1, 25),
+        source="alpha_vantage",
+    )
+    secondary = _closes_to_bars(
+        _twenty_rising_closes() + [Decimal("120")],
+        end_date=_AS_OF,
+        source="polygon",
+    )
+    snapshot = assess_from_bars(
+        "AAPL",
+        list(reversed(primary + secondary)),
+        calendar_name=_CALENDAR,
+        max_latest_bar_staleness_trading_days=3,
+        as_of=_AS_OF,
+        computed_at=_COMPUTED_AT,
+        multi_source=_multi_source_config(allow_cross_source_component_fill=True),
+    )
+    assert snapshot.lookback_end_date == _AS_OF
+    assert snapshot.as_of_trading_date == _AS_OF
+    assert snapshot.components["component_source"] == "mixed"
+    assert snapshot.input_source == "mixed"

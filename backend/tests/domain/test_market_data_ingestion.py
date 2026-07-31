@@ -151,6 +151,7 @@ async def test_valid_bars_are_stored() -> None:
     assert result.rejected_count == 0
     assert result.error is None
     assert result.latest_trading_date == _AS_OF
+    assert result.latest_trading_date_source == _SOURCE
     assert repository.saved_bars == bars
 
 
@@ -274,10 +275,21 @@ async def test_stale_latest_bar_is_rejected_but_older_bars_in_same_run_are_not()
 
 
 @pytest.mark.asyncio
-async def test_primary_success_does_not_call_secondary() -> None:
-    bars = [_bar("AAPL", _AS_OF)]
-    primary = FakeProvider({"AAPL": bars})
-    secondary = FakeProvider({"AAPL": [_bar("AAPL", _AS_OF, close=Decimal("999"))]})
+async def test_primary_success_also_refreshes_secondary_tip() -> None:
+    primary_bars = [_bar("AAPL", _AS_OF)]
+    secondary_tip = date(2024, 1, 3)
+    secondary_bars = [
+        _bar(
+            "AAPL",
+            secondary_tip,
+            open=Decimal("990"),
+            high=Decimal("1000"),
+            low=Decimal("980"),
+            close=Decimal("999"),
+        )
+    ]
+    primary = FakeProvider({"AAPL": primary_bars})
+    secondary = FakeProvider({"AAPL": secondary_bars})
     repository = FakeRepository()
 
     run_result = await _service(
@@ -285,15 +297,22 @@ async def test_primary_success_does_not_call_secondary() -> None:
         repository,
         secondary_provider=secondary,
         secondary_source=_SECONDARY_SOURCE,
+        as_of=secondary_tip,
     ).run(["AAPL"])
 
-    assert secondary.requested_symbols == []
-    assert run_result.results[0].stored_count == 1
-    assert repository.saved == [(_SOURCE, bars[0])]
+    result = run_result.results[0]
+    assert secondary.requested_symbols == ["AAPL"]
+    assert result.stored_count == 2
+    assert result.latest_trading_date == secondary_tip
+    assert result.latest_trading_date_source == _SECONDARY_SOURCE
+    assert repository.saved == [
+        (_SOURCE, primary_bars[0]),
+        (_SECONDARY_SOURCE, secondary_bars[0]),
+    ]
 
 
 @pytest.mark.asyncio
-async def test_rate_limit_on_primary_fails_over_to_secondary_source() -> None:
+async def test_rate_limit_on_primary_still_refreshes_secondary() -> None:
     secondary_bars = [_bar("AAPL", _AS_OF)]
     primary = FakeProvider(
         errors_by_symbol={"AAPL": ProviderRateLimitError("rate limited")}
@@ -312,11 +331,12 @@ async def test_rate_limit_on_primary_fails_over_to_secondary_source() -> None:
     assert secondary.requested_symbols == ["AAPL"]
     assert run_result.results[0].error is None
     assert run_result.results[0].stored_count == 1
+    assert run_result.results[0].latest_trading_date_source == _SECONDARY_SOURCE
     assert repository.saved == [(_SECONDARY_SOURCE, secondary_bars[0])]
 
 
 @pytest.mark.asyncio
-async def test_unavailable_on_primary_fails_over_to_secondary() -> None:
+async def test_unavailable_on_primary_still_refreshes_secondary() -> None:
     secondary_bars = [_bar("AAPL", _AS_OF)]
     primary = FakeProvider(
         errors_by_symbol={"AAPL": ProviderUnavailableError("transport down")}
@@ -336,11 +356,12 @@ async def test_unavailable_on_primary_fails_over_to_secondary() -> None:
 
 
 @pytest.mark.asyncio
-async def test_hard_provider_error_does_not_failover() -> None:
+async def test_hard_primary_error_still_allows_secondary_tip_catch_up() -> None:
+    secondary_bars = [_bar("AAPL", _AS_OF)]
     primary = FakeProvider(
         errors_by_symbol={"AAPL": ProviderError("invalid symbol")}
     )
-    secondary = FakeProvider({"AAPL": [_bar("AAPL", _AS_OF)]})
+    secondary = FakeProvider({"AAPL": secondary_bars})
     repository = FakeRepository()
 
     run_result = await _service(
@@ -350,10 +371,10 @@ async def test_hard_provider_error_does_not_failover() -> None:
         secondary_source=_SECONDARY_SOURCE,
     ).run(["AAPL"])
 
-    assert secondary.requested_symbols == []
-    assert run_result.results[0].error is not None
-    assert "invalid symbol" in run_result.results[0].error
-    assert repository.saved == []
+    assert secondary.requested_symbols == ["AAPL"]
+    assert run_result.results[0].error is None
+    assert run_result.results[0].stored_count == 1
+    assert repository.saved == [(_SECONDARY_SOURCE, secondary_bars[0])]
 
 
 @pytest.mark.asyncio

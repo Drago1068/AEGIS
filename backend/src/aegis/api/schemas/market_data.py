@@ -41,6 +41,7 @@ class IngestionSymbolResult(BaseModel):
     rejections: dict[RejectionReason, int]
     error: str | None = None
     latest_trading_date: date | None = None
+    latest_trading_date_source: str | None = None
 
 
 class IngestionRunResponse(BaseModel):

@@ -57,6 +57,8 @@ export interface IngestionSymbolResult {
   error: string | null;
   /** Max trading_date from the provider fetch for this symbol; null when empty/error. */
   latest_trading_date: string | null;
+  /** Observation source that produced latest_trading_date; null when tip is null. */
+  latest_trading_date_source?: string | null;
 }
 
 export interface IngestionRunResponse {

@@ -1,6 +1,6 @@
 # ADR-0139: Phase 138 NAS Live Verification of Phase 137
 
-- Status: Accepted (pending Phase 137 + live evidence)
+- Status: Accepted (live verified 2026-07-30; frontend recreate of ``811730c``)
 - Date: 2026-07-30
 
 ## Context
@@ -20,7 +20,8 @@ verified frontend redeploy on the UGREEN NAS under lab TLS after that lands
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-30 for ``811730c``
+(checklist item 64).
 
 ### 3. Out of scope
 
@@ -29,7 +30,7 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 137 is on HEAD: git archive → NAS; rebuild frontend TLS; then:
+# Deploy HEAD frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
 ```
 

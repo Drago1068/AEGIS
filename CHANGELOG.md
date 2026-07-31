@@ -7,10 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 140 - NAS Live Verification of Phase 139
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 139 backfill-status section
+extract. See
+[docs/architecture/decisions/0141-phase-140-nas-live-verify-phase-139.md](docs/architecture/decisions/0141-phase-140-nas-live-verify-phase-139.md).
+
+#### Added
+
+- ADR-0141: live verify requires frontend recreate for Phase 139; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 139 - Extract Backfill Status Banners
+
+Move outcome-label and assessment backfill summary banners into a presentational section
+(no behavior change). See
+[docs/architecture/decisions/0140-phase-139-extract-backfill-status-section.md](docs/architecture/decisions/0140-phase-139-extract-backfill-status-section.md).
+
+#### Added
+
+- Backfill status section extract drafted (implement next).
+
+#### Explicitly out of scope
+
+New backfill math, orders.
+
 ### Phase 138 - NAS Live Verification of Phase 137
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 137 latest-assessment section
-extract. See
+extract. Live verify passed 2026-07-30 (``811730c``). See
 [docs/architecture/decisions/0139-phase-138-nas-live-verify-phase-137.md](docs/architecture/decisions/0139-phase-138-nas-live-verify-phase-137.md).
 
 #### Added

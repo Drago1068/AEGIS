@@ -1015,6 +1015,8 @@ export interface ResearchEvidenceSummary {
   latest_calibration_corpus_count: number | null;
   /** bucket_count from latest_calibration when present; null otherwise. Distinct from readiness thresholds. */
   latest_calibration_bucket_count: number | null;
+  /** calibration_method_id from latest_calibration when present; null otherwise. Distinct from assessment latest_method_id. */
+  latest_calibration_method_id: string | null;
   detail: string;
 }
 

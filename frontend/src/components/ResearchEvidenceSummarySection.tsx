@@ -334,6 +334,12 @@ export function ResearchEvidenceSummarySection({
               : evidenceSummary.latest_calibration_bucket_count}
           </dd>
         </div>
+        <div>
+          <dt className="text-aegis-muted">Latest calibration method_id</dt>
+          <dd className="font-mono" data-testid="evidence-latest-calibration-method-id">
+            {evidenceSummary.latest_calibration_method_id ?? "null"}
+          </dd>
+        </div>
         {evidenceSummary.latest_outcome_label == null ? (
           <div>
             <dt className="text-aegis-muted">Latest outcome labels</dt>

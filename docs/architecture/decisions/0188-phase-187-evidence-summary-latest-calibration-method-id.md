@@ -1,6 +1,6 @@
 # ADR-0188: Phase 187 Evidence Summary Latest Calibration Method Id
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

@@ -251,4 +251,11 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "calibration_readiness bucket thresholds. Never invented."
         ),
     )
+    latest_calibration_method_id: str | None = Field(
+        default=None,
+        description=(
+            "calibration_method_id from latest_calibration when present. Null when none. "
+            "Distinct from assessment latest_method_id. Never invented."
+        ),
+    )
     detail: str

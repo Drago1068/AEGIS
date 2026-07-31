@@ -490,8 +490,12 @@ Phase 190 live-verified that revision (see
 [decisions/0191-phase-190-nas-live-verify-phase-189.md](decisions/0191-phase-190-nas-live-verify-phase-189.md)).
 Phase 191 surfaces top-level ``latest_calibration_schema_version`` on evidence summary (see
 [decisions/0192-phase-191-evidence-summary-latest-calibration-schema-version.md](decisions/0192-phase-191-evidence-summary-latest-calibration-schema-version.md)).
-Phase 192 (draft) live-verifies that revision (see
+Phase 192 live-verified that revision (see
 [decisions/0193-phase-192-nas-live-verify-phase-191.md](decisions/0193-phase-192-nas-live-verify-phase-191.md)).
+Phase 193 surfaces top-level ``latest_calibration_state`` on evidence summary (see
+[decisions/0194-phase-193-evidence-summary-latest-calibration-state.md](decisions/0194-phase-193-evidence-summary-latest-calibration-state.md)).
+Phase 194 (draft) live-verifies that revision (see
+[decisions/0195-phase-194-nas-live-verify-phase-193.md](decisions/0195-phase-194-nas-live-verify-phase-193.md)).
 
 ## System context
 

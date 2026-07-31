@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 192 - NAS Live Verification of Phase 191 (draft)
+### Phase 194 - NAS Live Verification of Phase 193 (draft)
 
-Ops evidence gate after Phase 191 latest calibration schema version field. See
+Ops evidence gate after Phase 193 latest calibration state field. See
+[docs/architecture/decisions/0195-phase-194-nas-live-verify-phase-193.md](docs/architecture/decisions/0195-phase-194-nas-live-verify-phase-193.md).
+
+### Phase 193 - Evidence Summary Latest Calibration State
+
+Surface top-level ``latest_calibration_state`` on evidence summary. See
+[docs/architecture/decisions/0194-phase-193-evidence-summary-latest-calibration-state.md](docs/architecture/decisions/0194-phase-193-evidence-summary-latest-calibration-state.md).
+
+#### Added
+
+- ``latest_calibration_state`` on evidence summary (+ export); from latest_calibration.
+- Console surfaces the field with ``data-testid="evidence-latest-calibration-state"``.
+- NAS verify checklist item 92 for Phase 194.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 192 - NAS Live Verification of Phase 191
+
+Ops evidence gate after Phase 191 latest calibration schema version field. Live verify passed
+2026-07-31 (``43353e3``; AAPL schema_version=1; method_version=2). See
 [docs/architecture/decisions/0193-phase-192-nas-live-verify-phase-191.md](docs/architecture/decisions/0193-phase-192-nas-live-verify-phase-191.md).
+
+#### Added
+
+- ADR-0193: live verify requires backend+frontend recreate for Phase 191; checklist item 91.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 191 - Evidence Summary Latest Calibration Schema Version
 

@@ -274,4 +274,11 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "assessment latest_schema_version. Never invented."
         ),
     )
+    latest_calibration_state: str | None = Field(
+        default=None,
+        description=(
+            "state from latest_calibration when present. Null when none. Expected research_only; "
+            "never invented."
+        ),
+    )
     detail: str

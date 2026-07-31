@@ -1021,6 +1021,8 @@ export interface ResearchEvidenceSummary {
   latest_calibration_method_version: number | null;
   /** schema_version from latest_calibration when present; null otherwise. Distinct from assessment latest_schema_version. */
   latest_calibration_schema_version: number | null;
+  /** state from latest_calibration when present; null otherwise. */
+  latest_calibration_state: string | null;
   detail: string;
 }
 

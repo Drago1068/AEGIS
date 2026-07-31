@@ -1009,6 +1009,8 @@ export interface ResearchEvidenceSummary {
   latest_calibration_id: number | null;
   /** outcome_horizon_key from latest_calibration when present; null otherwise. */
   latest_calibration_horizon_key: string | null;
+  /** computed_at from latest_calibration when present; null otherwise. Distinct from assessment latest_computed_at. */
+  latest_calibration_computed_at: string | null;
   detail: string;
 }
 

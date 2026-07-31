@@ -157,6 +157,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_id: null,
       latest_calibration_id: null,
       latest_calibration_horizon_key: null,
+      latest_calibration_computed_at: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
   });
@@ -521,6 +522,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_id: 10,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
+      latest_calibration_computed_at: "2024-01-26T19:00:00Z",
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
 
@@ -586,6 +588,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("evidence-latest-calibration-id")).toHaveTextContent("7");
       expect(screen.getByTestId("evidence-latest-calibration-horizon-key")).toHaveTextContent(
         "forward_return_5",
+      );
+      expect(screen.getByTestId("evidence-latest-calibration-computed-at")).toHaveTextContent(
+        "2024-01-26T19:00:00Z",
       );
       expect(screen.getByText(/mixed unlabeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed labeled \(scanned\)/i)).toBeInTheDocument();
@@ -723,6 +728,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_id: 10,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
+      latest_calibration_computed_at: "2024-01-26T19:00:00Z",
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([
@@ -843,6 +849,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_id: 10,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
+      latest_calibration_computed_at: "2024-01-26T19:00:00Z",
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -961,6 +968,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_id: 10,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
+      latest_calibration_computed_at: "2024-01-26T19:00:00Z",
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1169,6 +1177,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_id: 10,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
+      latest_calibration_computed_at: "2024-01-26T19:00:00Z",
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listResearchAssessments).mockResolvedValue([mixedRow]);
@@ -1337,6 +1346,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_id: 10,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
+      latest_calibration_computed_at: "2024-01-26T19:00:00Z",
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1501,6 +1511,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_id: 10,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
+      latest_calibration_computed_at: "2024-01-26T19:00:00Z",
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([

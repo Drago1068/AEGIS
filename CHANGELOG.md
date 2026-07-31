@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 180 - NAS Live Verification of Phase 179 (draft)
+### Phase 182 - NAS Live Verification of Phase 181 (draft)
 
-Ops evidence gate after Phase 179 latest calibration horizon key field. See
+Ops evidence gate after Phase 181 latest calibration computed_at field. See
+[docs/architecture/decisions/0183-phase-182-nas-live-verify-phase-181.md](docs/architecture/decisions/0183-phase-182-nas-live-verify-phase-181.md).
+
+### Phase 181 - Evidence Summary Latest Calibration Computed At
+
+Surface top-level ``latest_calibration_computed_at`` on evidence summary. See
+[docs/architecture/decisions/0182-phase-181-evidence-summary-latest-calibration-computed-at.md](docs/architecture/decisions/0182-phase-181-evidence-summary-latest-calibration-computed-at.md).
+
+#### Added
+
+- ``latest_calibration_computed_at`` on evidence summary (+ export); from latest_calibration.
+- Console surfaces the field with ``data-testid="evidence-latest-calibration-computed-at"``.
+- NAS verify checklist item 86 for Phase 182.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 180 - NAS Live Verification of Phase 179
+
+Ops evidence gate after Phase 179 latest calibration horizon key field. Live verify passed
+2026-07-31 (``dd3aaa5``; AAPL horizon_key=forward_return_5; calibration_id=66). See
 [docs/architecture/decisions/0181-phase-180-nas-live-verify-phase-179.md](docs/architecture/decisions/0181-phase-180-nas-live-verify-phase-179.md).
+
+#### Added
+
+- ADR-0181: live verify requires backend+frontend recreate for Phase 179; checklist item 85.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 179 - Evidence Summary Latest Calibration Horizon Key
 

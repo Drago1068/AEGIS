@@ -112,7 +112,8 @@ print_checklist() {
   echo " 83. Authenticated evidence-summary includes Phase 175 latest_outcome_label_id (Phase 176)"
   echo " 84. Authenticated evidence-summary includes Phase 177 latest_calibration_id (Phase 178)"
   echo " 85. Authenticated evidence-summary includes Phase 179 latest_calibration_horizon_key (Phase 180)"
-  echo " 86. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 86. Authenticated evidence-summary includes Phase 181 latest_calibration_computed_at (Phase 182)"
+  echo " 87. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -744,6 +745,12 @@ if ! grep -q '"latest_calibration_horizon_key"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 180 latest_calibration_horizon_key field present"
+# Phase 182: latest_calibration_computed_at from Phase 181 (null OK).
+if ! grep -q '"latest_calibration_computed_at"' "${summary_body}"; then
+  echo "evidence-summary missing latest_calibration_computed_at (Phase 181/182)" >&2
+  exit 1
+fi
+echo "OK  Phase 182 latest_calibration_computed_at field present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"

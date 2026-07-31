@@ -228,4 +228,11 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Never invented."
         ),
     )
+    latest_calibration_computed_at: datetime | None = Field(
+        default=None,
+        description=(
+            "computed_at from latest_calibration when present. Null when none. Distinct from "
+            "assessment latest_computed_at. Never invented."
+        ),
+    )
     detail: str

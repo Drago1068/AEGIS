@@ -312,6 +312,12 @@ export function ResearchEvidenceSummarySection({
             {evidenceSummary.latest_calibration_horizon_key ?? "null"}
           </dd>
         </div>
+        <div>
+          <dt className="text-aegis-muted">Latest calibration computed_at</dt>
+          <dd className="font-mono" data-testid="evidence-latest-calibration-computed-at">
+            {evidenceSummary.latest_calibration_computed_at ?? "null"}
+          </dd>
+        </div>
         {evidenceSummary.latest_outcome_label == null ? (
           <div>
             <dt className="text-aegis-muted">Latest outcome labels</dt>

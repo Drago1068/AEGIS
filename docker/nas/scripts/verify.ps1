@@ -123,7 +123,8 @@ function Write-VerifyChecklist {
     Write-Host " 83. Authenticated evidence-summary includes Phase 175 latest_outcome_label_id (Phase 176)"
     Write-Host " 84. Authenticated evidence-summary includes Phase 177 latest_calibration_id (Phase 178)"
     Write-Host " 85. Authenticated evidence-summary includes Phase 179 latest_calibration_horizon_key (Phase 180)"
-    Write-Host " 86. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 86. Authenticated evidence-summary includes Phase 181 latest_calibration_computed_at (Phase 182)"
+    Write-Host " 87. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -907,6 +908,13 @@ try {
         $horizonKey = $summary.latest_calibration_horizon_key
         $horizonPart = if ($null -eq $horizonKey -or $horizonKey -eq "") { "null" } else { [string]$horizonKey }
         Write-Host "OK  Phase 180 latest_calibration_horizon_key=$horizonPart"
+        # Phase 182: latest_calibration_computed_at from Phase 181 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_calibration_computed_at")) {
+            throw "evidence-summary missing latest_calibration_computed_at (Phase 181/182)"
+        }
+        $calComputedAt = $summary.latest_calibration_computed_at
+        $calComputedPart = if ($null -eq $calComputedAt -or $calComputedAt -eq "") { "null" } else { [string]$calComputedAt }
+        Write-Host "OK  Phase 182 latest_calibration_computed_at=$calComputedPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1007,6 +1015,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_horizon_key")) {
             throw "evidence-summary/export missing latest_calibration_horizon_key (Phase 179/180)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_computed_at")) {
+            throw "evidence-summary/export missing latest_calibration_computed_at (Phase 181/182)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

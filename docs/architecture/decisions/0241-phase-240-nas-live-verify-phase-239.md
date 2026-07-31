@@ -1,6 +1,6 @@
 # ADR-0241: Phase 240 NAS Live Verification of Phase 239
 
-- Status: Accepted (pending live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -21,12 +21,15 @@ backend+frontend redeploy on the UGREEN NAS under lab TLS after that lands.
 
 Retain live verify stdout.
 
-## Resume
+## Live evidence (2026-07-31)
 
-```powershell
-# After Phase 239 on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+- Revision ``b9e5033``; TLS recreate backend+frontend; verify passed.
+- AAPL: ``scan_unlabeled_label_ready_count=0``;
+  ``most_recent_unlabeled_labelable_as_of_trading_date=null``;
+  ``unlabeled_assessment_count=3``;
+  ``latest_assessment_label_block_reason=insufficient_forward_bars``.
+- Interpretation: zero ready backfill candidates; the three unlabeled rows are not
+  label-ready (matches empty outcome-label backfill).
 
 ## Related documents
 

@@ -1,6 +1,6 @@
 # ADR-0136: Phase 135 Extract Evidence Summary Panel Section
 
-- Status: Accepted (drafted; implement next)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -16,8 +16,9 @@ change.
 ### 1. Console
 
 Extract the evidence-summary UI into ``ResearchEvidenceSummarySection.tsx`` (props:
-evidenceSummary, pending, and handlers for mixed-filter / load-scan-labeled as needed).
-Preserve existing ``data-testid`` contracts. No API changes.
+evidenceSummary, pending, and handlers for mixed-filter / load-scan-labeled). Move
+horizon-expand UI state into the section. Preserve existing ``data-testid`` contracts.
+Add ``data-testid="evidence-summary-section"``. No API changes.
 
 ### 2. Out of scope
 

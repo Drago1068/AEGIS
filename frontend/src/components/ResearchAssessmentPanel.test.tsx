@@ -485,6 +485,7 @@ describe("ResearchAssessmentPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: /refresh evidence summary/i }));
 
     await waitFor(() => {
+      expect(screen.getByTestId("evidence-summary-section")).toBeInTheDocument();
       expect(screen.getByText(/evidence summary \(research-only/i)).toBeInTheDocument();
       expect(screen.getByText(/assessments \(≤100\)/i)).toBeInTheDocument();
       expect(screen.getByText(/calibration corpus \(readiness\)/i)).toBeInTheDocument();

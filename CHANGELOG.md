@@ -29,7 +29,8 @@ change). See
 
 #### Added
 
-- Evidence summary section extract drafted (implement next).
+- ``ResearchEvidenceSummarySection.tsx`` with ``data-testid="evidence-summary-section"``.
+- Horizon-expand UI state moved into the section (behavior-preserving).
 
 #### Explicitly out of scope
 

@@ -944,6 +944,10 @@ export interface ResearchEvidenceSummary {
   latest_outcome_label: OutcomeLabel | null;
   latest_calibration: ProbabilityCalibration | null;
   assessment_count: number;
+  /** Scanned ≤100 assessments with a default-method outcome label. */
+  labeled_assessment_count: number;
+  /** Scanned ≤100 assessments lacking a default-method outcome label. */
+  unlabeled_assessment_count: number;
   outcome_label_count: number;
   calibration_count: number;
   /** Component series source for latest assessment; may be "mixed". Null when no assessment. */

@@ -105,7 +105,8 @@ function Write-VerifyChecklist {
     Write-Host " 65. Phase 140: frontend redeploy includes Phase 139 extract-backfill-status-section (unit-tested)"
     Write-Host " 66. Phase 142: frontend redeploy includes Phase 141 extract-panel-header (unit-tested)"
     Write-Host " 67. Phase 144: frontend redeploy includes Phase 143 extract-error-alert (unit-tested)"
-    Write-Host " 68. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 68. Authenticated evidence-summary includes Phase 145 labeled/unlabeled scan counts (Phase 146)"
+    Write-Host " 69. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -720,6 +721,23 @@ try {
         }
         $mrlPart = if ($null -eq $mrlId) { "null" } else { [string]$mrlId }
         Write-Host "OK  Phase 80 most_recent_labeled_assessment_id=$mrlPart"
+        # Phase 146: scan-wide labeled/unlabeled counts from Phase 145.
+        if (-not ($summary.PSObject.Properties.Name -contains "labeled_assessment_count")) {
+            throw "evidence-summary missing labeled_assessment_count (Phase 145/146)"
+        }
+        if (-not ($summary.PSObject.Properties.Name -contains "unlabeled_assessment_count")) {
+            throw "evidence-summary missing unlabeled_assessment_count (Phase 145/146)"
+        }
+        $labeledScan = [int]$summary.labeled_assessment_count
+        $unlabeledScan = [int]$summary.unlabeled_assessment_count
+        $assessScan = [int]$summary.assessment_count
+        if ($labeledScan -lt 0 -or $unlabeledScan -lt 0) {
+            throw "Phase 146: labeled/unlabeled scan counts must be >= 0"
+        }
+        if (($labeledScan + $unlabeledScan) -ne $assessScan) {
+            throw "Phase 146: labeled($labeledScan)+unlabeled($unlabeledScan) != assessment_count($assessScan)"
+        }
+        Write-Host "OK  Phase 146 scan label coverage labeled=$labeledScan unlabeled=$unlabeledScan assessments=$assessScan"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -763,6 +781,12 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "mixed_labeled_assessment_count")) {
             throw "evidence-summary/export missing mixed_labeled_assessment_count (Phase 69/70)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "labeled_assessment_count")) {
+            throw "evidence-summary/export missing labeled_assessment_count (Phase 145/146)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "unlabeled_assessment_count")) {
+            throw "evidence-summary/export missing unlabeled_assessment_count (Phase 145/146)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

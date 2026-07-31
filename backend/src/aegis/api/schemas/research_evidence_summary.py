@@ -22,6 +22,22 @@ class ResearchEvidenceSummaryResponse(BaseModel):
     latest_outcome_label: OutcomeLabelResponse | None = None
     latest_calibration: ProbabilityCalibrationResponse | None = None
     assessment_count: int = Field(ge=0)
+    labeled_assessment_count: int = Field(
+        default=0,
+        ge=0,
+        description=(
+            "Count of scanned assessments (≤100 newest) that have a default-method "
+            "outcome label. Never invented."
+        ),
+    )
+    unlabeled_assessment_count: int = Field(
+        default=0,
+        ge=0,
+        description=(
+            "Count of scanned assessments (≤100 newest) that lack a default-method "
+            "outcome label. Equals assessment_count minus labeled_assessment_count."
+        ),
+    )
     outcome_label_count: int = Field(ge=0)
     calibration_count: int = Field(ge=0)
     latest_component_source: str | None = Field(

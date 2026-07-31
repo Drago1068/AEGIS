@@ -85,7 +85,8 @@ verify of Phase 125), Phase 127 (extract outcome-label history section), Phase 1
 Phase 138 (NAS live verify of Phase 137), Phase 139 (extract backfill status banners),
 Phase 140 (NAS live verify of Phase 139), Phase 141 (extract research assessment panel
 header), Phase 142 (NAS live verify of Phase 141), Phase 143 (extract research assessment
-error alert), and Phase 144 (NAS live verify of Phase 143).
+error alert), Phase 144 (NAS live verify of Phase 143), Phase 145 (evidence summary
+scan-wide label counts), and Phase 146 (NAS live verify of Phase 145).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -389,6 +390,10 @@ Phase 143 extracts the research assessment error alert (see
 [decisions/0144-phase-143-extract-research-assessment-error-alert.md](decisions/0144-phase-143-extract-research-assessment-error-alert.md)).
 Phase 144 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0145-phase-144-nas-live-verify-phase-143.md](decisions/0145-phase-144-nas-live-verify-phase-143.md)).
+Phase 145 adds scan-wide labeled/unlabeled assessment counts on evidence summary (see
+[decisions/0146-phase-145-evidence-summary-scan-label-counts.md](decisions/0146-phase-145-evidence-summary-scan-label-counts.md)).
+Phase 146 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0147-phase-146-nas-live-verify-phase-145.md](decisions/0147-phase-146-nas-live-verify-phase-145.md)).
 
 ## System context
 

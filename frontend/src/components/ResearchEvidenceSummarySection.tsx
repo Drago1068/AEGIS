@@ -94,6 +94,21 @@ export function ResearchEvidenceSummarySection({
           <dd className="font-mono">{evidenceSummary.assessment_count}</dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Labeled (scanned)</dt>
+          <dd className="font-mono" data-testid="evidence-labeled-assessment-count">
+            {evidenceSummary.labeled_assessment_count}
+            <span className="ml-1 font-sans text-xs font-normal text-aegis-muted">
+              of {evidenceSummary.assessment_count}
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-aegis-muted">Unlabeled (scanned)</dt>
+          <dd className="font-mono" data-testid="evidence-unlabeled-assessment-count">
+            {evidenceSummary.unlabeled_assessment_count}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Labels / calibrations (latest id)</dt>
           <dd className="font-mono">
             {evidenceSummary.outcome_label_count} / {evidenceSummary.calibration_count}

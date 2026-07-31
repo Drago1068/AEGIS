@@ -229,6 +229,8 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_outcome_label"] is None
     assert body["latest_calibration"] is None
     assert body["assessment_count"] == 0
+    assert body["labeled_assessment_count"] == 0
+    assert body["unlabeled_assessment_count"] == 0
     assert body["outcome_label_count"] == 0
     assert body["calibration_count"] == 0
     assert body["latest_component_source"] is None
@@ -259,6 +261,8 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_outcome_label"]["labels"]["forward_return_5"] == 0.05
     assert body["latest_calibration"]["probability_confidence"] == 0.62
     assert body["assessment_count"] == 1
+    assert body["labeled_assessment_count"] == 1
+    assert body["unlabeled_assessment_count"] == 0
     assert body["outcome_label_count"] == 1
     assert body["calibration_count"] == 1
     assert body["state"] == "research_only"
@@ -306,6 +310,8 @@ async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:
     assert body["mixed_component_source_assessment_count"] == 1
     assert body["mixed_unlabeled_assessment_count"] == 0
     assert body["mixed_labeled_assessment_count"] == 1
+    assert body["labeled_assessment_count"] == 1
+    assert body["unlabeled_assessment_count"] == 1
     assert body["latest_mixed_label_bar_source"] == "polygon"
 
 
@@ -346,6 +352,8 @@ async def test_evidence_summary_counts_mixed_unlabeled() -> None:
     assert body["mixed_component_source_assessment_count"] == 2
     assert body["mixed_unlabeled_assessment_count"] == 1
     assert body["mixed_labeled_assessment_count"] == 1
+    assert body["labeled_assessment_count"] == 1
+    assert body["unlabeled_assessment_count"] == 2
     assert body["latest_mixed_label_bar_source"] == "alpha_vantage"
     assert body["latest_outcome_label"] is None
     assert body["most_recent_labeled_assessment_id"] == 2

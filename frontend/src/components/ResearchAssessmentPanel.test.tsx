@@ -128,6 +128,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label: null,
       latest_calibration: null,
       assessment_count: 0,
+      labeled_assessment_count: 0,
+      unlabeled_assessment_count: 0,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: null,
@@ -457,6 +459,8 @@ describe("ResearchAssessmentPanel", () => {
       },
       latest_calibration: sampleCalibration,
       assessment_count: 2,
+      labeled_assessment_count: 1,
+      unlabeled_assessment_count: 1,
       outcome_label_count: 1,
       calibration_count: 1,
       latest_component_source: "mixed",
@@ -513,6 +517,9 @@ describe("ResearchAssessmentPanel", () => {
       ).toHaveTextContent(/mixed \(cross-source fill\)/);
       expect(screen.getByText(/resolved label bar source/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed-source assessments \(scanned\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/assessments \(≤100\)/i)).toBeInTheDocument();
+      expect(screen.getByTestId("evidence-labeled-assessment-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("evidence-unlabeled-assessment-count")).toHaveTextContent("1");
       expect(screen.getByText(/mixed unlabeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed labeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/of 1 mixed/i)).toBeInTheDocument();
@@ -607,6 +614,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label: null,
       latest_calibration: null,
       assessment_count: 2,
+      labeled_assessment_count: 1,
+      unlabeled_assessment_count: 1,
       outcome_label_count: 1,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",
@@ -708,6 +717,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label: null,
       latest_calibration: null,
       assessment_count: 2,
+      labeled_assessment_count: 1,
+      unlabeled_assessment_count: 1,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",
@@ -807,6 +818,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label: null,
       latest_calibration: null,
       assessment_count: 2,
+      labeled_assessment_count: 1,
+      unlabeled_assessment_count: 1,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",
@@ -996,6 +1009,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label: null,
       latest_calibration: null,
       assessment_count: 2,
+      labeled_assessment_count: 2,
+      unlabeled_assessment_count: 0,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: "mixed",
@@ -1145,6 +1160,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label: null,
       latest_calibration: null,
       assessment_count: 2,
+      labeled_assessment_count: 1,
+      unlabeled_assessment_count: 1,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",
@@ -1290,6 +1307,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label: null,
       latest_calibration: null,
       assessment_count: 2,
+      labeled_assessment_count: 1,
+      unlabeled_assessment_count: 1,
       outcome_label_count: 1,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",

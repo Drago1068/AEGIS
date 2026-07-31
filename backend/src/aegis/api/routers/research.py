@@ -403,6 +403,8 @@ async def _build_research_evidence_summary(
         if scanned_ids
         else set()
     )
+    labeled_assessment_count = sum(1 for row_id in scanned_ids if row_id in labeled_ids)
+    unlabeled_assessment_count = max(0, assessment_count - labeled_assessment_count)
     mixed_unlabeled_assessment_count = count_mixed_unlabeled_assessments(
         snapshots, labeled_ids
     )
@@ -464,6 +466,8 @@ async def _build_research_evidence_summary(
         latest_outcome_label=latest_outcome_label,
         latest_calibration=latest_calibration,
         assessment_count=assessment_count,
+        labeled_assessment_count=labeled_assessment_count,
+        unlabeled_assessment_count=unlabeled_assessment_count,
         outcome_label_count=outcome_label_count,
         calibration_count=calibration_count,
         latest_component_source=latest_component_source,

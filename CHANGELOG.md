@@ -7,9 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 146 - NAS Live Verification of Phase 145
+
+Ops evidence gate: redeploy backend+frontend under lab TLS after Phase 145 scan-wide
+label counts. See
+[docs/architecture/decisions/0147-phase-146-nas-live-verify-phase-145.md](docs/architecture/decisions/0147-phase-146-nas-live-verify-phase-145.md).
+
+#### Added
+
+- ADR-0147: live verify requires backend+frontend recreate for Phase 145; checklist item 68.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 145 - Evidence Summary Scan-Wide Label Counts
+
+Add labeled/unlabeled assessment counts across the ≤100 evidence-summary scan (not only
+mixed). See
+[docs/architecture/decisions/0146-phase-145-evidence-summary-scan-label-counts.md](docs/architecture/decisions/0146-phase-145-evidence-summary-scan-label-counts.md).
+
+#### Added
+
+- ``labeled_assessment_count`` / ``unlabeled_assessment_count`` on evidence summary (+ export).
+- Console surfaces both counts on ``ResearchEvidenceSummarySection``.
+
+#### Explicitly out of scope
+
+New calibration math, orders, further UI structural extracts.
+
 ### Phase 144 - NAS Live Verification of Phase 143
 
-Ops evidence gate: redeploy frontend under lab TLS after Phase 143 error-alert extract. See
+Ops evidence gate: redeploy frontend under lab TLS after Phase 143 error-alert extract. Live
+verify passed 2026-07-30 (``434f471``). See
 [docs/architecture/decisions/0145-phase-144-nas-live-verify-phase-143.md](docs/architecture/decisions/0145-phase-144-nas-live-verify-phase-143.md).
 
 #### Added

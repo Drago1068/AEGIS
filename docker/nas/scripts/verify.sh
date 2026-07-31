@@ -94,7 +94,8 @@ print_checklist() {
   echo " 65. Phase 140: frontend redeploy includes Phase 139 extract-backfill-status-section (unit-tested)"
   echo " 66. Phase 142: frontend redeploy includes Phase 141 extract-panel-header (unit-tested)"
   echo " 67. Phase 144: frontend redeploy includes Phase 143 extract-error-alert (unit-tested)"
-  echo " 68. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 68. Authenticated evidence-summary includes Phase 145 labeled/unlabeled scan counts (Phase 146)"
+  echo " 69. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -614,6 +615,16 @@ if ! grep -q '"most_recent_labeled_outcome_label"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 80 most_recent_labeled_* fields present"
+# Phase 146: scan-wide labeled/unlabeled counts from Phase 145.
+if ! grep -q '"labeled_assessment_count"' "${summary_body}"; then
+  echo "evidence-summary missing labeled_assessment_count (Phase 145/146)" >&2
+  exit 1
+fi
+if ! grep -q '"unlabeled_assessment_count"' "${summary_body}"; then
+  echo "evidence-summary missing unlabeled_assessment_count (Phase 145/146)" >&2
+  exit 1
+fi
+echo "OK  Phase 146 scan-wide labeled/unlabeled assessment counts present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"

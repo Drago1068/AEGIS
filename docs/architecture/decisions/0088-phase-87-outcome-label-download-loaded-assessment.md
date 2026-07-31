@@ -1,6 +1,6 @@
 # ADR-0088: Phase 87 Outcome-Label Download Uses Loaded Assessment Id
 
-- Status: Accepted (draft / pending implementation)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -21,11 +21,8 @@ history assessment id is tracked. Keep research-only labeling; do not invent row
 
 New API fields, default-on calibration, changing ``latest_assessment``, orders, ACME.
 
-## Resume
-
-Implement UI + unit tests; update CHANGELOG/README/overview; then Phase 88 NAS verify.
-
 ## Related documents
 
 - [0086-phase-85-outcome-label-load-kind-caption.md](0086-phase-85-outcome-label-load-kind-caption.md)
 - [0084-phase-83-outcome-label-history-assessment-id.md](0084-phase-83-outcome-label-history-assessment-id.md)
+- [0089-phase-88-nas-live-verify-phase-87.md](0089-phase-88-nas-live-verify-phase-87.md)

@@ -325,13 +325,14 @@ export function ResearchAssessmentPanel({
   }
 
   function onDownloadOutcomeLabels() {
-    if (latest?.id == null) {
+    const assessmentId = outcomeLabelHistoryAssessmentId ?? latest?.id ?? null;
+    if (assessmentId == null) {
       return;
     }
     startTransition(async () => {
       setError(null);
       try {
-        await downloadOutcomeLabels(baseUrl, symbol, latest.id as number, 20);
+        await downloadOutcomeLabels(baseUrl, symbol, assessmentId, 20);
       } catch (err) {
         setError(formatAssessmentError(err));
       }
@@ -554,7 +555,9 @@ export function ResearchAssessmentPanel({
           <button
             type="button"
             onClick={onDownloadOutcomeLabels}
-            disabled={isPending || latest?.id == null}
+            disabled={
+              isPending || (outcomeLabelHistoryAssessmentId == null && latest?.id == null)
+            }
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Download outcome labels JSON

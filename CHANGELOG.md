@@ -26,9 +26,9 @@ Bind outcome-label JSON download to the assessment id shown in the panel (not al
 latest). See
 [docs/architecture/decisions/0088-phase-87-outcome-label-download-loaded-assessment.md](docs/architecture/decisions/0088-phase-87-outcome-label-download-loaded-assessment.md).
 
-#### Planned
+#### Added
 
-- Download uses ``outcomeLabelHistoryAssessmentId`` when set.
+- Download uses ``outcomeLabelHistoryAssessmentId`` when set; else ``latest.id``.
 
 #### Explicitly out of scope
 

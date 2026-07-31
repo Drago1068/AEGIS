@@ -131,7 +131,8 @@ print_checklist() {
   echo "102. Authenticated evidence-summary includes Phase 213 most_recent_labeled_outcome_label_id (Phase 214)"
   echo "103. Authenticated evidence-summary includes Phase 215 most_recent_labeled_outcome_label_method_id (Phase 216)"
   echo "104. Authenticated evidence-summary includes Phase 217 most_recent_labeled_outcome_label_method_version (Phase 218)"
-  echo "105. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo "105. Authenticated evidence-summary includes Phase 219 most_recent_labeled_outcome_label_schema_version (Phase 220)"
+  echo "106. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -877,6 +878,12 @@ if ! grep -q '"most_recent_labeled_outcome_label_method_version"' "${summary_bod
   exit 1
 fi
 echo "OK  Phase 218 most_recent_labeled_outcome_label_method_version field present"
+# Phase 220: most_recent_labeled_outcome_label_schema_version from Phase 219 (null OK when no scan labels).
+if ! grep -q '"most_recent_labeled_outcome_label_schema_version"' "${summary_body}"; then
+  echo "evidence-summary missing most_recent_labeled_outcome_label_schema_version (Phase 219/220)" >&2
+  exit 1
+fi
+echo "OK  Phase 220 most_recent_labeled_outcome_label_schema_version field present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -976,6 +983,10 @@ if ! grep -q '"most_recent_labeled_outcome_label_method_id"' "${export_body}"; t
 fi
 if ! grep -q '"most_recent_labeled_outcome_label_method_version"' "${export_body}"; then
   echo "evidence-summary/export missing most_recent_labeled_outcome_label_method_version (Phase 217/218)" >&2
+  exit 1
+fi
+if ! grep -q '"most_recent_labeled_outcome_label_schema_version"' "${export_body}"; then
+  echo "evidence-summary/export missing most_recent_labeled_outcome_label_schema_version (Phase 219/220)" >&2
   exit 1
 fi
 echo "OK  evidence-summary/export attachment state=research_only"

@@ -1,6 +1,6 @@
 # ADR-0220: Phase 219 Evidence Summary Most Recent Labeled Outcome Label Schema Version
 
-- Status: Proposed (pending implementation)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -34,3 +34,4 @@ New scoring math, default-on calibration, orders, ACME, UI structural extracts.
 
 - [0218-phase-217-evidence-summary-most-recent-labeled-outcome-label-method-version.md](0218-phase-217-evidence-summary-most-recent-labeled-outcome-label-method-version.md)
 - [0221-phase-220-nas-live-verify-phase-219.md](0221-phase-220-nas-live-verify-phase-219.md)
+- [0222-phase-221-evidence-summary-most-recent-labeled-outcome-label-state.md](0222-phase-221-evidence-summary-most-recent-labeled-outcome-label-state.md)

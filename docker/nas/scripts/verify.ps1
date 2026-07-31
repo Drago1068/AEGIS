@@ -142,7 +142,8 @@ function Write-VerifyChecklist {
     Write-Host "102. Authenticated evidence-summary includes Phase 213 most_recent_labeled_outcome_label_id (Phase 214)"
     Write-Host "103. Authenticated evidence-summary includes Phase 215 most_recent_labeled_outcome_label_method_id (Phase 216)"
     Write-Host "104. Authenticated evidence-summary includes Phase 217 most_recent_labeled_outcome_label_method_version (Phase 218)"
-    Write-Host "105. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "105. Authenticated evidence-summary includes Phase 219 most_recent_labeled_outcome_label_schema_version (Phase 220)"
+    Write-Host "106. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1080,6 +1081,13 @@ try {
         $scanLabelMethodVersion = $summary.most_recent_labeled_outcome_label_method_version
         $scanLabelMethodVersionPart = if ($null -eq $scanLabelMethodVersion -or $scanLabelMethodVersion -eq "") { "null" } else { [string]$scanLabelMethodVersion }
         Write-Host "OK  Phase 218 most_recent_labeled_outcome_label_method_version=$scanLabelMethodVersionPart"
+        # Phase 220: most_recent_labeled_outcome_label_schema_version from Phase 219 (null OK when no scan labels).
+        if (-not ($summary.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label_schema_version")) {
+            throw "evidence-summary missing most_recent_labeled_outcome_label_schema_version (Phase 219/220)"
+        }
+        $scanLabelSchemaVersion = $summary.most_recent_labeled_outcome_label_schema_version
+        $scanLabelSchemaVersionPart = if ($null -eq $scanLabelSchemaVersion -or $scanLabelSchemaVersion -eq "") { "null" } else { [string]$scanLabelSchemaVersion }
+        Write-Host "OK  Phase 220 most_recent_labeled_outcome_label_schema_version=$scanLabelSchemaVersionPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1237,6 +1245,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label_method_version")) {
             throw "evidence-summary/export missing most_recent_labeled_outcome_label_method_version (Phase 217/218)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label_schema_version")) {
+            throw "evidence-summary/export missing most_recent_labeled_outcome_label_schema_version (Phase 219/220)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

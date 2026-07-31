@@ -143,6 +143,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_outcome_label_id: null,
       most_recent_labeled_outcome_label_method_id: null,
       most_recent_labeled_outcome_label_method_version: null,
+      most_recent_labeled_outcome_label_schema_version: null,
       latest_coverage_confidence: null,
       latest_research_index: null,
       latest_as_of_trading_date: null,
@@ -526,6 +527,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_outcome_label_id: 20,
       most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       most_recent_labeled_outcome_label_method_version: 1,
+      most_recent_labeled_outcome_label_schema_version: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -629,6 +631,9 @@ describe("ResearchAssessmentPanel", () => {
       ).toHaveTextContent("forward_total_return_v1");
       expect(
         screen.getByTestId("evidence-most-recent-labeled-outcome-label-method-version"),
+      ).toHaveTextContent("1");
+      expect(
+        screen.getByTestId("evidence-most-recent-labeled-outcome-label-schema-version"),
       ).toHaveTextContent("1");
       expect(screen.getByTestId("evidence-latest-outcome-label-computed-at")).toHaveTextContent(
         "2024-01-26T19:00:00Z",
@@ -804,6 +809,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_outcome_label_id: 30,
       most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       most_recent_labeled_outcome_label_method_version: 1,
+      most_recent_labeled_outcome_label_schema_version: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -943,6 +949,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_outcome_label_id: 30,
       most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       most_recent_labeled_outcome_label_method_version: 1,
+      most_recent_labeled_outcome_label_schema_version: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1080,6 +1087,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_outcome_label_id: 30,
       most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       most_recent_labeled_outcome_label_method_version: 1,
+      most_recent_labeled_outcome_label_schema_version: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1307,6 +1315,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_outcome_label_id: 30,
       most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       most_recent_labeled_outcome_label_method_version: 1,
+      most_recent_labeled_outcome_label_schema_version: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1494,6 +1503,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_outcome_label_id: 30,
       most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       most_recent_labeled_outcome_label_method_version: 1,
+      most_recent_labeled_outcome_label_schema_version: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1677,6 +1687,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_outcome_label_id: 30,
       most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
       most_recent_labeled_outcome_label_method_version: 1,
+      most_recent_labeled_outcome_label_schema_version: 1,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",

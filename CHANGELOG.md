@@ -7,16 +7,37 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 222 - NAS Live Verification of Phase 221 (draft)
+
+Ops evidence gate after Phase 221 most recent labeled outcome label state field. See
+[docs/architecture/decisions/0223-phase-222-nas-live-verify-phase-221.md](docs/architecture/decisions/0223-phase-222-nas-live-verify-phase-221.md).
+
+### Phase 221 - Evidence Summary Most Recent Labeled Outcome Label State (draft)
+
+Surface top-level ``most_recent_labeled_outcome_label_state`` on evidence summary for
+scan-labeled provenance. See
+[docs/architecture/decisions/0222-phase-221-evidence-summary-most-recent-labeled-outcome-label-state.md](docs/architecture/decisions/0222-phase-221-evidence-summary-most-recent-labeled-outcome-label-state.md).
+
 ### Phase 220 - NAS Live Verification of Phase 219 (draft)
 
 Ops evidence gate after Phase 219 most recent labeled outcome label schema version field. See
 [docs/architecture/decisions/0221-phase-220-nas-live-verify-phase-219.md](docs/architecture/decisions/0221-phase-220-nas-live-verify-phase-219.md).
 
-### Phase 219 - Evidence Summary Most Recent Labeled Outcome Label Schema Version (draft)
+### Phase 219 - Evidence Summary Most Recent Labeled Outcome Label Schema Version
 
 Surface top-level ``most_recent_labeled_outcome_label_schema_version`` on evidence summary for
 scan-labeled provenance. See
 [docs/architecture/decisions/0220-phase-219-evidence-summary-most-recent-labeled-outcome-label-schema-version.md](docs/architecture/decisions/0220-phase-219-evidence-summary-most-recent-labeled-outcome-label-schema-version.md).
+
+#### Added
+
+- ``most_recent_labeled_outcome_label_schema_version`` on evidence summary (+ export); from scan-labeled label.
+- Console surfaces the field with ``data-testid="evidence-most-recent-labeled-outcome-label-schema-version"``.
+- NAS verify checklist item 105 for Phase 220.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 218 - NAS Live Verification of Phase 217
 

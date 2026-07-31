@@ -244,6 +244,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["most_recent_labeled_outcome_label_id"] is None
     assert body["most_recent_labeled_outcome_label_method_id"] is None
     assert body["most_recent_labeled_outcome_label_method_version"] is None
+    assert body["most_recent_labeled_outcome_label_schema_version"] is None
     assert body["latest_coverage_confidence"] is None
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
@@ -346,6 +347,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["most_recent_labeled_outcome_label_id"] == 10
     assert body["most_recent_labeled_outcome_label_method_id"] == "forward_total_return_v1"
     assert body["most_recent_labeled_outcome_label_method_version"] == 1
+    assert body["most_recent_labeled_outcome_label_schema_version"] == 1
     assert body["latest_outcome_label_id"] == 10
 
 
@@ -436,6 +438,7 @@ async def test_evidence_summary_counts_mixed_unlabeled() -> None:
     assert body["most_recent_labeled_outcome_label_id"] == 11
     assert body["most_recent_labeled_outcome_label_method_id"] == "forward_total_return_v1"
     assert body["most_recent_labeled_outcome_label_method_version"] == 1
+    assert body["most_recent_labeled_outcome_label_schema_version"] == 1
     assert body["latest_outcome_label_id"] is None
     assert body["latest_outcome_label_method_id"] is None
 

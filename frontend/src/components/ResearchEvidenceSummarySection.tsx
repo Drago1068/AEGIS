@@ -319,6 +319,17 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Most recent labeled outcome_label schema_version</dt>
+          <dd
+            className="font-mono"
+            data-testid="evidence-most-recent-labeled-outcome-label-schema-version"
+          >
+            {evidenceSummary.most_recent_labeled_outcome_label_schema_version == null
+              ? "null"
+              : evidenceSummary.most_recent_labeled_outcome_label_schema_version}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest outcome_label computed_at</dt>
           <dd className="font-mono" data-testid="evidence-latest-outcome-label-computed-at">
             {evidenceSummary.latest_outcome_label_computed_at ?? "null"}

@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 176 - NAS Live Verification of Phase 175 (draft)
+### Phase 178 - NAS Live Verification of Phase 177 (draft)
 
-Ops evidence gate after Phase 175 latest outcome label id field. See
+Ops evidence gate after Phase 177 latest calibration id field. See
+[docs/architecture/decisions/0179-phase-178-nas-live-verify-phase-177.md](docs/architecture/decisions/0179-phase-178-nas-live-verify-phase-177.md).
+
+### Phase 177 - Evidence Summary Latest Calibration Id (draft)
+
+Surface top-level ``latest_calibration_id`` on evidence summary. See
+[docs/architecture/decisions/0178-phase-177-evidence-summary-latest-calibration-id.md](docs/architecture/decisions/0178-phase-177-evidence-summary-latest-calibration-id.md).
+
+### Phase 176 - NAS Live Verification of Phase 175
+
+Ops evidence gate after Phase 175 latest outcome label id field. Live verify passed
+2026-07-31 (``8836fd2``; AAPL outcome_label_id=null — latest assessment unlabeled). See
 [docs/architecture/decisions/0177-phase-176-nas-live-verify-phase-175.md](docs/architecture/decisions/0177-phase-176-nas-live-verify-phase-175.md).
+
+#### Added
+
+- ADR-0177: live verify requires backend+frontend recreate for Phase 175; checklist item 83.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 175 - Evidence Summary Latest Outcome Label Id
 

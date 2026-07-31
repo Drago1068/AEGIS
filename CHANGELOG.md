@@ -7,10 +7,37 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 112 - NAS Live Verification of Phase 111
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 111 load-kind helper. See
+[docs/architecture/decisions/0113-phase-112-nas-live-verify-phase-111.md](docs/architecture/decisions/0113-phase-112-nas-live-verify-phase-111.md).
+
+#### Added
+
+- ADR-0113: live verify requires frontend recreate for Phase 111; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 111 - Resolve Outcome-Label History Load Kind Helper
+
+Extract shared load-kind resolution for outcome-label compute/backfill refresh (no behavior
+change). See
+[docs/architecture/decisions/0112-phase-111-resolve-outcome-label-history-load-kind.md](docs/architecture/decisions/0112-phase-111-resolve-outcome-label-history-load-kind.md).
+
+#### Added
+
+- Shared load-kind helper drafted (implement next).
+
+#### Explicitly out of scope
+
+UX copy changes, new API fields, orders.
+
 ### Phase 110 - NAS Live Verification of Phase 109
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 109 handler single-source
-cleanup. See
+cleanup. Live verify passed 2026-07-30 (``9a7abee``). See
 [docs/architecture/decisions/0111-phase-110-nas-live-verify-phase-109.md](docs/architecture/decisions/0111-phase-110-nas-live-verify-phase-109.md).
 
 #### Added

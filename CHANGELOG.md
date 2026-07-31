@@ -7,16 +7,37 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 226 - NAS Live Verification of Phase 225 (draft)
+
+Ops evidence gate after Phase 225 most recent labeled outcome label computed_at field. See
+[docs/architecture/decisions/0227-phase-226-nas-live-verify-phase-225.md](docs/architecture/decisions/0227-phase-226-nas-live-verify-phase-225.md).
+
+### Phase 225 - Evidence Summary Most Recent Labeled Outcome Label Computed At (draft)
+
+Surface top-level ``most_recent_labeled_outcome_label_computed_at`` on evidence summary for
+scan-labeled provenance. See
+[docs/architecture/decisions/0226-phase-225-evidence-summary-most-recent-labeled-outcome-label-computed-at.md](docs/architecture/decisions/0226-phase-225-evidence-summary-most-recent-labeled-outcome-label-computed-at.md).
+
 ### Phase 224 - NAS Live Verification of Phase 223 (draft)
 
 Ops evidence gate after Phase 223 most recent labeled outcome label bar source field. See
 [docs/architecture/decisions/0225-phase-224-nas-live-verify-phase-223.md](docs/architecture/decisions/0225-phase-224-nas-live-verify-phase-223.md).
 
-### Phase 223 - Evidence Summary Most Recent Labeled Outcome Label Bar Source (draft)
+### Phase 223 - Evidence Summary Most Recent Labeled Outcome Label Bar Source
 
 Surface top-level ``most_recent_labeled_outcome_label_bar_source`` on evidence summary for
 scan-labeled provenance. See
 [docs/architecture/decisions/0224-phase-223-evidence-summary-most-recent-labeled-outcome-label-bar-source.md](docs/architecture/decisions/0224-phase-223-evidence-summary-most-recent-labeled-outcome-label-bar-source.md).
+
+#### Added
+
+- ``most_recent_labeled_outcome_label_bar_source`` on evidence summary (+ export); from scan-labeled label.
+- Console surfaces the field with ``data-testid="evidence-most-recent-labeled-outcome-label-bar-source"``.
+- NAS verify checklist item 107 for Phase 224.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 222 - NAS Live Verification of Phase 221
 

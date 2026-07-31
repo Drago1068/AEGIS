@@ -465,6 +465,11 @@ async def _build_research_evidence_summary(
         if most_recent_labeled_outcome_label is not None
         else None
     )
+    most_recent_labeled_outcome_label_bar_source = (
+        most_recent_labeled_outcome_label.bar_source
+        if most_recent_labeled_outcome_label is not None
+        else None
+    )
 
     if snapshot is not None and snapshot.id is not None:
         enriched = await enrich_assessment_with_calibration(snapshot, calibration_repository)
@@ -616,6 +621,7 @@ async def _build_research_evidence_summary(
         most_recent_labeled_outcome_label_method_version=most_recent_labeled_outcome_label_method_version,
         most_recent_labeled_outcome_label_schema_version=most_recent_labeled_outcome_label_schema_version,
         most_recent_labeled_outcome_label_state=most_recent_labeled_outcome_label_state,
+        most_recent_labeled_outcome_label_bar_source=most_recent_labeled_outcome_label_bar_source,
         latest_coverage_confidence=latest_coverage_confidence,
         latest_research_index=latest_research_index,
         latest_as_of_trading_date=latest_as_of_trading_date,

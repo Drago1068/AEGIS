@@ -144,7 +144,8 @@ function Write-VerifyChecklist {
     Write-Host "104. Authenticated evidence-summary includes Phase 217 most_recent_labeled_outcome_label_method_version (Phase 218)"
     Write-Host "105. Authenticated evidence-summary includes Phase 219 most_recent_labeled_outcome_label_schema_version (Phase 220)"
     Write-Host "106. Authenticated evidence-summary includes Phase 221 most_recent_labeled_outcome_label_state (Phase 222)"
-    Write-Host "107. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "107. Authenticated evidence-summary includes Phase 223 most_recent_labeled_outcome_label_bar_source (Phase 224)"
+    Write-Host "108. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1096,6 +1097,13 @@ try {
         $scanLabelState = $summary.most_recent_labeled_outcome_label_state
         $scanLabelStatePart = if ($null -eq $scanLabelState -or $scanLabelState -eq "") { "null" } else { [string]$scanLabelState }
         Write-Host "OK  Phase 222 most_recent_labeled_outcome_label_state=$scanLabelStatePart"
+        # Phase 224: most_recent_labeled_outcome_label_bar_source from Phase 223 (null OK when no scan labels).
+        if (-not ($summary.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label_bar_source")) {
+            throw "evidence-summary missing most_recent_labeled_outcome_label_bar_source (Phase 223/224)"
+        }
+        $scanLabelBarSource = $summary.most_recent_labeled_outcome_label_bar_source
+        $scanLabelBarSourcePart = if ($null -eq $scanLabelBarSource -or $scanLabelBarSource -eq "") { "null" } else { [string]$scanLabelBarSource }
+        Write-Host "OK  Phase 224 most_recent_labeled_outcome_label_bar_source=$scanLabelBarSourcePart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1259,6 +1267,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label_state")) {
             throw "evidence-summary/export missing most_recent_labeled_outcome_label_state (Phase 221/222)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label_bar_source")) {
+            throw "evidence-summary/export missing most_recent_labeled_outcome_label_bar_source (Phase 223/224)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

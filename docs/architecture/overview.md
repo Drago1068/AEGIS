@@ -556,10 +556,15 @@ Phase 221 surfaces top-level ``most_recent_labeled_outcome_label_state`` for sca
 [decisions/0222-phase-221-evidence-summary-most-recent-labeled-outcome-label-state.md](decisions/0222-phase-221-evidence-summary-most-recent-labeled-outcome-label-state.md)).
 Phase 222 live-verified that revision (see
 [decisions/0223-phase-222-nas-live-verify-phase-221.md](decisions/0223-phase-222-nas-live-verify-phase-221.md)).
-Phase 223 (draft) surfaces top-level ``most_recent_labeled_outcome_label_bar_source`` (see
+Phase 223 surfaces top-level ``most_recent_labeled_outcome_label_bar_source`` for scan-labeled
+bar source (see
 [decisions/0224-phase-223-evidence-summary-most-recent-labeled-outcome-label-bar-source.md](decisions/0224-phase-223-evidence-summary-most-recent-labeled-outcome-label-bar-source.md)).
 Phase 224 (draft) live-verifies that revision (see
 [decisions/0225-phase-224-nas-live-verify-phase-223.md](decisions/0225-phase-224-nas-live-verify-phase-223.md)).
+Phase 225 (draft) surfaces top-level ``most_recent_labeled_outcome_label_computed_at`` (see
+[decisions/0226-phase-225-evidence-summary-most-recent-labeled-outcome-label-computed-at.md](decisions/0226-phase-225-evidence-summary-most-recent-labeled-outcome-label-computed-at.md)).
+Phase 226 (draft) live-verifies that revision (see
+[decisions/0227-phase-226-nas-live-verify-phase-225.md](decisions/0227-phase-226-nas-live-verify-phase-225.md)).
 
 ## System context
 

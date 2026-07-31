@@ -79,6 +79,7 @@ class SymbolIngestionResult:
     rejected_count: int
     rejections: dict[RejectionReason, int] = field(default_factory=_empty_rejections)
     error: str | None = None
+    latest_trading_date: date | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -238,6 +239,7 @@ class MarketDataIngestionService:
             corrected_count=corrected_count,
             rejected_count=sum(rejections.values()),
             rejections=rejections,
+            latest_trading_date=latest_trading_date,
         )
 
     async def _fetch_bars_with_optional_failover(

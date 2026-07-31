@@ -341,12 +341,14 @@ describe("market data client", () => {
             rejected_count: 0,
             rejections: {},
             error: null,
+            latest_trading_date: "2024-01-02",
           },
         ],
       },
     });
     const run = await ingestMarketData("http://localhost:8000");
     expect(run.results[0]?.stored_count).toBe(1);
+    expect(run.results[0]?.latest_trading_date).toBe("2024-01-02");
   });
 
   it("throws on non-ok ingest", async () => {

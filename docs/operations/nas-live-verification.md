@@ -208,7 +208,7 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 121 | Phase 252 backend+frontend redeploy (Phase 251 min-horizon forward bar shortfall) | Evidence-summary includes latest_assessment_min_horizon_forward_bar_shortfall (null/0 OK) |
 | 122 | Phase 254 backend+frontend redeploy (Phase 253 min-horizon required label end date) | Evidence-summary includes latest_assessment_min_horizon_required_label_end_date (null OK) |
 | 123 | Phase 256 backend+frontend redeploy (Phase 255 stored-bar calendar lag) | Evidence-summary includes stored_bar_calendar_lag_trading_days (null/0 OK) |
-| 124 | Phase 258 on-demand ingest tip refresh (Phase 257) | Authenticated POST /market-data/ingest + re-read lag/tip (unchanged OK) |
+| 124 | Phase 258–260 on-demand ingest tip refresh + provider tip | Authenticated POST /market-data/ingest + latest_trading_date + re-read lag/tip (unchanged OK) |
 | 125 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.

@@ -13,7 +13,8 @@ need a verified backend redeploy under lab TLS after that lands.
 ### 1. Scope
 
 1. Deploy ``HEAD`` TLS; recreate backend (frontend optional if unchanged).
-2. ``verify.ps1`` / ``verify.sh`` pass; ingest result logs ``latest_trading_date``.
+2. ``verify.ps1`` / ``verify.sh`` pass; ingest result logs ``latest_trading_date``
+   (checklist item 124).
 3. Alembic ``0009`` / ``head``.
 
 ### 2. Upload ≠ verified

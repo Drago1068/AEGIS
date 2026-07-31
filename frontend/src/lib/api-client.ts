@@ -51,9 +51,12 @@ export interface IngestionSymbolResult {
   symbol: string;
   stored_count: number;
   skipped_existing_count: number;
+  corrected_count?: number;
   rejected_count: number;
   rejections: Record<string, number>;
   error: string | null;
+  /** Max trading_date from the provider fetch for this symbol; null when empty/error. */
+  latest_trading_date: string | null;
 }
 
 export interface IngestionRunResponse {

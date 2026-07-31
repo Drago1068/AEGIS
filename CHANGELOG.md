@@ -12,11 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 259 ingest-run latest trading date. See
 [docs/architecture/decisions/0261-phase-260-nas-live-verify-phase-259.md](docs/architecture/decisions/0261-phase-260-nas-live-verify-phase-259.md).
 
-### Phase 259 - Ingest Run Latest Trading Date (draft)
+### Phase 259 - Ingest Run Latest Trading Date
 
 Expose max trading date seen in an ingest fetch so operators can compare provider tip vs
 store tip when ``stored=0``. See
 [docs/architecture/decisions/0260-phase-259-ingest-run-latest-trading-date.md](docs/architecture/decisions/0260-phase-259-ingest-run-latest-trading-date.md).
+
+#### Added
+
+- ``latest_trading_date`` on ingest symbol results (domain + API + console).
+- NAS verify logs provider tip beside store tip (checklist item 124).
+
+#### Explicitly out of scope
+
+New evidence-summary fields, inventing closes, default-on calibration, orders.
 
 ### Phase 258 - NAS Live Verification of Phase 257
 

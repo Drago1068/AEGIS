@@ -161,6 +161,7 @@ async def test_ingest_returns_run_summary() -> None:
                 corrected_count=0,
                 rejected_count=1,
                 rejections={RejectionReason.STALE: 1},
+                latest_trading_date=date(2024, 1, 2),
             )
         ]
     )
@@ -179,6 +180,7 @@ async def test_ingest_returns_run_summary() -> None:
     assert body["results"][0]["rejected_count"] == 1
     assert body["results"][0]["rejections"] == {"stale": 1}
     assert body["results"][0]["error"] is None
+    assert body["results"][0]["latest_trading_date"] == "2024-01-02"
     assert service.requested_symbols == ["AAPL"]
     assert research.assess_calls == []
 

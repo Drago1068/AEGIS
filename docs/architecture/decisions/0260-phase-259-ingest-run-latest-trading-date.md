@@ -1,6 +1,6 @@
-# ADR-0260: Phase 259 Ingest Run Latest Trading Date (draft)
+# ADR-0260: Phase 259 Ingest Run Latest Trading Date
 
-- Status: Proposed (ready after Phase 258; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -11,21 +11,20 @@ cannot tell whether **providers** lack newer closes or the run merely skipped du
 without exposing the max trading date seen in the fetch. Prefer this ingest-run diagnostic
 over another evidence-summary scalar or UI modularization.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. API
 
 Extend ``IngestionSymbolResult`` (+ domain result) with
 ``latest_trading_date: date | null``:
 
-- Max ``trading_date`` among bars considered in that symbol’s ingest attempt (accepted,
-  skipped-existing, or corrected candidates from the provider fetch — never invent).
+- Max ``trading_date`` among bars from the provider fetch for that symbol (never invent).
 - Null when the fetch produced no usable bars / hard error with empty payload.
 
-### 2. Verify
+### 2. Console / verify
 
-Log ``latest_trading_date`` for the verify symbol on checklist item 124 / successor so
-stdout shows provider tip beside store tip.
+- Operator ingest panel shows provider tip.
+- NAS verify logs ``latest_trading_date`` for the verify symbol beside store tip.
 
 ### 3. Out of scope
 
@@ -36,6 +35,8 @@ modularization, forcing provider APIs to return future sessions.
 
 Ingest path is proven; tip stayed flat. Exposing the fetch tip answers “is the store
 behind the provider?” without redundant assessment scalars.
+
+Gate approved by standing instruction ("Proceed and approve from here on out").
 
 ## Resume (after Phase 258 gate)
 

@@ -150,6 +150,7 @@ async def test_valid_bars_are_stored() -> None:
     assert result.corrected_count == 0
     assert result.rejected_count == 0
     assert result.error is None
+    assert result.latest_trading_date == _AS_OF
     assert repository.saved_bars == bars
 
 
@@ -187,7 +188,20 @@ async def test_already_stored_dates_are_skipped_idempotently() -> None:
     assert result.skipped_existing_count == 1
     assert result.stored_count == 1
     assert result.corrected_count == 0
+    assert result.latest_trading_date == _AS_OF
     assert [bar.trading_date for bar in repository.saved_bars] == [_AS_OF]
+
+
+@pytest.mark.asyncio
+async def test_latest_trading_date_null_when_provider_errors() -> None:
+    provider = FakeProvider(errors_by_symbol={"AAPL": ProviderError("down")})
+    repository = FakeRepository()
+
+    run_result = await _service(provider, repository).run(["AAPL"])
+
+    result = run_result.results[0]
+    assert result.error is not None
+    assert result.latest_trading_date is None
 
 
 @pytest.mark.asyncio
@@ -241,6 +255,7 @@ async def test_empty_provider_response_stores_nothing() -> None:
     assert result.corrected_count == 0
     assert result.rejected_count == 0
     assert result.skipped_existing_count == 0
+    assert result.latest_trading_date is None
     assert repository.saved_bars == []
 
 
@@ -255,6 +270,7 @@ async def test_stale_latest_bar_is_rejected_but_older_bars_in_same_run_are_not()
     result = run_result.results[0]
     assert result.rejections == {RejectionReason.STALE: 1}
     assert result.stored_count == 0
+    assert result.latest_trading_date == date(2023, 12, 1)
 
 
 @pytest.mark.asyncio

@@ -40,6 +40,7 @@ class IngestionSymbolResult(BaseModel):
     rejected_count: int
     rejections: dict[RejectionReason, int]
     error: str | None = None
+    latest_trading_date: date | None = None
 
 
 class IngestionRunResponse(BaseModel):

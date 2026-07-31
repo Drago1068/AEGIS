@@ -161,7 +161,7 @@ function Write-VerifyChecklist {
     Write-Host "121. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
     Write-Host "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
     Write-Host "123. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-    Write-Host "124. Authenticated POST /market-data/ingest tip refresh; re-read evidence-summary lag/tip (Phase 257/258; unchanged OK)"
+    Write-Host "124. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257–260; unchanged lag OK)"
     Write-Host "125. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
@@ -1257,9 +1257,14 @@ try {
             }
             $verifyRow = @($ingestBody.results | Where-Object { [string]$_.symbol -eq $verifySymbol }) | Select-Object -First 1
             if ($null -ne $verifyRow) {
-                Write-Host ("OK  Phase 258 ingest {0} stored={1} skipped_existing={2} corrected={3} rejected={4} error={5}" -f `
+                $providerTip = $verifyRow.latest_trading_date
+                if (-not ($verifyRow.PSObject.Properties.Name -contains "latest_trading_date")) {
+                    throw "market-data/ingest result missing latest_trading_date (Phase 259/260)"
+                }
+                $providerTipPart = if ($null -eq $providerTip -or $providerTip -eq "") { "null" } else { [string]$providerTip }
+                Write-Host ("OK  Phase 260 ingest {0} stored={1} skipped_existing={2} corrected={3} rejected={4} latest_trading_date={5} error={6}" -f `
                     $verifySymbol, $verifyRow.stored_count, $verifyRow.skipped_existing_count, `
-                    $verifyRow.corrected_count, $verifyRow.rejected_count, `
+                    $verifyRow.corrected_count, $verifyRow.rejected_count, $providerTipPart, `
                     $(if ($null -eq $verifyRow.error -or $verifyRow.error -eq "") { "null" } else { [string]$verifyRow.error }))
             } else {
                 Write-Host "OK  Phase 258 ingest results_count=$(@($ingestBody.results).Count) (verify symbol not in run; watchlist OK)"

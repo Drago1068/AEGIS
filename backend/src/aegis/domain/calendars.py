@@ -56,3 +56,20 @@ def most_recent_trading_day(as_of: date, calendar_name: str) -> date:
             f"{_LOOKBACK_DAYS_FOR_MOST_RECENT}-day window ending {as_of.isoformat()}"
         )
     return days[-1].date()  # pyright: ignore[reportUnknownMemberType]
+
+
+def count_trading_days_strictly_between(
+    start: date, end: date, calendar_name: str
+) -> int:
+    """Count trading days strictly after ``start`` and up to and including ``end``.
+
+    Returns 0 when ``end <= start``. Used for staleness and scan-labeled freshness lag.
+    """
+
+    count = 0
+    current = start
+    while current < end:
+        current += timedelta(days=1)
+        if is_trading_day(current, calendar_name):
+            count += 1
+    return count

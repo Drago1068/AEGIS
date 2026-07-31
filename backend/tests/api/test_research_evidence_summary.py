@@ -249,6 +249,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["most_recent_labeled_outcome_label_bar_source"] is None
     assert body["most_recent_labeled_outcome_label_computed_at"] is None
     assert body["most_recent_labeled_outcome_label_as_of_trading_date"] is None
+    assert body["scan_labeled_freshness_lag_trading_days"] is None
     assert body["latest_coverage_confidence"] is None
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
@@ -356,7 +357,44 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["most_recent_labeled_outcome_label_bar_source"] == "alpha_vantage"
     assert body["most_recent_labeled_outcome_label_computed_at"] == "2024-01-26T19:00:00Z"
     assert body["most_recent_labeled_outcome_label_as_of_trading_date"] == "2024-01-26"
+    assert body["scan_labeled_freshness_lag_trading_days"] == 0
     assert body["latest_outcome_label_id"] == 10
+
+
+async def test_evidence_summary_scan_labeled_freshness_lag_trading_days() -> None:
+    """Phase 229: lag uses NYSE trading days between labeled as_of and latest as_of."""
+
+    unlabeled_latest = ResearchAssessmentSnapshotData(
+        id=2,
+        symbol="AAPL",
+        method_id="daily_bar_research_v1",
+        method_version=1,
+        state="research_only",
+        as_of_trading_date=date(2024, 2, 9),
+        event_time=datetime(2024, 2, 9, 23, 59, 59, tzinfo=UTC),
+        computed_at=datetime(2024, 2, 9, 18, 0, tzinfo=UTC),
+        coverage_confidence=0.95,
+        probability_confidence=None,
+        components={"research_index": 0.5},
+        schema_version=1,
+        input_source="alpha_vantage",
+        lookback_start_date=date(2024, 1, 12),
+        lookback_end_date=date(2024, 2, 9),
+        bar_count=20,
+    )
+    labeled_older = _snapshot(snapshot_id=1)
+    async with _client(
+        assessments=[unlabeled_latest, labeled_older],
+        labels=[_label()],
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["latest_as_of_trading_date"] == "2024-02-09"
+    assert body["most_recent_labeled_outcome_label_as_of_trading_date"] == "2024-01-26"
+    assert body["latest_outcome_label_id"] is None
+    assert body["scan_labeled_freshness_lag_trading_days"] == 10
 
 
 async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:
@@ -451,6 +489,7 @@ async def test_evidence_summary_counts_mixed_unlabeled() -> None:
     assert body["most_recent_labeled_outcome_label_bar_source"] == "alpha_vantage"
     assert body["most_recent_labeled_outcome_label_computed_at"] == "2024-01-26T19:00:00Z"
     assert body["most_recent_labeled_outcome_label_as_of_trading_date"] == "2024-01-26"
+    assert body["scan_labeled_freshness_lag_trading_days"] == 0
     assert body["latest_outcome_label_id"] is None
     assert body["latest_outcome_label_method_id"] is None
 

@@ -1,6 +1,6 @@
-# ADR-0230: Phase 229 Evidence Summary Scan-Labeled Freshness Lag (draft)
+# ADR-0230: Phase 229 Evidence Summary Scan-Labeled Freshness Lag
 
-- Status: Proposed (ready after Phase 228 series-complete; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -15,7 +15,7 @@ absolute latest assessment.
 That gap is an **evidence diagnostic**, not another nested extract: a top-level lag integer
 makes unlabeled/labeled freshness fail-closed and auditable without inventing probabilities.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. API
 
@@ -23,11 +23,12 @@ Add ``scan_labeled_freshness_lag_trading_days: int | null`` to
 ``ResearchEvidenceSummaryResponse`` (+ export):
 
 - When both ``latest_as_of_trading_date`` and
-  ``most_recent_labeled_outcome_label_as_of_trading_date`` are present, set to the non-negative
-  calendar/trading-day difference (latest minus labeled; clamp at 0 if inverted).
-- Null when either date is missing. Never invent dates or fill from nested payloads alone.
-
-Exact calendar vs exchange-trading-day definition must be locked in implementation and tested.
+  ``most_recent_labeled_outcome_label_as_of_trading_date`` are present, set to the
+  non-negative **exchange trading-day** count strictly after the labeled as_of through the
+  latest as_of inclusive (same helper as assessment staleness:
+  ``count_trading_days_strictly_between`` on ``AEGIS`` ``exchange_calendar_name``, default
+  NYSE).
+- Null when either date is missing. Clamp to 0 if inverted. Never invent dates.
 
 ### 2. Console
 
@@ -45,15 +46,6 @@ Surface near scan-labeled as_of
 Scan-labeled identity/provenance scalars are complete. The remaining operator pain is
 **interpreting the unlabeled gap**. Lag is derived evidence from existing dates, not a new
 nested dig.
-
-## Resume (after series-complete gate)
-
-```powershell
-# Implement scan_labeled_freshness_lag_trading_days (ADR-0230); tests; commit+push; then Phase 230:
-# git archive HEAD → NAS; rebuild backend+frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-# Expect: OK Phase 230 scan_labeled_freshness_lag_trading_days=… (AAPL non-null when both as_of dates present)
-```
 
 ## Related documents
 

@@ -31,7 +31,11 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import TYPE_CHECKING, Protocol
 
-from aegis.domain.calendars import is_trading_day, most_recent_trading_day
+from aegis.domain.calendars import (
+    count_trading_days_strictly_between,
+    is_trading_day,
+    most_recent_trading_day,
+)
 
 if TYPE_CHECKING:
     from aegis.domain.research_assessment_backfill import AssessmentBackfillSummary
@@ -301,7 +305,7 @@ def compute_coverage_confidence(
     if latest_trading_date >= expected_latest:
         freshness_factor = 1.0
     else:
-        lag = _count_trading_days_strictly_between(
+        lag = count_trading_days_strictly_between(
             latest_trading_date, expected_latest, calendar_name
         )
         freshness_factor = max(
@@ -341,7 +345,7 @@ def coverage_factor_breakdown(
     if latest_trading_date >= expected_latest:
         freshness_factor = 1.0
     else:
-        lag = _count_trading_days_strictly_between(
+        lag = count_trading_days_strictly_between(
             latest_trading_date, expected_latest, calendar_name
         )
         freshness_factor = max(
@@ -882,7 +886,7 @@ def _assert_latest_not_stale(
     if bar.trading_date >= expected_latest:
         return
 
-    lag = _count_trading_days_strictly_between(
+    lag = count_trading_days_strictly_between(
         bar.trading_date, expected_latest, calendar_name
     )
     if lag > max_staleness_trading_days:
@@ -894,20 +898,6 @@ def _assert_latest_not_stale(
                 f"{expected_latest.isoformat()}"
             ),
         )
-
-
-def _count_trading_days_strictly_between(
-    start: date, end: date, calendar_name: str
-) -> int:
-    """Count trading days strictly after ``start`` and up to and including ``end``."""
-
-    count = 0
-    current = start
-    while current < end:
-        current += timedelta(days=1)
-        if is_trading_day(current, calendar_name):
-            count += 1
-    return count
 
 
 def _session_event_time(trading_date: date) -> datetime:

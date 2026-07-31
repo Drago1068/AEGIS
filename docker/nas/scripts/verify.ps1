@@ -147,7 +147,8 @@ function Write-VerifyChecklist {
     Write-Host "107. Authenticated evidence-summary includes Phase 223 most_recent_labeled_outcome_label_bar_source (Phase 224)"
     Write-Host "108. Authenticated evidence-summary includes Phase 225 most_recent_labeled_outcome_label_computed_at (Phase 226)"
     Write-Host "109. Authenticated evidence-summary includes Phase 227 most_recent_labeled_outcome_label_as_of_trading_date (Phase 228)"
-    Write-Host "110. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "110. Authenticated evidence-summary includes Phase 229 scan_labeled_freshness_lag_trading_days (Phase 230)"
+    Write-Host "111. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1120,6 +1121,13 @@ try {
         $scanLabelAsOf = $summary.most_recent_labeled_outcome_label_as_of_trading_date
         $scanLabelAsOfPart = if ($null -eq $scanLabelAsOf -or $scanLabelAsOf -eq "") { "null" } else { [string]$scanLabelAsOf }
         Write-Host "OK  Phase 228 most_recent_labeled_outcome_label_as_of_trading_date=$scanLabelAsOfPart"
+        # Phase 230: scan_labeled_freshness_lag_trading_days from Phase 229 (null OK when either as_of missing).
+        if (-not ($summary.PSObject.Properties.Name -contains "scan_labeled_freshness_lag_trading_days")) {
+            throw "evidence-summary missing scan_labeled_freshness_lag_trading_days (Phase 229/230)"
+        }
+        $scanLag = $summary.scan_labeled_freshness_lag_trading_days
+        $scanLagPart = if ($null -eq $scanLag -or $scanLag -eq "") { "null" } else { [string]$scanLag }
+        Write-Host "OK  Phase 230 scan_labeled_freshness_lag_trading_days=$scanLagPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1292,6 +1300,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_labeled_outcome_label_as_of_trading_date")) {
             throw "evidence-summary/export missing most_recent_labeled_outcome_label_as_of_trading_date (Phase 227/228)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "scan_labeled_freshness_lag_trading_days")) {
+            throw "evidence-summary/export missing scan_labeled_freshness_lag_trading_days (Phase 229/230)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

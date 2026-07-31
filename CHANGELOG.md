@@ -12,11 +12,22 @@ delivery workflow).
 Ops evidence gate after Phase 229 scan-labeled freshness lag diagnostic. See
 [docs/architecture/decisions/0231-phase-230-nas-live-verify-phase-229.md](docs/architecture/decisions/0231-phase-230-nas-live-verify-phase-229.md).
 
-### Phase 229 - Evidence Summary Scan-Labeled Freshness Lag (draft)
+### Phase 229 - Evidence Summary Scan-Labeled Freshness Lag
 
-Derived evidence diagnostic: trading-day lag between latest assessment as_of and most recent
-labeled outcome_label as_of. See
+Derived evidence diagnostic: NYSE trading-day lag between latest assessment as_of and most
+recent labeled outcome_label as_of. See
 [docs/architecture/decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md](docs/architecture/decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md).
+
+#### Added
+
+- ``scan_labeled_freshness_lag_trading_days`` on evidence summary (+ export); null when either
+  as_of missing; exchange trading-day count via ``count_trading_days_strictly_between``.
+- Console surfaces the field with ``data-testid="evidence-scan-labeled-freshness-lag-trading-days"``.
+- NAS verify checklist item 110 for Phase 230.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts, redundant nested field lifts.
 
 ### Phase 228 - NAS Live Verification of Phase 227
 

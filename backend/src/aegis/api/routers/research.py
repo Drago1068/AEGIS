@@ -32,6 +32,7 @@ from aegis.api.schemas.research_outcome_labels import (
     OutcomeLabelResponse,
 )
 from aegis.api.schemas.research_probability_calibration import ProbabilityCalibrationResponse
+from aegis.domain.calendars import count_trading_days_strictly_between
 from aegis.domain.research_assessment import (
     ASSESSMENT_FILTER_SCAN_LIMIT,
     ResearchAssessmentService,
@@ -379,6 +380,7 @@ async def _build_research_evidence_summary(
     outcome_label_service: OutcomeLabelService,
     calibration_service: ResearchProbabilityCalibrationService,
     calibration_repository: ResearchProbabilityCalibrationRepository,
+    calendar_name: str,
 ) -> ResearchEvidenceSummaryResponse:
     """Compose the Phase 22 research-only evidence aggregate (null/zero missing fields)."""
 
@@ -606,6 +608,20 @@ async def _build_research_evidence_summary(
         else None
     )
 
+    scan_labeled_freshness_lag_trading_days: int | None = None
+    if (
+        latest_as_of_trading_date is not None
+        and most_recent_labeled_outcome_label_as_of_trading_date is not None
+    ):
+        if latest_as_of_trading_date <= most_recent_labeled_outcome_label_as_of_trading_date:
+            scan_labeled_freshness_lag_trading_days = 0
+        else:
+            scan_labeled_freshness_lag_trading_days = count_trading_days_strictly_between(
+                most_recent_labeled_outcome_label_as_of_trading_date,
+                latest_as_of_trading_date,
+                calendar_name,
+            )
+
     return ResearchEvidenceSummaryResponse(
         symbol=symbol.upper(),
         state="research_only",
@@ -634,6 +650,7 @@ async def _build_research_evidence_summary(
         most_recent_labeled_outcome_label_bar_source=most_recent_labeled_outcome_label_bar_source,
         most_recent_labeled_outcome_label_computed_at=most_recent_labeled_outcome_label_computed_at,
         most_recent_labeled_outcome_label_as_of_trading_date=most_recent_labeled_outcome_label_as_of_trading_date,
+        scan_labeled_freshness_lag_trading_days=scan_labeled_freshness_lag_trading_days,
         latest_coverage_confidence=latest_coverage_confidence,
         latest_research_index=latest_research_index,
         latest_as_of_trading_date=latest_as_of_trading_date,
@@ -679,6 +696,7 @@ async def _build_research_evidence_summary(
     response_model=ResearchEvidenceSummaryResponse,
 )
 async def get_research_evidence_summary(
+    request: Request,
     symbol: str,
     assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
     outcome_label_service: OutcomeLabelService = Depends(get_outcome_label_service),
@@ -697,11 +715,13 @@ async def get_research_evidence_summary(
         outcome_label_service=outcome_label_service,
         calibration_service=calibration_service,
         calibration_repository=calibration_repository,
+        calendar_name=request.app.state.settings.exchange_calendar_name,
     )
 
 
 @router.get("/{symbol}/evidence-summary/export")
 async def export_research_evidence_summary(
+    request: Request,
     symbol: str,
     assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
     outcome_label_service: OutcomeLabelService = Depends(get_outcome_label_service),
@@ -720,6 +740,7 @@ async def export_research_evidence_summary(
         outcome_label_service=outcome_label_service,
         calibration_service=calibration_service,
         calibration_repository=calibration_repository,
+        calendar_name=request.app.state.settings.exchange_calendar_name,
     )
     filename = f"aegis-{summary.symbol}-evidence-summary.json"
     return JSONResponse(

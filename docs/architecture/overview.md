@@ -571,10 +571,10 @@ the planned scan-labeled scalar provenance series (see
 [decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md](decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md)).
 Phase 228 live-verified that revision and closed the series milestone (see
 [decisions/0229-phase-228-nas-live-verify-phase-227.md](decisions/0229-phase-228-nas-live-verify-phase-227.md)).
-Phase 229 (draft) proposes a scan-labeled freshness lag diagnostic rather than more nested extracts
-(see
+Phase 229 surfaces ``scan_labeled_freshness_lag_trading_days`` as an exchange trading-day
+freshness diagnostic between latest assessment as_of and scan-labeled outcome_label as_of (see
 [decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md](decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md)).
-Phase 230 (draft) would live-verify that diagnostic (see
+Phase 230 (draft) live-verifies that diagnostic (see
 [decisions/0231-phase-230-nas-live-verify-phase-229.md](decisions/0231-phase-230-nas-live-verify-phase-229.md)).
 
 ## System context

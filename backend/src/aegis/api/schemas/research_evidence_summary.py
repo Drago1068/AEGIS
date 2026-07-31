@@ -167,6 +167,15 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "assessment latest_as_of_trading_date. Never invented."
         ),
     )
+    scan_labeled_freshness_lag_trading_days: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Exchange trading-day lag from most_recent_labeled_outcome_label_as_of_trading_date "
+            "to latest_as_of_trading_date (strictly after labeled through latest inclusive). "
+            "Null when either date is missing. Clamped to 0 if inverted. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

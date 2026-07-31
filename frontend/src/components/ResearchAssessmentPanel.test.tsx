@@ -159,6 +159,7 @@ describe("ResearchAssessmentPanel", () => {
     render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
 
     expect(screen.getByText(/state: research only/i)).toBeInTheDocument();
+    expect(screen.getByTestId("latest-assessment-section")).toBeInTheDocument();
     expect(screen.getByText("0.9500")).toBeInTheDocument();
     expect(screen.getByText(/null \(not calibrated\)/i)).toBeInTheDocument();
     expect(screen.getByText("0.46")).toBeInTheDocument();

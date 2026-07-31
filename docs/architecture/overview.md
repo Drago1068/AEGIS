@@ -80,8 +80,9 @@ verify of Phase 125), Phase 127 (extract outcome-label history section), Phase 1
 (NAS live verify of Phase 127), Phase 129 (extract assessment history section), Phase 130
 (NAS live verify of Phase 129), Phase 131 (extract calibration readiness section), Phase 132
 (NAS live verify of Phase 131), Phase 133 (extract probability calibration section), Phase 134
-(NAS live verify of Phase 133), Phase 135 (extract evidence summary section), and Phase 136
-(NAS live verify of Phase 135).
+(NAS live verify of Phase 133), Phase 135 (extract evidence summary section), Phase 136
+(NAS live verify of Phase 135), Phase 137 (extract latest assessment detail section), and
+Phase 138 (NAS live verify of Phase 137).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -369,6 +370,10 @@ Phase 135 extracts the evidence-summary panel section (see
 [decisions/0136-phase-135-extract-evidence-summary-section.md](decisions/0136-phase-135-extract-evidence-summary-section.md)).
 Phase 136 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0137-phase-136-nas-live-verify-phase-135.md](decisions/0137-phase-136-nas-live-verify-phase-135.md)).
+Phase 137 extracts the latest-assessment detail panel section (see
+[decisions/0138-phase-137-extract-latest-assessment-section.md](decisions/0138-phase-137-extract-latest-assessment-section.md)).
+Phase 138 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0139-phase-138-nas-live-verify-phase-137.md](decisions/0139-phase-138-nas-live-verify-phase-137.md)).
 
 ## System context
 

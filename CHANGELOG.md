@@ -7,10 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 138 - NAS Live Verification of Phase 137
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 137 latest-assessment section
+extract. See
+[docs/architecture/decisions/0139-phase-138-nas-live-verify-phase-137.md](docs/architecture/decisions/0139-phase-138-nas-live-verify-phase-137.md).
+
+#### Added
+
+- ADR-0139: live verify requires frontend recreate for Phase 137; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 137 - Extract Latest Assessment Detail Panel Section
+
+Move latest-assessment detail UI into a presentational section component (no behavior
+change). See
+[docs/architecture/decisions/0138-phase-137-extract-latest-assessment-section.md](docs/architecture/decisions/0138-phase-137-extract-latest-assessment-section.md).
+
+#### Added
+
+- ``ResearchLatestAssessmentSection.tsx`` with ``data-testid="latest-assessment-section"``.
+
+#### Explicitly out of scope
+
+New assessment math, orders.
+
 ### Phase 136 - NAS Live Verification of Phase 135
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 135 evidence-summary section
-extract. See
+extract. Live verify passed 2026-07-30 (``876c866``). See
 [docs/architecture/decisions/0137-phase-136-nas-live-verify-phase-135.md](docs/architecture/decisions/0137-phase-136-nas-live-verify-phase-135.md).
 
 #### Added

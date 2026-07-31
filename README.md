@@ -7,9 +7,9 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 136 draft (NAS live verify of Phase 135).** Next: redeploy frontend under
-lab TLS after Phase 135 evidence-summary section extract. Phase 134 live verify closed. See
-[docs/architecture/decisions/0137-phase-136-nas-live-verify-phase-135.md](docs/architecture/decisions/0137-phase-136-nas-live-verify-phase-135.md)
+**Current phase: Phase 138 draft (NAS live verify of Phase 137).** Next: redeploy frontend under
+lab TLS after Phase 137 latest-assessment section extract. Phase 136 live verify closed. See
+[docs/architecture/decisions/0139-phase-138-nas-live-verify-phase-137.md](docs/architecture/decisions/0139-phase-138-nas-live-verify-phase-137.md)
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

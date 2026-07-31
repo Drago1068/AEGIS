@@ -146,6 +146,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_bar_count: null,
       latest_input_source: null,
       latest_method_id: null,
+      latest_method_version: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
   });
@@ -499,6 +500,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_bar_count: 20,
       latest_input_source: "alpha_vantage",
       latest_method_id: "daily_bar_research_v1",
+      latest_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
 
@@ -542,6 +544,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("evidence-latest-method-id")).toHaveTextContent(
         "daily_bar_research_v1",
       );
+      expect(screen.getByTestId("evidence-latest-method-version")).toHaveTextContent("1");
       expect(screen.getByText(/mixed unlabeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed labeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/of 1 mixed/i)).toBeInTheDocument();
@@ -667,6 +670,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_bar_count: 20,
       latest_input_source: "alpha_vantage",
       latest_method_id: "daily_bar_research_v1",
+      latest_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([
@@ -776,6 +780,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_bar_count: 20,
       latest_input_source: "alpha_vantage",
       latest_method_id: "daily_bar_research_v1",
+      latest_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -883,6 +888,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_bar_count: 20,
       latest_input_source: "alpha_vantage",
       latest_method_id: "daily_bar_research_v1",
+      latest_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1080,6 +1086,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_bar_count: 20,
       latest_input_source: "alpha_vantage",
       latest_method_id: "daily_bar_research_v1",
+      latest_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listResearchAssessments).mockResolvedValue([mixedRow]);
@@ -1237,6 +1244,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_bar_count: 20,
       latest_input_source: "alpha_vantage",
       latest_method_id: "daily_bar_research_v1",
+      latest_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1390,6 +1398,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_bar_count: 20,
       latest_input_source: "alpha_vantage",
       latest_method_id: "daily_bar_research_v1",
+      latest_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([

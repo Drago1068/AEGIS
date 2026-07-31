@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 159 latest method version field. See
 [docs/architecture/decisions/0161-phase-160-nas-live-verify-phase-159.md](docs/architecture/decisions/0161-phase-160-nas-live-verify-phase-159.md).
 
-### Phase 159 - Evidence Summary Latest Method Version (draft)
+### Phase 159 - Evidence Summary Latest Method Version
 
 Surface top-level ``latest_method_version`` on evidence summary. See
 [docs/architecture/decisions/0160-phase-159-evidence-summary-latest-method-version.md](docs/architecture/decisions/0160-phase-159-evidence-summary-latest-method-version.md).
+
+#### Added
+
+- ``latest_method_version`` on evidence summary (+ export); copied from latest assessment.
+- Console surfaces the field with ``data-testid="evidence-latest-method-version"``.
+- NAS verify checklist item 75 for Phase 160.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 158 - NAS Live Verification of Phase 157
 

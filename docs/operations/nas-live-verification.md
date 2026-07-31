@@ -159,7 +159,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 72 | Phase 154 backend+frontend redeploy (Phase 153 latest bar count) | Evidence-summary includes latest_bar_count (null OK) |
 | 73 | Phase 156 backend+frontend redeploy (Phase 155 latest input source) | Evidence-summary includes latest_input_source (null OK) |
 | 74 | Phase 158 backend+frontend redeploy (Phase 157 latest method id) | Evidence-summary includes latest_method_id (null OK) |
-| 75 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 75 | Phase 160 backend+frontend redeploy (Phase 159 latest method version) | Evidence-summary includes latest_method_version (null OK) |
+| 76 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

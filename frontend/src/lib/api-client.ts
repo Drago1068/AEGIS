@@ -981,6 +981,8 @@ export interface ResearchEvidenceSummary {
   latest_input_source: string | null;
   /** method_id from latest assessment; null when none. */
   latest_method_id: string | null;
+  /** method_version from latest assessment; null when none. */
+  latest_method_version: number | null;
   detail: string;
 }
 

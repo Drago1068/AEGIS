@@ -1,6 +1,6 @@
 # ADR-0160: Phase 159 Evidence Summary Latest Method Version
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

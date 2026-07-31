@@ -146,4 +146,11 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "method_id from the latest assessment. Null when no assessment. Never invented."
         ),
     )
+    latest_method_version: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "method_version from the latest assessment. Null when no assessment. Never invented."
+        ),
+    )
     detail: str

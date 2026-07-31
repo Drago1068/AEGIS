@@ -476,6 +476,9 @@ async def _build_research_evidence_summary(
         latest_assessment.input_source if latest_assessment is not None else None
     )
     latest_method_id = latest_assessment.method_id if latest_assessment is not None else None
+    latest_method_version = (
+        latest_assessment.method_version if latest_assessment is not None else None
+    )
 
     return ResearchEvidenceSummaryResponse(
         symbol=symbol.upper(),
@@ -503,6 +506,7 @@ async def _build_research_evidence_summary(
         latest_bar_count=latest_bar_count,
         latest_input_source=latest_input_source,
         latest_method_id=latest_method_id,
+        latest_method_version=latest_method_version,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

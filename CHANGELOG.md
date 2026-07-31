@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 196 - NAS Live Verification of Phase 195 (draft)
+### Phase 198 - NAS Live Verification of Phase 197 (draft)
 
-Ops evidence gate after Phase 195 latest calibration probability confidence field. See
+Ops evidence gate after Phase 197 latest calibration assessment snapshot id field. See
+[docs/architecture/decisions/0199-phase-198-nas-live-verify-phase-197.md](docs/architecture/decisions/0199-phase-198-nas-live-verify-phase-197.md).
+
+### Phase 197 - Evidence Summary Latest Calibration Assessment Snapshot Id
+
+Surface top-level ``latest_calibration_assessment_snapshot_id`` on evidence summary. See
+[docs/architecture/decisions/0198-phase-197-evidence-summary-latest-calibration-assessment-snapshot-id.md](docs/architecture/decisions/0198-phase-197-evidence-summary-latest-calibration-assessment-snapshot-id.md).
+
+#### Added
+
+- ``latest_calibration_assessment_snapshot_id`` on evidence summary (+ export); from latest_calibration.
+- Console surfaces the field with ``data-testid="evidence-latest-calibration-assessment-snapshot-id"``.
+- NAS verify checklist item 94 for Phase 198.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 196 - NAS Live Verification of Phase 195
+
+Ops evidence gate after Phase 195 latest calibration probability confidence field. Live verify
+passed 2026-07-31 (``3e8bf3c``; AAPL probability_confidence=0.75; state=research_only). See
 [docs/architecture/decisions/0197-phase-196-nas-live-verify-phase-195.md](docs/architecture/decisions/0197-phase-196-nas-live-verify-phase-195.md).
+
+#### Added
+
+- ADR-0197: live verify requires backend+frontend recreate for Phase 195; checklist item 93.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 195 - Evidence Summary Latest Calibration Probability Confidence
 

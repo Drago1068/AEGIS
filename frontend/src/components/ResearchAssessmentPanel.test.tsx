@@ -165,6 +165,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_schema_version: null,
       latest_calibration_state: null,
       latest_calibration_probability_confidence: null,
+      latest_calibration_assessment_snapshot_id: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
   });
@@ -537,6 +538,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_schema_version: 1,
       latest_calibration_state: "research_only",
       latest_calibration_probability_confidence: 0.62,
+      latest_calibration_assessment_snapshot_id: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
 
@@ -627,6 +629,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-latest-calibration-probability-confidence"),
       ).toHaveTextContent("0.6200");
+      expect(
+        screen.getByTestId("evidence-latest-calibration-assessment-snapshot-id"),
+      ).toHaveTextContent("1");
       expect(screen.getByText(/mixed unlabeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed labeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/of 1 mixed/i)).toBeInTheDocument();
@@ -771,6 +776,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_schema_version: 1,
       latest_calibration_state: "research_only",
       latest_calibration_probability_confidence: 0.62,
+      latest_calibration_assessment_snapshot_id: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([
@@ -899,6 +905,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_schema_version: 1,
       latest_calibration_state: "research_only",
       latest_calibration_probability_confidence: 0.62,
+      latest_calibration_assessment_snapshot_id: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1025,6 +1032,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_schema_version: 1,
       latest_calibration_state: "research_only",
       latest_calibration_probability_confidence: 0.62,
+      latest_calibration_assessment_snapshot_id: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1241,6 +1249,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_schema_version: 1,
       latest_calibration_state: "research_only",
       latest_calibration_probability_confidence: 0.62,
+      latest_calibration_assessment_snapshot_id: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listResearchAssessments).mockResolvedValue([mixedRow]);
@@ -1417,6 +1426,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_schema_version: 1,
       latest_calibration_state: "research_only",
       latest_calibration_probability_confidence: 0.62,
+      latest_calibration_assessment_snapshot_id: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1589,6 +1599,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_schema_version: 1,
       latest_calibration_state: "research_only",
       latest_calibration_probability_confidence: 0.62,
+      latest_calibration_assessment_snapshot_id: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([

@@ -498,8 +498,12 @@ Phase 194 live-verified that revision (see
 [decisions/0195-phase-194-nas-live-verify-phase-193.md](decisions/0195-phase-194-nas-live-verify-phase-193.md)).
 Phase 195 surfaces top-level ``latest_calibration_probability_confidence`` on evidence summary (see
 [decisions/0196-phase-195-evidence-summary-latest-calibration-probability-confidence.md](decisions/0196-phase-195-evidence-summary-latest-calibration-probability-confidence.md)).
-Phase 196 (draft) live-verifies that revision (see
+Phase 196 live-verified that revision (see
 [decisions/0197-phase-196-nas-live-verify-phase-195.md](decisions/0197-phase-196-nas-live-verify-phase-195.md)).
+Phase 197 surfaces top-level ``latest_calibration_assessment_snapshot_id`` on evidence summary (see
+[decisions/0198-phase-197-evidence-summary-latest-calibration-assessment-snapshot-id.md](decisions/0198-phase-197-evidence-summary-latest-calibration-assessment-snapshot-id.md)).
+Phase 198 (draft) live-verifies that revision (see
+[decisions/0199-phase-198-nas-live-verify-phase-197.md](decisions/0199-phase-198-nas-live-verify-phase-197.md)).
 
 ## System context
 

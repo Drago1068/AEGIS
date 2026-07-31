@@ -1025,6 +1025,8 @@ export interface ResearchEvidenceSummary {
   latest_calibration_state: string | null;
   /** probability_confidence from latest_calibration when present; null otherwise. Distinct from assessment latest_probability_confidence. */
   latest_calibration_probability_confidence: number | null;
+  /** assessment_snapshot_id from latest_calibration when present; null otherwise. May differ from latest_assessment_id. */
+  latest_calibration_assessment_snapshot_id: number | null;
   detail: string;
 }
 

@@ -290,4 +290,13 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Distinct from assessment latest_probability_confidence. Never invented."
         ),
     )
+    latest_calibration_assessment_snapshot_id: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "assessment_snapshot_id from latest_calibration when present. Null when none. "
+            "May differ from latest_assessment_id when newest assessment has no calibration. "
+            "Never invented."
+        ),
+    )
     detail: str

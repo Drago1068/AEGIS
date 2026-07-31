@@ -368,6 +368,17 @@ export function ResearchEvidenceSummarySection({
             </span>
           </dd>
         </div>
+        <div>
+          <dt className="text-aegis-muted">Latest calibration assessment_snapshot_id</dt>
+          <dd
+            className="font-mono"
+            data-testid="evidence-latest-calibration-assessment-snapshot-id"
+          >
+            {evidenceSummary.latest_calibration_assessment_snapshot_id == null
+              ? "null"
+              : evidenceSummary.latest_calibration_assessment_snapshot_id}
+          </dd>
+        </div>
         {evidenceSummary.latest_outcome_label == null ? (
           <div>
             <dt className="text-aegis-muted">Latest outcome labels</dt>

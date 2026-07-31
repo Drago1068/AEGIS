@@ -1,6 +1,6 @@
 # ADR-0197: Phase 196 NAS Live Verification of Phase 195
 
-- Status: Proposed (pending Phase 195 + live evidence)
+- Status: Accepted (live verified 2026-07-31; backend+frontend recreate of ``3e8bf3c``)
 - Date: 2026-07-31
 
 ## Context
@@ -16,12 +16,14 @@ that lands.
 1. Deploy current ``HEAD`` with TLS overlay; recreate **backend** and **frontend**.
 2. Run `verify.ps1` / `verify.sh` successfully (prior gates remain).
 3. Authenticated evidence-summary includes ``latest_calibration_probability_confidence``
-   (null OK; checklist item 93 after Phase 195 lands).
+   (null OK; checklist item 93).
 4. SSH `alembic current` includes **`0009`** or `head`.
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-31 for ``3e8bf3c``
+(checklist item 93; AAPL ``latest_calibration_probability_confidence=0.75``;
+``latest_calibration_state=research_only``).
 
 ### 3. Out of scope
 
@@ -30,7 +32,7 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 195 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# Deploy HEAD backend+frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
 ```
 

@@ -131,7 +131,8 @@ function Write-VerifyChecklist {
     Write-Host " 91. Authenticated evidence-summary includes Phase 191 latest_calibration_schema_version (Phase 192)"
     Write-Host " 92. Authenticated evidence-summary includes Phase 193 latest_calibration_state (Phase 194)"
     Write-Host " 93. Authenticated evidence-summary includes Phase 195 latest_calibration_probability_confidence (Phase 196)"
-    Write-Host " 94. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 94. Authenticated evidence-summary includes Phase 197 latest_calibration_assessment_snapshot_id (Phase 198)"
+    Write-Host " 95. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -989,6 +990,16 @@ try {
         }
         $calProbPart = if ($null -eq $calProbConf) { "null" } else { [string]$calProbConf }
         Write-Host "OK  Phase 196 latest_calibration_probability_confidence=$calProbPart"
+        # Phase 198: latest_calibration_assessment_snapshot_id from Phase 197 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_calibration_assessment_snapshot_id")) {
+            throw "evidence-summary missing latest_calibration_assessment_snapshot_id (Phase 197/198)"
+        }
+        $calSnapId = $summary.latest_calibration_assessment_snapshot_id
+        if ($null -ne $calSnapId -and [int]$calSnapId -lt 1) {
+            throw "Phase 198: latest_calibration_assessment_snapshot_id must be >= 1 when set"
+        }
+        $calSnapPart = if ($null -eq $calSnapId) { "null" } else { [string]$calSnapId }
+        Write-Host "OK  Phase 198 latest_calibration_assessment_snapshot_id=$calSnapPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1113,6 +1124,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_probability_confidence")) {
             throw "evidence-summary/export missing latest_calibration_probability_confidence (Phase 195/196)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_assessment_snapshot_id")) {
+            throw "evidence-summary/export missing latest_calibration_assessment_snapshot_id (Phase 197/198)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

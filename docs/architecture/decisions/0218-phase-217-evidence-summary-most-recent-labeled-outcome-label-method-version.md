@@ -33,3 +33,4 @@ New scoring math, default-on calibration, orders, ACME, UI structural extracts.
 
 - [0216-phase-215-evidence-summary-most-recent-labeled-outcome-label-method-id.md](0216-phase-215-evidence-summary-most-recent-labeled-outcome-label-method-id.md)
 - [0219-phase-218-nas-live-verify-phase-217.md](0219-phase-218-nas-live-verify-phase-217.md)
+- [0220-phase-219-evidence-summary-most-recent-labeled-outcome-label-schema-version.md](0220-phase-219-evidence-summary-most-recent-labeled-outcome-label-schema-version.md)

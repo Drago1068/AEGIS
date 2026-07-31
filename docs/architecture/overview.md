@@ -294,6 +294,10 @@ Phase 105 adds one-click load of outcome labels for latest when the panel differ
 [decisions/0106-phase-105-load-labels-for-latest.md](decisions/0106-phase-105-load-labels-for-latest.md)).
 Phase 106 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0107-phase-106-nas-live-verify-phase-105.md](decisions/0107-phase-106-nas-live-verify-phase-105.md)).
+Phase 107 renames the shared active outcome-label assessment id helper (see
+[decisions/0108-phase-107-rename-active-outcome-label-assessment-id.md](decisions/0108-phase-107-rename-active-outcome-label-assessment-id.md)).
+Phase 108 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0109-phase-108-nas-live-verify-phase-107.md](decisions/0109-phase-108-nas-live-verify-phase-107.md)).
 
 ## System context
 

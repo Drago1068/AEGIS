@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 198 - NAS Live Verification of Phase 197 (draft)
+### Phase 200 - NAS Live Verification of Phase 199 (draft)
 
-Ops evidence gate after Phase 197 latest calibration assessment snapshot id field. See
+Ops evidence gate after Phase 199 latest outcome label computed_at field. See
+[docs/architecture/decisions/0201-phase-200-nas-live-verify-phase-199.md](docs/architecture/decisions/0201-phase-200-nas-live-verify-phase-199.md).
+
+### Phase 199 - Evidence Summary Latest Outcome Label Computed At (draft)
+
+Surface top-level ``latest_outcome_label_computed_at`` on evidence summary. See
+[docs/architecture/decisions/0200-phase-199-evidence-summary-latest-outcome-label-computed-at.md](docs/architecture/decisions/0200-phase-199-evidence-summary-latest-outcome-label-computed-at.md).
+
+### Phase 198 - NAS Live Verification of Phase 197
+
+Ops evidence gate after Phase 197 latest calibration assessment snapshot id field. Live verify
+passed 2026-07-31 (``77b8901``; AAPL assessment_snapshot_id=126; probability_confidence=0.75).
+See
 [docs/architecture/decisions/0199-phase-198-nas-live-verify-phase-197.md](docs/architecture/decisions/0199-phase-198-nas-live-verify-phase-197.md).
+
+#### Added
+
+- ADR-0199: live verify requires backend+frontend recreate for Phase 197; checklist item 94.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 197 - Evidence Summary Latest Calibration Assessment Snapshot Id
 

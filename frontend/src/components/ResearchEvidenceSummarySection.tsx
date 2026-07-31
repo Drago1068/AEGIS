@@ -176,6 +176,14 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Latest research_index</dt>
+          <dd className="font-mono" data-testid="evidence-latest-research-index">
+            {evidenceSummary.latest_research_index == null
+              ? "null"
+              : evidenceSummary.latest_research_index.toFixed(4)}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest coverage_confidence</dt>
           <dd className="font-mono" data-testid="evidence-latest-coverage-confidence">
             {evidenceSummary.latest_coverage_confidence == null

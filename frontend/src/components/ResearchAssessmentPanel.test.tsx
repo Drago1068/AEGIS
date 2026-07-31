@@ -141,6 +141,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_assessment_id: null,
       most_recent_labeled_outcome_label: null,
       latest_coverage_confidence: null,
+      latest_research_index: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
   });
@@ -489,6 +490,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "alpha_vantage",
       },
       latest_coverage_confidence: 0.95,
+      latest_research_index: 0.46,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
 
@@ -523,6 +525,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("evidence-labeled-assessment-count")).toHaveTextContent("1");
       expect(screen.getByTestId("evidence-unlabeled-assessment-count")).toHaveTextContent("1");
       expect(screen.getByTestId("evidence-latest-coverage-confidence")).toHaveTextContent("0.9500");
+      expect(screen.getByTestId("evidence-latest-research-index")).toHaveTextContent("0.4600");
       expect(screen.getByText(/mixed unlabeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed labeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/of 1 mixed/i)).toBeInTheDocument();
@@ -643,6 +646,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       latest_coverage_confidence: 0.95,
+      latest_research_index: 0.46,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([
@@ -747,6 +751,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       latest_coverage_confidence: 0.95,
+      latest_research_index: 0.46,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -849,6 +854,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       latest_coverage_confidence: 0.95,
+      latest_research_index: 0.46,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1041,6 +1047,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       latest_coverage_confidence: 0.95,
+      latest_research_index: 0.46,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listResearchAssessments).mockResolvedValue([mixedRow]);
@@ -1193,6 +1200,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       latest_coverage_confidence: 0.95,
+      latest_research_index: 0.46,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1341,6 +1349,7 @@ describe("ResearchAssessmentPanel", () => {
         bar_source: "polygon",
       },
       latest_coverage_confidence: 0.95,
+      latest_research_index: 0.46,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([

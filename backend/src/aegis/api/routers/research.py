@@ -461,6 +461,13 @@ async def _build_research_evidence_summary(
     latest_coverage_confidence = (
         latest_assessment.coverage_confidence if latest_assessment is not None else None
     )
+    latest_research_index: float | None = None
+    if latest_assessment is not None:
+        raw_index = latest_assessment.components.get("research_index")
+        if isinstance(raw_index, bool):
+            latest_research_index = None
+        elif isinstance(raw_index, (int, float)):
+            latest_research_index = float(raw_index)
 
     return ResearchEvidenceSummaryResponse(
         symbol=symbol.upper(),
@@ -483,6 +490,7 @@ async def _build_research_evidence_summary(
         most_recent_labeled_assessment_id=most_recent_labeled_assessment_id,
         most_recent_labeled_outcome_label=most_recent_labeled_outcome_label,
         latest_coverage_confidence=latest_coverage_confidence,
+        latest_research_index=latest_research_index,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

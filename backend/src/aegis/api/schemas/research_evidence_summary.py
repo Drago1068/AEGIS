@@ -109,4 +109,11 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Distinct from probability_confidence; never invented."
         ),
     )
+    latest_research_index: float | None = Field(
+        default=None,
+        description=(
+            "research_index from latest assessment components when present and numeric. "
+            "Null when no assessment or the component is missing/non-numeric. Never invented."
+        ),
+    )
     detail: str

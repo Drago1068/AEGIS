@@ -968,6 +968,8 @@ export interface ResearchEvidenceSummary {
   most_recent_labeled_outcome_label: OutcomeLabel | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
+  /** research_index from latest assessment components when numeric; null otherwise. */
+  latest_research_index: number | null;
   detail: string;
 }
 

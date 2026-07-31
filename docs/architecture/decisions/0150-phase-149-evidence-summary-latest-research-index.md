@@ -1,6 +1,6 @@
 # ADR-0150: Phase 149 Evidence Summary Latest Research Index
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -15,12 +15,13 @@ detail section) for the research index that drives calibration bucketing. A top-
 ### 1. API
 
 Add ``latest_research_index: float | null`` to ``ResearchEvidenceSummaryResponse`` (+ export).
-Source from the latest assessment ``components.research_index`` when present; otherwise
-null. Never invent.
+Source from the latest assessment ``components.research_index`` when present and numeric;
+otherwise null. Never invent.
 
 ### 2. Console
 
-Show the field on ``ResearchEvidenceSummarySection`` near coverage/probability rows.
+Show the field on ``ResearchEvidenceSummarySection`` near coverage/probability rows
+(``data-testid="evidence-latest-research-index"``).
 
 ### 3. Out of scope
 

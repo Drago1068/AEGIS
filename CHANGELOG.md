@@ -7,15 +7,32 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 150 - NAS Live Verification of Phase 149 (draft)
+### Phase 150 - NAS Live Verification of Phase 149
 
 Ops evidence gate after Phase 149 latest research index field. See
 [docs/architecture/decisions/0151-phase-150-nas-live-verify-phase-149.md](docs/architecture/decisions/0151-phase-150-nas-live-verify-phase-149.md).
 
-### Phase 149 - Evidence Summary Latest Research Index (draft)
+#### Added
+
+- ADR-0151: live verify requires backend+frontend recreate for Phase 149; checklist item 70.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 149 - Evidence Summary Latest Research Index
 
 Surface top-level ``latest_research_index`` on evidence summary. See
 [docs/architecture/decisions/0150-phase-149-evidence-summary-latest-research-index.md](docs/architecture/decisions/0150-phase-149-evidence-summary-latest-research-index.md).
+
+#### Added
+
+- ``latest_research_index`` on evidence summary (+ export); numeric ``components.research_index`` only.
+- Console surfaces the field with ``data-testid="evidence-latest-research-index"``.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 148 - NAS Live Verification of Phase 147
 

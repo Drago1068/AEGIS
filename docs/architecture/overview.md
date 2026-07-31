@@ -550,12 +550,16 @@ Phase 218 live-verified that revision (see
 Phase 219 surfaces top-level ``most_recent_labeled_outcome_label_schema_version`` for scan-labeled
 schema version (see
 [decisions/0220-phase-219-evidence-summary-most-recent-labeled-outcome-label-schema-version.md](decisions/0220-phase-219-evidence-summary-most-recent-labeled-outcome-label-schema-version.md)).
-Phase 220 (draft) live-verifies that revision (see
+Phase 220 live-verified that revision (see
 [decisions/0221-phase-220-nas-live-verify-phase-219.md](decisions/0221-phase-220-nas-live-verify-phase-219.md)).
-Phase 221 (draft) surfaces top-level ``most_recent_labeled_outcome_label_state`` (see
+Phase 221 surfaces top-level ``most_recent_labeled_outcome_label_state`` for scan-labeled state (see
 [decisions/0222-phase-221-evidence-summary-most-recent-labeled-outcome-label-state.md](decisions/0222-phase-221-evidence-summary-most-recent-labeled-outcome-label-state.md)).
 Phase 222 (draft) live-verifies that revision (see
 [decisions/0223-phase-222-nas-live-verify-phase-221.md](decisions/0223-phase-222-nas-live-verify-phase-221.md)).
+Phase 223 (draft) surfaces top-level ``most_recent_labeled_outcome_label_bar_source`` (see
+[decisions/0224-phase-223-evidence-summary-most-recent-labeled-outcome-label-bar-source.md](decisions/0224-phase-223-evidence-summary-most-recent-labeled-outcome-label-bar-source.md)).
+Phase 224 (draft) live-verifies that revision (see
+[decisions/0225-phase-224-nas-live-verify-phase-223.md](decisions/0225-phase-224-nas-live-verify-phase-223.md)).
 
 ## System context
 

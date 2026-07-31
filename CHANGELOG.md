@@ -7,21 +7,52 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 224 - NAS Live Verification of Phase 223 (draft)
+
+Ops evidence gate after Phase 223 most recent labeled outcome label bar source field. See
+[docs/architecture/decisions/0225-phase-224-nas-live-verify-phase-223.md](docs/architecture/decisions/0225-phase-224-nas-live-verify-phase-223.md).
+
+### Phase 223 - Evidence Summary Most Recent Labeled Outcome Label Bar Source (draft)
+
+Surface top-level ``most_recent_labeled_outcome_label_bar_source`` on evidence summary for
+scan-labeled provenance. See
+[docs/architecture/decisions/0224-phase-223-evidence-summary-most-recent-labeled-outcome-label-bar-source.md](docs/architecture/decisions/0224-phase-223-evidence-summary-most-recent-labeled-outcome-label-bar-source.md).
+
 ### Phase 222 - NAS Live Verification of Phase 221 (draft)
 
 Ops evidence gate after Phase 221 most recent labeled outcome label state field. See
 [docs/architecture/decisions/0223-phase-222-nas-live-verify-phase-221.md](docs/architecture/decisions/0223-phase-222-nas-live-verify-phase-221.md).
 
-### Phase 221 - Evidence Summary Most Recent Labeled Outcome Label State (draft)
+### Phase 221 - Evidence Summary Most Recent Labeled Outcome Label State
 
 Surface top-level ``most_recent_labeled_outcome_label_state`` on evidence summary for
 scan-labeled provenance. See
 [docs/architecture/decisions/0222-phase-221-evidence-summary-most-recent-labeled-outcome-label-state.md](docs/architecture/decisions/0222-phase-221-evidence-summary-most-recent-labeled-outcome-label-state.md).
 
-### Phase 220 - NAS Live Verification of Phase 219 (draft)
+#### Added
 
-Ops evidence gate after Phase 219 most recent labeled outcome label schema version field. See
+- ``most_recent_labeled_outcome_label_state`` on evidence summary (+ export); from scan-labeled label.
+- Console surfaces the field with ``data-testid="evidence-most-recent-labeled-outcome-label-state"``.
+- NAS verify checklist item 106 for Phase 222.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 220 - NAS Live Verification of Phase 219
+
+Ops evidence gate after Phase 219 most recent labeled outcome label schema version field. Live
+verify passed 2026-07-31 (``a2b36b8``; AAPL ``most_recent_labeled_outcome_label_schema_version=1``
+with ``most_recent_labeled_outcome_label_id=82``). See
 [docs/architecture/decisions/0221-phase-220-nas-live-verify-phase-219.md](docs/architecture/decisions/0221-phase-220-nas-live-verify-phase-219.md).
+
+#### Added
+
+- ADR-0221: live verify requires backend+frontend recreate for Phase 219; checklist item 105.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 219 - Evidence Summary Most Recent Labeled Outcome Label Schema Version
 

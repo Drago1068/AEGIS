@@ -135,6 +135,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "assessment/calibration schema versions. Never invented."
         ),
     )
+    most_recent_labeled_outcome_label_state: str | None = Field(
+        default=None,
+        description=(
+            "state from most_recent_labeled_outcome_label when present. Null when no "
+            "scan-labeled rows. Distinct from latest_outcome_label_state and "
+            "assessment/calibration states. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

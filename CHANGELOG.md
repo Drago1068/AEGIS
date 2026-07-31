@@ -7,10 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 132 - NAS Live Verification of Phase 131
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 131 calibration-readiness
+section extract. See
+[docs/architecture/decisions/0133-phase-132-nas-live-verify-phase-131.md](docs/architecture/decisions/0133-phase-132-nas-live-verify-phase-131.md).
+
+#### Added
+
+- ADR-0133: live verify requires frontend recreate for Phase 131; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 131 - Extract Calibration Readiness Panel Section
+
+Move calibration readiness diagnostics UI into a presentational section component (no
+behavior change). See
+[docs/architecture/decisions/0132-phase-131-extract-calibration-readiness-section.md](docs/architecture/decisions/0132-phase-131-extract-calibration-readiness-section.md).
+
+#### Added
+
+- Calibration readiness section extract drafted (implement next).
+
+#### Explicitly out of scope
+
+New calibration math, orders.
+
 ### Phase 130 - NAS Live Verification of Phase 129
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 129 assessment-history
-section extract. See
+section extract. Live verify passed 2026-07-30 (``0ece4fb``). See
 [docs/architecture/decisions/0131-phase-130-nas-live-verify-phase-129.md](docs/architecture/decisions/0131-phase-130-nas-live-verify-phase-129.md).
 
 #### Added

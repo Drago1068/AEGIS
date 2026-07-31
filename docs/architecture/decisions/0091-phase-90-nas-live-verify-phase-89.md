@@ -1,6 +1,6 @@
 # ADR-0091: Phase 90 NAS Live Verification of Phase 89
 
-- Status: Accepted (pending live evidence)
+- Status: Accepted (live verified 2026-07-30; frontend recreate of ``7eb4bdf``)
 - Date: 2026-07-30
 
 ## Context

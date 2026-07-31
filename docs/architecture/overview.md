@@ -55,7 +55,8 @@ labels), Phase 82 (NAS live verify of Phase 81), Phase 83 (outcome-label history
 id caption), Phase 84 (NAS live verify of Phase 83), Phase 85 (outcome-label load-kind
 caption), and Phase 86 (NAS live verify of Phase 85). Phase 87 (outcome-label download uses
 loaded assessment id), Phase 88 (NAS live verify of Phase 87), Phase 89 (download names
-assessment id), and Phase 90 (NAS live verify of Phase 89).
+assessment id), and Phase 90 (NAS live verify of Phase 89). Phase 91 (outcome-label empty
+state for loaded assessment) and Phase 92 (NAS live verify of Phase 91) are drafted.
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -249,6 +250,11 @@ Phase 89 names the download target assessment id on the export control (see
 [decisions/0090-phase-89-outcome-label-download-names-assessment.md](decisions/0090-phase-89-outcome-label-download-names-assessment.md)).
 Phase 90 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0091-phase-90-nas-live-verify-phase-89.md](decisions/0091-phase-90-nas-live-verify-phase-89.md)).
+Phase 91 keeps the outcome-label panel visible with an empty-state when a loaded assessment
+has no labels (see
+[decisions/0092-phase-91-outcome-label-empty-state-loaded-assessment.md](decisions/0092-phase-91-outcome-label-empty-state-loaded-assessment.md)).
+Phase 92 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0093-phase-92-nas-live-verify-phase-91.md](decisions/0093-phase-92-nas-live-verify-phase-91.md)).
 
 ## System context
 

@@ -7,10 +7,37 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 92 - NAS Live Verification of Phase 91
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 91 empty-state panel. See
+[docs/architecture/decisions/0093-phase-92-nas-live-verify-phase-91.md](docs/architecture/decisions/0093-phase-92-nas-live-verify-phase-91.md).
+
+#### Added
+
+- ADR-0093: live verify requires frontend recreate for Phase 91; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 91 - Outcome-Label Empty State for Loaded Assessment
+
+Keep the outcome-label panel (and captions) visible when a loaded assessment has no
+stored labels. See
+[docs/architecture/decisions/0092-phase-91-outcome-label-empty-state-loaded-assessment.md](docs/architecture/decisions/0092-phase-91-outcome-label-empty-state-loaded-assessment.md).
+
+#### Planned
+
+- Empty-state line when ``outcomeLabelHistoryAssessmentId`` is set and labels are empty.
+
+#### Explicitly out of scope
+
+New API fields, default-on calibration, changing ``latest_assessment``, orders.
+
 ### Phase 90 - NAS Live Verification of Phase 89
 
 Ops evidence gate: redeploy frontend under lab TLS with Phase 89 download assessment-id
-label. See
+label. Live verify passed 2026-07-30 (``7eb4bdf``). See
 [docs/architecture/decisions/0091-phase-90-nas-live-verify-phase-89.md](docs/architecture/decisions/0091-phase-90-nas-live-verify-phase-89.md).
 
 #### Added

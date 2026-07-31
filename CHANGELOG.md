@@ -7,10 +7,31 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 254 - NAS Live Verification of Phase 253 (draft)
+### Phase 256 - NAS Live Verification of Phase 255 (draft)
 
-Ops evidence gate after Phase 253 min-horizon required label end-date diagnostic. See
+Ops evidence gate after Phase 255 stored-bar calendar lag diagnostic. See
+[docs/architecture/decisions/0257-phase-256-nas-live-verify-phase-255.md](docs/architecture/decisions/0257-phase-256-nas-live-verify-phase-255.md).
+
+### Phase 255 - Evidence Summary Stored Bar Calendar Lag (draft)
+
+Exchange sessions the label-source bar tip lags behind the prior completed session
+(ingest freshness vs calendar; not unlock shortfall). See
+[docs/architecture/decisions/0256-phase-255-evidence-summary-stored-bar-calendar-lag.md](docs/architecture/decisions/0256-phase-255-evidence-summary-stored-bar-calendar-lag.md).
+
+### Phase 254 - NAS Live Verification of Phase 253
+
+Ops evidence gate after Phase 253 min-horizon required label end-date diagnostic. Live verify
+passed 2026-07-31 (``c25e8b6``; AAPL
+``latest_assessment_min_horizon_required_label_end_date=2026-08-05``). See
 [docs/architecture/decisions/0255-phase-254-nas-live-verify-phase-253.md](docs/architecture/decisions/0255-phase-254-nas-live-verify-phase-253.md).
+
+#### Added
+
+- ADR-0255: live verify requires backend+frontend recreate for Phase 253; checklist item 122.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 253 - Evidence Summary Min-Horizon Required Label End Date
 

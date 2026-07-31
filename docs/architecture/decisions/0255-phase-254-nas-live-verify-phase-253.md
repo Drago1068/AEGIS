@@ -1,11 +1,11 @@
-# ADR-0255: Phase 254 NAS Live Verification of Phase 253 (draft)
+# ADR-0255: Phase 254 NAS Live Verification of Phase 253
 
-- Status: Proposed (pending Phase 253 + live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
-Phase 253 would add ``latest_assessment_min_horizon_required_label_end_date`` (ADR-0254).
+Phase 253 adds ``latest_assessment_min_horizon_required_label_end_date`` (ADR-0254).
 Operators need a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after
 that lands.
 
@@ -23,12 +23,16 @@ that lands.
 
 Retain live verify stdout.
 
-## Resume
+## Live evidence (2026-07-31)
 
-```powershell
-# After Phase 253 on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+- Revision ``c25e8b6``; TLS recreate backend+frontend; verify passed.
+- AAPL: ``latest_assessment_min_horizon_required_label_end_date=2026-08-05`` (vs max
+  ``latest_assessment_required_label_end_date=2026-08-26``);
+  ``latest_assessment_min_horizon_forward_bar_shortfall=5``;
+  ``latest_assessment_forward_bar_shortfall=20``;
+  ``latest_assessment_last_available_label_bar_date=2026-07-29``;
+  ``latest_as_of_trading_date=2026-07-29``;
+  ``latest_assessment_label_block_reason=insufficient_forward_bars``.
 
 ## Related documents
 

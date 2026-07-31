@@ -48,3 +48,4 @@ Gate approved by standing instruction ("Proceed and approve from here on out").
 - [0252-phase-251-evidence-summary-min-horizon-forward-bar-shortfall.md](0252-phase-251-evidence-summary-min-horizon-forward-bar-shortfall.md)
 - [0253-phase-252-nas-live-verify-phase-251.md](0253-phase-252-nas-live-verify-phase-251.md)
 - [0255-phase-254-nas-live-verify-phase-253.md](0255-phase-254-nas-live-verify-phase-253.md)
+- [0256-phase-255-evidence-summary-stored-bar-calendar-lag.md](0256-phase-255-evidence-summary-stored-bar-calendar-lag.md)

@@ -631,8 +631,13 @@ Phase 252 live-verified that shortfall (see
 Phase 253 surfaces ``latest_assessment_min_horizon_required_label_end_date`` as the
 min-horizon unlock calendar (see
 [decisions/0254-phase-253-evidence-summary-min-horizon-required-label-end-date.md](decisions/0254-phase-253-evidence-summary-min-horizon-required-label-end-date.md)).
-Phase 254 (draft) would live-verify that end date (see
+Phase 254 live-verified that end date (see
 [decisions/0255-phase-254-nas-live-verify-phase-253.md](decisions/0255-phase-254-nas-live-verify-phase-253.md)).
+Phase 255 (draft) proposes ``stored_bar_calendar_lag_trading_days`` for ingest freshness
+vs the session calendar (see
+[decisions/0256-phase-255-evidence-summary-stored-bar-calendar-lag.md](decisions/0256-phase-255-evidence-summary-stored-bar-calendar-lag.md)).
+Phase 256 (draft) would live-verify that lag (see
+[decisions/0257-phase-256-nas-live-verify-phase-255.md](decisions/0257-phase-256-nas-live-verify-phase-255.md)).
 
 ## System context
 

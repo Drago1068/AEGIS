@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 173 latest assessment id field. See
 [docs/architecture/decisions/0175-phase-174-nas-live-verify-phase-173.md](docs/architecture/decisions/0175-phase-174-nas-live-verify-phase-173.md).
 
-### Phase 173 - Evidence Summary Latest Assessment Id (draft)
+### Phase 173 - Evidence Summary Latest Assessment Id
 
 Surface top-level ``latest_assessment_id`` on evidence summary. See
 [docs/architecture/decisions/0174-phase-173-evidence-summary-latest-assessment-id.md](docs/architecture/decisions/0174-phase-173-evidence-summary-latest-assessment-id.md).
+
+#### Added
+
+- ``latest_assessment_id`` on evidence summary (+ export); copied from latest assessment id.
+- Console surfaces the field with ``data-testid="evidence-latest-assessment-id"``.
+- NAS verify checklist item 82 for Phase 174.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 172 - NAS Live Verification of Phase 171
 

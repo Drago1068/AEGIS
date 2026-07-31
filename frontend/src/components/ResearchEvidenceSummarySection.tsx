@@ -282,6 +282,14 @@ export function ResearchEvidenceSummarySection({
               : evidenceSummary.latest_calibration.probability_confidence.toFixed(4)}
           </dd>
         </div>
+        <div>
+          <dt className="text-aegis-muted">Latest assessment id</dt>
+          <dd className="font-mono" data-testid="evidence-latest-assessment-id">
+            {evidenceSummary.latest_assessment_id == null
+              ? "null"
+              : evidenceSummary.latest_assessment_id}
+          </dd>
+        </div>
         {evidenceSummary.latest_outcome_label == null ? (
           <div>
             <dt className="text-aegis-muted">Latest outcome labels</dt>

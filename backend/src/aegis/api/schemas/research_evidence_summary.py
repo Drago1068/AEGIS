@@ -196,4 +196,13 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "latest_coverage_confidence; never invented."
         ),
     )
+    latest_assessment_id: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "id from the latest assessment. Null when no assessment. Distinct from "
+            "most_recent_labeled_assessment_id when the absolute newest snapshot is unlabeled. "
+            "Never invented."
+        ),
+    )
     detail: str

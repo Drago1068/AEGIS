@@ -998,6 +998,11 @@ export interface ResearchEvidenceSummary {
    * Distinct from latest_coverage_confidence.
    */
   latest_probability_confidence: number | null;
+  /**
+   * id from latest assessment; null when none.
+   * Distinct from most_recent_labeled_assessment_id when newest is unlabeled.
+   */
+  latest_assessment_id: number | null;
   detail: string;
 }
 

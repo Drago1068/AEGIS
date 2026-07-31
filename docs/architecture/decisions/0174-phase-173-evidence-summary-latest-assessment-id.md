@@ -1,6 +1,6 @@
 # ADR-0174: Phase 173 Evidence Summary Latest Assessment Id
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

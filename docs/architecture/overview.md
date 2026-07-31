@@ -452,7 +452,7 @@ Phase 171 surfaces top-level ``latest_probability_confidence`` on evidence summa
 [decisions/0172-phase-171-evidence-summary-latest-probability-confidence.md](decisions/0172-phase-171-evidence-summary-latest-probability-confidence.md)).
 Phase 172 live-verified that revision (see
 [decisions/0173-phase-172-nas-live-verify-phase-171.md](decisions/0173-phase-172-nas-live-verify-phase-171.md)).
-Phase 173 (draft) surfaces top-level ``latest_assessment_id`` on evidence summary (see
+Phase 173 surfaces top-level ``latest_assessment_id`` on evidence summary (see
 [decisions/0174-phase-173-evidence-summary-latest-assessment-id.md](decisions/0174-phase-173-evidence-summary-latest-assessment-id.md)).
 Phase 174 (draft) live-verifies that revision (see
 [decisions/0175-phase-174-nas-live-verify-phase-173.md](decisions/0175-phase-174-nas-live-verify-phase-173.md)).

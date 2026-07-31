@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 256 - NAS Live Verification of Phase 255 (draft)
+### Phase 258 - NAS Live Verification of Phase 257 (draft)
 
-Ops evidence gate after Phase 255 stored-bar calendar lag diagnostic. See
+Ops evidence gate after Phase 257 on-demand ingest tip refresh. See
+[docs/architecture/decisions/0259-phase-258-nas-live-verify-phase-257.md](docs/architecture/decisions/0259-phase-258-nas-live-verify-phase-257.md).
+
+### Phase 257 - On-Demand Ingest Tip Refresh (draft)
+
+Exercise authenticated ingest so the stored tip / calendar lag can advance when providers
+have newer closes. See
+[docs/architecture/decisions/0258-phase-257-on-demand-ingest-tip-refresh.md](docs/architecture/decisions/0258-phase-257-on-demand-ingest-tip-refresh.md).
+
+### Phase 256 - NAS Live Verification of Phase 255
+
+Ops evidence gate after Phase 255 stored-bar calendar lag diagnostic. Live verify passed
+2026-07-31 (``9259c16``; AAPL ``stored_bar_calendar_lag_trading_days=2``). See
 [docs/architecture/decisions/0257-phase-256-nas-live-verify-phase-255.md](docs/architecture/decisions/0257-phase-256-nas-live-verify-phase-255.md).
+
+#### Added
+
+- ADR-0257: live verify requires backend+frontend recreate for Phase 255; checklist item 123.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 255 - Evidence Summary Stored Bar Calendar Lag
 

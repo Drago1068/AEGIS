@@ -974,6 +974,11 @@ export interface ResearchEvidenceSummary {
   latest_as_of_trading_date: string | null;
   /** bar_count from latest assessment; null when none. */
   latest_bar_count: number | null;
+  /**
+   * input_source from latest assessment (primary observation provenance).
+   * Distinct from latest_component_source (which may be "mixed"). Null when none.
+   */
+  latest_input_source: string | null;
   detail: string;
 }
 

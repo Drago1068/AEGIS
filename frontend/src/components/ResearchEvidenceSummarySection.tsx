@@ -198,6 +198,15 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Latest input_source</dt>
+          <dd className="font-mono" data-testid="evidence-latest-input-source">
+            {evidenceSummary.latest_input_source ?? "null"}
+            <span className="ml-1 font-sans text-xs font-normal text-aegis-muted">
+              (distinct from component source)
+            </span>
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest coverage_confidence</dt>
           <dd className="font-mono" data-testid="evidence-latest-coverage-confidence">
             {evidenceSummary.latest_coverage_confidence == null

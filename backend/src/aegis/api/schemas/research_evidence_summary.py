@@ -132,4 +132,12 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "bar_count from the latest assessment. Null when no assessment. Never invented."
         ),
     )
+    latest_input_source: str | None = Field(
+        default=None,
+        description=(
+            "input_source from the latest assessment (primary observation provenance). "
+            "Null when no assessment. Distinct from latest_component_source (which may be "
+            "'mixed'). Never invented."
+        ),
+    )
     detail: str

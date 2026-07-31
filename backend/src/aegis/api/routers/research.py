@@ -472,6 +472,9 @@ async def _build_research_evidence_summary(
         latest_assessment.as_of_trading_date if latest_assessment is not None else None
     )
     latest_bar_count = latest_assessment.bar_count if latest_assessment is not None else None
+    latest_input_source = (
+        latest_assessment.input_source if latest_assessment is not None else None
+    )
 
     return ResearchEvidenceSummaryResponse(
         symbol=symbol.upper(),
@@ -497,6 +500,7 @@ async def _build_research_evidence_summary(
         latest_research_index=latest_research_index,
         latest_as_of_trading_date=latest_as_of_trading_date,
         latest_bar_count=latest_bar_count,
+        latest_input_source=latest_input_source,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

@@ -1,6 +1,6 @@
 # ADR-0156: Phase 155 Evidence Summary Latest Input Source
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -21,7 +21,8 @@ Keep distinct from ``latest_component_source`` (which may be ``mixed``).
 
 ### 2. Console
 
-Show the field on ``ResearchEvidenceSummarySection`` near component source / bar count.
+Show the field on ``ResearchEvidenceSummarySection`` near component source / bar count
+(``data-testid="evidence-latest-input-source"``).
 
 ### 3. Out of scope
 

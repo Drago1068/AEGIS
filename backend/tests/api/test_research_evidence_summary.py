@@ -245,6 +245,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
     assert body["latest_bar_count"] is None
+    assert body["latest_input_source"] is None
     assert body["calibration_readiness"]["status"] == "no_assessment"
     assert "never invented" in body["detail"].lower() or "not invented" in body["detail"].lower()
 
@@ -266,6 +267,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_research_index"] == 0.46
     assert body["latest_as_of_trading_date"] == "2024-01-26"
     assert body["latest_bar_count"] == 20
+    assert body["latest_input_source"] == "alpha_vantage"
     assert body["latest_outcome_label"]["labels"]["forward_return_5"] == 0.05
     assert body["latest_calibration"]["probability_confidence"] == 0.62
     assert body["assessment_count"] == 1
@@ -314,6 +316,7 @@ async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["latest_component_source"] == "mixed"
+    assert body["latest_input_source"] == "mixed"
     assert body["latest_resolved_label_bar_source"] == "polygon"
     assert body["mixed_component_source_assessment_count"] == 1
     assert body["mixed_unlabeled_assessment_count"] == 0

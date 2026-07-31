@@ -12,11 +12,21 @@ delivery workflow).
 Ops evidence gate after Phase 155 latest input source field. See
 [docs/architecture/decisions/0157-phase-156-nas-live-verify-phase-155.md](docs/architecture/decisions/0157-phase-156-nas-live-verify-phase-155.md).
 
-### Phase 155 - Evidence Summary Latest Input Source (draft)
+### Phase 155 - Evidence Summary Latest Input Source
 
 Surface top-level ``latest_input_source`` on evidence summary (distinct from component
 source). See
 [docs/architecture/decisions/0156-phase-155-evidence-summary-latest-input-source.md](docs/architecture/decisions/0156-phase-155-evidence-summary-latest-input-source.md).
+
+#### Added
+
+- ``latest_input_source`` on evidence summary (+ export); copied from latest assessment.
+- Console surfaces the field with ``data-testid="evidence-latest-input-source"``.
+- NAS verify checklist item 73 for Phase 156.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 154 - NAS Live Verification of Phase 153
 

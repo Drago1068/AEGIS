@@ -416,7 +416,7 @@ Phase 153 surfaces top-level ``latest_bar_count`` on evidence summary (see
 [decisions/0154-phase-153-evidence-summary-latest-bar-count.md](decisions/0154-phase-153-evidence-summary-latest-bar-count.md)).
 Phase 154 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0155-phase-154-nas-live-verify-phase-153.md](decisions/0155-phase-154-nas-live-verify-phase-153.md)).
-Phase 155 (draft) surfaces top-level ``latest_input_source`` on evidence summary (see
+Phase 155 surfaces top-level ``latest_input_source`` on evidence summary (see
 [decisions/0156-phase-155-evidence-summary-latest-input-source.md](decisions/0156-phase-155-evidence-summary-latest-input-source.md)).
 Phase 156 (draft) live-verifies that revision (see
 [decisions/0157-phase-156-nas-live-verify-phase-155.md](decisions/0157-phase-156-nas-live-verify-phase-155.md)).

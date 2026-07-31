@@ -7,9 +7,12 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 229 implemented (scan-labeled freshness lag trading days).** Next:
-Phase 230 NAS backend+frontend verify (ADR-0231). See
-[docs/architecture/decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md](docs/architecture/decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md)
+**Current phase: Phase 230 closed (scan-labeled freshness lag live-verified).** Next (draft):
+Phase 231 ``latest_assessment_is_label_ready`` evidence diagnostic (ADR-0232), then Phase 232
+NAS verify (ADR-0233). Prefer explaining *why* latest is unlabeled over more nested extracts.
+See
+[docs/architecture/decisions/0231-phase-230-nas-live-verify-phase-229.md](docs/architecture/decisions/0231-phase-230-nas-live-verify-phase-229.md),
+[docs/architecture/decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md](docs/architecture/decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

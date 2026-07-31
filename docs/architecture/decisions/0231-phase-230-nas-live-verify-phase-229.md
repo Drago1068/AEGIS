@@ -1,6 +1,6 @@
 # ADR-0231: Phase 230 NAS Live Verification of Phase 229
 
-- Status: Proposed (pending Phase 229 + live evidence)
+- Status: Accepted (live verified 2026-07-31; backend+frontend recreate of ``9154394``)
 - Date: 2026-07-31
 
 ## Context
@@ -21,7 +21,11 @@ TLS after that lands.
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-31 for ``9154394``
+(checklist item 110; AAPL ``scan_labeled_freshness_lag_trading_days=119`` with
+``latest_as_of_trading_date=2026-07-29``,
+``most_recent_labeled_outcome_label_as_of_trading_date=2026-02-05``,
+``most_recent_labeled_outcome_label_id=82``).
 
 ### 3. Out of scope
 
@@ -30,12 +34,12 @@ New math beyond the lag diagnostic, default-on calibration, ACME, actionable pro
 ## Resume
 
 ```powershell
-# After Phase 229 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# Deploy HEAD backend+frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
-# Expect: OK Phase 230 scan_labeled_freshness_lag_trading_days=… (AAPL non-null; ~119 for current corpus)
 ```
 
 ## Related documents
 
 - [0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md](0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md)
+- [0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md](0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md)
 - [../../operations/nas-live-verification.md](../../operations/nas-live-verification.md)

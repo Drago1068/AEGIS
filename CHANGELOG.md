@@ -7,10 +7,32 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 230 - NAS Live Verification of Phase 229 (draft)
+### Phase 232 - NAS Live Verification of Phase 231 (draft)
 
-Ops evidence gate after Phase 229 scan-labeled freshness lag diagnostic. See
+Ops evidence gate after Phase 231 latest-assessment label-ready diagnostic. See
+[docs/architecture/decisions/0233-phase-232-nas-live-verify-phase-231.md](docs/architecture/decisions/0233-phase-232-nas-live-verify-phase-231.md).
+
+### Phase 231 - Evidence Summary Latest Assessment Is Label Ready (draft)
+
+Boolean evidence diagnostic: whether the absolute latest assessment has stored forward bars
+needed to label (reuse ``is_snapshot_label_ready``). See
+[docs/architecture/decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md](docs/architecture/decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md).
+
+### Phase 230 - NAS Live Verification of Phase 229
+
+Ops evidence gate after Phase 229 scan-labeled freshness lag diagnostic. Live verify passed
+2026-07-31 (``9154394``; AAPL ``scan_labeled_freshness_lag_trading_days=119`` with
+``latest_as_of_trading_date=2026-07-29`` and
+``most_recent_labeled_outcome_label_as_of_trading_date=2026-02-05``). See
 [docs/architecture/decisions/0231-phase-230-nas-live-verify-phase-229.md](docs/architecture/decisions/0231-phase-230-nas-live-verify-phase-229.md).
+
+#### Added
+
+- ADR-0231: live verify requires backend+frontend recreate for Phase 229; checklist item 110.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 229 - Evidence Summary Scan-Labeled Freshness Lag
 

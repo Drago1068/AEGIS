@@ -385,6 +385,30 @@ def snapshot_required_label_end_date(
     return forward_horizon_end_date(as_of, max(horizons), calendar_name)
 
 
+def snapshot_last_available_label_bar_date(
+    snapshot: ResearchAssessmentSnapshotData,
+    bars: Sequence[ResearchBarInput],
+    *,
+    calendar_name: str,
+    horizons: tuple[int, ...] = FORWARD_HORIZON_SESSIONS,
+) -> date | None:
+    """Return max stored close date on the label source with day >= as_of (ADR-0250).
+
+    Includes as_of when no forward closes yet. Returns ``None`` when there is no as_of
+    close. Never invents closes. ``calendar_name`` / ``horizons`` are unused but kept
+    for call-site parity with sibling diagnostics.
+    """
+
+    _ = calendar_name, horizons
+    bar_source = _resolve_label_bar_source(snapshot, bars)
+    closes_by_date = _index_closes(list(bars), bar_source)
+    as_of = snapshot.as_of_trading_date
+    if as_of not in closes_by_date:
+        return None
+    forward_or_as_of = [day for day in closes_by_date if day >= as_of]
+    return max(forward_or_as_of)
+
+
 def is_snapshot_label_ready(
     snapshot: ResearchAssessmentSnapshotData,
     bars: Sequence[ResearchBarInput],
@@ -487,15 +511,16 @@ class OutcomeLabelService:
         int,
         int | None,
         date | None,
+        date | None,
     ]:
-        """Return latest readiness, labelable dates, unlabeled+ready count, shortfall, end date.
+        """Return readiness, labelable dates, count, shortfall, end date, last bar date.
 
-        Loads stored bars once (ADR-0232/0234/0236/0238/0240/0246/0248). Empty scan returns
-        ``(None, None, None, None, 0, None, None)``.
+        Loads stored bars once (ADR-0232/0234/0236/0238/0240/0246/0248/0250). Empty scan
+        returns ``(None, None, None, None, 0, None, None, None)``.
         """
 
         if not snapshots_newest_first:
-            return None, None, None, None, 0, None, None
+            return None, None, None, None, 0, None, None, None
 
         bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
         if labeled_assessment_ids is None:
@@ -515,6 +540,11 @@ class OutcomeLabelService:
             calendar_name=self._calendar_name,
         )
         required_label_end_date = snapshot_required_label_end_date(
+            latest,
+            bars,
+            calendar_name=self._calendar_name,
+        )
+        last_available_label_bar_date = snapshot_last_available_label_bar_date(
             latest,
             bars,
             calendar_name=self._calendar_name,
@@ -543,6 +573,7 @@ class OutcomeLabelService:
             unlabeled_label_ready_count,
             forward_bar_shortfall,
             required_label_end_date,
+            last_available_label_bar_date,
         )
 
     async def assessment_ids_with_labels(

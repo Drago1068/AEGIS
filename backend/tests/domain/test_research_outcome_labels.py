@@ -19,6 +19,7 @@ from aegis.domain.research_outcome_labels import (
     compute_forward_total_return_labels,
     forward_horizon_end_date,
     snapshot_forward_bar_shortfall,
+    snapshot_last_available_label_bar_date,
     snapshot_required_label_end_date,
 )
 
@@ -173,6 +174,43 @@ def test_snapshot_required_label_end_date_no_as_of_is_null() -> None:
         horizons=(5,),
     )
     assert end is None
+
+
+def test_snapshot_last_available_label_bar_date_as_of_only() -> None:
+    bars = [_bar(_AS_OF, Decimal("100"))]
+    last = snapshot_last_available_label_bar_date(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    assert last == _AS_OF
+
+
+def test_snapshot_last_available_label_bar_date_partial_forward() -> None:
+    bars = [
+        _bar(_AS_OF, Decimal("100")),
+        _bar(date(2024, 1, 3), Decimal("101")),
+        _bar(date(2024, 1, 5), Decimal("103")),
+    ]
+    last = snapshot_last_available_label_bar_date(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    assert last == date(2024, 1, 5)
+
+
+def test_snapshot_last_available_label_bar_date_no_as_of_is_null() -> None:
+    bars = [_bar(date(2024, 1, 3), Decimal("101"))]
+    last = snapshot_last_available_label_bar_date(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    assert last is None
 
 
 def test_missing_snapshot_id_fail_closed() -> None:

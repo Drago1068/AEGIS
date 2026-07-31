@@ -142,6 +142,7 @@ class _FakeOutcomeLabelService:
         unlabeled_labelable_as_of: date | None = None,
         forward_bar_shortfall: int | None = 20,
         required_label_end_date: date | None = date(2024, 2, 26),
+        last_available_label_bar_date: date | None = date(2024, 1, 26),
     ) -> None:
         self._listed = listed or []
         self._label_ready = label_ready
@@ -151,8 +152,10 @@ class _FakeOutcomeLabelService:
         self._forward_bar_shortfall = 0 if label_ready else forward_bar_shortfall
         if not label_ready and label_block_reason == "no_as_of_bar":
             self._required_label_end_date = None
+            self._last_available_label_bar_date = None
         else:
             self._required_label_end_date = required_label_end_date
+            self._last_available_label_bar_date = last_available_label_bar_date
 
     async def list_labels_for_assessment(
         self, symbol: str, assessment_snapshot_id: int, limit: int
@@ -208,9 +211,10 @@ class _FakeOutcomeLabelService:
         int,
         int | None,
         date | None,
+        date | None,
     ]:
         if not snapshots_newest_first:
-            return None, None, None, None, 0, None, None
+            return None, None, None, None, 0, None, None, None
         labeled = labeled_assessment_ids
         if labeled is None:
             labeled = {row.assessment_snapshot_id for row in self._listed}
@@ -240,10 +244,13 @@ class _FakeOutcomeLabelService:
         else:
             shortfall = self._forward_bar_shortfall
         end_date: date | None
+        last_bar: date | None
         if reason == OutcomeLabelReason.NO_AS_OF_BAR and not ready:
             end_date = None
+            last_bar = None
         else:
             end_date = self._required_label_end_date
+            last_bar = self._last_available_label_bar_date
         return (
             ready,
             reason,
@@ -252,6 +259,7 @@ class _FakeOutcomeLabelService:
             unlabeled_ready_count,
             shortfall,
             end_date,
+            last_bar,
         )
 
 
@@ -295,6 +303,7 @@ def _client(
     unlabeled_labelable_as_of: date | None = None,
     forward_bar_shortfall: int | None = 20,
     required_label_end_date: date | None = date(2024, 2, 26),
+    last_available_label_bar_date: date | None = date(2024, 1, 26),
 ) -> AsyncClient:
     app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
     app.dependency_overrides[require_operator] = _operator
@@ -309,6 +318,7 @@ def _client(
         unlabeled_labelable_as_of=unlabeled_labelable_as_of,
         forward_bar_shortfall=forward_bar_shortfall,
         required_label_end_date=required_label_end_date,
+        last_available_label_bar_date=last_available_label_bar_date,
     )
     app.dependency_overrides[get_research_calibration_service] = lambda: _FakeCalibrationService(
         readiness=readiness or _readiness(),
@@ -375,6 +385,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["most_recent_unlabeled_as_of_trading_date"] is None
     assert body["latest_assessment_forward_bar_shortfall"] is None
     assert body["latest_assessment_required_label_end_date"] is None
+    assert body["latest_assessment_last_available_label_bar_date"] is None
     assert body["latest_coverage_confidence"] is None
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
@@ -435,6 +446,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["most_recent_unlabeled_as_of_trading_date"] is None
     assert body["latest_assessment_forward_bar_shortfall"] == 0
     assert body["latest_assessment_required_label_end_date"] == "2024-02-26"
+    assert body["latest_assessment_last_available_label_bar_date"] == "2024-01-26"
     assert body["latest_coverage_confidence"] == 0.95
     assert body["latest_research_index"] == 0.46
     assert body["latest_as_of_trading_date"] == "2024-01-26"
@@ -548,6 +560,7 @@ async def test_evidence_summary_latest_assessment_is_label_ready_false() -> None
     assert body["latest_assessment_label_block_reason"] == "insufficient_forward_bars"
     assert body["latest_assessment_forward_bar_shortfall"] == 20
     assert body["latest_assessment_required_label_end_date"] == "2024-02-26"
+    assert body["latest_assessment_last_available_label_bar_date"] == "2024-01-26"
 
 
 async def test_evidence_summary_latest_assessment_label_block_reason_no_as_of() -> None:
@@ -566,6 +579,7 @@ async def test_evidence_summary_latest_assessment_label_block_reason_no_as_of() 
     assert body["latest_assessment_label_block_reason"] == "no_as_of_bar"
     assert body["latest_assessment_forward_bar_shortfall"] is None
     assert body["latest_assessment_required_label_end_date"] is None
+    assert body["latest_assessment_last_available_label_bar_date"] is None
 
 
 async def test_evidence_summary_latest_assessment_forward_bar_shortfall() -> None:
@@ -595,6 +609,20 @@ async def test_evidence_summary_latest_assessment_required_label_end_date() -> N
     assert response.status_code == 200
     body = response.json()
     assert body["latest_assessment_required_label_end_date"] == "2024-03-15"
+
+
+async def test_evidence_summary_latest_assessment_last_available_label_bar_date() -> None:
+    async with _client(
+        assessments=[_snapshot()],
+        labels=[],
+        label_ready=False,
+        last_available_label_bar_date=date(2024, 2, 1),
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["latest_assessment_last_available_label_bar_date"] == "2024-02-01"
 
 
 async def test_evidence_summary_most_recent_labelable_as_of_trading_date() -> None:

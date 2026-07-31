@@ -12,11 +12,23 @@ delivery workflow).
 Ops evidence gate after Phase 249 last-available label-bar date diagnostic. See
 [docs/architecture/decisions/0251-phase-250-nas-live-verify-phase-249.md](docs/architecture/decisions/0251-phase-250-nas-live-verify-phase-249.md).
 
-### Phase 249 - Evidence Summary Latest Last Available Label Bar Date (draft)
+### Phase 249 - Evidence Summary Latest Last Available Label Bar Date
 
 How far stored label-source bars have advanced toward the required unlock end (progress
 beside shortfall). See
 [docs/architecture/decisions/0250-phase-249-evidence-summary-latest-last-available-label-bar-date.md](docs/architecture/decisions/0250-phase-249-evidence-summary-latest-last-available-label-bar-date.md).
+
+#### Added
+
+- ``latest_assessment_last_available_label_bar_date`` on evidence summary (+ export): max
+  stored close on resolved label source with day >= as_of; null when N/A.
+- Domain ``snapshot_last_available_label_bar_date``; console
+  ``data-testid="evidence-latest-assessment-last-available-label-bar-date"``.
+- NAS verify checklist item 120 for Phase 250.
+
+#### Explicitly out of scope
+
+UI modularization, inventing future closes, default-on calibration, orders.
 
 ### Phase 248 - NAS Live Verification of Phase 247
 

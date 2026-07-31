@@ -253,6 +253,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "assessment or no as_of bar. Never invents closes."
         ),
     )
+    latest_assessment_last_available_label_bar_date: date | None = Field(
+        default=None,
+        description=(
+            "Max stored close date on the resolved label bar source with day >= as_of "
+            "(bar progress toward unlock). Includes as_of when no forward closes yet. "
+            "Null when no assessment or no as_of bar. Never invents closes."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

@@ -1032,6 +1032,11 @@ export interface ResearchEvidenceSummary {
    * Null when no assessment or no as_of bar. Never invents closes.
    */
   latest_assessment_required_label_end_date: string | null;
+  /**
+   * Max stored label-source close date with day >= as_of (bar progress toward unlock).
+   * Null when no assessment or no as_of bar. Never invents closes.
+   */
+  latest_assessment_last_available_label_bar_date: string | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

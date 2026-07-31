@@ -1,6 +1,6 @@
-# ADR-0250: Phase 249 Evidence Summary Latest Last Available Label Bar Date (draft)
+# ADR-0250: Phase 249 Evidence Summary Latest Last Available Label Bar Date
 
-- Status: Proposed (ready after Phase 248; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -13,7 +13,7 @@ that end — progress vs gap for backfill planning.
 Further tip id/as_of scalars are low value; last available label-bar date is the remaining
 progress signal.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. API
 

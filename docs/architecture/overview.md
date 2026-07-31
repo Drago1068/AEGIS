@@ -618,8 +618,8 @@ companion (see
 [decisions/0248-phase-247-evidence-summary-latest-required-label-end-date.md](decisions/0248-phase-247-evidence-summary-latest-required-label-end-date.md)).
 Phase 248 live-verified that end date (see
 [decisions/0249-phase-248-nas-live-verify-phase-247.md](decisions/0249-phase-248-nas-live-verify-phase-247.md)).
-Phase 249 (draft) proposes ``latest_assessment_last_available_label_bar_date`` for bar
-progress toward unlock (see
+Phase 249 surfaces ``latest_assessment_last_available_label_bar_date`` for bar progress
+toward unlock (see
 [decisions/0250-phase-249-evidence-summary-latest-last-available-label-bar-date.md](decisions/0250-phase-249-evidence-summary-latest-last-available-label-bar-date.md)).
 Phase 250 (draft) would live-verify that date (see
 [decisions/0251-phase-250-nas-live-verify-phase-249.md](decisions/0251-phase-250-nas-live-verify-phase-249.md)).

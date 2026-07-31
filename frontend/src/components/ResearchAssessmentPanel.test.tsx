@@ -334,6 +334,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("outcome-label-history-assessment-id")).toHaveTextContent(
         /assessment id 1/i,
       );
+      expect(screen.getByTestId("outcome-label-history-load-kind")).toHaveTextContent(/latest/i);
       expect(
         screen.getByText(
           /fwd5=0\.0500 end=2024-02-02 · fwd20=0\.1000 end=2024-02-23/,
@@ -736,6 +737,9 @@ describe("ResearchAssessmentPanel", () => {
       );
       expect(screen.getByTestId("outcome-label-history-assessment-id")).toHaveTextContent(
         /assessment id 3/i,
+      );
+      expect(screen.getByTestId("outcome-label-history-load-kind")).toHaveTextContent(
+        /scan-labeled \(latest is 1\)/i,
       );
     });
   });

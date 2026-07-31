@@ -126,6 +126,9 @@ export function ResearchAssessmentPanel({
   const [outcomeLabelHistoryAssessmentId, setOutcomeLabelHistoryAssessmentId] = useState<
     number | null
   >(null);
+  const [outcomeLabelHistoryLoadKind, setOutcomeLabelHistoryLoadKind] = useState<
+    "latest" | "scan_labeled" | null
+  >(null);
   const [readiness, setReadiness] = useState<CalibrationReadiness | null>(null);
   const [calibration, setCalibration] = useState<ProbabilityCalibration | null>(null);
   const [calibrationHistory, setCalibrationHistory] = useState<ProbabilityCalibration[]>(
@@ -164,11 +167,15 @@ export function ResearchAssessmentPanel({
     setExpandedHorizonKey(null);
   }
 
-  async function loadOutcomeLabelHistory(assessmentId: number) {
+  async function loadOutcomeLabelHistory(
+    assessmentId: number,
+    loadKind: "latest" | "scan_labeled" = "latest",
+  ) {
     const rows = await listOutcomeLabels(baseUrl, symbol, assessmentId, 20);
     setOutcomeLabelHistory(rows);
     setOutcomeLabel(rows[0] ?? null);
     setOutcomeLabelHistoryAssessmentId(assessmentId);
+    setOutcomeLabelHistoryLoadKind(loadKind);
   }
 
   async function loadCalibrationHistory(assessmentId: number) {
@@ -194,13 +201,14 @@ export function ResearchAssessmentPanel({
         setOutcomeLabel(null);
         setOutcomeLabelHistory([]);
         setOutcomeLabelHistoryAssessmentId(null);
+        setOutcomeLabelHistoryLoadKind(null);
         setCalibration(null);
         setCalibrationHistory([]);
         setEvidenceSummary(null);
         await loadAssessmentHistory();
         await loadReadiness();
         if (snapshot.id != null) {
-          await loadOutcomeLabelHistory(snapshot.id);
+          await loadOutcomeLabelHistory(snapshot.id, "latest");
           await loadCalibrationHistory(snapshot.id);
         }
         await loadEvidenceSummary();
@@ -219,12 +227,13 @@ export function ResearchAssessmentPanel({
         setOutcomeLabel(null);
         setOutcomeLabelHistory([]);
         setOutcomeLabelHistoryAssessmentId(null);
+        setOutcomeLabelHistoryLoadKind(null);
         setCalibration(null);
         setCalibrationHistory([]);
         setEvidenceSummary(null);
         await loadAssessmentHistory();
         if (snapshot.id != null) {
-          await loadOutcomeLabelHistory(snapshot.id);
+          await loadOutcomeLabelHistory(snapshot.id, "latest");
           await loadCalibrationHistory(snapshot.id);
         }
         await loadReadiness();
@@ -236,6 +245,7 @@ export function ResearchAssessmentPanel({
           setOutcomeLabel(null);
           setOutcomeLabelHistory([]);
           setOutcomeLabelHistoryAssessmentId(null);
+          setOutcomeLabelHistoryLoadKind(null);
           setReadiness(null);
           setCalibration(null);
           setCalibrationHistory([]);
@@ -387,7 +397,7 @@ export function ResearchAssessmentPanel({
     startTransition(async () => {
       setError(null);
       try {
-        await loadOutcomeLabelHistory(assessmentId);
+        await loadOutcomeLabelHistory(assessmentId, "scan_labeled");
       } catch (err) {
         setError(formatAssessmentError(err));
       }
@@ -962,6 +972,17 @@ export function ResearchAssessmentPanel({
                   data-testid="outcome-label-history-assessment-id"
                 >
                   Assessment id {outcomeLabelHistoryAssessmentId}
+                  {outcomeLabelHistoryLoadKind != null ? (
+                    <span data-testid="outcome-label-history-load-kind">
+                      {" "}
+                      · {outcomeLabelHistoryLoadKind === "scan_labeled" ? "scan-labeled" : "latest"}
+                      {outcomeLabelHistoryLoadKind === "scan_labeled" &&
+                      latest?.id != null &&
+                      latest.id !== outcomeLabelHistoryAssessmentId
+                        ? ` (latest is ${latest.id})`
+                        : ""}
+                    </span>
+                  ) : null}
                 </p>
               ) : null}
               <dl className="mt-2 grid gap-2 sm:grid-cols-2">

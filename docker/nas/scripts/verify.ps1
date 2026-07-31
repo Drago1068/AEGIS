@@ -75,7 +75,8 @@ function Write-VerifyChecklist {
     Write-Host " 35. Authenticated evidence-summary most_recent_labeled_* fields (Phase 80)"
     Write-Host " 36. Phase 82: frontend redeploy includes Phase 81 load-scan-labeled control (unit-tested)"
     Write-Host " 37. Phase 84: frontend redeploy includes Phase 83 assessment-id caption (unit-tested)"
-    Write-Host " 38. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 38. Phase 86: frontend redeploy includes Phase 85 load-kind caption (unit-tested)"
+    Write-Host " 39. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {

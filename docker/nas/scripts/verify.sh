@@ -64,7 +64,8 @@ print_checklist() {
   echo " 35. Authenticated evidence-summary most_recent_labeled_* fields (Phase 80)"
   echo " 36. Phase 82: frontend redeploy includes Phase 81 load-scan-labeled control (unit-tested)"
   echo " 37. Phase 84: frontend redeploy includes Phase 83 assessment-id caption (unit-tested)"
-  echo " 38. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 38. Phase 86: frontend redeploy includes Phase 85 load-kind caption (unit-tested)"
+  echo " 39. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then

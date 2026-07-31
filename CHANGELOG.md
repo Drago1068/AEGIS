@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 163 latest lookback start date field. See
 [docs/architecture/decisions/0165-phase-164-nas-live-verify-phase-163.md](docs/architecture/decisions/0165-phase-164-nas-live-verify-phase-163.md).
 
-### Phase 163 - Evidence Summary Latest Lookback Start Date (draft)
+### Phase 163 - Evidence Summary Latest Lookback Start Date
 
 Surface top-level ``latest_lookback_start_date`` on evidence summary. See
 [docs/architecture/decisions/0164-phase-163-evidence-summary-latest-lookback-start.md](docs/architecture/decisions/0164-phase-163-evidence-summary-latest-lookback-start.md).
+
+#### Added
+
+- ``latest_lookback_start_date`` on evidence summary (+ export); copied from latest assessment.
+- Console surfaces the field with ``data-testid="evidence-latest-lookback-start-date"``.
+- NAS verify checklist item 77 for Phase 164.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 162 - NAS Live Verification of Phase 161
 

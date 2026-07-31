@@ -1,6 +1,6 @@
 # ADR-0164: Phase 163 Evidence Summary Latest Lookback Start Date
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

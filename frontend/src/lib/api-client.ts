@@ -985,6 +985,8 @@ export interface ResearchEvidenceSummary {
   latest_method_version: number | null;
   /** lookback_end_date from latest assessment (ISO date); null when none. */
   latest_lookback_end_date: string | null;
+  /** lookback_start_date from latest assessment (ISO date); null when none. */
+  latest_lookback_start_date: string | null;
   detail: string;
 }
 

@@ -432,7 +432,7 @@ Phase 161 surfaces top-level ``latest_lookback_end_date`` on evidence summary (s
 [decisions/0162-phase-161-evidence-summary-latest-lookback-end.md](decisions/0162-phase-161-evidence-summary-latest-lookback-end.md)).
 Phase 162 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0163-phase-162-nas-live-verify-phase-161.md](decisions/0163-phase-162-nas-live-verify-phase-161.md)).
-Phase 163 (draft) surfaces top-level ``latest_lookback_start_date`` on evidence summary (see
+Phase 163 surfaces top-level ``latest_lookback_start_date`` on evidence summary (see
 [decisions/0164-phase-163-evidence-summary-latest-lookback-start.md](decisions/0164-phase-163-evidence-summary-latest-lookback-start.md)).
 Phase 164 (draft) live-verifies that revision (see
 [decisions/0165-phase-164-nas-live-verify-phase-163.md](decisions/0165-phase-164-nas-live-verify-phase-163.md)).

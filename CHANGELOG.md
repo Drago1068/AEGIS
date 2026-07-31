@@ -7,9 +7,37 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 120 - NAS Live Verification of Phase 119
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 119 calibration chip naming.
+See
+[docs/architecture/decisions/0121-phase-120-nas-live-verify-phase-119.md](docs/architecture/decisions/0121-phase-120-nas-live-verify-phase-119.md).
+
+#### Added
+
+- ADR-0121: live verify requires frontend recreate for Phase 119; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 119 - Calibration Action Chips Name Latest Explicitly
+
+Show ``({id} · latest)`` / aria ``(latest)`` on compute/download calibration controls. See
+[docs/architecture/decisions/0120-phase-119-calibration-action-chips-name-latest.md](docs/architecture/decisions/0120-phase-119-calibration-action-chips-name-latest.md).
+
+#### Added
+
+- Calibration chip/aria ``latest`` naming drafted (implement next).
+
+#### Explicitly out of scope
+
+Changing calibration target, default-on calibration, orders.
+
 ### Phase 118 - NAS Live Verification of Phase 117
 
-Ops evidence gate: redeploy frontend under lab TLS after Phase 117 id-chip load-kind. See
+Ops evidence gate: redeploy frontend under lab TLS after Phase 117 id-chip load-kind. Live
+verify passed 2026-07-30 (``272e4b4``). See
 [docs/architecture/decisions/0119-phase-118-nas-live-verify-phase-117.md](docs/architecture/decisions/0119-phase-118-nas-live-verify-phase-117.md).
 
 #### Added

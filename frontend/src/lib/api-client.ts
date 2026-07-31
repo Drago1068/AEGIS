@@ -991,6 +991,8 @@ export interface ResearchEvidenceSummary {
   latest_schema_version: number | null;
   /** computed_at from latest assessment (ISO datetime); null when none. */
   latest_computed_at: string | null;
+  /** event_time from latest assessment (ISO datetime); null when none. */
+  latest_event_time: string | null;
   detail: string;
 }
 

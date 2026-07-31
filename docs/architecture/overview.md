@@ -444,7 +444,7 @@ Phase 167 surfaces top-level ``latest_computed_at`` on evidence summary (see
 [decisions/0168-phase-167-evidence-summary-latest-computed-at.md](decisions/0168-phase-167-evidence-summary-latest-computed-at.md)).
 Phase 168 live-verified that revision (see
 [decisions/0169-phase-168-nas-live-verify-phase-167.md](decisions/0169-phase-168-nas-live-verify-phase-167.md)).
-Phase 169 (draft) surfaces top-level ``latest_event_time`` on evidence summary (see
+Phase 169 surfaces top-level ``latest_event_time`` on evidence summary (see
 [decisions/0170-phase-169-evidence-summary-latest-event-time.md](decisions/0170-phase-169-evidence-summary-latest-event-time.md)).
 Phase 170 (draft) live-verifies that revision (see
 [decisions/0171-phase-170-nas-live-verify-phase-169.md](decisions/0171-phase-170-nas-live-verify-phase-169.md)).

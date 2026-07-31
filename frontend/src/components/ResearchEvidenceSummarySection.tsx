@@ -247,6 +247,12 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Latest event_time</dt>
+          <dd className="font-mono" data-testid="evidence-latest-event-time">
+            {evidenceSummary.latest_event_time ?? "null"}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest coverage_confidence</dt>
           <dd className="font-mono" data-testid="evidence-latest-coverage-confidence">
             {evidenceSummary.latest_coverage_confidence == null

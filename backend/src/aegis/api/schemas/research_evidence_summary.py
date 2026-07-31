@@ -180,4 +180,10 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "computed_at from the latest assessment. Null when no assessment. Never invented."
         ),
     )
+    latest_event_time: datetime | None = Field(
+        default=None,
+        description=(
+            "event_time from the latest assessment. Null when no assessment. Never invented."
+        ),
+    )
     detail: str

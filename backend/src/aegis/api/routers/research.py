@@ -491,6 +491,9 @@ async def _build_research_evidence_summary(
     latest_computed_at = (
         latest_assessment.computed_at if latest_assessment is not None else None
     )
+    latest_event_time = (
+        latest_assessment.event_time if latest_assessment is not None else None
+    )
 
     return ResearchEvidenceSummaryResponse(
         symbol=symbol.upper(),
@@ -523,6 +526,7 @@ async def _build_research_evidence_summary(
         latest_lookback_start_date=latest_lookback_start_date,
         latest_schema_version=latest_schema_version,
         latest_computed_at=latest_computed_at,
+        latest_event_time=latest_event_time,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

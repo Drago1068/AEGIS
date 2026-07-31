@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 169 latest event_time field. See
 [docs/architecture/decisions/0171-phase-170-nas-live-verify-phase-169.md](docs/architecture/decisions/0171-phase-170-nas-live-verify-phase-169.md).
 
-### Phase 169 - Evidence Summary Latest Event Time (draft)
+### Phase 169 - Evidence Summary Latest Event Time
 
 Surface top-level ``latest_event_time`` on evidence summary. See
 [docs/architecture/decisions/0170-phase-169-evidence-summary-latest-event-time.md](docs/architecture/decisions/0170-phase-169-evidence-summary-latest-event-time.md).
+
+#### Added
+
+- ``latest_event_time`` on evidence summary (+ export); copied from latest assessment.
+- Console surfaces the field with ``data-testid="evidence-latest-event-time"``.
+- NAS verify checklist item 80 for Phase 170.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 168 - NAS Live Verification of Phase 167
 

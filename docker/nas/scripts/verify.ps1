@@ -117,7 +117,8 @@ function Write-VerifyChecklist {
     Write-Host " 77. Authenticated evidence-summary includes Phase 163 latest_lookback_start_date (Phase 164)"
     Write-Host " 78. Authenticated evidence-summary includes Phase 165 latest_schema_version (Phase 166)"
     Write-Host " 79. Authenticated evidence-summary includes Phase 167 latest_computed_at (Phase 168)"
-    Write-Host " 80. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 80. Authenticated evidence-summary includes Phase 169 latest_event_time (Phase 170)"
+    Write-Host " 81. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -844,6 +845,13 @@ try {
         $computedAt = $summary.latest_computed_at
         $computedPart = if ($null -eq $computedAt -or $computedAt -eq "") { "null" } else { [string]$computedAt }
         Write-Host "OK  Phase 168 latest_computed_at=$computedPart"
+        # Phase 170: latest_event_time from Phase 169 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_event_time")) {
+            throw "evidence-summary missing latest_event_time (Phase 169/170)"
+        }
+        $eventTime = $summary.latest_event_time
+        $eventPart = if ($null -eq $eventTime -or $eventTime -eq "") { "null" } else { [string]$eventTime }
+        Write-Host "OK  Phase 170 latest_event_time=$eventPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -926,6 +934,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_computed_at")) {
             throw "evidence-summary/export missing latest_computed_at (Phase 167/168)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_event_time")) {
+            throw "evidence-summary/export missing latest_event_time (Phase 169/170)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

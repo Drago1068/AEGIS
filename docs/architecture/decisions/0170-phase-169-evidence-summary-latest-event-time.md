@@ -1,6 +1,6 @@
 # ADR-0170: Phase 169 Evidence Summary Latest Event Time
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

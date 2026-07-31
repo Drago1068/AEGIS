@@ -18,10 +18,20 @@ Surface top-level ``most_recent_labeled_outcome_label_bar_source`` on evidence s
 scan-labeled provenance. See
 [docs/architecture/decisions/0224-phase-223-evidence-summary-most-recent-labeled-outcome-label-bar-source.md](docs/architecture/decisions/0224-phase-223-evidence-summary-most-recent-labeled-outcome-label-bar-source.md).
 
-### Phase 222 - NAS Live Verification of Phase 221 (draft)
+### Phase 222 - NAS Live Verification of Phase 221
 
-Ops evidence gate after Phase 221 most recent labeled outcome label state field. See
+Ops evidence gate after Phase 221 most recent labeled outcome label state field. Live verify
+passed 2026-07-31 (``8a3f9a7``; AAPL ``most_recent_labeled_outcome_label_state=research_only``
+with ``most_recent_labeled_outcome_label_id=82``). See
 [docs/architecture/decisions/0223-phase-222-nas-live-verify-phase-221.md](docs/architecture/decisions/0223-phase-222-nas-live-verify-phase-221.md).
+
+#### Added
+
+- ADR-0223: live verify requires backend+frontend recreate for Phase 221; checklist item 106.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 221 - Evidence Summary Most Recent Labeled Outcome Label State
 

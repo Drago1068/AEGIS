@@ -1,6 +1,6 @@
 # ADR-0223: Phase 222 NAS Live Verification of Phase 221
 
-- Status: Proposed (pending Phase 221 + live evidence)
+- Status: Accepted (live verified 2026-07-31; backend+frontend recreate of ``8a3f9a7``)
 - Date: 2026-07-31
 
 ## Context
@@ -21,7 +21,9 @@ that lands.
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-31 for ``8a3f9a7``
+(checklist item 106; AAPL ``most_recent_labeled_outcome_label_state=research_only`` with
+``most_recent_labeled_outcome_label_id=82`` and ``schema_version=1``).
 
 ### 3. Out of scope
 
@@ -30,9 +32,8 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 221 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# Deploy HEAD backend+frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
-# Expect: OK Phase 222 most_recent_labeled_outcome_label_state=research_only (AAPL)
 ```
 
 ## Related documents

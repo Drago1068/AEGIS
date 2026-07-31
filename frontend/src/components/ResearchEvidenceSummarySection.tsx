@@ -190,6 +190,12 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Latest lookback_end_date</dt>
+          <dd className="font-mono" data-testid="evidence-latest-lookback-end-date">
+            {evidenceSummary.latest_lookback_end_date ?? "null"}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest bar_count</dt>
           <dd className="font-mono" data-testid="evidence-latest-bar-count">
             {evidenceSummary.latest_bar_count == null

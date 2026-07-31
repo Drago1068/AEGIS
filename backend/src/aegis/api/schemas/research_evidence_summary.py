@@ -153,4 +153,11 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "method_version from the latest assessment. Null when no assessment. Never invented."
         ),
     )
+    latest_lookback_end_date: date | None = Field(
+        default=None,
+        description=(
+            "lookback_end_date from the latest assessment. Null when no assessment. "
+            "Never invented."
+        ),
+    )
     detail: str

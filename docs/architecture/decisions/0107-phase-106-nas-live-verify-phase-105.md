@@ -1,6 +1,6 @@
 # ADR-0107: Phase 106 NAS Live Verification of Phase 105
 
-- Status: Accepted (pending live evidence)
+- Status: Accepted (live verified 2026-07-30; frontend recreate of ``759bd25``)
 - Date: 2026-07-30
 
 ## Context

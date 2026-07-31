@@ -65,6 +65,8 @@ assessment id), Phase 100 (NAS live verify of Phase 99), Phase 101 (compute cali
 names latest assessment id), and Phase 102 (NAS live verify of Phase 101). Phase 103
 (calibration controls note when scan-labeled differs), Phase 104 (NAS live verify of
 Phase 103), Phase 105 (load labels for latest), and Phase 106 (NAS live verify of Phase 105).
+Phase 107 (rename active outcome-label assessment id helper) and Phase 108 (NAS live verify
+of Phase 107) are drafted.
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see

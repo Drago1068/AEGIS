@@ -1011,6 +1011,8 @@ export interface ResearchEvidenceSummary {
   latest_outcome_label_method_id: string | null;
   /** label_method_version from latest_outcome_label when latest assessment is labeled; null otherwise. Distinct from assessment/calibration method versions. */
   latest_outcome_label_method_version: number | null;
+  /** schema_version from latest_outcome_label when latest assessment is labeled; null otherwise. Distinct from assessment/calibration schema versions. */
+  latest_outcome_label_schema_version: number | null;
   /** id from latest_calibration when present; null otherwise. */
   latest_calibration_id: number | null;
   /** outcome_horizon_key from latest_calibration when present; null otherwise. */

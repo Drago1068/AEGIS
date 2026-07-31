@@ -135,7 +135,8 @@ function Write-VerifyChecklist {
     Write-Host " 95. Authenticated evidence-summary includes Phase 199 latest_outcome_label_computed_at (Phase 200)"
     Write-Host " 96. Authenticated evidence-summary includes Phase 201 latest_outcome_label_method_id (Phase 202)"
     Write-Host " 97. Authenticated evidence-summary includes Phase 203 latest_outcome_label_method_version (Phase 204)"
-    Write-Host " 98. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 98. Authenticated evidence-summary includes Phase 205 latest_outcome_label_schema_version (Phase 206)"
+    Write-Host " 99. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1024,6 +1025,13 @@ try {
         $labelMethodVersion = $summary.latest_outcome_label_method_version
         $labelVersionPart = if ($null -eq $labelMethodVersion -or $labelMethodVersion -eq "") { "null" } else { [string]$labelMethodVersion }
         Write-Host "OK  Phase 204 latest_outcome_label_method_version=$labelVersionPart"
+        # Phase 206: latest_outcome_label_schema_version from Phase 205 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_outcome_label_schema_version")) {
+            throw "evidence-summary missing latest_outcome_label_schema_version (Phase 205/206)"
+        }
+        $labelSchemaVersion = $summary.latest_outcome_label_schema_version
+        $labelSchemaPart = if ($null -eq $labelSchemaVersion -or $labelSchemaVersion -eq "") { "null" } else { [string]$labelSchemaVersion }
+        Write-Host "OK  Phase 206 latest_outcome_label_schema_version=$labelSchemaPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1160,6 +1168,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_outcome_label_method_version")) {
             throw "evidence-summary/export missing latest_outcome_label_method_version (Phase 203/204)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_outcome_label_schema_version")) {
+            throw "evidence-summary/export missing latest_outcome_label_schema_version (Phase 205/206)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

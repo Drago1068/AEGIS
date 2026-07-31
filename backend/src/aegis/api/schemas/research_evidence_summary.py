@@ -238,6 +238,15 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "latest_calibration_method_version. Never invented."
         ),
     )
+    latest_outcome_label_schema_version: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "schema_version from latest_outcome_label when the latest assessment is labeled. "
+            "Null when unlabeled. Distinct from assessment latest_schema_version and "
+            "latest_calibration_schema_version. Never invented."
+        ),
+    )
     latest_calibration_id: int | None = Field(
         default=None,
         ge=1,

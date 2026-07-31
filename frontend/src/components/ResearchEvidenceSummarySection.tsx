@@ -311,6 +311,14 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Latest outcome_label schema_version</dt>
+          <dd className="font-mono" data-testid="evidence-latest-outcome-label-schema-version">
+            {evidenceSummary.latest_outcome_label_schema_version == null
+              ? "null"
+              : evidenceSummary.latest_outcome_label_schema_version}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest calibration id</dt>
           <dd className="font-mono" data-testid="evidence-latest-calibration-id">
             {evidenceSummary.latest_calibration_id == null

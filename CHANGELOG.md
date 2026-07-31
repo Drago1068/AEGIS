@@ -7,10 +7,40 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 204 - NAS Live Verification of Phase 203 (draft)
+### Phase 206 - NAS Live Verification of Phase 205 (draft)
 
-Ops evidence gate after Phase 203 latest outcome label method version field. See
+Ops evidence gate after Phase 205 latest outcome label schema version field. See
+[docs/architecture/decisions/0207-phase-206-nas-live-verify-phase-205.md](docs/architecture/decisions/0207-phase-206-nas-live-verify-phase-205.md).
+
+### Phase 205 - Evidence Summary Latest Outcome Label Schema Version
+
+Surface top-level ``latest_outcome_label_schema_version`` on evidence summary. See
+[docs/architecture/decisions/0206-phase-205-evidence-summary-latest-outcome-label-schema-version.md](docs/architecture/decisions/0206-phase-205-evidence-summary-latest-outcome-label-schema-version.md).
+
+#### Added
+
+- ``latest_outcome_label_schema_version`` on evidence summary (+ export); from latest_outcome_label.
+- Console surfaces the field with ``data-testid="evidence-latest-outcome-label-schema-version"``.
+- NAS verify checklist item 98 for Phase 206.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 204 - NAS Live Verification of Phase 203
+
+Ops evidence gate after Phase 203 latest outcome label method version field. Live verify passed
+2026-07-31 (``32b2040``; AAPL ``latest_outcome_label_method_version=null`` — latest unlabeled).
+See
 [docs/architecture/decisions/0205-phase-204-nas-live-verify-phase-203.md](docs/architecture/decisions/0205-phase-204-nas-live-verify-phase-203.md).
+
+#### Added
+
+- ADR-0205: live verify requires backend+frontend recreate for Phase 203; checklist item 97.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 203 - Evidence Summary Latest Outcome Label Method Version
 

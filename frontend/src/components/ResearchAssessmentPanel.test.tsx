@@ -158,6 +158,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_computed_at: null,
       latest_outcome_label_method_id: null,
       latest_outcome_label_method_version: null,
+      latest_outcome_label_schema_version: null,
       latest_calibration_id: null,
       latest_calibration_horizon_key: null,
       latest_calibration_computed_at: null,
@@ -534,6 +535,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_computed_at: "2024-01-26T19:00:00Z",
       latest_outcome_label_method_id: "forward_total_return_v1",
       latest_outcome_label_method_version: 1,
+      latest_outcome_label_schema_version: 1,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -614,6 +616,9 @@ describe("ResearchAssessmentPanel", () => {
         "forward_total_return_v1",
       );
       expect(screen.getByTestId("evidence-latest-outcome-label-method-version")).toHaveTextContent(
+        "1",
+      );
+      expect(screen.getByTestId("evidence-latest-outcome-label-schema-version")).toHaveTextContent(
         "1",
       );
       expect(screen.getByTestId("evidence-latest-calibration-id")).toHaveTextContent("7");
@@ -784,6 +789,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_computed_at: "2024-01-26T19:00:00Z",
       latest_outcome_label_method_id: "forward_total_return_v1",
       latest_outcome_label_method_version: 1,
+      latest_outcome_label_schema_version: 1,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -916,6 +922,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_computed_at: "2024-01-26T19:00:00Z",
       latest_outcome_label_method_id: "forward_total_return_v1",
       latest_outcome_label_method_version: 1,
+      latest_outcome_label_schema_version: 1,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -1046,6 +1053,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_computed_at: "2024-01-26T19:00:00Z",
       latest_outcome_label_method_id: "forward_total_return_v1",
       latest_outcome_label_method_version: 1,
+      latest_outcome_label_schema_version: 1,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -1266,6 +1274,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_computed_at: "2024-01-26T19:00:00Z",
       latest_outcome_label_method_id: "forward_total_return_v1",
       latest_outcome_label_method_version: 1,
+      latest_outcome_label_schema_version: 1,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -1446,6 +1455,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_computed_at: "2024-01-26T19:00:00Z",
       latest_outcome_label_method_id: "forward_total_return_v1",
       latest_outcome_label_method_version: 1,
+      latest_outcome_label_schema_version: 1,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",
@@ -1622,6 +1632,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_outcome_label_computed_at: "2024-01-26T19:00:00Z",
       latest_outcome_label_method_id: "forward_total_return_v1",
       latest_outcome_label_method_version: 1,
+      latest_outcome_label_schema_version: 1,
       latest_calibration_id: 7,
       latest_calibration_horizon_key: "forward_return_5",
       latest_calibration_computed_at: "2024-01-26T19:00:00Z",

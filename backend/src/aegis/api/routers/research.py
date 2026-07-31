@@ -512,6 +512,9 @@ async def _build_research_evidence_summary(
         if latest_outcome_label is not None
         else None
     )
+    latest_outcome_label_schema_version = (
+        latest_outcome_label.schema_version if latest_outcome_label is not None else None
+    )
     latest_calibration_id = (
         latest_calibration.id if latest_calibration is not None else None
     )
@@ -590,6 +593,7 @@ async def _build_research_evidence_summary(
         latest_outcome_label_computed_at=latest_outcome_label_computed_at,
         latest_outcome_label_method_id=latest_outcome_label_method_id,
         latest_outcome_label_method_version=latest_outcome_label_method_version,
+        latest_outcome_label_schema_version=latest_outcome_label_schema_version,
         latest_calibration_id=latest_calibration_id,
         latest_calibration_horizon_key=latest_calibration_horizon_key,
         latest_calibration_computed_at=latest_calibration_computed_at,

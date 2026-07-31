@@ -559,6 +559,9 @@ describe("ResearchAssessmentPanel", () => {
         20,
       );
     });
+    expect(screen.getByTestId("download-outcome-labels")).toHaveAccessibleName(
+      /download outcome labels json for assessment 1/i,
+    );
   });
 
   it("downloads outcome labels JSON for scan-labeled assessment id", async () => {
@@ -650,6 +653,9 @@ describe("ResearchAssessmentPanel", () => {
         20,
       );
     });
+    expect(screen.getByTestId("download-outcome-labels")).toHaveAccessibleName(
+      /download outcome labels json for assessment 3/i,
+    );
   });
 
   it("downloads calibrations JSON via export route", async () => {

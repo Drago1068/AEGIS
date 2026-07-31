@@ -66,7 +66,8 @@ print_checklist() {
   echo " 37. Phase 84: frontend redeploy includes Phase 83 assessment-id caption (unit-tested)"
   echo " 38. Phase 86: frontend redeploy includes Phase 85 load-kind caption (unit-tested)"
   echo " 39. Phase 88: frontend redeploy includes Phase 87 download-loaded-assessment (unit-tested)"
-  echo " 40. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 40. Phase 90: frontend redeploy includes Phase 89 download-names-assessment (unit-tested)"
+  echo " 41. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then

@@ -1,6 +1,6 @@
 # ADR-0089: Phase 88 NAS Live Verification of Phase 87
 
-- Status: Accepted (pending Phase 87 + live evidence)
+- Status: Accepted (live verified 2026-07-30; frontend recreate of ``6cf4ae8``)
 - Date: 2026-07-30
 
 ## Context

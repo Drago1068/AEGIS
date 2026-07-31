@@ -7,9 +7,37 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 90 - NAS Live Verification of Phase 89
+
+Ops evidence gate: redeploy frontend under lab TLS with Phase 89 download assessment-id
+label. See
+[docs/architecture/decisions/0091-phase-90-nas-live-verify-phase-89.md](docs/architecture/decisions/0091-phase-90-nas-live-verify-phase-89.md).
+
+#### Added
+
+- ADR-0091: live verify requires frontend recreate for Phase 89; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 89 - Outcome-Label Download Names Assessment Id
+
+Show which assessment id the outcome-label JSON download targets. See
+[docs/architecture/decisions/0090-phase-89-outcome-label-download-names-assessment.md](docs/architecture/decisions/0090-phase-89-outcome-label-download-names-assessment.md).
+
+#### Added
+
+- Download button shows ``({id})`` and accessible name includes the assessment id.
+
+#### Explicitly out of scope
+
+New API fields, default-on calibration, changing ``latest_assessment``, orders.
+
 ### Phase 88 - NAS Live Verification of Phase 87
 
-Ops evidence gate: redeploy frontend under lab TLS after Phase 87 download binding. See
+Ops evidence gate: redeploy frontend under lab TLS after Phase 87 download binding.
+Live verify passed 2026-07-30 (``6cf4ae8``). See
 [docs/architecture/decisions/0089-phase-88-nas-live-verify-phase-87.md](docs/architecture/decisions/0089-phase-88-nas-live-verify-phase-87.md).
 
 #### Added

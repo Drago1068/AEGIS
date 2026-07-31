@@ -54,7 +54,8 @@ summary), Phase 80 (NAS live verify of Phase 79), Phase 81 (load scan-labeled ou
 labels), Phase 82 (NAS live verify of Phase 81), Phase 83 (outcome-label history assessment
 id caption), Phase 84 (NAS live verify of Phase 83), Phase 85 (outcome-label load-kind
 caption), and Phase 86 (NAS live verify of Phase 85). Phase 87 (outcome-label download uses
-loaded assessment id) and Phase 88 (NAS live verify of Phase 87) are drafted.
+loaded assessment id), Phase 88 (NAS live verify of Phase 87), Phase 89 (download names
+assessment id), and Phase 90 (NAS live verify of Phase 89).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -244,6 +245,10 @@ Phase 87 binds outcome-label JSON download to the loaded assessment id (see
 [decisions/0088-phase-87-outcome-label-download-loaded-assessment.md](decisions/0088-phase-87-outcome-label-download-loaded-assessment.md)).
 Phase 88 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0089-phase-88-nas-live-verify-phase-87.md](decisions/0089-phase-88-nas-live-verify-phase-87.md)).
+Phase 89 names the download target assessment id on the export control (see
+[decisions/0090-phase-89-outcome-label-download-names-assessment.md](decisions/0090-phase-89-outcome-label-download-names-assessment.md)).
+Phase 90 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0091-phase-90-nas-live-verify-phase-89.md](decisions/0091-phase-90-nas-live-verify-phase-89.md)).
 
 ## System context
 

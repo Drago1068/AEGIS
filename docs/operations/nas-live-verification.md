@@ -32,7 +32,8 @@ This checklist is the operator evidence gate after package/deploy. Architecture:
 [ADR-0083](../architecture/decisions/0083-phase-82-nas-live-verify-phase-81.md),
 [ADR-0085](../architecture/decisions/0085-phase-84-nas-live-verify-phase-83.md),
 [ADR-0087](../architecture/decisions/0087-phase-86-nas-live-verify-phase-85.md),
-[ADR-0089](../architecture/decisions/0089-phase-88-nas-live-verify-phase-87.md).
+[ADR-0089](../architecture/decisions/0089-phase-88-nas-live-verify-phase-87.md),
+[ADR-0091](../architecture/decisions/0091-phase-90-nas-live-verify-phase-89.md).
 Authoritative scripted checks: `docker/nas/scripts/verify.ps1` / `verify.sh`.
 Lab TLS cutover/rollback: [nas-tls-cutover.md](nas-tls-cutover.md).
 
@@ -114,7 +115,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 37 | Phase 84 frontend redeploy (Phase 83 assessment-id caption) | Frontend recreated; caption UX unit-tested |
 | 38 | Phase 86 frontend redeploy (Phase 85 load-kind caption) | Frontend recreated; load-kind UX unit-tested |
 | 39 | Phase 88 frontend redeploy (Phase 87 download loaded assessment) | Frontend recreated; download UX unit-tested |
-| 40 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 40 | Phase 90 frontend redeploy (Phase 89 download names assessment) | Frontend recreated; named-download UX unit-tested |
+| 41 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

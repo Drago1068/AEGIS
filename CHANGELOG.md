@@ -18,10 +18,22 @@ Derived evidence diagnostic: trading-day lag between latest assessment as_of and
 labeled outcome_label as_of. See
 [docs/architecture/decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md](docs/architecture/decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md).
 
-### Phase 228 - NAS Live Verification of Phase 227 (draft)
+### Phase 228 - NAS Live Verification of Phase 227
 
-Ops evidence gate after Phase 227 most recent labeled outcome label as-of trading date field. See
+Ops evidence gate after Phase 227 most recent labeled outcome label as-of trading date field.
+Live verify passed 2026-07-31 (``285dafe``; AAPL
+``most_recent_labeled_outcome_label_as_of_trading_date=2026-02-05`` with
+``most_recent_labeled_outcome_label_id=82``). Closes the planned scan-labeled scalar
+provenance series (Phases 213–228). See
 [docs/architecture/decisions/0229-phase-228-nas-live-verify-phase-227.md](docs/architecture/decisions/0229-phase-228-nas-live-verify-phase-227.md).
+
+#### Added
+
+- ADR-0229: live verify requires backend+frontend recreate for Phase 227; checklist item 109.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 227 - Evidence Summary Most Recent Labeled Outcome Label As-Of Trading Date
 

@@ -1,13 +1,14 @@
 # ADR-0229: Phase 228 NAS Live Verification of Phase 227
 
-- Status: Proposed (pending Phase 227 + live evidence)
+- Status: Accepted (live verified 2026-07-31; backend+frontend recreate of ``285dafe``)
 - Date: 2026-07-31
 
 ## Context
 
 Phase 227 adds ``most_recent_labeled_outcome_label_as_of_trading_date`` on evidence summary
 (ADR-0228). Operators need a verified backend+frontend redeploy on the UGREEN NAS under lab
-TLS after that lands.
+TLS after that lands. This closes the planned scan-labeled scalar provenance series
+(Phases 213–228).
 
 ## Decisions
 
@@ -22,7 +23,11 @@ TLS after that lands.
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout as evidence.
+Retain live verify stdout as evidence. Live verify passed 2026-07-31 for ``285dafe``
+(checklist item 109; AAPL
+``most_recent_labeled_outcome_label_as_of_trading_date=2026-02-05`` with
+``most_recent_labeled_outcome_label_id=82`` and
+``computed_at=2026-07-30T21:25:15.962739Z``).
 
 ### 3. Out of scope
 
@@ -31,12 +36,12 @@ New math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 227 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# Deploy HEAD backend+frontend to NAS under TLS, then:
 .\docker\nas\scripts\verify.ps1
-# Expect: OK Phase 228 most_recent_labeled_outcome_label_as_of_trading_date=… (AAPL non-null)
 ```
 
 ## Related documents
 
 - [0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md](0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md)
+- [0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md](0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md)
 - [../../operations/nas-live-verification.md](../../operations/nas-live-verification.md)

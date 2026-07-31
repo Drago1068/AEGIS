@@ -569,11 +569,13 @@ Phase 226 live-verified that revision (see
 Phase 227 surfaces top-level ``most_recent_labeled_outcome_label_as_of_trading_date`` and completes
 the planned scan-labeled scalar provenance series (see
 [decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md](decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md)).
-Phase 228 (draft) live-verifies that revision (see
+Phase 228 live-verified that revision and closed the series milestone (see
 [decisions/0229-phase-228-nas-live-verify-phase-227.md](decisions/0229-phase-228-nas-live-verify-phase-227.md)).
 Phase 229 (draft) proposes a scan-labeled freshness lag diagnostic rather than more nested extracts
 (see
 [decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md](decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md)).
+Phase 230 (draft) would live-verify that diagnostic (see
+[decisions/0231-phase-230-nas-live-verify-phase-229.md](decisions/0231-phase-230-nas-live-verify-phase-229.md)).
 
 ## System context
 

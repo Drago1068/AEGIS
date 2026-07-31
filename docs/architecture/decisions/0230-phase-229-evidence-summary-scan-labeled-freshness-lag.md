@@ -1,11 +1,11 @@
 # ADR-0230: Phase 229 Evidence Summary Scan-Labeled Freshness Lag (draft)
 
-- Status: Proposed (pending Phase 228 series-complete gate)
+- Status: Proposed (ready after Phase 228 series-complete; do not start until gate approved)
 - Date: 2026-07-31
 
 ## Context
 
-Phases 213–228 complete the planned scan-labeled scalar provenance lift
+Phases 213–228 completed the planned scan-labeled scalar provenance lift
 (``most_recent_labeled_outcome_label_*``). Live NAS evidence repeatedly shows AAPL with
 ``latest_outcome_label_id=null`` while scan-labeled fields are non-null. Operators can now
 see both ``latest_as_of_trading_date`` and ``most_recent_labeled_outcome_label_as_of_trading_date``
@@ -46,7 +46,17 @@ Scan-labeled identity/provenance scalars are complete. The remaining operator pa
 **interpreting the unlabeled gap**. Lag is derived evidence from existing dates, not a new
 nested dig.
 
+## Resume (after series-complete gate)
+
+```powershell
+# Implement scan_labeled_freshness_lag_trading_days (ADR-0230); tests; commit+push; then Phase 230:
+# git archive HEAD → NAS; rebuild backend+frontend TLS; then:
+.\docker\nas\scripts\verify.ps1
+# Expect: OK Phase 230 scan_labeled_freshness_lag_trading_days=… (AAPL non-null when both as_of dates present)
+```
+
 ## Related documents
 
 - [0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md](0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md)
+- [0229-phase-228-nas-live-verify-phase-227.md](0229-phase-228-nas-live-verify-phase-227.md)
 - [0231-phase-230-nas-live-verify-phase-229.md](0231-phase-230-nas-live-verify-phase-229.md)

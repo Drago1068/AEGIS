@@ -1,6 +1,6 @@
 # ADR-0144: Phase 143 Extract Research Assessment Error Alert
 
-- Status: Accepted (drafted; implement next)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context

@@ -381,6 +381,9 @@ describe("ResearchAssessmentPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: /run assessment/i }));
 
     await waitFor(() => {
+      expect(screen.getByTestId("research-assessment-error")).toHaveTextContent(
+        /insufficient_primary_bars/i,
+      );
       expect(screen.getByRole("alert")).toHaveTextContent(/insufficient_primary_bars/i);
     });
     expect(screen.queryByText(/state: research only/i)).not.toBeInTheDocument();

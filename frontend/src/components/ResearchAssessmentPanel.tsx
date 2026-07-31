@@ -32,6 +32,7 @@ import {
 
 import { resolveOutcomeLabelHistoryLoadKind } from "./research-assessment-panel-helpers";
 import { ResearchAssessmentActionToolbar } from "./ResearchAssessmentActionToolbar";
+import { ResearchAssessmentErrorAlert } from "./ResearchAssessmentErrorAlert";
 import { ResearchAssessmentHistorySection } from "./ResearchAssessmentHistorySection";
 import { ResearchAssessmentPanelHeader } from "./ResearchAssessmentPanelHeader";
 import { ResearchBackfillStatusSection } from "./ResearchBackfillStatusSection";
@@ -476,11 +477,7 @@ export function ResearchAssessmentPanel({
         />
       </ResearchAssessmentPanelHeader>
 
-      {error ? (
-        <p className="mb-3 text-sm text-aegis-danger" role="alert">
-          {error}
-        </p>
-      ) : null}
+      <ResearchAssessmentErrorAlert error={error} />
 
       <ResearchBackfillStatusSection
         backfillSummary={backfillSummary}

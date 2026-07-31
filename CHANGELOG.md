@@ -27,7 +27,8 @@ Move panel error banner into a presentational component (no behavior change). Se
 
 #### Added
 
-- Error alert extract drafted (implement next).
+- ``ResearchAssessmentErrorAlert.tsx`` with ``data-testid="research-assessment-error"``.
+- Panel UI modularization complete; next phases prefer product/evidence work.
 
 #### Explicitly out of scope
 

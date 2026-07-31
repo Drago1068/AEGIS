@@ -7,21 +7,52 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 228 - NAS Live Verification of Phase 227 (draft)
+
+Ops evidence gate after Phase 227 most recent labeled outcome label as-of trading date field. See
+[docs/architecture/decisions/0229-phase-228-nas-live-verify-phase-227.md](docs/architecture/decisions/0229-phase-228-nas-live-verify-phase-227.md).
+
+### Phase 227 - Evidence Summary Most Recent Labeled Outcome Label As-Of Trading Date (draft)
+
+Surface top-level ``most_recent_labeled_outcome_label_as_of_trading_date`` on evidence summary for
+scan-labeled provenance. See
+[docs/architecture/decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md](docs/architecture/decisions/0228-phase-227-evidence-summary-most-recent-labeled-outcome-label-as-of-trading-date.md).
+
 ### Phase 226 - NAS Live Verification of Phase 225 (draft)
 
 Ops evidence gate after Phase 225 most recent labeled outcome label computed_at field. See
 [docs/architecture/decisions/0227-phase-226-nas-live-verify-phase-225.md](docs/architecture/decisions/0227-phase-226-nas-live-verify-phase-225.md).
 
-### Phase 225 - Evidence Summary Most Recent Labeled Outcome Label Computed At (draft)
+### Phase 225 - Evidence Summary Most Recent Labeled Outcome Label Computed At
 
 Surface top-level ``most_recent_labeled_outcome_label_computed_at`` on evidence summary for
 scan-labeled provenance. See
 [docs/architecture/decisions/0226-phase-225-evidence-summary-most-recent-labeled-outcome-label-computed-at.md](docs/architecture/decisions/0226-phase-225-evidence-summary-most-recent-labeled-outcome-label-computed-at.md).
 
-### Phase 224 - NAS Live Verification of Phase 223 (draft)
+#### Added
 
-Ops evidence gate after Phase 223 most recent labeled outcome label bar source field. See
+- ``most_recent_labeled_outcome_label_computed_at`` on evidence summary (+ export); from scan-labeled label.
+- Console surfaces the field with ``data-testid="evidence-most-recent-labeled-outcome-label-computed-at"``.
+- NAS verify checklist item 108 for Phase 226.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 224 - NAS Live Verification of Phase 223
+
+Ops evidence gate after Phase 223 most recent labeled outcome label bar source field. Live verify
+passed 2026-07-31 (``7d73b42``; AAPL ``most_recent_labeled_outcome_label_bar_source=polygon``
+with ``most_recent_labeled_outcome_label_id=82``). See
 [docs/architecture/decisions/0225-phase-224-nas-live-verify-phase-223.md](docs/architecture/decisions/0225-phase-224-nas-live-verify-phase-223.md).
+
+#### Added
+
+- ADR-0225: live verify requires backend+frontend recreate for Phase 223; checklist item 107.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 223 - Evidence Summary Most Recent Labeled Outcome Label Bar Source
 

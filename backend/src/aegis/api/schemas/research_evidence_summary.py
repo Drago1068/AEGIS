@@ -151,6 +151,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "input/source fields. Never invented."
         ),
     )
+    most_recent_labeled_outcome_label_computed_at: datetime | None = Field(
+        default=None,
+        description=(
+            "computed_at from most_recent_labeled_outcome_label when present. Null when no "
+            "scan-labeled rows. Distinct from latest_outcome_label_computed_at and "
+            "assessment/calibration computed_at. Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

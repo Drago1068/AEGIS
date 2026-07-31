@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 188 - NAS Live Verification of Phase 187 (draft)
+### Phase 190 - NAS Live Verification of Phase 189 (draft)
 
-Ops evidence gate after Phase 187 latest calibration method id field. See
+Ops evidence gate after Phase 189 latest calibration method version field. See
+[docs/architecture/decisions/0191-phase-190-nas-live-verify-phase-189.md](docs/architecture/decisions/0191-phase-190-nas-live-verify-phase-189.md).
+
+### Phase 189 - Evidence Summary Latest Calibration Method Version
+
+Surface top-level ``latest_calibration_method_version`` on evidence summary. See
+[docs/architecture/decisions/0190-phase-189-evidence-summary-latest-calibration-method-version.md](docs/architecture/decisions/0190-phase-189-evidence-summary-latest-calibration-method-version.md).
+
+#### Added
+
+- ``latest_calibration_method_version`` on evidence summary (+ export); from latest_calibration.
+- Console surfaces the field with ``data-testid="evidence-latest-calibration-method-version"``.
+- NAS verify checklist item 90 for Phase 190.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 188 - NAS Live Verification of Phase 187
+
+Ops evidence gate after Phase 187 latest calibration method id field. Live verify passed
+2026-07-31 (``ac5cedc``; AAPL method_id=research_calibration_v1). See
 [docs/architecture/decisions/0189-phase-188-nas-live-verify-phase-187.md](docs/architecture/decisions/0189-phase-188-nas-live-verify-phase-187.md).
+
+#### Added
+
+- ADR-0189: live verify requires backend+frontend recreate for Phase 187; checklist item 89.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 187 - Evidence Summary Latest Calibration Method Id
 

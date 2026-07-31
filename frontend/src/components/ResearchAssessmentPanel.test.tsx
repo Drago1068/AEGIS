@@ -161,6 +161,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_corpus_count: null,
       latest_calibration_bucket_count: null,
       latest_calibration_method_id: null,
+      latest_calibration_method_version: null,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
   });
@@ -529,6 +530,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_corpus_count: 12,
       latest_calibration_bucket_count: 6,
       latest_calibration_method_id: "research_calibration_v1",
+      latest_calibration_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
 
@@ -606,6 +608,9 @@ describe("ResearchAssessmentPanel", () => {
       );
       expect(screen.getByTestId("evidence-latest-calibration-method-id")).toHaveTextContent(
         "research_calibration_v1",
+      );
+      expect(screen.getByTestId("evidence-latest-calibration-method-version")).toHaveTextContent(
+        "1",
       );
       expect(screen.getByText(/mixed unlabeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed labeled \(scanned\)/i)).toBeInTheDocument();
@@ -747,6 +752,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_corpus_count: 12,
       latest_calibration_bucket_count: 6,
       latest_calibration_method_id: "research_calibration_v1",
+      latest_calibration_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([
@@ -871,6 +877,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_corpus_count: 12,
       latest_calibration_bucket_count: 6,
       latest_calibration_method_id: "research_calibration_v1",
+      latest_calibration_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -993,6 +1000,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_corpus_count: 12,
       latest_calibration_bucket_count: 6,
       latest_calibration_method_id: "research_calibration_v1",
+      latest_calibration_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1205,6 +1213,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_corpus_count: 12,
       latest_calibration_bucket_count: 6,
       latest_calibration_method_id: "research_calibration_v1",
+      latest_calibration_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listResearchAssessments).mockResolvedValue([mixedRow]);
@@ -1377,6 +1386,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_corpus_count: 12,
       latest_calibration_bucket_count: 6,
       latest_calibration_method_id: "research_calibration_v1",
+      latest_calibration_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([]);
@@ -1545,6 +1555,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_calibration_corpus_count: 12,
       latest_calibration_bucket_count: 6,
       latest_calibration_method_id: "research_calibration_v1",
+      latest_calibration_method_version: 1,
       detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
     });
     vi.mocked(listOutcomeLabels).mockResolvedValue([

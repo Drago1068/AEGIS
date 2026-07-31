@@ -1017,6 +1017,8 @@ export interface ResearchEvidenceSummary {
   latest_calibration_bucket_count: number | null;
   /** calibration_method_id from latest_calibration when present; null otherwise. Distinct from assessment latest_method_id. */
   latest_calibration_method_id: string | null;
+  /** calibration_method_version from latest_calibration when present; null otherwise. Distinct from assessment latest_method_version. */
+  latest_calibration_method_version: number | null;
   detail: string;
 }
 

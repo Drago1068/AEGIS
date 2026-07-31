@@ -482,8 +482,12 @@ Phase 186 live-verified that revision (see
 [decisions/0187-phase-186-nas-live-verify-phase-185.md](decisions/0187-phase-186-nas-live-verify-phase-185.md)).
 Phase 187 surfaces top-level ``latest_calibration_method_id`` on evidence summary (see
 [decisions/0188-phase-187-evidence-summary-latest-calibration-method-id.md](decisions/0188-phase-187-evidence-summary-latest-calibration-method-id.md)).
-Phase 188 (draft) live-verifies that revision (see
+Phase 188 live-verified that revision (see
 [decisions/0189-phase-188-nas-live-verify-phase-187.md](decisions/0189-phase-188-nas-live-verify-phase-187.md)).
+Phase 189 surfaces top-level ``latest_calibration_method_version`` on evidence summary (see
+[decisions/0190-phase-189-evidence-summary-latest-calibration-method-version.md](decisions/0190-phase-189-evidence-summary-latest-calibration-method-version.md)).
+Phase 190 (draft) live-verifies that revision (see
+[decisions/0191-phase-190-nas-live-verify-phase-189.md](decisions/0191-phase-190-nas-live-verify-phase-189.md)).
 
 ## System context
 

@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 246 - NAS Live Verification of Phase 245 (draft)
+### Phase 248 - NAS Live Verification of Phase 247 (draft)
 
-Ops evidence gate after Phase 245 latest forward-bar shortfall diagnostic. See
+Ops evidence gate after Phase 247 required label end-date diagnostic. See
+[docs/architecture/decisions/0249-phase-248-nas-live-verify-phase-247.md](docs/architecture/decisions/0249-phase-248-nas-live-verify-phase-247.md).
+
+### Phase 247 - Evidence Summary Latest Required Label End Date (draft)
+
+Calendar trading date that unlocks max-horizon labeling (companion to shortfall). See
+[docs/architecture/decisions/0248-phase-247-evidence-summary-latest-required-label-end-date.md](docs/architecture/decisions/0248-phase-247-evidence-summary-latest-required-label-end-date.md).
+
+### Phase 246 - NAS Live Verification of Phase 245
+
+Ops evidence gate after Phase 245 latest forward-bar shortfall diagnostic. Live verify passed
+2026-07-31 (``cbe7032``; AAPL ``latest_assessment_forward_bar_shortfall=20``). See
 [docs/architecture/decisions/0247-phase-246-nas-live-verify-phase-245.md](docs/architecture/decisions/0247-phase-246-nas-live-verify-phase-245.md).
+
+#### Added
+
+- ADR-0247: live verify requires backend+frontend recreate for Phase 245; checklist item 118.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 245 - Evidence Summary Latest Label Forward Bar Shortfall
 

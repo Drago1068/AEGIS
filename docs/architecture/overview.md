@@ -90,8 +90,9 @@ scan-wide label counts), Phase 146 (NAS live verify of Phase 145), Phase 147 (ev
 summary latest coverage confidence), Phase 148 (NAS live verify of Phase 147), Phase 149
 (evidence summary latest research index), Phase 150 (NAS live verify of Phase 149),
 Phase 151 (evidence summary latest as-of trading date), Phase 152 (NAS live verify of
-Phase 151), Phase 153 (evidence summary latest bar count), and Phase 154 (NAS live verify of
-Phase 153).
+Phase 151), Phase 153 (evidence summary latest bar count), Phase 154 (NAS live verify of
+Phase 153), Phase 155 (draft: evidence summary latest input source), and Phase 156 (draft:
+NAS live verify of Phase 155).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -415,6 +416,10 @@ Phase 153 surfaces top-level ``latest_bar_count`` on evidence summary (see
 [decisions/0154-phase-153-evidence-summary-latest-bar-count.md](decisions/0154-phase-153-evidence-summary-latest-bar-count.md)).
 Phase 154 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0155-phase-154-nas-live-verify-phase-153.md](decisions/0155-phase-154-nas-live-verify-phase-153.md)).
+Phase 155 (draft) surfaces top-level ``latest_input_source`` on evidence summary (see
+[decisions/0156-phase-155-evidence-summary-latest-input-source.md](decisions/0156-phase-155-evidence-summary-latest-input-source.md)).
+Phase 156 (draft) live-verifies that revision (see
+[decisions/0157-phase-156-nas-live-verify-phase-155.md](decisions/0157-phase-156-nas-live-verify-phase-155.md)).
 
 ## System context
 

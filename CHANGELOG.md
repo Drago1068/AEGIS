@@ -7,9 +7,21 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 156 - NAS Live Verification of Phase 155 (draft)
+
+Ops evidence gate after Phase 155 latest input source field. See
+[docs/architecture/decisions/0157-phase-156-nas-live-verify-phase-155.md](docs/architecture/decisions/0157-phase-156-nas-live-verify-phase-155.md).
+
+### Phase 155 - Evidence Summary Latest Input Source (draft)
+
+Surface top-level ``latest_input_source`` on evidence summary (distinct from component
+source). See
+[docs/architecture/decisions/0156-phase-155-evidence-summary-latest-input-source.md](docs/architecture/decisions/0156-phase-155-evidence-summary-latest-input-source.md).
+
 ### Phase 154 - NAS Live Verification of Phase 153
 
-Ops evidence gate after Phase 153 latest bar count field. See
+Ops evidence gate after Phase 153 latest bar count field. Live verify passed 2026-07-30
+(``dda412e``; AAPL bar_count=20). See
 [docs/architecture/decisions/0155-phase-154-nas-live-verify-phase-153.md](docs/architecture/decisions/0155-phase-154-nas-live-verify-phase-153.md).
 
 #### Added

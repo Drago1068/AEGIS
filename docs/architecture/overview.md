@@ -604,9 +604,9 @@ Phase 241 surfaces ``most_recent_unlabeled_assessment_id`` for unlabeled tip dri
 [decisions/0242-phase-241-evidence-summary-most-recent-unlabeled-assessment-id.md](decisions/0242-phase-241-evidence-summary-most-recent-unlabeled-assessment-id.md)).
 Phase 242 live-verified that id (see
 [decisions/0243-phase-242-nas-live-verify-phase-241.md](decisions/0243-phase-242-nas-live-verify-phase-241.md)).
-Phase 243 (draft) proposes ``most_recent_unlabeled_as_of_trading_date`` for tip freshness (see
+Phase 243 surfaces ``most_recent_unlabeled_as_of_trading_date`` for tip freshness (see
 [decisions/0244-phase-243-evidence-summary-most-recent-unlabeled-as-of.md](decisions/0244-phase-243-evidence-summary-most-recent-unlabeled-as-of.md)).
-Phase 244 (draft) would live-verify that as_of (see
+Phase 244 live-verifies that as_of (see
 [decisions/0245-phase-244-nas-live-verify-phase-243.md](decisions/0245-phase-244-nas-live-verify-phase-243.md)).
 
 ## System context

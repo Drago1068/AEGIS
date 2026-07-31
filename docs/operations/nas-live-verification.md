@@ -201,7 +201,8 @@ $env:AEGIS_NAS_VERIFY_SYMBOL = "MSFT"
 | 114 | Phase 238 backend+frontend redeploy (Phase 237 most recent unlabeled labelable as-of) | Evidence-summary includes most_recent_unlabeled_labelable_as_of_trading_date (null OK when none) |
 | 115 | Phase 240 backend+frontend redeploy (Phase 239 scan unlabeled label-ready count) | Evidence-summary includes scan_unlabeled_label_ready_count (0 OK when none) |
 | 116 | Phase 242 backend+frontend redeploy (Phase 241 most recent unlabeled assessment id) | Evidence-summary includes most_recent_unlabeled_assessment_id (null OK when none unlabeled) |
-| 117 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
+| 117 | Phase 244 backend+frontend redeploy (Phase 243 most recent unlabeled as-of) | Evidence-summary includes most_recent_unlabeled_as_of_trading_date (null OK when none unlabeled) |
+| 118 | TLS (if enabled) | HTTPS URLs + `AEGIS_SESSION_COOKIE_SECURE=true` |
 
 Capture stdout as evidence. Failures exit non-zero — do not mark the NAS revision verified.
 

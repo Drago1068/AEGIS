@@ -1017,6 +1017,11 @@ export interface ResearchEvidenceSummary {
    * Null when none unlabeled. Never invented.
    */
   most_recent_unlabeled_assessment_id: number | null;
+  /**
+   * as_of_trading_date of the newest unlabeled assessment (same tip as id).
+   * Null when none unlabeled. Never invented.
+   */
+  most_recent_unlabeled_as_of_trading_date: string | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

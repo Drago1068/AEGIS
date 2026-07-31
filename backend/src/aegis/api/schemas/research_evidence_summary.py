@@ -227,6 +227,15 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "(equals latest only when latest is unlabeled). Never invented."
         ),
     )
+    most_recent_unlabeled_as_of_trading_date: date | None = Field(
+        default=None,
+        description=(
+            "as_of_trading_date of the newest scanned unlabeled assessment (same row as "
+            "most_recent_unlabeled_assessment_id). Null when none unlabeled. Distinct from "
+            "most_recent_unlabeled_labelable_as_of_trading_date and latest_as_of_trading_date. "
+            "Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

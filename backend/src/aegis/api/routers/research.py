@@ -428,9 +428,11 @@ async def _build_research_evidence_summary(
     labeled_assessment_count = sum(1 for row_id in scanned_ids if row_id in labeled_ids)
     unlabeled_assessment_count = max(0, assessment_count - labeled_assessment_count)
     most_recent_unlabeled_assessment_id: int | None = None
+    most_recent_unlabeled_as_of_trading_date: date | None = None
     for row in snapshots:
         if row.id is not None and row.id not in labeled_ids:
             most_recent_unlabeled_assessment_id = row.id
+            most_recent_unlabeled_as_of_trading_date = row.as_of_trading_date
             break
     mixed_unlabeled_assessment_count = count_mixed_unlabeled_assessments(
         snapshots, labeled_ids
@@ -684,6 +686,7 @@ async def _build_research_evidence_summary(
         ),
         scan_unlabeled_label_ready_count=scan_unlabeled_label_ready_count,
         most_recent_unlabeled_assessment_id=most_recent_unlabeled_assessment_id,
+        most_recent_unlabeled_as_of_trading_date=most_recent_unlabeled_as_of_trading_date,
         latest_coverage_confidence=latest_coverage_confidence,
         latest_research_index=latest_research_index,
         latest_as_of_trading_date=latest_as_of_trading_date,

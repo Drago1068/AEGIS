@@ -7,15 +7,33 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 244 - NAS Live Verification of Phase 243 (draft)
+### Phase 244 - NAS Live Verification of Phase 243
 
 Ops evidence gate after Phase 243 most-recent-unlabeled as_of diagnostic. See
 [docs/architecture/decisions/0245-phase-244-nas-live-verify-phase-243.md](docs/architecture/decisions/0245-phase-244-nas-live-verify-phase-243.md).
 
-### Phase 243 - Evidence Summary Most Recent Unlabeled As-Of (draft)
+#### Added
+
+- ADR-0245: live verify requires backend+frontend recreate for Phase 243; checklist item 117.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 243 - Evidence Summary Most Recent Unlabeled As-Of
 
 as_of_trading_date of the newest unlabeled assessment (tip freshness beside tip id). See
 [docs/architecture/decisions/0244-phase-243-evidence-summary-most-recent-unlabeled-as-of.md](docs/architecture/decisions/0244-phase-243-evidence-summary-most-recent-unlabeled-as-of.md).
+
+#### Added
+
+- ``most_recent_unlabeled_as_of_trading_date`` on evidence summary (+ export).
+- Console ``data-testid="evidence-most-recent-unlabeled-as-of-trading-date"``.
+- NAS verify checklist item 117 for Phase 244.
+
+#### Explicitly out of scope
+
+UI modularization, inventing label-ready targets, default-on calibration, orders.
 
 ### Phase 242 - NAS Live Verification of Phase 241
 

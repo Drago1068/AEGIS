@@ -143,7 +143,8 @@ print_checklist() {
   echo "114. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
   echo "115. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
   echo "116. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
-  echo "117. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo "117. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
+  echo "118. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -961,6 +962,12 @@ if ! grep -q '"most_recent_unlabeled_assessment_id"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 242 most_recent_unlabeled_assessment_id field present"
+# Phase 244: most_recent_unlabeled_as_of_trading_date from Phase 243 (null OK when none unlabeled).
+if ! grep -q '"most_recent_unlabeled_as_of_trading_date"' "${summary_body}"; then
+  echo "evidence-summary missing most_recent_unlabeled_as_of_trading_date (Phase 243/244)" >&2
+  exit 1
+fi
+echo "OK  Phase 244 most_recent_unlabeled_as_of_trading_date field present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -1108,6 +1115,10 @@ if ! grep -q '"scan_unlabeled_label_ready_count"' "${export_body}"; then
 fi
 if ! grep -q '"most_recent_unlabeled_assessment_id"' "${export_body}"; then
   echo "evidence-summary/export missing most_recent_unlabeled_assessment_id (Phase 241/242)" >&2
+  exit 1
+fi
+if ! grep -q '"most_recent_unlabeled_as_of_trading_date"' "${export_body}"; then
+  echo "evidence-summary/export missing most_recent_unlabeled_as_of_trading_date (Phase 243/244)" >&2
   exit 1
 fi
 echo "OK  evidence-summary/export attachment state=research_only"

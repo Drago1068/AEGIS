@@ -154,7 +154,8 @@ function Write-VerifyChecklist {
     Write-Host "114. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
     Write-Host "115. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
     Write-Host "116. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
-    Write-Host "117. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "117. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
+    Write-Host "118. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1176,6 +1177,13 @@ try {
         $unlabeledAssessmentId = $summary.most_recent_unlabeled_assessment_id
         $unlabeledAssessmentIdPart = if ($null -eq $unlabeledAssessmentId -or $unlabeledAssessmentId -eq "") { "null" } else { [string]$unlabeledAssessmentId }
         Write-Host "OK  Phase 242 most_recent_unlabeled_assessment_id=$unlabeledAssessmentIdPart"
+        # Phase 244: most_recent_unlabeled_as_of_trading_date from Phase 243 (null OK when none unlabeled).
+        if (-not ($summary.PSObject.Properties.Name -contains "most_recent_unlabeled_as_of_trading_date")) {
+            throw "evidence-summary missing most_recent_unlabeled_as_of_trading_date (Phase 243/244)"
+        }
+        $unlabeledAsOf = $summary.most_recent_unlabeled_as_of_trading_date
+        $unlabeledAsOfPart = if ($null -eq $unlabeledAsOf -or $unlabeledAsOf -eq "") { "null" } else { [string]$unlabeledAsOf }
+        Write-Host "OK  Phase 244 most_recent_unlabeled_as_of_trading_date=$unlabeledAsOfPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1369,6 +1377,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_unlabeled_assessment_id")) {
             throw "evidence-summary/export missing most_recent_unlabeled_assessment_id (Phase 241/242)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_unlabeled_as_of_trading_date")) {
+            throw "evidence-summary/export missing most_recent_unlabeled_as_of_trading_date (Phase 243/244)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

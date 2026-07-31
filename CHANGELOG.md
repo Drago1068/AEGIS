@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 160 - NAS Live Verification of Phase 159 (draft)
+### Phase 162 - NAS Live Verification of Phase 161 (draft)
 
-Ops evidence gate after Phase 159 latest method version field. See
+Ops evidence gate after Phase 161 latest lookback end date field. See
+[docs/architecture/decisions/0163-phase-162-nas-live-verify-phase-161.md](docs/architecture/decisions/0163-phase-162-nas-live-verify-phase-161.md).
+
+### Phase 161 - Evidence Summary Latest Lookback End Date (draft)
+
+Surface top-level ``latest_lookback_end_date`` on evidence summary. See
+[docs/architecture/decisions/0162-phase-161-evidence-summary-latest-lookback-end.md](docs/architecture/decisions/0162-phase-161-evidence-summary-latest-lookback-end.md).
+
+### Phase 160 - NAS Live Verification of Phase 159
+
+Ops evidence gate after Phase 159 latest method version field. Live verify passed 2026-07-31
+(``f78c02b``; AAPL method_version=2). See
 [docs/architecture/decisions/0161-phase-160-nas-live-verify-phase-159.md](docs/architecture/decisions/0161-phase-160-nas-live-verify-phase-159.md).
+
+#### Added
+
+- ADR-0161: live verify requires backend+frontend recreate for Phase 159; checklist item 75.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 159 - Evidence Summary Latest Method Version
 

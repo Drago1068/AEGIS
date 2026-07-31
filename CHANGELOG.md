@@ -26,7 +26,7 @@ Keep the outcome-label panel (and captions) visible when a loaded assessment has
 stored labels. See
 [docs/architecture/decisions/0092-phase-91-outcome-label-empty-state-loaded-assessment.md](docs/architecture/decisions/0092-phase-91-outcome-label-empty-state-loaded-assessment.md).
 
-#### Planned
+#### Added
 
 - Empty-state line when ``outcomeLabelHistoryAssessmentId`` is set and labels are empty.
 

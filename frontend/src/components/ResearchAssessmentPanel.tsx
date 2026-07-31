@@ -976,7 +976,7 @@ export function ResearchAssessmentPanel({
               </ul>
             )}
           </div>
-          {outcomeLabel ? (
+          {outcomeLabel || outcomeLabelHistoryAssessmentId != null ? (
             <div className="rounded border border-aegis-line bg-white/60 p-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
                 Outcome labels (evidence only — not calibrated probability)
@@ -1000,46 +1000,57 @@ export function ResearchAssessmentPanel({
                   ) : null}
                 </p>
               ) : null}
-              <dl className="mt-2 grid gap-2 sm:grid-cols-2">
-                {sortedLabelEntries(outcomeLabel.labels).map(([key, value]) => {
-                  const end = outcomeLabel.label_end_dates[key];
-                  return (
-                    <div key={key}>
-                      <dt className="text-aegis-muted">{key}</dt>
-                      <dd className="font-mono">
-                        {value.toFixed(6)}
-                        {typeof end === "string" && end.length > 0
-                          ? ` · end ${end}`
-                          : null}
-                      </dd>
-                    </div>
-                  );
-                })}
-              </dl>
-              <p className="mt-2 text-xs text-aegis-muted">
-                Bar source {outcomeLabel.bar_source}. Label method{" "}
-                {outcomeLabel.label_method_id} v{outcomeLabel.label_method_version}.
-              </p>
-              {outcomeLabelHistory.length > 1 ? (
-                <div className="mt-3 border-t border-aegis-line pt-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
-                    Outcome label history (newest first)
-                  </p>
-                  <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
-                    {outcomeLabelHistory.map((row) => {
-                      const horizons = formatLabelHorizonSummary(
-                        row.labels,
-                        row.label_end_dates,
-                      );
+              {outcomeLabel ? (
+                <>
+                  <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                    {sortedLabelEntries(outcomeLabel.labels).map(([key, value]) => {
+                      const end = outcomeLabel.label_end_dates[key];
                       return (
-                        <li key={row.id ?? `${row.computed_at}-${horizons}`}>
-                          {row.computed_at} · {horizons} · {row.bar_source}
-                        </li>
+                        <div key={key}>
+                          <dt className="text-aegis-muted">{key}</dt>
+                          <dd className="font-mono">
+                            {value.toFixed(6)}
+                            {typeof end === "string" && end.length > 0
+                              ? ` · end ${end}`
+                              : null}
+                          </dd>
+                        </div>
                       );
                     })}
-                  </ul>
-                </div>
-              ) : null}
+                  </dl>
+                  <p className="mt-2 text-xs text-aegis-muted">
+                    Bar source {outcomeLabel.bar_source}. Label method{" "}
+                    {outcomeLabel.label_method_id} v{outcomeLabel.label_method_version}.
+                  </p>
+                  {outcomeLabelHistory.length > 1 ? (
+                    <div className="mt-3 border-t border-aegis-line pt-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
+                        Outcome label history (newest first)
+                      </p>
+                      <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
+                        {outcomeLabelHistory.map((row) => {
+                          const horizons = formatLabelHorizonSummary(
+                            row.labels,
+                            row.label_end_dates,
+                          );
+                          return (
+                            <li key={row.id ?? `${row.computed_at}-${horizons}`}>
+                              {row.computed_at} · {horizons} · {row.bar_source}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  ) : null}
+                </>
+              ) : (
+                <p
+                  className="mt-2 text-sm text-aegis-muted"
+                  data-testid="outcome-label-empty-state"
+                >
+                  No outcome labels stored for assessment {outcomeLabelHistoryAssessmentId}
+                </p>
+              )}
             </div>
           ) : null}
           {readiness ? (

@@ -1,6 +1,6 @@
 # ADR-0092: Phase 91 Outcome-Label Empty State for Loaded Assessment
 
-- Status: Accepted (draft / pending implementation)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
@@ -25,11 +25,8 @@ display, still render the outcome-label panel shell with:
 
 New API fields, default-on calibration, changing ``latest_assessment``, orders, ACME.
 
-## Resume
-
-Implement UI + unit tests; update CHANGELOG/README/overview; then Phase 92 NAS verify.
-
 ## Related documents
 
 - [0084-phase-83-outcome-label-history-assessment-id.md](0084-phase-83-outcome-label-history-assessment-id.md)
 - [0090-phase-89-outcome-label-download-names-assessment.md](0090-phase-89-outcome-label-download-names-assessment.md)
+- [0093-phase-92-nas-live-verify-phase-91.md](0093-phase-92-nas-live-verify-phase-91.md)

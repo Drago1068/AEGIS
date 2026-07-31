@@ -255,6 +255,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "latest_calibration_state. Never invented."
         ),
     )
+    latest_outcome_label_bar_source: str | None = Field(
+        default=None,
+        description=(
+            "bar_source from latest_outcome_label when the latest assessment is labeled. Null "
+            "when unlabeled. Distinct from latest_resolved_label_bar_source (which may resolve "
+            "without a label row) and latest_mixed_label_bar_source. Never invented."
+        ),
+    )
     latest_calibration_id: int | None = Field(
         default=None,
         ge=1,

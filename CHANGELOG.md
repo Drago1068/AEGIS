@@ -7,9 +7,22 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 234 - NAS Live Verification of Phase 233 (draft)
+### Phase 236 - NAS Live Verification of Phase 235 (draft)
 
-Ops evidence gate after Phase 233 latest-assessment label block reason. See
+Ops evidence gate after Phase 235 most-recent-labelable as_of diagnostic. See
+[docs/architecture/decisions/0237-phase-236-nas-live-verify-phase-235.md](docs/architecture/decisions/0237-phase-236-nas-live-verify-phase-235.md).
+
+### Phase 235 - Evidence Summary Most Recent Labelable As-Of Trading Date (draft)
+
+Newest assessment as_of that is label-ready with stored bars (backfill targeting diagnostic).
+See
+[docs/architecture/decisions/0236-phase-235-evidence-summary-most-recent-labelable-as-of-trading-date.md](docs/architecture/decisions/0236-phase-235-evidence-summary-most-recent-labelable-as-of-trading-date.md).
+
+### Phase 234 - NAS Live Verification of Phase 233 (blocked on NAS SSH)
+
+Ops evidence gate after Phase 233 label block reason. Implementation is on ``main``
+(``9dee476``); live deploy/verify **blocked 2026-07-31** while NAS SSH port 22 refuses
+connections (host still pings). See
 [docs/architecture/decisions/0235-phase-234-nas-live-verify-phase-233.md](docs/architecture/decisions/0235-phase-234-nas-live-verify-phase-233.md).
 
 ### Phase 233 - Evidence Summary Latest Assessment Label Block Reason

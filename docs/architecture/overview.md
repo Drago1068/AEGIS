@@ -584,8 +584,13 @@ Phase 232 live-verified that diagnostic (see
 Phase 233 surfaces ``latest_assessment_label_block_reason`` for the fail-closed gate code when
 not ready (see
 [decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md](decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md)).
-Phase 234 (draft) live-verifies that reason field (see
+Phase 234 live-verifies that reason field once NAS SSH is available (see
 [decisions/0235-phase-234-nas-live-verify-phase-233.md](decisions/0235-phase-234-nas-live-verify-phase-233.md)).
+Phase 235 (draft) proposes ``most_recent_labelable_as_of_trading_date`` for backfill targeting
+(see
+[decisions/0236-phase-235-evidence-summary-most-recent-labelable-as-of-trading-date.md](decisions/0236-phase-235-evidence-summary-most-recent-labelable-as-of-trading-date.md)).
+Phase 236 (draft) would live-verify that field (see
+[decisions/0237-phase-236-nas-live-verify-phase-235.md](decisions/0237-phase-236-nas-live-verify-phase-235.md)).
 
 ## System context
 

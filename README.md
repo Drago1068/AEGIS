@@ -7,9 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 233 implemented (latest assessment label block reason).** Next: Phase 234
-NAS backend+frontend verify (ADR-0235). See
-[docs/architecture/decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md](docs/architecture/decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md)
+**Current phase: Phase 233 implemented on main (`9dee476`); Phase 234 blocked on NAS SSH
+(port 22 refused; host pings).** When SSH returns: deploy+verify Phase 234, then draft next is
+Phase 235 ``most_recent_labelable_as_of_trading_date`` (ADR-0236). See
+[docs/architecture/decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md](docs/architecture/decisions/0234-phase-233-evidence-summary-latest-assessment-label-block-reason.md),
+[docs/architecture/decisions/0235-phase-234-nas-live-verify-phase-233.md](docs/architecture/decisions/0235-phase-234-nas-live-verify-phase-233.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

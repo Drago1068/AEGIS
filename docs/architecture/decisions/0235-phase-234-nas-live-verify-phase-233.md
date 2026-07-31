@@ -1,13 +1,16 @@
 # ADR-0235: Phase 234 NAS Live Verification of Phase 233
 
-- Status: Proposed (pending Phase 233 + live evidence)
+- Status: Proposed (pending NAS SSH restore + live evidence)
 - Date: 2026-07-31
 
 ## Context
 
-Phase 233 adds ``latest_assessment_label_block_reason`` on evidence summary (ADR-0234).
-Operators need a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after
-that lands.
+Phase 233 adds ``latest_assessment_label_block_reason`` on evidence summary (ADR-0234;
+implemented on ``main`` at ``9dee476``). Operators need a verified backend+frontend redeploy
+on the UGREEN NAS under lab TLS after that lands.
+
+**Ops note (2026-07-31):** Host ``192.168.1.12`` responds to ICMP, but TCP/SSH port 22
+refuses connections (banner exchange fails). Phase 234 cannot proceed until SSH is restored.
 
 ## Decisions
 
@@ -30,7 +33,8 @@ New scoring math, default-on calibration, ACME, actionable promotion, orders.
 ## Resume
 
 ```powershell
-# After Phase 233 is on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
+# When NAS SSH accepts connections again:
+# git archive HEAD (9dee476+) → NAS; rebuild backend+frontend TLS; then:
 .\docker\nas\scripts\verify.ps1
 # Expect: OK Phase 234 latest_assessment_label_block_reason=insufficient_forward_bars (AAPL)
 ```

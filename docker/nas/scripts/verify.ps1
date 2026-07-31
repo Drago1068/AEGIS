@@ -100,7 +100,8 @@ function Write-VerifyChecklist {
     Write-Host " 60. Phase 130: frontend redeploy includes Phase 129 extract-assessment-history-section (unit-tested)"
     Write-Host " 61. Phase 132: frontend redeploy includes Phase 131 extract-calibration-readiness-section (unit-tested)"
     Write-Host " 62. Phase 134: frontend redeploy includes Phase 133 extract-probability-calibration-section (unit-tested)"
-    Write-Host " 63. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 63. Phase 136: frontend redeploy includes Phase 135 extract-evidence-summary-section (unit-tested)"
+    Write-Host " 64. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {

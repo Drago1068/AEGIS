@@ -89,7 +89,8 @@ print_checklist() {
   echo " 60. Phase 130: frontend redeploy includes Phase 129 extract-assessment-history-section (unit-tested)"
   echo " 61. Phase 132: frontend redeploy includes Phase 131 extract-calibration-readiness-section (unit-tested)"
   echo " 62. Phase 134: frontend redeploy includes Phase 133 extract-probability-calibration-section (unit-tested)"
-  echo " 63. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo " 63. Phase 136: frontend redeploy includes Phase 135 extract-evidence-summary-section (unit-tested)"
+  echo " 64. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then

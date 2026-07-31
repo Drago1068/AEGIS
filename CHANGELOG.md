@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 184 - NAS Live Verification of Phase 183 (draft)
+### Phase 186 - NAS Live Verification of Phase 185 (draft)
 
-Ops evidence gate after Phase 183 latest calibration corpus count field. See
+Ops evidence gate after Phase 185 latest calibration bucket count field. See
+[docs/architecture/decisions/0187-phase-186-nas-live-verify-phase-185.md](docs/architecture/decisions/0187-phase-186-nas-live-verify-phase-185.md).
+
+### Phase 185 - Evidence Summary Latest Calibration Bucket Count
+
+Surface top-level ``latest_calibration_bucket_count`` on evidence summary. See
+[docs/architecture/decisions/0186-phase-185-evidence-summary-latest-calibration-bucket-count.md](docs/architecture/decisions/0186-phase-185-evidence-summary-latest-calibration-bucket-count.md).
+
+#### Added
+
+- ``latest_calibration_bucket_count`` on evidence summary (+ export); from latest_calibration.
+- Console surfaces the field with ``data-testid="evidence-latest-calibration-bucket-count"``.
+- NAS verify checklist item 88 for Phase 186.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
+
+### Phase 184 - NAS Live Verification of Phase 183
+
+Ops evidence gate after Phase 183 latest calibration corpus count field. Live verify passed
+2026-07-31 (``af08753``; AAPL corpus_count=100). See
 [docs/architecture/decisions/0185-phase-184-nas-live-verify-phase-183.md](docs/architecture/decisions/0185-phase-184-nas-live-verify-phase-183.md).
+
+#### Added
+
+- ADR-0185: live verify requires backend+frontend recreate for Phase 183; checklist item 87.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 183 - Evidence Summary Latest Calibration Corpus Count
 

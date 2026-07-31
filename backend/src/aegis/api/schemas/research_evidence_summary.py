@@ -243,4 +243,12 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "calibration_readiness corpus thresholds. Never invented."
         ),
     )
+    latest_calibration_bucket_count: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "bucket_count from latest_calibration when present. Null when none. Distinct from "
+            "calibration_readiness bucket thresholds. Never invented."
+        ),
+    )
     detail: str

@@ -125,7 +125,8 @@ function Write-VerifyChecklist {
     Write-Host " 85. Authenticated evidence-summary includes Phase 179 latest_calibration_horizon_key (Phase 180)"
     Write-Host " 86. Authenticated evidence-summary includes Phase 181 latest_calibration_computed_at (Phase 182)"
     Write-Host " 87. Authenticated evidence-summary includes Phase 183 latest_calibration_corpus_count (Phase 184)"
-    Write-Host " 88. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 88. Authenticated evidence-summary includes Phase 185 latest_calibration_bucket_count (Phase 186)"
+    Write-Host " 89. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -926,6 +927,16 @@ try {
         }
         $corpusPart = if ($null -eq $corpusCount) { "null" } else { [string]$corpusCount }
         Write-Host "OK  Phase 184 latest_calibration_corpus_count=$corpusPart"
+        # Phase 186: latest_calibration_bucket_count from Phase 185 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_calibration_bucket_count")) {
+            throw "evidence-summary missing latest_calibration_bucket_count (Phase 185/186)"
+        }
+        $bucketCount = $summary.latest_calibration_bucket_count
+        if ($null -ne $bucketCount -and [int]$bucketCount -lt 0) {
+            throw "Phase 186: latest_calibration_bucket_count must be >= 0 when set"
+        }
+        $bucketPart = if ($null -eq $bucketCount) { "null" } else { [string]$bucketCount }
+        Write-Host "OK  Phase 186 latest_calibration_bucket_count=$bucketPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1032,6 +1043,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_corpus_count")) {
             throw "evidence-summary/export missing latest_calibration_corpus_count (Phase 183/184)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_bucket_count")) {
+            throw "evidence-summary/export missing latest_calibration_bucket_count (Phase 185/186)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

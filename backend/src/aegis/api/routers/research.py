@@ -513,6 +513,9 @@ async def _build_research_evidence_summary(
     latest_calibration_corpus_count = (
         latest_calibration.corpus_count if latest_calibration is not None else None
     )
+    latest_calibration_bucket_count = (
+        latest_calibration.bucket_count if latest_calibration is not None else None
+    )
 
     return ResearchEvidenceSummaryResponse(
         symbol=symbol.upper(),
@@ -553,6 +556,7 @@ async def _build_research_evidence_summary(
         latest_calibration_horizon_key=latest_calibration_horizon_key,
         latest_calibration_computed_at=latest_calibration_computed_at,
         latest_calibration_corpus_count=latest_calibration_corpus_count,
+        latest_calibration_bucket_count=latest_calibration_bucket_count,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

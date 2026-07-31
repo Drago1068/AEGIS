@@ -264,14 +264,18 @@ export function ResearchAssessmentPanel({
   }
 
   function onComputeOutcomeLabels() {
-    if (latest?.id == null) {
+    const assessmentId = outcomeLabelHistoryAssessmentId ?? latest?.id ?? null;
+    if (assessmentId == null) {
       return;
     }
+    const loadKind =
+      outcomeLabelHistoryLoadKind ??
+      (latest?.id != null && assessmentId === latest.id ? "latest" : "scan_labeled");
     startTransition(async () => {
       setError(null);
       try {
-        await createOutcomeLabels(baseUrl, symbol, latest.id as number);
-        await loadOutcomeLabelHistory(latest.id as number);
+        await createOutcomeLabels(baseUrl, symbol, assessmentId);
+        await loadOutcomeLabelHistory(assessmentId, loadKind);
         await loadReadiness();
         await loadEvidenceSummary();
       } catch (err) {
@@ -542,10 +546,21 @@ export function ResearchAssessmentPanel({
           <button
             type="button"
             onClick={onComputeOutcomeLabels}
-            disabled={isPending || latest?.id == null}
+            disabled={isPending || downloadOutcomeLabelsAssessmentId == null}
+            data-testid="compute-outcome-labels"
+            aria-label={
+              downloadOutcomeLabelsAssessmentId != null
+                ? `Compute outcome labels for assessment ${downloadOutcomeLabelsAssessmentId}`
+                : "Compute outcome labels"
+            }
             className="rounded border border-aegis-line bg-white px-3 py-2 text-sm font-medium text-aegis-ink transition hover:bg-aegis-panel disabled:opacity-60"
           >
             Compute outcome labels
+            {downloadOutcomeLabelsAssessmentId != null ? (
+              <span className="ml-1 font-mono text-xs text-aegis-muted">
+                ({downloadOutcomeLabelsAssessmentId})
+              </span>
+            ) : null}
           </button>
           <button
             type="button"

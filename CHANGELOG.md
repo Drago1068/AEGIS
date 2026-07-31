@@ -7,9 +7,37 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 94 - NAS Live Verification of Phase 93
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 93 compute binding. See
+[docs/architecture/decisions/0095-phase-94-nas-live-verify-phase-93.md](docs/architecture/decisions/0095-phase-94-nas-live-verify-phase-93.md).
+
+#### Added
+
+- ADR-0095: live verify requires frontend recreate for Phase 93; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 93 - Compute Outcome Labels Uses Loaded Assessment Id
+
+Bind compute outcome labels to the assessment id shown in the panel (not always latest).
+See
+[docs/architecture/decisions/0094-phase-93-compute-outcome-labels-loaded-assessment.md](docs/architecture/decisions/0094-phase-93-compute-outcome-labels-loaded-assessment.md).
+
+#### Added
+
+- Compute uses ``outcomeLabelHistoryAssessmentId`` when set; button names the target id.
+
+#### Explicitly out of scope
+
+New API fields, default-on calibration, changing ``latest_assessment``, orders.
+
 ### Phase 92 - NAS Live Verification of Phase 91
 
-Ops evidence gate: redeploy frontend under lab TLS after Phase 91 empty-state panel. See
+Ops evidence gate: redeploy frontend under lab TLS after Phase 91 empty-state panel.
+Live verify passed 2026-07-30 (``7bad1e9``). See
 [docs/architecture/decisions/0093-phase-92-nas-live-verify-phase-91.md](docs/architecture/decisions/0093-phase-92-nas-live-verify-phase-91.md).
 
 #### Added

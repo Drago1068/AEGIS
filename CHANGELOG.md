@@ -7,10 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 106 - NAS Live Verification of Phase 105
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 105 load-latest labels
+control. See
+[docs/architecture/decisions/0107-phase-106-nas-live-verify-phase-105.md](docs/architecture/decisions/0107-phase-106-nas-live-verify-phase-105.md).
+
+#### Added
+
+- ADR-0107: live verify requires frontend recreate for Phase 105; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 105 - Load Labels for Latest Assessment
+
+One-click return to outcome labels for ``latest`` when the panel is on another assessment.
+See
+[docs/architecture/decisions/0106-phase-105-load-labels-for-latest.md](docs/architecture/decisions/0106-phase-105-load-labels-for-latest.md).
+
+#### Added
+
+- ``Load labels for latest {id}`` control when loaded label assessment differs from latest.
+
+#### Explicitly out of scope
+
+New API fields, default-on calibration, changing ``latest_assessment``, orders.
+
 ### Phase 104 - NAS Live Verification of Phase 103
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 103 calibration-controls
-note. See
+note. Live verify passed 2026-07-30 (``0bf44c2``). See
 [docs/architecture/decisions/0105-phase-104-nas-live-verify-phase-103.md](docs/architecture/decisions/0105-phase-104-nas-live-verify-phase-103.md).
 
 #### Added

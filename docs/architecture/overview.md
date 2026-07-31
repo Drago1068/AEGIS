@@ -63,8 +63,8 @@ verify of Phase 95), Phase 97 (assessment backfill preserves loaded outcome labe
 Phase 98 (NAS live verify of Phase 97). Phase 99 (calibrations download names latest
 assessment id), Phase 100 (NAS live verify of Phase 99), Phase 101 (compute calibration
 names latest assessment id), and Phase 102 (NAS live verify of Phase 101). Phase 103
-(calibration controls note when scan-labeled differs) and Phase 104 (NAS live verify of
-Phase 103) are drafted.
+(calibration controls note when scan-labeled differs), Phase 104 (NAS live verify of
+Phase 103), Phase 105 (load labels for latest), and Phase 106 (NAS live verify of Phase 105).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -288,6 +288,10 @@ Phase 103 notes that calibration controls always use latest when the label panel
 [decisions/0104-phase-103-calibration-controls-note-scan-labeled.md](decisions/0104-phase-103-calibration-controls-note-scan-labeled.md)).
 Phase 104 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0105-phase-104-nas-live-verify-phase-103.md](decisions/0105-phase-104-nas-live-verify-phase-103.md)).
+Phase 105 adds one-click load of outcome labels for latest when the panel differs (see
+[decisions/0106-phase-105-load-labels-for-latest.md](decisions/0106-phase-105-load-labels-for-latest.md)).
+Phase 106 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0107-phase-106-nas-live-verify-phase-105.md](decisions/0107-phase-106-nas-live-verify-phase-105.md)).
 
 ## System context
 

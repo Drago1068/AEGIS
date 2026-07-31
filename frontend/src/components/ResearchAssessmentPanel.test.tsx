@@ -731,6 +731,33 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("calibration-controls-latest-note")).toHaveTextContent(
         /calibration actions use latest assessment 1 \(panel labels are for 3\)/i,
       );
+      expect(screen.getByTestId("load-latest-labels")).toHaveTextContent(
+        /load labels for latest 1/i,
+      );
+    });
+
+    vi.mocked(listOutcomeLabels).mockClear();
+    vi.mocked(listOutcomeLabels).mockResolvedValue([]);
+    const loadLatest = screen.getByTestId("load-latest-labels");
+    await waitFor(() => {
+      expect(loadLatest).not.toBeDisabled();
+    });
+    fireEvent.click(loadLatest);
+    await waitFor(() => {
+      expect(listOutcomeLabels).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        1,
+        20,
+      );
+      expect(screen.getByTestId("outcome-label-history-assessment-id")).toHaveTextContent(
+        /assessment id 1/i,
+      );
+      expect(screen.getByTestId("outcome-label-history-load-kind")).toHaveTextContent(
+        /· latest/i,
+      );
+      expect(screen.queryByTestId("calibration-controls-latest-note")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("load-latest-labels")).not.toBeInTheDocument();
     });
   });
 

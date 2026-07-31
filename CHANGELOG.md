@@ -7,9 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 96 - NAS Live Verification of Phase 95
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 95 backfill refresh binding.
+See
+[docs/architecture/decisions/0097-phase-96-nas-live-verify-phase-95.md](docs/architecture/decisions/0097-phase-96-nas-live-verify-phase-95.md).
+
+#### Added
+
+- ADR-0097: live verify requires frontend recreate for Phase 95; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 95 - Outcome-Label Backfill Refresh Uses Loaded Assessment Id
+
+After backfill, refresh outcome-label history for the loaded assessment id (not always
+latest). See
+[docs/architecture/decisions/0096-phase-95-outcome-label-backfill-refresh-loaded-assessment.md](docs/architecture/decisions/0096-phase-95-outcome-label-backfill-refresh-loaded-assessment.md).
+
+#### Planned
+
+- Backfill refresh uses ``outcomeLabelHistoryAssessmentId ?? latest.id``.
+
+#### Explicitly out of scope
+
+New API fields, default-on calibration, changing ``latest_assessment``, orders.
+
 ### Phase 94 - NAS Live Verification of Phase 93
 
-Ops evidence gate: redeploy frontend under lab TLS after Phase 93 compute binding. See
+Ops evidence gate: redeploy frontend under lab TLS after Phase 93 compute binding.
+Live verify passed 2026-07-30 (``41a3456``). See
 [docs/architecture/decisions/0095-phase-94-nas-live-verify-phase-93.md](docs/architecture/decisions/0095-phase-94-nas-live-verify-phase-93.md).
 
 #### Added

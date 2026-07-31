@@ -58,6 +58,8 @@ loaded assessment id), Phase 88 (NAS live verify of Phase 87), Phase 89 (downloa
 assessment id), and Phase 90 (NAS live verify of Phase 89). Phase 91 (outcome-label empty
 state for loaded assessment), Phase 92 (NAS live verify of Phase 91), Phase 93 (compute
 outcome labels uses loaded assessment id), and Phase 94 (NAS live verify of Phase 93).
+Phase 95 (outcome-label backfill refresh uses loaded assessment id) and Phase 96 (NAS live
+verify of Phase 95) are drafted.
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -260,6 +262,10 @@ Phase 93 binds compute outcome labels to the loaded assessment id (see
 [decisions/0094-phase-93-compute-outcome-labels-loaded-assessment.md](decisions/0094-phase-93-compute-outcome-labels-loaded-assessment.md)).
 Phase 94 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0095-phase-94-nas-live-verify-phase-93.md](decisions/0095-phase-94-nas-live-verify-phase-93.md)).
+Phase 95 refreshes outcome-label history for the loaded assessment after backfill (see
+[decisions/0096-phase-95-outcome-label-backfill-refresh-loaded-assessment.md](decisions/0096-phase-95-outcome-label-backfill-refresh-loaded-assessment.md)).
+Phase 96 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0097-phase-96-nas-live-verify-phase-95.md](decisions/0097-phase-96-nas-live-verify-phase-95.md)).
 
 ## System context
 

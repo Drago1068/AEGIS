@@ -1,6 +1,6 @@
 # ADR-0095: Phase 94 NAS Live Verification of Phase 93
 
-- Status: Accepted (pending live evidence)
+- Status: Accepted (live verified 2026-07-30; frontend recreate of ``41a3456``)
 - Date: 2026-07-30
 
 ## Context

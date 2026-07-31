@@ -16,7 +16,7 @@ that lands.
 1. Deploy ``HEAD`` TLS; recreate backend+frontend.
 2. ``verify.ps1`` / ``verify.sh`` pass.
 3. Evidence-summary includes ``latest_assessment_min_horizon_required_label_end_date``
-   (null OK; checklist TBD).
+   (null OK; checklist item 122).
 4. Alembic ``0009`` / ``head``.
 
 ### 2. Upload ≠ verified

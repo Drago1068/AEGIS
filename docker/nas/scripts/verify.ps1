@@ -159,7 +159,8 @@ function Write-VerifyChecklist {
     Write-Host "119. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
     Write-Host "120. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
     Write-Host "121. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
-    Write-Host "122. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
+    Write-Host "123. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1216,6 +1217,13 @@ try {
         $minShortfall = $summary.latest_assessment_min_horizon_forward_bar_shortfall
         $minShortfallPart = if ($null -eq $minShortfall -or $minShortfall -eq "") { "null" } else { [string]$minShortfall }
         Write-Host "OK  Phase 252 latest_assessment_min_horizon_forward_bar_shortfall=$minShortfallPart"
+        # Phase 254: latest_assessment_min_horizon_required_label_end_date from Phase 253 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_assessment_min_horizon_required_label_end_date")) {
+            throw "evidence-summary missing latest_assessment_min_horizon_required_label_end_date (Phase 253/254)"
+        }
+        $minEnd = $summary.latest_assessment_min_horizon_required_label_end_date
+        $minEndPart = if ($null -eq $minEnd -or $minEnd -eq "") { "null" } else { [string]$minEnd }
+        Write-Host "OK  Phase 254 latest_assessment_min_horizon_required_label_end_date=$minEndPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1424,6 +1432,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_assessment_min_horizon_forward_bar_shortfall")) {
             throw "evidence-summary/export missing latest_assessment_min_horizon_forward_bar_shortfall (Phase 251/252)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_assessment_min_horizon_required_label_end_date")) {
+            throw "evidence-summary/export missing latest_assessment_min_horizon_required_label_end_date (Phase 253/254)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

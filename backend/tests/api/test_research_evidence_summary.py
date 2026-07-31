@@ -144,6 +144,7 @@ class _FakeOutcomeLabelService:
         required_label_end_date: date | None = date(2024, 2, 26),
         last_available_label_bar_date: date | None = date(2024, 1, 26),
         min_horizon_forward_bar_shortfall: int | None = 5,
+        min_horizon_required_label_end_date: date | None = date(2024, 2, 2),
     ) -> None:
         self._listed = listed or []
         self._label_ready = label_ready
@@ -158,9 +159,11 @@ class _FakeOutcomeLabelService:
             self._required_label_end_date = None
             self._last_available_label_bar_date = None
             self._min_horizon_forward_bar_shortfall = None
+            self._min_horizon_required_label_end_date = None
         else:
             self._required_label_end_date = required_label_end_date
             self._last_available_label_bar_date = last_available_label_bar_date
+            self._min_horizon_required_label_end_date = min_horizon_required_label_end_date
 
     async def list_labels_for_assessment(
         self, symbol: str, assessment_snapshot_id: int, limit: int
@@ -218,9 +221,10 @@ class _FakeOutcomeLabelService:
         date | None,
         date | None,
         int | None,
+        date | None,
     ]:
         if not snapshots_newest_first:
-            return None, None, None, None, 0, None, None, None, None
+            return None, None, None, None, 0, None, None, None, None, None
         labeled = labeled_assessment_ids
         if labeled is None:
             labeled = {row.assessment_snapshot_id for row in self._listed}
@@ -255,12 +259,15 @@ class _FakeOutcomeLabelService:
             min_shortfall = self._min_horizon_forward_bar_shortfall
         end_date: date | None
         last_bar: date | None
+        min_end: date | None
         if reason == OutcomeLabelReason.NO_AS_OF_BAR and not ready:
             end_date = None
             last_bar = None
+            min_end = None
         else:
             end_date = self._required_label_end_date
             last_bar = self._last_available_label_bar_date
+            min_end = self._min_horizon_required_label_end_date
         return (
             ready,
             reason,
@@ -271,6 +278,7 @@ class _FakeOutcomeLabelService:
             end_date,
             last_bar,
             min_shortfall,
+            min_end,
         )
 
 
@@ -316,6 +324,7 @@ def _client(
     required_label_end_date: date | None = date(2024, 2, 26),
     last_available_label_bar_date: date | None = date(2024, 1, 26),
     min_horizon_forward_bar_shortfall: int | None = 5,
+    min_horizon_required_label_end_date: date | None = date(2024, 2, 2),
 ) -> AsyncClient:
     app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
     app.dependency_overrides[require_operator] = _operator
@@ -332,6 +341,7 @@ def _client(
         required_label_end_date=required_label_end_date,
         last_available_label_bar_date=last_available_label_bar_date,
         min_horizon_forward_bar_shortfall=min_horizon_forward_bar_shortfall,
+        min_horizon_required_label_end_date=min_horizon_required_label_end_date,
     )
     app.dependency_overrides[get_research_calibration_service] = lambda: _FakeCalibrationService(
         readiness=readiness or _readiness(),
@@ -400,6 +410,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_assessment_required_label_end_date"] is None
     assert body["latest_assessment_last_available_label_bar_date"] is None
     assert body["latest_assessment_min_horizon_forward_bar_shortfall"] is None
+    assert body["latest_assessment_min_horizon_required_label_end_date"] is None
     assert body["latest_coverage_confidence"] is None
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
@@ -462,6 +473,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_assessment_required_label_end_date"] == "2024-02-26"
     assert body["latest_assessment_last_available_label_bar_date"] == "2024-01-26"
     assert body["latest_assessment_min_horizon_forward_bar_shortfall"] == 0
+    assert body["latest_assessment_min_horizon_required_label_end_date"] == "2024-02-02"
     assert body["latest_coverage_confidence"] == 0.95
     assert body["latest_research_index"] == 0.46
     assert body["latest_as_of_trading_date"] == "2024-01-26"
@@ -577,6 +589,7 @@ async def test_evidence_summary_latest_assessment_is_label_ready_false() -> None
     assert body["latest_assessment_required_label_end_date"] == "2024-02-26"
     assert body["latest_assessment_last_available_label_bar_date"] == "2024-01-26"
     assert body["latest_assessment_min_horizon_forward_bar_shortfall"] == 5
+    assert body["latest_assessment_min_horizon_required_label_end_date"] == "2024-02-02"
 
 
 async def test_evidence_summary_latest_assessment_label_block_reason_no_as_of() -> None:
@@ -597,6 +610,7 @@ async def test_evidence_summary_latest_assessment_label_block_reason_no_as_of() 
     assert body["latest_assessment_required_label_end_date"] is None
     assert body["latest_assessment_last_available_label_bar_date"] is None
     assert body["latest_assessment_min_horizon_forward_bar_shortfall"] is None
+    assert body["latest_assessment_min_horizon_required_label_end_date"] is None
 
 
 async def test_evidence_summary_latest_assessment_forward_bar_shortfall() -> None:
@@ -654,6 +668,20 @@ async def test_evidence_summary_latest_assessment_min_horizon_forward_bar_shortf
     assert response.status_code == 200
     body = response.json()
     assert body["latest_assessment_min_horizon_forward_bar_shortfall"] == 3
+
+
+async def test_evidence_summary_latest_assessment_min_horizon_required_label_end_date() -> None:
+    async with _client(
+        assessments=[_snapshot()],
+        labels=[],
+        label_ready=False,
+        min_horizon_required_label_end_date=date(2024, 2, 9),
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["latest_assessment_min_horizon_required_label_end_date"] == "2024-02-09"
 
 
 async def test_evidence_summary_most_recent_labelable_as_of_trading_date() -> None:

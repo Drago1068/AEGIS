@@ -12,11 +12,22 @@ delivery workflow).
 Ops evidence gate after Phase 253 min-horizon required label end-date diagnostic. See
 [docs/architecture/decisions/0255-phase-254-nas-live-verify-phase-253.md](docs/architecture/decisions/0255-phase-254-nas-live-verify-phase-253.md).
 
-### Phase 253 - Evidence Summary Min-Horizon Required Label End Date (draft)
+### Phase 253 - Evidence Summary Min-Horizon Required Label End Date
 
 Calendar trading date that unlocks the earliest forward horizon (companion to min shortfall).
 See
 [docs/architecture/decisions/0254-phase-253-evidence-summary-min-horizon-required-label-end-date.md](docs/architecture/decisions/0254-phase-253-evidence-summary-min-horizon-required-label-end-date.md).
+
+#### Added
+
+- ``latest_assessment_min_horizon_required_label_end_date`` on evidence summary (+ export).
+- Reuses ``snapshot_required_label_end_date`` with ``horizons=(min(...),)``.
+- Console ``data-testid="evidence-latest-assessment-min-horizon-required-label-end-date"``.
+- NAS verify checklist item 122 for Phase 254.
+
+#### Explicitly out of scope
+
+UI modularization, inventing closes, default-on calibration, orders, multi-horizon maps.
 
 ### Phase 252 - NAS Live Verification of Phase 251
 

@@ -194,6 +194,25 @@ def test_snapshot_required_label_end_date_from_as_of() -> None:
     assert end == forward_horizon_end_date(_AS_OF, 5, "NYSE")
 
 
+def test_snapshot_required_label_end_date_min_differs_from_max() -> None:
+    bars = [_bar(_AS_OF, Decimal("100"))]
+    min_end = snapshot_required_label_end_date(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    max_end = snapshot_required_label_end_date(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5, 20),
+    )
+    assert min_end == date(2024, 1, 9)
+    assert max_end == forward_horizon_end_date(_AS_OF, 20, "NYSE")
+    assert min_end is not None and max_end is not None and min_end < max_end
+
+
 def test_snapshot_required_label_end_date_no_as_of_is_null() -> None:
     bars = [_bar(date(2024, 1, 3), Decimal("101"))]
     end = snapshot_required_label_end_date(

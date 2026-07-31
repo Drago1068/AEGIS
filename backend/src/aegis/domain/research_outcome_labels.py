@@ -513,15 +513,16 @@ class OutcomeLabelService:
         date | None,
         date | None,
         int | None,
+        date | None,
     ]:
-        """Return readiness, dates, counts, max/min shortfall, end date, last bar date.
+        """Return readiness, dates, counts, max/min shortfall and end dates, last bar.
 
-        Loads stored bars once (ADR-0232…0250/0252). Empty scan returns
-        ``(None, None, None, None, 0, None, None, None, None)``.
+        Loads stored bars once (ADR-0232…0250/0252/0254). Empty scan returns
+        ``(None, None, None, None, 0, None, None, None, None, None)``.
         """
 
         if not snapshots_newest_first:
-            return None, None, None, None, 0, None, None, None, None
+            return None, None, None, None, 0, None, None, None, None, None
 
         bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
         if labeled_assessment_ids is None:
@@ -551,6 +552,12 @@ class OutcomeLabelService:
             latest,
             bars,
             calendar_name=self._calendar_name,
+        )
+        min_horizon_required_label_end_date = snapshot_required_label_end_date(
+            latest,
+            bars,
+            calendar_name=self._calendar_name,
+            horizons=(min_horizon,),
         )
         last_available_label_bar_date = snapshot_last_available_label_bar_date(
             latest,
@@ -583,6 +590,7 @@ class OutcomeLabelService:
             required_label_end_date,
             last_available_label_bar_date,
             min_horizon_forward_bar_shortfall,
+            min_horizon_required_label_end_date,
         )
 
     async def assessment_ids_with_labels(

@@ -1,6 +1,6 @@
-# ADR-0254: Phase 253 Evidence Summary Min-Horizon Required Label End Date (draft)
+# ADR-0254: Phase 253 Evidence Summary Min-Horizon Required Label End Date
 
-- Status: Proposed (ready after Phase 252; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -9,7 +9,7 @@ Phases 251–252 shipped min-horizon shortfall (AAPL live ``5`` vs max ``20``). 
 how many sessions remain for earliest unlock but not **which trading date** unlocks the
 minimum horizon — the calendar companion to min shortfall (mirroring max end date).
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. API
 
@@ -31,6 +31,8 @@ UI modularization, inventing closes, default-on calibration, orders, multi-horiz
 
 Min shortfall answered “how many for earliest?” End date answers “until which session?” —
 completes the min-horizon unlock pair beside the max triad.
+
+Gate approved by standing instruction ("Proceed and approve from here on out").
 
 ## Resume (after Phase 252 gate)
 

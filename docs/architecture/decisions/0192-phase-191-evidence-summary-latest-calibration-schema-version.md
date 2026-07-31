@@ -1,6 +1,6 @@
 # ADR-0192: Phase 191 Evidence Summary Latest Calibration Schema Version
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

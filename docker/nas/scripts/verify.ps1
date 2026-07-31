@@ -128,7 +128,8 @@ function Write-VerifyChecklist {
     Write-Host " 88. Authenticated evidence-summary includes Phase 185 latest_calibration_bucket_count (Phase 186)"
     Write-Host " 89. Authenticated evidence-summary includes Phase 187 latest_calibration_method_id (Phase 188)"
     Write-Host " 90. Authenticated evidence-summary includes Phase 189 latest_calibration_method_version (Phase 190)"
-    Write-Host " 91. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 91. Authenticated evidence-summary includes Phase 191 latest_calibration_schema_version (Phase 192)"
+    Write-Host " 92. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -956,6 +957,16 @@ try {
         }
         $calMethodVerPart = if ($null -eq $calMethodVer) { "null" } else { [string]$calMethodVer }
         Write-Host "OK  Phase 190 latest_calibration_method_version=$calMethodVerPart"
+        # Phase 192: latest_calibration_schema_version from Phase 191 (null OK).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_calibration_schema_version")) {
+            throw "evidence-summary missing latest_calibration_schema_version (Phase 191/192)"
+        }
+        $calSchemaVer = $summary.latest_calibration_schema_version
+        if ($null -ne $calSchemaVer -and [int]$calSchemaVer -lt 1) {
+            throw "Phase 192: latest_calibration_schema_version must be >= 1 when set"
+        }
+        $calSchemaVerPart = if ($null -eq $calSchemaVer) { "null" } else { [string]$calSchemaVer }
+        Write-Host "OK  Phase 192 latest_calibration_schema_version=$calSchemaVerPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1071,6 +1082,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_method_version")) {
             throw "evidence-summary/export missing latest_calibration_method_version (Phase 189/190)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_calibration_schema_version")) {
+            throw "evidence-summary/export missing latest_calibration_schema_version (Phase 191/192)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

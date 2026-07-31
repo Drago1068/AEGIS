@@ -266,4 +266,12 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "Distinct from assessment latest_method_version. Never invented."
         ),
     )
+    latest_calibration_schema_version: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "schema_version from latest_calibration when present. Null when none. Distinct from "
+            "assessment latest_schema_version. Never invented."
+        ),
+    )
     detail: str

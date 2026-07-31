@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 191 latest calibration schema version field. See
 [docs/architecture/decisions/0193-phase-192-nas-live-verify-phase-191.md](docs/architecture/decisions/0193-phase-192-nas-live-verify-phase-191.md).
 
-### Phase 191 - Evidence Summary Latest Calibration Schema Version (draft)
+### Phase 191 - Evidence Summary Latest Calibration Schema Version
 
 Surface top-level ``latest_calibration_schema_version`` on evidence summary. See
 [docs/architecture/decisions/0192-phase-191-evidence-summary-latest-calibration-schema-version.md](docs/architecture/decisions/0192-phase-191-evidence-summary-latest-calibration-schema-version.md).
+
+#### Added
+
+- ``latest_calibration_schema_version`` on evidence summary (+ export); from latest_calibration.
+- Console surfaces the field with ``data-testid="evidence-latest-calibration-schema-version"``.
+- NAS verify checklist item 91 for Phase 192.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 190 - NAS Live Verification of Phase 189
 

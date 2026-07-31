@@ -7,9 +7,20 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 244 - NAS Live Verification of Phase 243 (draft)
+
+Ops evidence gate after Phase 243 most-recent-unlabeled as_of diagnostic. See
+[docs/architecture/decisions/0245-phase-244-nas-live-verify-phase-243.md](docs/architecture/decisions/0245-phase-244-nas-live-verify-phase-243.md).
+
+### Phase 243 - Evidence Summary Most Recent Unlabeled As-Of (draft)
+
+as_of_trading_date of the newest unlabeled assessment (tip freshness beside tip id). See
+[docs/architecture/decisions/0244-phase-243-evidence-summary-most-recent-unlabeled-as-of.md](docs/architecture/decisions/0244-phase-243-evidence-summary-most-recent-unlabeled-as-of.md).
+
 ### Phase 242 - NAS Live Verification of Phase 241
 
-Ops evidence gate after Phase 241 most-recent-unlabeled assessment id diagnostic. See
+Ops evidence gate after Phase 241 most-recent-unlabeled assessment id diagnostic. Live verify
+passed 2026-07-31 (``c7d5f7b``; AAPL ``most_recent_unlabeled_assessment_id=126``). See
 [docs/architecture/decisions/0243-phase-242-nas-live-verify-phase-241.md](docs/architecture/decisions/0243-phase-242-nas-live-verify-phase-241.md).
 
 #### Added

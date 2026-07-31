@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 248 - NAS Live Verification of Phase 247 (draft)
+### Phase 250 - NAS Live Verification of Phase 249 (draft)
 
-Ops evidence gate after Phase 247 required label end-date diagnostic. See
+Ops evidence gate after Phase 249 last-available label-bar date diagnostic. See
+[docs/architecture/decisions/0251-phase-250-nas-live-verify-phase-249.md](docs/architecture/decisions/0251-phase-250-nas-live-verify-phase-249.md).
+
+### Phase 249 - Evidence Summary Latest Last Available Label Bar Date (draft)
+
+How far stored label-source bars have advanced toward the required unlock end (progress
+beside shortfall). See
+[docs/architecture/decisions/0250-phase-249-evidence-summary-latest-last-available-label-bar-date.md](docs/architecture/decisions/0250-phase-249-evidence-summary-latest-last-available-label-bar-date.md).
+
+### Phase 248 - NAS Live Verification of Phase 247
+
+Ops evidence gate after Phase 247 required label end-date diagnostic. Live verify passed
+2026-07-31 (``3fe7edf``; AAPL ``latest_assessment_required_label_end_date=2026-08-26``). See
 [docs/architecture/decisions/0249-phase-248-nas-live-verify-phase-247.md](docs/architecture/decisions/0249-phase-248-nas-live-verify-phase-247.md).
+
+#### Added
+
+- ADR-0249: live verify requires backend+frontend recreate for Phase 247; checklist item 119.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 247 - Evidence Summary Latest Required Label End Date
 

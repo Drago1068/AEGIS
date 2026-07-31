@@ -1,11 +1,11 @@
-# ADR-0249: Phase 248 NAS Live Verification of Phase 247 (draft)
+# ADR-0249: Phase 248 NAS Live Verification of Phase 247
 
-- Status: Proposed (pending Phase 247 + live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
-Phase 247 would add ``latest_assessment_required_label_end_date`` (ADR-0248). Operators need
+Phase 247 adds ``latest_assessment_required_label_end_date`` (ADR-0248). Operators need
 a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that lands.
 
 ## Decisions
@@ -15,19 +15,21 @@ a verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that 
 1. Deploy ``HEAD`` TLS; recreate backend+frontend.
 2. ``verify.ps1`` / ``verify.sh`` pass.
 3. Evidence-summary includes ``latest_assessment_required_label_end_date`` (null OK;
-   checklist TBD).
+   checklist item 119).
 4. Alembic ``0009`` / ``head``.
 
 ### 2. Upload ≠ verified
 
 Retain live verify stdout.
 
-## Resume
+## Live evidence (2026-07-31)
 
-```powershell
-# After Phase 247 on HEAD: git archive → NAS; rebuild backend+frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+- Revision ``3fe7edf``; TLS recreate backend+frontend; verify passed.
+- AAPL: ``latest_assessment_required_label_end_date=2026-08-26``;
+  ``latest_assessment_forward_bar_shortfall=20``;
+  ``latest_assessment_label_block_reason=insufficient_forward_bars``;
+  ``latest_as_of_trading_date=2026-07-29``;
+  ``scan_unlabeled_label_ready_count=0``.
 
 ## Related documents
 

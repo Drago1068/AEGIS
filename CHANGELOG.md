@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 177 latest calibration id field. See
 [docs/architecture/decisions/0179-phase-178-nas-live-verify-phase-177.md](docs/architecture/decisions/0179-phase-178-nas-live-verify-phase-177.md).
 
-### Phase 177 - Evidence Summary Latest Calibration Id (draft)
+### Phase 177 - Evidence Summary Latest Calibration Id
 
 Surface top-level ``latest_calibration_id`` on evidence summary. See
 [docs/architecture/decisions/0178-phase-177-evidence-summary-latest-calibration-id.md](docs/architecture/decisions/0178-phase-177-evidence-summary-latest-calibration-id.md).
+
+#### Added
+
+- ``latest_calibration_id`` on evidence summary (+ export); from latest_calibration when set.
+- Console surfaces the field with ``data-testid="evidence-latest-calibration-id"``.
+- NAS verify checklist item 84 for Phase 178.
+
+#### Explicitly out of scope
+
+New scoring math, orders, UI structural extracts.
 
 ### Phase 176 - NAS Live Verification of Phase 175
 

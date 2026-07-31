@@ -213,4 +213,12 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "no label on the absolute newest assessment. Never invented."
         ),
     )
+    latest_calibration_id: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "id from latest_calibration when a calibration row is attached. Null when none. "
+            "Never invented."
+        ),
+    )
     detail: str

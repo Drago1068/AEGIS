@@ -1005,6 +1005,8 @@ export interface ResearchEvidenceSummary {
   latest_assessment_id: number | null;
   /** id from latest_outcome_label when latest assessment is labeled; null otherwise. */
   latest_outcome_label_id: number | null;
+  /** id from latest_calibration when present; null otherwise. */
+  latest_calibration_id: number | null;
   detail: string;
 }
 

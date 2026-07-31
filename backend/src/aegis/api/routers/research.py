@@ -501,6 +501,9 @@ async def _build_research_evidence_summary(
     latest_outcome_label_id = (
         latest_outcome_label.id if latest_outcome_label is not None else None
     )
+    latest_calibration_id = (
+        latest_calibration.id if latest_calibration is not None else None
+    )
 
     return ResearchEvidenceSummaryResponse(
         symbol=symbol.upper(),
@@ -537,6 +540,7 @@ async def _build_research_evidence_summary(
         latest_probability_confidence=latest_probability_confidence,
         latest_assessment_id=latest_assessment_id,
         latest_outcome_label_id=latest_outcome_label_id,
+        latest_calibration_id=latest_calibration_id,
         detail=(
             "Research-only evidence summary — not advice; missing fields are null or zero, "
             "never invented."

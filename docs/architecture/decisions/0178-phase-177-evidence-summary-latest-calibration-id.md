@@ -1,6 +1,6 @@
 # ADR-0178: Phase 177 Evidence Summary Latest Calibration Id
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context

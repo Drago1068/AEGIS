@@ -340,6 +340,7 @@ describe("ResearchAssessmentPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: /refresh latest/i }));
 
     await waitFor(() => {
+      expect(screen.getByTestId("outcome-label-history-section")).toBeInTheDocument();
       expect(screen.getByText(/outcome label history \(newest first\)/i)).toBeInTheDocument();
       expect(screen.getByTestId("outcome-label-history-assessment-id")).toHaveTextContent(
         /assessment id 1/i,

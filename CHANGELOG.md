@@ -29,7 +29,8 @@ See
 
 #### Added
 
-- Outcome-label history section extract drafted (implement next).
+- ``ResearchOutcomeLabelHistorySection.tsx`` with ``data-testid="outcome-label-history-section"``.
+- Shared label display helpers moved into ``research-assessment-panel-helpers.ts``.
 
 #### Explicitly out of scope
 

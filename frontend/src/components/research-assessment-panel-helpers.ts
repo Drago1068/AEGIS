@@ -5,6 +5,44 @@
 
 export type OutcomeLabelHistoryLoadKind = "latest" | "scan_labeled";
 
+/** Sort API label keys: forward_return_N by N ascending, then other keys. Never invent values. */
+export function sortedLabelEntries(labels: Record<string, number>): [string, number][] {
+  return Object.entries(labels).sort(([a], [b]) => {
+    const na = /^forward_return_(\d+)$/.exec(a);
+    const nb = /^forward_return_(\d+)$/.exec(b);
+    if (na && nb) {
+      return Number(na[1]) - Number(nb[1]);
+    }
+    if (na) {
+      return -1;
+    }
+    if (nb) {
+      return 1;
+    }
+    return a.localeCompare(b);
+  });
+}
+
+/** Compact history line from API label payload only (Phase 26 + Phase 30). */
+export function formatLabelHorizonSummary(
+  labels: Record<string, number>,
+  endDates?: Record<string, string>,
+): string {
+  const entries = sortedLabelEntries(labels);
+  if (entries.length === 0) {
+    return "none";
+  }
+  return entries
+    .map(([key, value]) => {
+      const match = /^forward_return_(\d+)$/.exec(key);
+      const short = match ? `fwd${match[1]}` : key;
+      const end = endDates?.[key];
+      const endPart = typeof end === "string" && end.length > 0 ? ` end=${end}` : "";
+      return `${short}=${value.toFixed(4)}${endPart}`;
+    })
+    .join(" · ");
+}
+
 /** Prefer tracked load-kind; otherwise infer from whether assessment matches latest. */
 export function resolveOutcomeLabelHistoryLoadKind(
   assessmentId: number,

@@ -3,10 +3,12 @@ import { describe, expect, it } from "vitest";
 import {
   formatCalibrationActionAriaLabel,
   formatCalibrationActionIdChip,
+  formatLabelHorizonSummary,
   formatOutcomeLabelActionAriaLabel,
   formatOutcomeLabelActionIdChip,
   formatOutcomeLabelBackfillAriaLabel,
   resolveOutcomeLabelHistoryLoadKind,
+  sortedLabelEntries,
 } from "./research-assessment-panel-helpers";
 
 describe("resolveOutcomeLabelHistoryLoadKind", () => {
@@ -98,5 +100,30 @@ describe("formatOutcomeLabelBackfillAriaLabel", () => {
     expect(formatOutcomeLabelBackfillAriaLabel(1, null)).toBe(
       "Backfill outcome labels then refresh assessment 1",
     );
+  });
+});
+
+describe("sortedLabelEntries", () => {
+  it("orders forward_return_N by horizon ascending then other keys", () => {
+    expect(
+      sortedLabelEntries({
+        z_other: 1,
+        forward_return_20: 0.2,
+        forward_return_5: 0.05,
+        a_other: 2,
+      }).map(([k]) => k),
+    ).toEqual(["forward_return_5", "forward_return_20", "a_other", "z_other"]);
+  });
+});
+
+describe("formatLabelHorizonSummary", () => {
+  it("formats compact horizon lines with optional end dates", () => {
+    expect(formatLabelHorizonSummary({})).toBe("none");
+    expect(
+      formatLabelHorizonSummary(
+        { forward_return_5: 0.05, forward_return_20: 0.1 },
+        { forward_return_5: "2024-02-02", forward_return_20: "2024-02-23" },
+      ),
+    ).toBe("fwd5=0.0500 end=2024-02-02 · fwd20=0.1000 end=2024-02-23");
   });
 });

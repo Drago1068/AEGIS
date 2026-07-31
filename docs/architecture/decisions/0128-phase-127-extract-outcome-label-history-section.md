@@ -1,22 +1,23 @@
 # ADR-0128: Phase 127 Extract Outcome-Label History Panel Section
 
-- Status: Accepted (drafted; implement next)
+- Status: Accepted
 - Date: 2026-07-30
 
 ## Context
 
 Phases 123–125 modularized the action toolbar. ``ResearchAssessmentPanel.tsx`` still embeds
-a large outcome-label history block (caption, empty state, load-scan/latest controls, list).
+a large outcome-label history block (caption, empty state, load-latest control, list).
 Extracting that section continues the maintainability path without behavior change.
 
 ## Decisions
 
 ### 1. Console
 
-Extract the outcome-label history UI into a presentational component such as
-``ResearchOutcomeLabelHistorySection.tsx`` (props: labels, history id, load-kind, latest id,
-evidence most-recent labeled fields, pending, and load handlers). Preserve existing
-``data-testid`` contracts. No API changes.
+Extract the outcome-label history UI into ``ResearchOutcomeLabelHistorySection.tsx``.
+Move shared ``sortedLabelEntries`` / ``formatLabelHorizonSummary`` into
+``research-assessment-panel-helpers.ts``. Preserve existing ``data-testid`` contracts.
+``load-scan-labeled-labels`` remains in the evidence-summary block (co-located with
+most-recent labeled fields). No API changes.
 
 ### 2. Out of scope
 

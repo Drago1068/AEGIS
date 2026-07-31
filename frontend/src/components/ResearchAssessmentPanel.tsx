@@ -32,8 +32,10 @@ import {
 
 import {
   resolveOutcomeLabelHistoryLoadKind,
+  sortedLabelEntries,
 } from "./research-assessment-panel-helpers";
 import { ResearchAssessmentActionToolbar } from "./ResearchAssessmentActionToolbar";
+import { ResearchOutcomeLabelHistorySection } from "./ResearchOutcomeLabelHistorySection";
 
 type ResearchAssessmentPanelProps = {
   symbol: string;
@@ -55,44 +57,6 @@ function formatAssessmentError(err: unknown): string {
     }
   }
   return err.message;
-}
-
-/** Sort API label keys: forward_return_N by N ascending, then other keys. Never invent values. */
-function sortedLabelEntries(labels: Record<string, number>): [string, number][] {
-  return Object.entries(labels).sort(([a], [b]) => {
-    const na = /^forward_return_(\d+)$/.exec(a);
-    const nb = /^forward_return_(\d+)$/.exec(b);
-    if (na && nb) {
-      return Number(na[1]) - Number(nb[1]);
-    }
-    if (na) {
-      return -1;
-    }
-    if (nb) {
-      return 1;
-    }
-    return a.localeCompare(b);
-  });
-}
-
-/** Compact history line from API label payload only (Phase 26 + Phase 30). */
-function formatLabelHorizonSummary(
-  labels: Record<string, number>,
-  endDates?: Record<string, string>,
-): string {
-  const entries = sortedLabelEntries(labels);
-  if (entries.length === 0) {
-    return "none";
-  }
-  return entries
-    .map(([key, value]) => {
-      const match = /^forward_return_(\d+)$/.exec(key);
-      const short = match ? `fwd${match[1]}` : key;
-      const end = endDates?.[key];
-      const endPart = typeof end === "string" && end.length > 0 ? ` end=${end}` : "";
-      return `${short}=${value.toFixed(4)}${endPart}`;
-    })
-    .join(" · ");
 }
 
 /** Compact assessment history line from API payload only (Phase 28/61). */
@@ -921,96 +885,15 @@ export function ResearchAssessmentPanel({
               </ul>
             )}
           </div>
-          {outcomeLabel || outcomeLabelHistoryAssessmentId != null ? (
-            <div className="rounded border border-aegis-line bg-white/60 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
-                Outcome labels (evidence only — not calibrated probability)
-              </p>
-              {outcomeLabelHistoryAssessmentId != null ? (
-                <p
-                  className="mt-1 font-mono text-xs text-aegis-muted"
-                  data-testid="outcome-label-history-assessment-id"
-                >
-                  Assessment id {outcomeLabelHistoryAssessmentId}
-                  {outcomeLabelHistoryLoadKind != null ? (
-                    <span data-testid="outcome-label-history-load-kind">
-                      {" "}
-                      · {outcomeLabelHistoryLoadKind === "scan_labeled" ? "scan-labeled" : "latest"}
-                      {outcomeLabelHistoryLoadKind === "scan_labeled" &&
-                      latest?.id != null &&
-                      latest.id !== outcomeLabelHistoryAssessmentId
-                        ? ` (latest is ${latest.id})`
-                        : ""}
-                    </span>
-                  ) : null}
-                </p>
-              ) : null}
-              {outcomeLabelHistoryAssessmentId != null &&
-              latest?.id != null &&
-              outcomeLabelHistoryAssessmentId !== latest.id ? (
-                <button
-                  type="button"
-                  className="mt-2 text-sm underline-offset-2 hover:underline disabled:opacity-60"
-                  disabled={isPending}
-                  data-testid="load-latest-labels"
-                  onClick={onLoadLatestLabels}
-                >
-                  Load labels for latest {latest.id}
-                </button>
-              ) : null}
-              {outcomeLabel ? (
-                <>
-                  <dl className="mt-2 grid gap-2 sm:grid-cols-2">
-                    {sortedLabelEntries(outcomeLabel.labels).map(([key, value]) => {
-                      const end = outcomeLabel.label_end_dates[key];
-                      return (
-                        <div key={key}>
-                          <dt className="text-aegis-muted">{key}</dt>
-                          <dd className="font-mono">
-                            {value.toFixed(6)}
-                            {typeof end === "string" && end.length > 0
-                              ? ` · end ${end}`
-                              : null}
-                          </dd>
-                        </div>
-                      );
-                    })}
-                  </dl>
-                  <p className="mt-2 text-xs text-aegis-muted">
-                    Bar source {outcomeLabel.bar_source}. Label method{" "}
-                    {outcomeLabel.label_method_id} v{outcomeLabel.label_method_version}.
-                  </p>
-                  {outcomeLabelHistory.length > 1 ? (
-                    <div className="mt-3 border-t border-aegis-line pt-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
-                        Outcome label history (newest first)
-                      </p>
-                      <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
-                        {outcomeLabelHistory.map((row) => {
-                          const horizons = formatLabelHorizonSummary(
-                            row.labels,
-                            row.label_end_dates,
-                          );
-                          return (
-                            <li key={row.id ?? `${row.computed_at}-${horizons}`}>
-                              {row.computed_at} · {horizons} · {row.bar_source}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  ) : null}
-                </>
-              ) : (
-                <p
-                  className="mt-2 text-sm text-aegis-muted"
-                  data-testid="outcome-label-empty-state"
-                >
-                  No outcome labels stored for assessment {outcomeLabelHistoryAssessmentId}
-                </p>
-              )}
-            </div>
-          ) : null}
+          <ResearchOutcomeLabelHistorySection
+            outcomeLabel={outcomeLabel}
+            outcomeLabelHistory={outcomeLabelHistory}
+            outcomeLabelHistoryAssessmentId={outcomeLabelHistoryAssessmentId}
+            outcomeLabelHistoryLoadKind={outcomeLabelHistoryLoadKind}
+            latestId={latest?.id ?? null}
+            isPending={isPending}
+            onLoadLatestLabels={onLoadLatestLabels}
+          />
           {readiness ? (
             <div className="rounded border border-aegis-line bg-white/60 p-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">

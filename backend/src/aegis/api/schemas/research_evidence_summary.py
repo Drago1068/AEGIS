@@ -217,6 +217,16 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "(backfill-candidate cardinality). Zero when none or empty scan. Never invented."
         ),
     )
+    most_recent_unlabeled_assessment_id: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "Assessment id of the newest scanned assessment that has no default-method "
+            "outcome label (unlabeled tip for drill-down). Null when none unlabeled. "
+            "Distinct from most_recent_labeled_assessment_id and latest_assessment_id "
+            "(equals latest only when latest is unlabeled). Never invented."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

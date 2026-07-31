@@ -153,7 +153,8 @@ function Write-VerifyChecklist {
     Write-Host "113. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
     Write-Host "114. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
     Write-Host "115. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
-    Write-Host "116. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "116. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
+    Write-Host "117. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1168,6 +1169,13 @@ try {
         }
         $unlabeledReadyCount = $summary.scan_unlabeled_label_ready_count
         Write-Host "OK  Phase 240 scan_unlabeled_label_ready_count=$unlabeledReadyCount"
+        # Phase 242: most_recent_unlabeled_assessment_id from Phase 241 (null OK when none unlabeled).
+        if (-not ($summary.PSObject.Properties.Name -contains "most_recent_unlabeled_assessment_id")) {
+            throw "evidence-summary missing most_recent_unlabeled_assessment_id (Phase 241/242)"
+        }
+        $unlabeledAssessmentId = $summary.most_recent_unlabeled_assessment_id
+        $unlabeledAssessmentIdPart = if ($null -eq $unlabeledAssessmentId -or $unlabeledAssessmentId -eq "") { "null" } else { [string]$unlabeledAssessmentId }
+        Write-Host "OK  Phase 242 most_recent_unlabeled_assessment_id=$unlabeledAssessmentIdPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1358,6 +1366,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "scan_unlabeled_label_ready_count")) {
             throw "evidence-summary/export missing scan_unlabeled_label_ready_count (Phase 239/240)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "most_recent_unlabeled_assessment_id")) {
+            throw "evidence-summary/export missing most_recent_unlabeled_assessment_id (Phase 241/242)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

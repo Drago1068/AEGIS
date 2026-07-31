@@ -600,10 +600,9 @@ cardinality (see
 [decisions/0240-phase-239-evidence-summary-scan-unlabeled-label-ready-count.md](decisions/0240-phase-239-evidence-summary-scan-unlabeled-label-ready-count.md)).
 Phase 240 live-verified that count (see
 [decisions/0241-phase-240-nas-live-verify-phase-239.md](decisions/0241-phase-240-nas-live-verify-phase-239.md)).
-Phase 241 (draft) proposes ``most_recent_unlabeled_assessment_id`` for unlabeled tip
-drill-down (see
+Phase 241 surfaces ``most_recent_unlabeled_assessment_id`` for unlabeled tip drill-down (see
 [decisions/0242-phase-241-evidence-summary-most-recent-unlabeled-assessment-id.md](decisions/0242-phase-241-evidence-summary-most-recent-unlabeled-assessment-id.md)).
-Phase 242 (draft) would live-verify that id (see
+Phase 242 live-verifies that id (see
 [decisions/0243-phase-242-nas-live-verify-phase-241.md](decisions/0243-phase-242-nas-live-verify-phase-241.md)).
 
 ## System context

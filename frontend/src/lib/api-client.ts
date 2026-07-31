@@ -1012,6 +1012,11 @@ export interface ResearchEvidenceSummary {
    * Zero when none. Never invented.
    */
   scan_unlabeled_label_ready_count: number;
+  /**
+   * Newest scanned assessment id with no default-method outcome label.
+   * Null when none unlabeled. Never invented.
+   */
+  most_recent_unlabeled_assessment_id: number | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

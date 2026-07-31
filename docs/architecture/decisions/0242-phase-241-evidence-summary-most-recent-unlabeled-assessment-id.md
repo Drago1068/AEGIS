@@ -1,18 +1,18 @@
-# ADR-0242: Phase 241 Evidence Summary Most Recent Unlabeled Assessment Id (draft)
+# ADR-0242: Phase 241 Evidence Summary Most Recent Unlabeled Assessment Id
 
-- Status: Proposed (ready after Phase 240; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
 Phases 237–240 established unlabeled+labelable as_of and
-``scan_unlabeled_label_ready_count``. Live AAPL shows ``count=0`` with
+``scan_unlabeled_label_ready_count``. Live AAPL showed ``count=0`` with
 ``unlabeled_assessment_count=3`` and latest blocked
 (``insufficient_forward_bars``). Operators inspecting the unlabeled tip need the
 **assessment snapshot id** of the newest unlabeled row (for load / drill-down) without
-scanning history by hand. The ready as_of is null; the unlabeled tip id is still known.
+scanning history by hand.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. API
 
@@ -31,18 +31,10 @@ Add ``most_recent_unlabeled_assessment_id: int | null`` (+ export):
 
 UI modularization, inventing label-ready targets, default-on calibration, orders.
 
-### 4. Why this next
+## Consequences
 
-Count/date answered “how many / which as_of ready?” The id answers “which unlabeled row
-to open first?” — the remaining operator gap when ready count is zero but unlabeled > 0.
-
-## Resume (after Phase 240 gate)
-
-```powershell
-# Implement most_recent_unlabeled_assessment_id (ADR-0242); tests; commit+push; then Phase 242:
-# git archive HEAD → NAS; rebuild backend+frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+- Evidence summary and export expose the unlabeled tip id for drill-down.
+- Phase 242 live-verifies the field on NAS (checklist item 116).
 
 ## Related documents
 

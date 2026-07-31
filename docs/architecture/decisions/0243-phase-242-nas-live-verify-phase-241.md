@@ -1,11 +1,11 @@
-# ADR-0243: Phase 242 NAS Live Verification of Phase 241 (draft)
+# ADR-0243: Phase 242 NAS Live Verification of Phase 241
 
-- Status: Proposed (pending Phase 241 + live evidence)
+- Status: Accepted (pending live evidence)
 - Date: 2026-07-31
 
 ## Context
 
-Phase 241 would add ``most_recent_unlabeled_assessment_id`` (ADR-0242). Operators need a
+Phase 241 adds ``most_recent_unlabeled_assessment_id`` (ADR-0242). Operators need a
 verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that lands.
 
 ## Decisions
@@ -14,7 +14,8 @@ verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that la
 
 1. Deploy ``HEAD`` TLS; recreate backend+frontend.
 2. ``verify.ps1`` / ``verify.sh`` pass.
-3. Evidence-summary includes ``most_recent_unlabeled_assessment_id`` (null OK; checklist TBD).
+3. Evidence-summary includes ``most_recent_unlabeled_assessment_id`` (null OK;
+   checklist item 116).
 4. Alembic ``0009`` / ``head``.
 
 ### 2. Upload ≠ verified

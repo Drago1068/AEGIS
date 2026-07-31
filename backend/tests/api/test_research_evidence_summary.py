@@ -85,10 +85,10 @@ def _readiness() -> CalibrationReadinessData:
     )
 
 
-def _label() -> OutcomeLabelData:
+def _label(*, assessment_snapshot_id: int = 1) -> OutcomeLabelData:
     return OutcomeLabelData(
         id=10,
-        assessment_snapshot_id=1,
+        assessment_snapshot_id=assessment_snapshot_id,
         symbol="AAPL",
         label_method_id=LABEL_METHOD_ID,
         label_method_version=1,
@@ -332,6 +332,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["most_recent_labelable_as_of_trading_date"] is None
     assert body["most_recent_unlabeled_labelable_as_of_trading_date"] is None
     assert body["scan_unlabeled_label_ready_count"] == 0
+    assert body["most_recent_unlabeled_assessment_id"] is None
     assert body["latest_coverage_confidence"] is None
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
@@ -388,6 +389,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["most_recent_labelable_as_of_trading_date"] == "2024-01-26"
     assert body["most_recent_unlabeled_labelable_as_of_trading_date"] is None
     assert body["scan_unlabeled_label_ready_count"] == 0
+    assert body["most_recent_unlabeled_assessment_id"] is None
     assert body["latest_coverage_confidence"] == 0.95
     assert body["latest_research_index"] == 0.46
     assert body["latest_as_of_trading_date"] == "2024-01-26"
@@ -585,6 +587,45 @@ async def test_evidence_summary_most_recent_unlabeled_labelable_as_of_trading_da
     assert body["most_recent_labelable_as_of_trading_date"] == "2024-01-26"
     assert body["most_recent_unlabeled_labelable_as_of_trading_date"] == "2024-01-20"
     assert body["scan_unlabeled_label_ready_count"] == 1
+    assert body["most_recent_unlabeled_assessment_id"] == 2
+
+
+async def test_evidence_summary_most_recent_unlabeled_assessment_id() -> None:
+    """Newest unlabeled tip id even when that row is not label-ready."""
+
+    unlabeled_latest = ResearchAssessmentSnapshotData(
+        id=2,
+        symbol="AAPL",
+        method_id="daily_bar_research_v1",
+        method_version=1,
+        state="research_only",
+        as_of_trading_date=date(2024, 2, 9),
+        event_time=datetime(2024, 2, 9, 23, 59, 59, tzinfo=UTC),
+        computed_at=datetime(2024, 2, 9, 18, 0, tzinfo=UTC),
+        coverage_confidence=0.95,
+        probability_confidence=None,
+        components={"research_index": 0.5},
+        schema_version=1,
+        input_source="alpha_vantage",
+        lookback_start_date=date(2024, 1, 12),
+        lookback_end_date=date(2024, 2, 9),
+        bar_count=20,
+    )
+    async with _client(
+        assessments=[unlabeled_latest, _snapshot(snapshot_id=1)],
+        labels=[_label(assessment_snapshot_id=1)],
+        label_ready=False,
+        labelable_as_of=date(2024, 1, 26),
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["latest_assessment_id"] == 2
+    assert body["most_recent_labeled_assessment_id"] == 1
+    assert body["most_recent_unlabeled_assessment_id"] == 2
+    assert body["unlabeled_assessment_count"] == 1
+    assert body["scan_unlabeled_label_ready_count"] == 0
 
 
 async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:

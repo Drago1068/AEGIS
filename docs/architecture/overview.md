@@ -626,8 +626,13 @@ Phase 250 live-verified that date (see
 Phase 251 surfaces ``latest_assessment_min_horizon_forward_bar_shortfall`` for
 earliest-horizon unlock (see
 [decisions/0252-phase-251-evidence-summary-min-horizon-forward-bar-shortfall.md](decisions/0252-phase-251-evidence-summary-min-horizon-forward-bar-shortfall.md)).
-Phase 252 (draft) would live-verify that shortfall (see
+Phase 252 live-verified that shortfall (see
 [decisions/0253-phase-252-nas-live-verify-phase-251.md](decisions/0253-phase-252-nas-live-verify-phase-251.md)).
+Phase 253 (draft) proposes ``latest_assessment_min_horizon_required_label_end_date`` as the
+min-horizon unlock calendar (see
+[decisions/0254-phase-253-evidence-summary-min-horizon-required-label-end-date.md](decisions/0254-phase-253-evidence-summary-min-horizon-required-label-end-date.md)).
+Phase 254 (draft) would live-verify that end date (see
+[decisions/0255-phase-254-nas-live-verify-phase-253.md](decisions/0255-phase-254-nas-live-verify-phase-253.md)).
 
 ## System context
 

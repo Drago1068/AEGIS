@@ -7,10 +7,31 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 252 - NAS Live Verification of Phase 251 (draft)
+### Phase 254 - NAS Live Verification of Phase 253 (draft)
 
-Ops evidence gate after Phase 251 min-horizon forward-bar shortfall diagnostic. See
+Ops evidence gate after Phase 253 min-horizon required label end-date diagnostic. See
+[docs/architecture/decisions/0255-phase-254-nas-live-verify-phase-253.md](docs/architecture/decisions/0255-phase-254-nas-live-verify-phase-253.md).
+
+### Phase 253 - Evidence Summary Min-Horizon Required Label End Date (draft)
+
+Calendar trading date that unlocks the earliest forward horizon (companion to min shortfall).
+See
+[docs/architecture/decisions/0254-phase-253-evidence-summary-min-horizon-required-label-end-date.md](docs/architecture/decisions/0254-phase-253-evidence-summary-min-horizon-required-label-end-date.md).
+
+### Phase 252 - NAS Live Verification of Phase 251
+
+Ops evidence gate after Phase 251 min-horizon forward-bar shortfall diagnostic. Live verify
+passed 2026-07-31 (``6858194``; AAPL
+``latest_assessment_min_horizon_forward_bar_shortfall=5``). See
 [docs/architecture/decisions/0253-phase-252-nas-live-verify-phase-251.md](docs/architecture/decisions/0253-phase-252-nas-live-verify-phase-251.md).
+
+#### Added
+
+- ADR-0253: live verify requires backend+frontend recreate for Phase 251; checklist item 121.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
 
 ### Phase 251 - Evidence Summary Min-Horizon Forward Bar Shortfall
 

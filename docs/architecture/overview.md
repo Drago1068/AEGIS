@@ -470,8 +470,12 @@ Phase 180 live-verified that revision (see
 [decisions/0181-phase-180-nas-live-verify-phase-179.md](decisions/0181-phase-180-nas-live-verify-phase-179.md)).
 Phase 181 surfaces top-level ``latest_calibration_computed_at`` on evidence summary (see
 [decisions/0182-phase-181-evidence-summary-latest-calibration-computed-at.md](decisions/0182-phase-181-evidence-summary-latest-calibration-computed-at.md)).
-Phase 182 (draft) live-verifies that revision (see
+Phase 182 live-verified that revision (see
 [decisions/0183-phase-182-nas-live-verify-phase-181.md](decisions/0183-phase-182-nas-live-verify-phase-181.md)).
+Phase 183 (draft) surfaces top-level ``latest_calibration_corpus_count`` (see
+[decisions/0184-phase-183-evidence-summary-latest-calibration-corpus-count.md](decisions/0184-phase-183-evidence-summary-latest-calibration-corpus-count.md)).
+Phase 184 (draft) live-verifies that revision (see
+[decisions/0185-phase-184-nas-live-verify-phase-183.md](decisions/0185-phase-184-nas-live-verify-phase-183.md)).
 
 ## System context
 

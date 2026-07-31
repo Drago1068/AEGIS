@@ -7,10 +7,38 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 130 - NAS Live Verification of Phase 129
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 129 assessment-history
+section extract. See
+[docs/architecture/decisions/0131-phase-130-nas-live-verify-phase-129.md](docs/architecture/decisions/0131-phase-130-nas-live-verify-phase-129.md).
+
+#### Added
+
+- ADR-0131: live verify requires frontend recreate for Phase 129; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 129 - Extract Assessment History Panel Section
+
+Move assessment history UI into a presentational section component (no behavior change).
+See
+[docs/architecture/decisions/0130-phase-129-extract-assessment-history-section.md](docs/architecture/decisions/0130-phase-129-extract-assessment-history-section.md).
+
+#### Added
+
+- Assessment history section extract drafted (implement next).
+
+#### Explicitly out of scope
+
+New assessment math, orders.
+
 ### Phase 128 - NAS Live Verification of Phase 127
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 127 outcome-label section
-extract. See
+extract. Live verify passed 2026-07-30 (``9823e30``). See
 [docs/architecture/decisions/0129-phase-128-nas-live-verify-phase-127.md](docs/architecture/decisions/0129-phase-128-nas-live-verify-phase-127.md).
 
 #### Added

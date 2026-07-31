@@ -76,8 +76,9 @@ action id chip includes load kind), Phase 118 (NAS live verify of Phase 117), Ph
 (outcome-label backfill names refresh target), Phase 122 (NAS live verify of Phase 121),
 Phase 123 (extract research assessment action toolbar), Phase 124 (NAS live verify of
 Phase 123), Phase 125 (group research assessment action toolbar), Phase 126 (NAS live
-verify of Phase 125), Phase 127 (extract outcome-label history section), and Phase 128
-(NAS live verify of Phase 127).
+verify of Phase 125), Phase 127 (extract outcome-label history section), Phase 128
+(NAS live verify of Phase 127), Phase 129 (extract assessment history section), and
+Phase 130 (NAS live verify of Phase 129).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -349,6 +350,10 @@ Phase 127 extracts the outcome-label history panel section (see
 [decisions/0128-phase-127-extract-outcome-label-history-section.md](decisions/0128-phase-127-extract-outcome-label-history-section.md)).
 Phase 128 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0129-phase-128-nas-live-verify-phase-127.md](decisions/0129-phase-128-nas-live-verify-phase-127.md)).
+Phase 129 extracts the assessment history panel section (see
+[decisions/0130-phase-129-extract-assessment-history-section.md](decisions/0130-phase-129-extract-assessment-history-section.md)).
+Phase 130 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0131-phase-130-nas-live-verify-phase-129.md](decisions/0131-phase-130-nas-live-verify-phase-129.md)).
 
 ## System context
 

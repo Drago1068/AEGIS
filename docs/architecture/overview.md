@@ -422,8 +422,12 @@ Phase 156 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0157-phase-156-nas-live-verify-phase-155.md](decisions/0157-phase-156-nas-live-verify-phase-155.md)).
 Phase 157 surfaces top-level ``latest_method_id`` on evidence summary (see
 [decisions/0158-phase-157-evidence-summary-latest-method-id.md](decisions/0158-phase-157-evidence-summary-latest-method-id.md)).
-Phase 158 (draft) live-verifies that revision (see
+Phase 158 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0159-phase-158-nas-live-verify-phase-157.md](decisions/0159-phase-158-nas-live-verify-phase-157.md)).
+Phase 159 (draft) surfaces top-level ``latest_method_version`` on evidence summary (see
+[decisions/0160-phase-159-evidence-summary-latest-method-version.md](decisions/0160-phase-159-evidence-summary-latest-method-version.md)).
+Phase 160 (draft) live-verifies that revision (see
+[decisions/0161-phase-160-nas-live-verify-phase-159.md](decisions/0161-phase-160-nas-live-verify-phase-159.md)).
 
 ## System context
 

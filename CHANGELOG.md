@@ -7,9 +7,36 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 144 - NAS Live Verification of Phase 143
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 143 error-alert extract. See
+[docs/architecture/decisions/0145-phase-144-nas-live-verify-phase-143.md](docs/architecture/decisions/0145-phase-144-nas-live-verify-phase-143.md).
+
+#### Added
+
+- ADR-0145: live verify requires frontend recreate for Phase 143; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 143 - Extract Research Assessment Error Alert
+
+Move panel error banner into a presentational component (no behavior change). See
+[docs/architecture/decisions/0144-phase-143-extract-research-assessment-error-alert.md](docs/architecture/decisions/0144-phase-143-extract-research-assessment-error-alert.md).
+
+#### Added
+
+- Error alert extract drafted (implement next).
+
+#### Explicitly out of scope
+
+New product math, orders.
+
 ### Phase 142 - NAS Live Verification of Phase 141
 
-Ops evidence gate: redeploy frontend under lab TLS after Phase 141 panel-header extract. See
+Ops evidence gate: redeploy frontend under lab TLS after Phase 141 panel-header extract.
+Live verify passed 2026-07-30 (``1eea8ea``). See
 [docs/architecture/decisions/0143-phase-142-nas-live-verify-phase-141.md](docs/architecture/decisions/0143-phase-142-nas-live-verify-phase-141.md).
 
 #### Added

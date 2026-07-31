@@ -574,8 +574,13 @@ Phase 228 live-verified that revision and closed the series milestone (see
 Phase 229 surfaces ``scan_labeled_freshness_lag_trading_days`` as an exchange trading-day
 freshness diagnostic between latest assessment as_of and scan-labeled outcome_label as_of (see
 [decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md](decisions/0230-phase-229-evidence-summary-scan-labeled-freshness-lag.md)).
-Phase 230 (draft) live-verifies that diagnostic (see
+Phase 230 live-verified that diagnostic (see
 [decisions/0231-phase-230-nas-live-verify-phase-229.md](decisions/0231-phase-230-nas-live-verify-phase-229.md)).
+Phase 231 (draft) proposes ``latest_assessment_is_label_ready`` so operators can see whether
+the absolute latest row can be labeled today (see
+[decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md](decisions/0232-phase-231-evidence-summary-latest-assessment-is-label-ready.md)).
+Phase 232 (draft) would live-verify that diagnostic (see
+[decisions/0233-phase-232-nas-live-verify-phase-231.md](decisions/0233-phase-232-nas-live-verify-phase-231.md)).
 
 ## System context
 

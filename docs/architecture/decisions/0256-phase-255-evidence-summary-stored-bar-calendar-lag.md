@@ -1,6 +1,6 @@
-# ADR-0256: Phase 255 Evidence Summary Stored Bar Calendar Lag (draft)
+# ADR-0256: Phase 255 Evidence Summary Stored Bar Calendar Lag
 
-- Status: Proposed (ready after Phase 254; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -16,7 +16,7 @@ A bare ``latest_stored_daily_bar_date`` would usually equal
 ``latest_assessment_last_available_label_bar_date`` when tip >= as_of — redundant scalar.
 Prefer calendar lag.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. API
 
@@ -24,10 +24,10 @@ Add ``stored_bar_calendar_lag_trading_days: int | null`` (+ export):
 
 - Let tip = max stored close date on the resolved label bar source (absolute tip).
 - Let reference = prior completed session for ``AEGIS`` ``exchange_calendar_name`` (default
-  NYSE) relative to request UTC “now” (same session rules as other calendar helpers).
+  NYSE) relative to request UTC “now” (``most_recent_trading_day``).
 - Lag = non-negative exchange trading-day count from tip through reference (reuse
-  ``count_trading_days_strictly_between`` / sibling helper; clamp 0 if tip >= reference).
-- Null when no stored bars / no tip. Never invent closes.
+  ``count_trading_days_strictly_between``; clamp 0 if tip >= reference).
+- Null when no assessment / no tip. Never invent closes.
 
 ### 2. Console
 
@@ -43,6 +43,8 @@ tip date that duplicates last-available, forcing provider ingest in this phase.
 Unlock answered “how far to label?” Calendar lag answers “how stale is the store vs the
 session calendar?” — the product gap blocking tip progress visibility without another
 date scalar.
+
+Gate approved by standing instruction ("Proceed and approve from here on out").
 
 ## Resume (after Phase 254 gate)
 

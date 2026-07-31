@@ -149,7 +149,8 @@ print_checklist() {
   echo "120. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
   echo "121. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
   echo "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
-  echo "123. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo "123. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
+  echo "124. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -1003,6 +1004,12 @@ if ! grep -q '"latest_assessment_min_horizon_required_label_end_date"' "${summar
   exit 1
 fi
 echo "OK  Phase 254 latest_assessment_min_horizon_required_label_end_date field present"
+# Phase 256: stored_bar_calendar_lag_trading_days from Phase 255 (null/0 OK).
+if ! grep -q '"stored_bar_calendar_lag_trading_days"' "${summary_body}"; then
+  echo "evidence-summary missing stored_bar_calendar_lag_trading_days (Phase 255/256)" >&2
+  exit 1
+fi
+echo "OK  Phase 256 stored_bar_calendar_lag_trading_days field present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -1174,6 +1181,10 @@ if ! grep -q '"latest_assessment_min_horizon_forward_bar_shortfall"' "${export_b
 fi
 if ! grep -q '"latest_assessment_min_horizon_required_label_end_date"' "${export_body}"; then
   echo "evidence-summary/export missing latest_assessment_min_horizon_required_label_end_date (Phase 253/254)" >&2
+  exit 1
+fi
+if ! grep -q '"stored_bar_calendar_lag_trading_days"' "${export_body}"; then
+  echo "evidence-summary/export missing stored_bar_calendar_lag_trading_days (Phase 255/256)" >&2
   exit 1
 fi
 echo "OK  evidence-summary/export attachment state=research_only"

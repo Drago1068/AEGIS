@@ -278,6 +278,15 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "assessment or no as_of bar. Never invents closes."
         ),
     )
+    stored_bar_calendar_lag_trading_days: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Exchange trading sessions the label-source bar tip lags the prior completed "
+            "session (ingest freshness vs calendar). 0 when tip is current; null when no "
+            "assessment or no stored tip. Never invents closes."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

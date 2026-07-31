@@ -14,7 +14,11 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Protocol
 
-from aegis.domain.calendars import count_trading_days_strictly_between, is_trading_day
+from aegis.domain.calendars import (
+    count_trading_days_strictly_between,
+    is_trading_day,
+    most_recent_trading_day,
+)
 from aegis.domain.research_assessment import (
     COMPONENT_SOURCE_MIXED,
     STATE_RESEARCH_ONLY,
@@ -409,6 +413,53 @@ def snapshot_last_available_label_bar_date(
     return max(forward_or_as_of)
 
 
+def snapshot_label_source_max_bar_date(
+    snapshot: ResearchAssessmentSnapshotData,
+    bars: Sequence[ResearchBarInput],
+    *,
+    calendar_name: str = "NYSE",
+) -> date | None:
+    """Return absolute max stored close date on the resolved label bar source (ADR-0256).
+
+    Not filtered to ``day >= as_of``. Returns ``None`` when the source has no usable
+    closes. Never invents closes. ``calendar_name`` unused; kept for call-site parity.
+    """
+
+    _ = calendar_name
+    bar_source = _resolve_label_bar_source(snapshot, bars)
+    closes_by_date = _index_closes(list(bars), bar_source)
+    if not closes_by_date:
+        return None
+    return max(closes_by_date)
+
+
+def stored_bar_calendar_lag_trading_days(
+    snapshot: ResearchAssessmentSnapshotData,
+    bars: Sequence[ResearchBarInput],
+    *,
+    calendar_name: str,
+    reference_date: date,
+) -> int | None:
+    """Return sessions the label-source tip lags the prior completed session (ADR-0256).
+
+    Tip is the absolute max stored close on the resolved label source. Reference is
+    ``most_recent_trading_day(reference_date)``. Returns ``0`` when tip is current;
+    ``None`` when no tip. Never invents closes.
+    """
+
+    tip = snapshot_label_source_max_bar_date(
+        snapshot,
+        bars,
+        calendar_name=calendar_name,
+    )
+    if tip is None:
+        return None
+    expected = most_recent_trading_day(reference_date, calendar_name)
+    if tip >= expected:
+        return 0
+    return count_trading_days_strictly_between(tip, expected, calendar_name)
+
+
 def is_snapshot_label_ready(
     snapshot: ResearchAssessmentSnapshotData,
     bars: Sequence[ResearchBarInput],
@@ -503,6 +554,7 @@ class OutcomeLabelService:
         snapshots_newest_first: list[ResearchAssessmentSnapshotData],
         *,
         labeled_assessment_ids: set[int] | None = None,
+        reference_date: date | None = None,
     ) -> tuple[
         bool | None,
         OutcomeLabelReason | None,
@@ -514,15 +566,16 @@ class OutcomeLabelService:
         date | None,
         int | None,
         date | None,
+        int | None,
     ]:
-        """Return readiness, dates, counts, max/min shortfall and end dates, last bar.
+        """Return readiness, dates, counts, unlock diagnostics, and calendar lag.
 
-        Loads stored bars once (ADR-0232…0250/0252/0254). Empty scan returns
-        ``(None, None, None, None, 0, None, None, None, None, None)``.
+        Loads stored bars once (ADR-0232…0250/0252/0254/0256). Empty scan returns
+        ``(None, None, None, None, 0, None, None, None, None, None, None)``.
         """
 
         if not snapshots_newest_first:
-            return None, None, None, None, 0, None, None, None, None, None
+            return None, None, None, None, 0, None, None, None, None, None, None
 
         bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
         if labeled_assessment_ids is None:
@@ -564,6 +617,13 @@ class OutcomeLabelService:
             bars,
             calendar_name=self._calendar_name,
         )
+        calendar_ref = reference_date if reference_date is not None else datetime.now(tz=UTC).date()
+        calendar_lag = stored_bar_calendar_lag_trading_days(
+            latest,
+            bars,
+            calendar_name=self._calendar_name,
+            reference_date=calendar_ref,
+        )
         most_recent_labelable: date | None = None
         most_recent_unlabeled_labelable: date | None = None
         unlabeled_label_ready_count = 0
@@ -591,6 +651,7 @@ class OutcomeLabelService:
             last_available_label_bar_date,
             min_horizon_forward_bar_shortfall,
             min_horizon_required_label_end_date,
+            calendar_lag,
         )
 
     async def assessment_ids_with_labels(

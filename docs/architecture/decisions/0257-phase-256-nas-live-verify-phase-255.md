@@ -15,7 +15,7 @@ verified backend+frontend redeploy on the UGREEN NAS under lab TLS after that la
 1. Deploy ``HEAD`` TLS; recreate backend+frontend.
 2. ``verify.ps1`` / ``verify.sh`` pass.
 3. Evidence-summary includes ``stored_bar_calendar_lag_trading_days`` (null/0 OK;
-   checklist TBD).
+   checklist item 123).
 4. Alembic ``0009`` / ``head``.
 
 ### 2. Upload ≠ verified

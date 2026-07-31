@@ -19,8 +19,10 @@ from aegis.domain.research_outcome_labels import (
     compute_forward_total_return_labels,
     forward_horizon_end_date,
     snapshot_forward_bar_shortfall,
+    snapshot_label_source_max_bar_date,
     snapshot_last_available_label_bar_date,
     snapshot_required_label_end_date,
+    stored_bar_calendar_lag_trading_days,
 )
 
 _AS_OF = date(2024, 1, 2)
@@ -211,6 +213,41 @@ def test_snapshot_required_label_end_date_min_differs_from_max() -> None:
     assert min_end == date(2024, 1, 9)
     assert max_end == forward_horizon_end_date(_AS_OF, 20, "NYSE")
     assert min_end is not None and max_end is not None and min_end < max_end
+
+
+def test_stored_bar_calendar_lag_current_tip_is_zero() -> None:
+    bars = [_bar(_AS_OF, Decimal("100"))]
+    lag = stored_bar_calendar_lag_trading_days(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        reference_date=_AS_OF,
+    )
+    assert lag == 0
+    assert snapshot_label_source_max_bar_date(_snapshot(), bars) == _AS_OF
+
+
+def test_stored_bar_calendar_lag_counts_sessions_behind_reference() -> None:
+    bars = [_bar(_AS_OF, Decimal("100"))]
+    # 2024-01-02 tip vs reference 2024-01-05 (Thu): sessions 1/3, 1/4, 1/5 => 3
+    lag = stored_bar_calendar_lag_trading_days(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        reference_date=date(2024, 1, 5),
+    )
+    assert lag == 3
+
+
+def test_stored_bar_calendar_lag_null_when_no_closes() -> None:
+    lag = stored_bar_calendar_lag_trading_days(
+        _snapshot(),
+        [],
+        calendar_name="NYSE",
+        reference_date=date(2024, 1, 5),
+    )
+    assert lag is None
+    assert snapshot_label_source_max_bar_date(_snapshot(), []) is None
 
 
 def test_snapshot_required_label_end_date_no_as_of_is_null() -> None:

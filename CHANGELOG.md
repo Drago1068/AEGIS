@@ -12,11 +12,22 @@ delivery workflow).
 Ops evidence gate after Phase 255 stored-bar calendar lag diagnostic. See
 [docs/architecture/decisions/0257-phase-256-nas-live-verify-phase-255.md](docs/architecture/decisions/0257-phase-256-nas-live-verify-phase-255.md).
 
-### Phase 255 - Evidence Summary Stored Bar Calendar Lag (draft)
+### Phase 255 - Evidence Summary Stored Bar Calendar Lag
 
 Exchange sessions the label-source bar tip lags behind the prior completed session
 (ingest freshness vs calendar; not unlock shortfall). See
 [docs/architecture/decisions/0256-phase-255-evidence-summary-stored-bar-calendar-lag.md](docs/architecture/decisions/0256-phase-255-evidence-summary-stored-bar-calendar-lag.md).
+
+#### Added
+
+- ``stored_bar_calendar_lag_trading_days`` on evidence summary (+ export).
+- Domain ``stored_bar_calendar_lag_trading_days`` / ``snapshot_label_source_max_bar_date``.
+- Console ``data-testid="evidence-stored-bar-calendar-lag-trading-days"``.
+- NAS verify checklist item 123 for Phase 256.
+
+#### Explicitly out of scope
+
+UI modularization, inventing closes, default-on calibration, orders, redundant tip dates.
 
 ### Phase 254 - NAS Live Verification of Phase 253
 

@@ -486,6 +486,15 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Stored bar calendar lag (trading days)</dt>
+          <dd
+            className="font-mono"
+            data-testid="evidence-stored-bar-calendar-lag-trading-days"
+          >
+            {evidenceSummary.stored_bar_calendar_lag_trading_days ?? "null"}
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Latest outcome_label computed_at</dt>
           <dd className="font-mono" data-testid="evidence-latest-outcome-label-computed-at">
             {evidenceSummary.latest_outcome_label_computed_at ?? "null"}

@@ -74,8 +74,9 @@ panel helpers module), Phase 116 (NAS live verify of Phase 115), Phase 117 (outc
 action id chip includes load kind), Phase 118 (NAS live verify of Phase 117), Phase 119
 (calibration action chips name latest), Phase 120 (NAS live verify of Phase 119), Phase 121
 (outcome-label backfill names refresh target), Phase 122 (NAS live verify of Phase 121),
-Phase 123 (extract research assessment action toolbar), and Phase 124 (NAS live verify of
-Phase 123).
+Phase 123 (extract research assessment action toolbar), Phase 124 (NAS live verify of
+Phase 123), Phase 125 (group research assessment action toolbar), and Phase 126 (NAS live
+verify of Phase 125).
 Recommendation, prediction, actionable promotion, and trading logic
 remain unimplemented; Phase 6 adds only labeled research-only heuristics with fail-closed
 gates (see
@@ -339,6 +340,10 @@ Phase 123 extracts the research assessment action toolbar component (see
 [decisions/0124-phase-123-extract-research-assessment-action-toolbar.md](decisions/0124-phase-123-extract-research-assessment-action-toolbar.md)).
 Phase 124 live-verifies that revision on the NAS under the lab TLS profile (see
 [decisions/0125-phase-124-nas-live-verify-phase-123.md](decisions/0125-phase-124-nas-live-verify-phase-123.md)).
+Phase 125 groups research assessment action toolbar controls (see
+[decisions/0126-phase-125-group-research-assessment-action-toolbar.md](decisions/0126-phase-125-group-research-assessment-action-toolbar.md)).
+Phase 126 live-verifies that revision on the NAS under the lab TLS profile (see
+[decisions/0127-phase-126-nas-live-verify-phase-125.md](decisions/0127-phase-126-nas-live-verify-phase-125.md)).
 
 ## System context
 

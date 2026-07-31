@@ -7,10 +7,36 @@ delivery workflow).
 
 ## [Unreleased]
 
+### Phase 126 - NAS Live Verification of Phase 125
+
+Ops evidence gate: redeploy frontend under lab TLS after Phase 125 toolbar grouping. See
+[docs/architecture/decisions/0127-phase-126-nas-live-verify-phase-125.md](docs/architecture/decisions/0127-phase-126-nas-live-verify-phase-125.md).
+
+#### Added
+
+- ADR-0127: live verify requires frontend recreate for Phase 125; prior gates remain.
+
+#### Explicitly out of scope
+
+New math, default-on calibration, ACME, actionable promotion, orders.
+
+### Phase 125 - Group Research Assessment Action Toolbar
+
+Label toolbar button groups (Diagnostics / Assessments / Outcome labels / Calibration). See
+[docs/architecture/decisions/0126-phase-125-group-research-assessment-action-toolbar.md](docs/architecture/decisions/0126-phase-125-group-research-assessment-action-toolbar.md).
+
+#### Added
+
+- Grouped toolbar sections with muted labels; existing action test ids preserved.
+
+#### Explicitly out of scope
+
+Changing action semantics, orders.
+
 ### Phase 124 - NAS Live Verification of Phase 123
 
 Ops evidence gate: redeploy frontend under lab TLS after Phase 123 action toolbar extract.
-See
+Live verify passed 2026-07-30 (``5afa71e``). See
 [docs/architecture/decisions/0125-phase-124-nas-live-verify-phase-123.md](docs/architecture/decisions/0125-phase-124-nas-live-verify-phase-123.md).
 
 #### Added

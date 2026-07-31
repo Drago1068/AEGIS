@@ -147,6 +147,10 @@ describe("ResearchAssessmentPanel", () => {
 
     expect(screen.getAllByText(/research only/i).length).toBeGreaterThan(0);
     expect(screen.getByTestId("research-assessment-action-toolbar")).toBeInTheDocument();
+    expect(screen.getByTestId("toolbar-group-diagnostics")).toBeInTheDocument();
+    expect(screen.getByTestId("toolbar-group-assessments")).toBeInTheDocument();
+    expect(screen.getByTestId("toolbar-group-outcome-labels")).toBeInTheDocument();
+    expect(screen.getByTestId("toolbar-group-calibration")).toBeInTheDocument();
     expect(screen.getByText(/no research assessment stored yet/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /compute calibration/i })).toBeDisabled();
   });

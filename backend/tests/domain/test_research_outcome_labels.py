@@ -19,6 +19,7 @@ from aegis.domain.research_outcome_labels import (
     compute_forward_total_return_labels,
     forward_horizon_end_date,
     snapshot_forward_bar_shortfall,
+    snapshot_required_label_end_date,
 )
 
 _AS_OF = date(2024, 1, 2)
@@ -149,6 +150,29 @@ def test_snapshot_forward_bar_shortfall_no_as_of_is_null() -> None:
         horizons=(5,),
     )
     assert shortfall is None
+
+
+def test_snapshot_required_label_end_date_from_as_of() -> None:
+    bars = [_bar(_AS_OF, Decimal("100"))]
+    end = snapshot_required_label_end_date(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    assert end == date(2024, 1, 9)
+    assert end == forward_horizon_end_date(_AS_OF, 5, "NYSE")
+
+
+def test_snapshot_required_label_end_date_no_as_of_is_null() -> None:
+    bars = [_bar(date(2024, 1, 3), Decimal("101"))]
+    end = snapshot_required_label_end_date(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    assert end is None
 
 
 def test_missing_snapshot_id_fail_closed() -> None:

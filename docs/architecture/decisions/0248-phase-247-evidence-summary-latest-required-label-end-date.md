@@ -1,6 +1,6 @@
-# ADR-0248: Phase 247 Evidence Summary Latest Required Label End Date (draft)
+# ADR-0248: Phase 247 Evidence Summary Latest Required Label End Date
 
-- Status: Proposed (ready after Phase 246; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -12,7 +12,7 @@ labeling — the companion calendar date to the shortfall count for backfill pla
 Further tip scalars (duplicate ids/as_ofs) are low value; the required end date is actionable
 beside shortfall.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. API
 

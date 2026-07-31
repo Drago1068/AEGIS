@@ -12,10 +12,22 @@ delivery workflow).
 Ops evidence gate after Phase 247 required label end-date diagnostic. See
 [docs/architecture/decisions/0249-phase-248-nas-live-verify-phase-247.md](docs/architecture/decisions/0249-phase-248-nas-live-verify-phase-247.md).
 
-### Phase 247 - Evidence Summary Latest Required Label End Date (draft)
+### Phase 247 - Evidence Summary Latest Required Label End Date
 
 Calendar trading date that unlocks max-horizon labeling (companion to shortfall). See
 [docs/architecture/decisions/0248-phase-247-evidence-summary-latest-required-label-end-date.md](docs/architecture/decisions/0248-phase-247-evidence-summary-latest-required-label-end-date.md).
+
+#### Added
+
+- ``latest_assessment_required_label_end_date`` on evidence summary (+ export): calendar
+  projection from as_of for max forward horizon; null when N/A.
+- Domain ``snapshot_required_label_end_date``; console
+  ``data-testid="evidence-latest-assessment-required-label-end-date"``.
+- NAS verify checklist item 119 for Phase 248.
+
+#### Explicitly out of scope
+
+UI modularization, inventing future closes, default-on calibration, orders.
 
 ### Phase 246 - NAS Live Verification of Phase 245
 

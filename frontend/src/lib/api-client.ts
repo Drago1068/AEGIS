@@ -1027,6 +1027,11 @@ export interface ResearchEvidenceSummary {
    * 0 when ready; null when no assessment or no as_of bar. Never invented.
    */
   latest_assessment_forward_bar_shortfall: number | null;
+  /**
+   * Trading date that unlocks max-horizon labeling for latest (calendar from as_of).
+   * Null when no assessment or no as_of bar. Never invents closes.
+   */
+  latest_assessment_required_label_end_date: string | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

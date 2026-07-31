@@ -145,7 +145,8 @@ print_checklist() {
   echo "116. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
   echo "117. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
   echo "118. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
-  echo "119. TLS profile: https:// URLs + Secure cookies when enabled"
+  echo "119. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
+  echo "120. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -975,6 +976,12 @@ if ! grep -q '"latest_assessment_forward_bar_shortfall"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 246 latest_assessment_forward_bar_shortfall field present"
+# Phase 248: latest_assessment_required_label_end_date from Phase 247 (null OK when N/A).
+if ! grep -q '"latest_assessment_required_label_end_date"' "${summary_body}"; then
+  echo "evidence-summary missing latest_assessment_required_label_end_date (Phase 247/248)" >&2
+  exit 1
+fi
+echo "OK  Phase 248 latest_assessment_required_label_end_date field present"
 # Phase 27/31: log present label and end-date keys only (never invent).
 if printf '%s' "${summary_body}" | grep -q '"latest_outcome_label"[[:space:]]*:[[:space:]]*null'; then
   echo "OK  evidence-summary state=research_only label_keys=(none) end_date_keys=(none)"
@@ -1130,6 +1137,10 @@ if ! grep -q '"most_recent_unlabeled_as_of_trading_date"' "${export_body}"; then
 fi
 if ! grep -q '"latest_assessment_forward_bar_shortfall"' "${export_body}"; then
   echo "evidence-summary/export missing latest_assessment_forward_bar_shortfall (Phase 245/246)" >&2
+  exit 1
+fi
+if ! grep -q '"latest_assessment_required_label_end_date"' "${export_body}"; then
+  echo "evidence-summary/export missing latest_assessment_required_label_end_date (Phase 247/248)" >&2
   exit 1
 fi
 echo "OK  evidence-summary/export attachment state=research_only"

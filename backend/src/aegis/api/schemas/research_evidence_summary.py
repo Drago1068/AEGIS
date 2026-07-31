@@ -245,6 +245,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "null when no assessment or no as_of bar. Never invented."
         ),
     )
+    latest_assessment_required_label_end_date: date | None = Field(
+        default=None,
+        description=(
+            "Trading date at which the max forward horizon for the latest assessment "
+            "would unlock labeling (calendar projection from as_of). Null when no "
+            "assessment or no as_of bar. Never invents closes."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

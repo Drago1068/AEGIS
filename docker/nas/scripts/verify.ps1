@@ -156,7 +156,8 @@ function Write-VerifyChecklist {
     Write-Host "116. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
     Write-Host "117. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
     Write-Host "118. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
-    Write-Host "119. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "119. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
+    Write-Host "120. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1192,6 +1193,13 @@ try {
         $forwardShortfall = $summary.latest_assessment_forward_bar_shortfall
         $forwardShortfallPart = if ($null -eq $forwardShortfall -or $forwardShortfall -eq "") { "null" } else { [string]$forwardShortfall }
         Write-Host "OK  Phase 246 latest_assessment_forward_bar_shortfall=$forwardShortfallPart"
+        # Phase 248: latest_assessment_required_label_end_date from Phase 247 (null OK when N/A).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_assessment_required_label_end_date")) {
+            throw "evidence-summary missing latest_assessment_required_label_end_date (Phase 247/248)"
+        }
+        $requiredEnd = $summary.latest_assessment_required_label_end_date
+        $requiredEndPart = if ($null -eq $requiredEnd -or $requiredEnd -eq "") { "null" } else { [string]$requiredEnd }
+        Write-Host "OK  Phase 248 latest_assessment_required_label_end_date=$requiredEndPart"
     } finally {
         if (Test-Path -LiteralPath $summaryPath) {
             Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
@@ -1391,6 +1399,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "latest_assessment_forward_bar_shortfall")) {
             throw "evidence-summary/export missing latest_assessment_forward_bar_shortfall (Phase 245/246)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_assessment_required_label_end_date")) {
+            throw "evidence-summary/export missing latest_assessment_required_label_end_date (Phase 247/248)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

@@ -312,11 +312,21 @@ export function ResearchAssessmentPanel({
         const summary = await backfillResearchAssessments(baseUrl, symbol, 20);
         setAssessmentBackfillSummary(summary);
         await loadAssessmentHistory();
+        const trackedLabelAssessmentId = outcomeLabelHistoryAssessmentId;
+        const trackedLoadKind = outcomeLabelHistoryLoadKind;
         try {
           const nextLatest = await getLatestResearchAssessment(baseUrl, symbol);
           setLatest(nextLatest);
+          const labelAssessmentId = trackedLabelAssessmentId ?? nextLatest.id ?? null;
+          if (labelAssessmentId != null) {
+            const loadKind =
+              trackedLoadKind ??
+              (nextLatest.id != null && labelAssessmentId === nextLatest.id
+                ? "latest"
+                : "scan_labeled");
+            await loadOutcomeLabelHistory(labelAssessmentId, loadKind);
+          }
           if (nextLatest.id != null) {
-            await loadOutcomeLabelHistory(nextLatest.id);
             await loadCalibrationHistory(nextLatest.id);
           }
         } catch (err) {

@@ -81,7 +81,8 @@ function Write-VerifyChecklist {
     Write-Host " 41. Phase 92: frontend redeploy includes Phase 91 empty-state-loaded-assessment (unit-tested)"
     Write-Host " 42. Phase 94: frontend redeploy includes Phase 93 compute-loaded-assessment (unit-tested)"
     Write-Host " 43. Phase 96: frontend redeploy includes Phase 95 backfill-refresh-loaded-assessment (unit-tested)"
-    Write-Host " 44. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host " 44. Phase 98: frontend redeploy includes Phase 97 assessment-backfill-preserves-labels (unit-tested)"
+    Write-Host " 45. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {

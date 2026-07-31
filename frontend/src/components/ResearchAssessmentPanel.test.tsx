@@ -1187,6 +1187,133 @@ describe("ResearchAssessmentPanel", () => {
     );
   });
 
+  it("keeps scan-labeled outcome labels after assessment backfill", async () => {
+    vi.mocked(getResearchEvidenceSummary).mockResolvedValue({
+      symbol: "AAPL",
+      state: "research_only",
+      latest_assessment: sampleAssessment,
+      calibration_readiness: {
+        symbol: "AAPL",
+        status: "insufficient_corpus",
+        assessment_snapshot_id: 1,
+        research_index: 0.46,
+        corpus_count: 0,
+        bucket_count: 0,
+        min_corpus: 10,
+        min_bucket: 5,
+        index_bucket_width: 0.15,
+        calibration_method_id: "research_calibration_v1",
+        detail: "research only",
+      },
+      latest_outcome_label: null,
+      latest_calibration: null,
+      assessment_count: 2,
+      outcome_label_count: 1,
+      calibration_count: 0,
+      latest_component_source: "alpha_vantage",
+      latest_resolved_label_bar_source: null,
+      mixed_component_source_assessment_count: 0,
+      mixed_unlabeled_assessment_count: 0,
+      mixed_labeled_assessment_count: 0,
+      latest_mixed_label_bar_source: null,
+      most_recent_labeled_assessment_id: 3,
+      most_recent_labeled_outcome_label: {
+        id: 30,
+        assessment_snapshot_id: 3,
+        symbol: "AAPL",
+        label_method_id: "forward_total_return_v1",
+        label_method_version: 1,
+        state: "research_only",
+        as_of_trading_date: "2024-01-26",
+        computed_at: "2024-01-26T20:00:00Z",
+        labels: { forward_return_5: 0.02 },
+        label_end_dates: { forward_return_5: "2024-02-02" },
+        schema_version: 1,
+        bar_source: "polygon",
+      },
+      detail: "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
+    });
+    vi.mocked(listOutcomeLabels).mockResolvedValue([
+      {
+        id: 30,
+        assessment_snapshot_id: 3,
+        symbol: "AAPL",
+        label_method_id: "forward_total_return_v1",
+        label_method_version: 1,
+        state: "research_only",
+        as_of_trading_date: "2024-01-26",
+        computed_at: "2024-01-26T20:00:00Z",
+        labels: { forward_return_5: 0.02 },
+        label_end_dates: { forward_return_5: "2024-02-02" },
+        schema_version: 1,
+        bar_source: "polygon",
+      },
+    ]);
+    vi.mocked(backfillResearchAssessments).mockResolvedValue({
+      symbol: "AAPL",
+      candidate_count: 1,
+      persisted_count: 1,
+      skipped_count: 0,
+      outcomes: [],
+      detail:
+        "Research-only assessment backfill — not advice; skips are fail-closed, never invent confidence.",
+    });
+    const nextLatest = { ...sampleAssessment, id: 4 };
+    vi.mocked(getLatestResearchAssessment).mockResolvedValue(nextLatest);
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /refresh evidence summary/i }));
+    const loadScan = await screen.findByTestId("load-scan-labeled-labels");
+    await waitFor(() => {
+      expect(loadScan).not.toBeDisabled();
+    });
+    fireEvent.click(loadScan);
+    await waitFor(() => {
+      expect(screen.getByTestId("outcome-label-history-assessment-id")).toHaveTextContent(
+        /assessment id 3/i,
+      );
+    });
+
+    vi.mocked(listOutcomeLabels).mockClear();
+    vi.mocked(listOutcomeLabels).mockResolvedValue([
+      {
+        id: 30,
+        assessment_snapshot_id: 3,
+        symbol: "AAPL",
+        label_method_id: "forward_total_return_v1",
+        label_method_version: 1,
+        state: "research_only",
+        as_of_trading_date: "2024-01-26",
+        computed_at: "2024-01-26T20:00:00Z",
+        labels: { forward_return_5: 0.02 },
+        label_end_dates: { forward_return_5: "2024-02-02" },
+        schema_version: 1,
+        bar_source: "polygon",
+      },
+    ]);
+    fireEvent.click(screen.getByRole("button", { name: /backfill assessments/i }));
+
+    await waitFor(() => {
+      expect(backfillResearchAssessments).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        20,
+      );
+      expect(listOutcomeLabels).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        3,
+        20,
+      );
+      expect(screen.getByTestId("outcome-label-history-assessment-id")).toHaveTextContent(
+        /assessment id 3/i,
+      );
+      expect(screen.getByTestId("outcome-label-history-load-kind")).toHaveTextContent(
+        /scan-labeled \(latest is 4\)/i,
+      );
+    });
+  });
+
   it("renders Phase 11 multi-source provenance fields from the API payload", () => {
     const v2 = {
       ...sampleAssessment,

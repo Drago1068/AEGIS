@@ -290,8 +290,12 @@ export function ResearchAssessmentPanel({
       try {
         const summary = await backfillOutcomeLabels(baseUrl, symbol, 100);
         setBackfillSummary(summary);
-        if (latest?.id != null) {
-          await loadOutcomeLabelHistory(latest.id as number);
+        const assessmentId = outcomeLabelHistoryAssessmentId ?? latest?.id ?? null;
+        if (assessmentId != null) {
+          const loadKind =
+            outcomeLabelHistoryLoadKind ??
+            (latest?.id != null && assessmentId === latest.id ? "latest" : "scan_labeled");
+          await loadOutcomeLabelHistory(assessmentId, loadKind);
         }
         await loadReadiness();
         await loadEvidenceSummary();

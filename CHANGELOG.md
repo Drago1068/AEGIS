@@ -27,9 +27,9 @@ After backfill, refresh outcome-label history for the loaded assessment id (not 
 latest). See
 [docs/architecture/decisions/0096-phase-95-outcome-label-backfill-refresh-loaded-assessment.md](docs/architecture/decisions/0096-phase-95-outcome-label-backfill-refresh-loaded-assessment.md).
 
-#### Planned
+#### Added
 
-- Backfill refresh uses ``outcomeLabelHistoryAssessmentId ?? latest.id``.
+- Backfill refresh uses ``outcomeLabelHistoryAssessmentId ?? latest.id`` (preserves load-kind).
 
 #### Explicitly out of scope
 

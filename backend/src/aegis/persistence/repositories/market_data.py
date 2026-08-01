@@ -84,6 +84,16 @@ class MarketDailyBarRepository:
             )
         return snapshots
 
+    async def get_max_trading_date(self, source: str, symbol: str) -> date | None:
+        """Return max stored trading_date for ``source``/``symbol``, or None if empty."""
+
+        stmt = select(func.max(MarketDailyBarObservation.trading_date)).where(
+            MarketDailyBarObservation.source == source,
+            MarketDailyBarObservation.symbol == symbol,
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def save_many(self, source: str, bars: list[DailyBar]) -> int:
         """Insert ``initial`` observations for ``bars``. Returns rows inserted."""
 

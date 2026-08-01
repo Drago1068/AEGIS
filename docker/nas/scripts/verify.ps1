@@ -161,7 +161,7 @@ function Write-VerifyChecklist {
     Write-Host "121. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
     Write-Host "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
     Write-Host "123. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-    Write-Host "124. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-264; unchanged lag OK)"
+    Write-Host "124. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
     Write-Host "125. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
@@ -1272,7 +1272,7 @@ try {
                 $providerTipSourcePart = if ($null -eq $providerTipSource -or $providerTipSource -eq "") { "null" } else { [string]$providerTipSource }
                 $primaryTip = $verifyRow.primary_latest_trading_date
                 $primaryTipPart = if ($null -eq $primaryTip -or $primaryTip -eq "") { "null" } else { [string]$primaryTip }
-                Write-Host ("OK  Phase 264 ingest {0} stored={1} skipped_existing={2} corrected={3} rejected={4} latest_trading_date={5} latest_trading_date_source={6} primary_latest_trading_date={7} error={8}" -f `
+                Write-Host ("OK  Phase 266 ingest {0} stored={1} skipped_existing={2} corrected={3} rejected={4} latest_trading_date={5} latest_trading_date_source={6} primary_latest_trading_date={7} error={8}" -f `
                     $verifySymbol, $verifyRow.stored_count, $verifyRow.skipped_existing_count, `
                     $verifyRow.corrected_count, $verifyRow.rejected_count, $providerTipPart, `
                     $providerTipSourcePart, $primaryTipPart, `

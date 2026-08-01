@@ -82,8 +82,11 @@ class FakeRepository:
     def __init__(
         self,
         current: dict[tuple[str, str], dict[date, StoredBarSnapshot]] | None = None,
+        *,
+        max_trading_dates: dict[tuple[str, str], date] | None = None,
     ) -> None:
         self._current = current or {}
+        self._max_trading_dates = max_trading_dates or {}
         self.saved: list[tuple[str, DailyBar]] = []
         self.corrections: list[tuple[str, DailyBar, int]] = []
 
@@ -95,6 +98,14 @@ class FakeRepository:
     ) -> dict[date, StoredBarSnapshot]:
         stored = self._current.get((source, symbol), {})
         return {d: stored[d] for d in trading_dates if d in stored}
+
+    async def get_max_trading_date(self, source: str, symbol: str) -> date | None:
+        if (source, symbol) in self._max_trading_dates:
+            return self._max_trading_dates[(source, symbol)]
+        stored = self._current.get((source, symbol), {})
+        if not stored:
+            return None
+        return max(stored)
 
     async def save_many(self, source: str, bars: list[DailyBar]) -> int:
         self.saved.extend((source, bar) for bar in bars)
@@ -337,6 +348,75 @@ async def test_rate_limit_on_primary_still_refreshes_secondary() -> None:
     assert run_result.results[0].latest_trading_date_source == _SECONDARY_SOURCE
     assert run_result.results[0].primary_latest_trading_date is None
     assert repository.saved == [(_SECONDARY_SOURCE, secondary_bars[0])]
+
+
+@pytest.mark.asyncio
+async def test_primary_fetch_error_falls_back_to_stored_primary_tip() -> None:
+    stored_tip = date(2024, 1, 2)
+    secondary_tip = date(2024, 1, 3)
+    secondary_bars = [
+        _bar(
+            "AAPL",
+            secondary_tip,
+            open=Decimal("990"),
+            high=Decimal("1000"),
+            low=Decimal("980"),
+            close=Decimal("999"),
+        )
+    ]
+    primary = FakeProvider(
+        errors_by_symbol={"AAPL": ProviderRateLimitError("rate limited")}
+    )
+    secondary = FakeProvider({"AAPL": secondary_bars})
+    repository = FakeRepository(
+        max_trading_dates={(_SOURCE, "AAPL"): stored_tip},
+    )
+
+    run_result = await _service(
+        primary,
+        repository,
+        secondary_provider=secondary,
+        secondary_source=_SECONDARY_SOURCE,
+        as_of=secondary_tip,
+    ).run(["AAPL"])
+
+    result = run_result.results[0]
+    assert result.error is None
+    assert result.latest_trading_date == secondary_tip
+    assert result.latest_trading_date_source == _SECONDARY_SOURCE
+    assert result.primary_latest_trading_date == stored_tip
+
+
+@pytest.mark.asyncio
+async def test_primary_empty_fetch_falls_back_to_stored_primary_tip() -> None:
+    stored_tip = date(2023, 12, 29)
+    primary = FakeProvider({"AAPL": []})
+    repository = FakeRepository(
+        max_trading_dates={(_SOURCE, "AAPL"): stored_tip},
+    )
+
+    run_result = await _service(primary, repository).run(["AAPL"])
+
+    result = run_result.results[0]
+    assert result.error is None
+    assert result.latest_trading_date is None
+    assert result.primary_latest_trading_date == stored_tip
+
+
+@pytest.mark.asyncio
+async def test_primary_only_error_falls_back_to_stored_primary_tip() -> None:
+    stored_tip = date(2024, 1, 2)
+    primary = FakeProvider(errors_by_symbol={"AAPL": ProviderError("down")})
+    repository = FakeRepository(
+        max_trading_dates={(_SOURCE, "AAPL"): stored_tip},
+    )
+
+    run_result = await _service(primary, repository).run(["AAPL"])
+
+    result = run_result.results[0]
+    assert result.error is not None
+    assert result.latest_trading_date is None
+    assert result.primary_latest_trading_date == stored_tip
 
 
 @pytest.mark.asyncio

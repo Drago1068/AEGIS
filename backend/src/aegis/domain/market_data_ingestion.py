@@ -9,7 +9,9 @@ protocol structurally without either module importing the other.
 Optional secondary-provider tip catch-up (ADR-0011 / ADR-0262) stays in this service so each
 successful write uses the producing adapter's ``source`` without silent provenance swaps.
 When a secondary is configured, both providers are refreshed independently per symbol so a
-primary rate-limit or lagging primary tip cannot hide a fresher secondary tip.
+primary rate-limit or lagging primary tip cannot hide a fresher secondary tip. When the
+primary fetch has no tip, ``primary_latest_trading_date`` falls back to the max stored
+primary close (ADR-0266) without inventing bars.
 
 Provider historical corrections (ADR-0013) insert append-only ``correction`` rows when a
 re-ingest materially differs from the current stored bar for the same trading date.
@@ -41,6 +43,10 @@ class DailyBarRepository(Protocol):
         trading_dates: set[date],
     ) -> dict[date, StoredBarSnapshot]:
         """Return current stored observations keyed by trading date."""
+        ...
+
+    async def get_max_trading_date(self, source: str, symbol: str) -> date | None:
+        """Return max stored trading_date for ``source``/``symbol``, or None if empty."""
         ...
 
     async def save_many(self, source: str, bars: list[DailyBar]) -> int:
@@ -126,15 +132,27 @@ class MarketDataIngestionService:
 
     async def _ingest_symbol(self, symbol: str) -> SymbolIngestionResult:
         primary = await self._ingest_from_provider(symbol, self._provider, self._source)
+        primary_tip = await self._resolve_primary_tip(symbol, primary)
         if self._secondary_provider is None or self._secondary_source is None:
-            return _with_primary_tip(primary)
+            return _with_primary_tip(primary, primary_tip)
 
         secondary = await self._ingest_from_provider(
             symbol,
             self._secondary_provider,
             self._secondary_source,
         )
-        return _merge_symbol_results(symbol, primary, secondary)
+        return _merge_symbol_results(symbol, primary, secondary, primary_tip=primary_tip)
+
+    async def _resolve_primary_tip(
+        self,
+        symbol: str,
+        primary: SymbolIngestionResult,
+    ) -> date | None:
+        """Prefer primary fetch tip; else max stored primary close (ADR-0266)."""
+
+        if primary.error is None and primary.latest_trading_date is not None:
+            return primary.latest_trading_date
+        return await self._repository.get_max_trading_date(self._source, symbol)
 
     async def _ingest_from_provider(
         self,
@@ -262,10 +280,12 @@ class MarketDataIngestionService:
         )
 
 
-def _with_primary_tip(result: SymbolIngestionResult) -> SymbolIngestionResult:
-    """Attach primary tip diagnostic when only the primary provider ran (ADR-0264)."""
+def _with_primary_tip(
+    result: SymbolIngestionResult,
+    primary_tip: date | None,
+) -> SymbolIngestionResult:
+    """Attach primary tip diagnostic when only the primary provider ran (ADR-0264/0266)."""
 
-    primary_tip = result.latest_trading_date if result.error is None else None
     return SymbolIngestionResult(
         symbol=result.symbol,
         stored_count=result.stored_count,
@@ -284,12 +304,13 @@ def _merge_symbol_results(
     symbol: str,
     primary: SymbolIngestionResult,
     secondary: SymbolIngestionResult,
+    *,
+    primary_tip: date | None,
 ) -> SymbolIngestionResult:
     """Combine independent primary/secondary outcomes for one symbol (ADR-0262)."""
 
     primary_ok = primary.error is None
     secondary_ok = secondary.error is None
-    primary_tip = primary.latest_trading_date if primary_ok else None
     if not primary_ok and not secondary_ok:
         return SymbolIngestionResult(
             symbol=symbol,
@@ -302,7 +323,7 @@ def _merge_symbol_results(
                 if primary.error and secondary.error
                 else (primary.error or secondary.error)
             ),
-            primary_latest_trading_date=None,
+            primary_latest_trading_date=primary_tip,
         )
 
     parts = [part for part in (primary, secondary) if part.error is None]
@@ -333,6 +354,9 @@ def _merge_symbol_results(
                     latest_trading_date.isoformat() if latest_trading_date else None
                 ),
                 "latest_trading_date_source": latest_trading_date_source,
+                "primary_latest_trading_date": (
+                    primary_tip.isoformat() if primary_tip else None
+                ),
             },
         )
     elif not secondary_ok:

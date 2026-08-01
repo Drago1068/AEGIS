@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 265 stored primary tip fallback. See
 [docs/architecture/decisions/0267-phase-266-nas-live-verify-phase-265.md](docs/architecture/decisions/0267-phase-266-nas-live-verify-phase-265.md).
 
-### Phase 265 - Stored Primary Tip Fallback (draft)
+### Phase 265 - Stored Primary Tip Fallback
 
-When primary fetch fails, surface max stored primary tip on ingest results. See
+When primary fetch fails or returns empty, surface max stored primary tip on ingest
+results. See
 [docs/architecture/decisions/0266-phase-265-stored-primary-tip-fallback.md](docs/architecture/decisions/0266-phase-265-stored-primary-tip-fallback.md).
+
+#### Added
+
+- Repository ``get_max_trading_date``; ingest falls back for ``primary_latest_trading_date``.
+
+#### Explicitly out of scope
+
+Inventing closes, calibration default-on, orders.
 
 ### Phase 264 - NAS Live Verification of Phase 263
 

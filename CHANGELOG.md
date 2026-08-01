@@ -7,10 +7,32 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 308 - NAS Live Verification of Phase 307 (draft)
+### Phase 310 - NAS Live Verification of Phase 309 (draft)
 
-Ops evidence gate after Phase 307 labeling frontier readout. See
+Ops evidence gate after Phase 309 min-horizon label path. See
+[docs/architecture/decisions/0311-phase-310-nas-live-verify-phase-309.md](docs/architecture/decisions/0311-phase-310-nas-live-verify-phase-309.md).
+
+### Phase 309 - Min-Horizon Label Path When Tip Blocked (draft)
+
+Explicit research-only ready-horizons outcome labeling when tip/max horizon is still
+blocked (product gap vs more UI stacking). See
+[docs/architecture/decisions/0310-phase-309-min-horizon-label-path.md](docs/architecture/decisions/0310-phase-309-min-horizon-label-path.md).
+
+### Phase 308 - NAS Live Verification of Phase 307
+
+Ops evidence gate after Phase 307 labeling frontier readout. Live verify passed 2026-08-01
+(``7c03852``; frontier ``tip_ready=False`` ``forward_shortfall=20``
+``required_end=2026-08-28`` ``min_horizon_shortfall=5`` ``min_horizon_end=2026-08-07``
+``last_available=2026-07-31``). See
 [docs/architecture/decisions/0309-phase-308-nas-live-verify-phase-307.md](docs/architecture/decisions/0309-phase-308-nas-live-verify-phase-307.md).
+
+#### Added
+
+- ADR-0309: live labeling frontier field-bundle evidence (checklist Phase 308 log).
+
+#### Explicitly out of scope
+
+Inventing bars/labels, orders.
 
 ### Phase 307 - Labeling Frontier Readout
 

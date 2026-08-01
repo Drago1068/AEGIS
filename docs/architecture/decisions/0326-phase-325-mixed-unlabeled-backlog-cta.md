@@ -30,3 +30,4 @@ changing unlock CTAs.
 - [0325-phase-324-nas-live-verify-phase-323.md](0325-phase-324-nas-live-verify-phase-323.md)
 - [0292-phase-291-mixed-unlabeled-backlog-callout.md](0292-phase-291-mixed-unlabeled-backlog-callout.md)
 - [0327-phase-326-nas-live-verify-phase-325.md](0327-phase-326-nas-live-verify-phase-325.md)
+- [0328-phase-327-freshness-lag-cta.md](0328-phase-327-freshness-lag-cta.md)

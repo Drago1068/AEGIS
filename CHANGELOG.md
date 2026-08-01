@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 326 - NAS Live Verification of Phase 325 (draft)
+### Phase 328 - NAS Live Verification of Phase 327 (draft)
 
-Ops evidence gate after Phase 325 mixed-unlabeled backlog CTA. See
+Ops evidence gate after Phase 327 freshness-lag CTA. See
+[docs/architecture/decisions/0329-phase-328-nas-live-verify-phase-327.md](docs/architecture/decisions/0329-phase-328-nas-live-verify-phase-327.md).
+
+### Phase 327 - Freshness-Lag Backfill CTA (draft)
+
+Elevate ready-horizon backfill CTA on the freshness-lag callout. See
+[docs/architecture/decisions/0328-phase-327-freshness-lag-cta.md](docs/architecture/decisions/0328-phase-327-freshness-lag-cta.md).
+
+### Phase 326 - NAS Live Verification of Phase 325
+
+Ops evidence gate after Phase 325 mixed-unlabeled backlog CTA. Live verify passed
+2026-08-01 (``e7ace4b``; ``mixed_unlabeled=7`` elevates CTA). See
 [docs/architecture/decisions/0327-phase-326-nas-live-verify-phase-325.md](docs/architecture/decisions/0327-phase-326-nas-live-verify-phase-325.md).
+
+#### Added
+
+- ADR-0327: live mixed-unlabeled backlog CTA evidence (checklist Phase 326 log).
+
+#### Explicitly out of scope
+
+Auto-backfill, inventing bars, orders.
 
 ### Phase 325 - Mixed-Unlabeled Backlog CTA
 

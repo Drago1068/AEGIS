@@ -7,10 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 273 closed (AV full→compact primary tip catch-up).** Next
-(draft): Phase 274 NAS live verify under lab TLS (ADR-0275). See
-[docs/architecture/decisions/0274-phase-273-primary-tip-catch-up-compact.md](docs/architecture/decisions/0274-phase-273-primary-tip-catch-up-compact.md),
+**Current phase: Phase 274 closed (AV compact primary tip catch-up live-verified).**
+Next (draft): Phase 275 surface primary fetch fallback on ingest results (ADR-0276), then
+Phase 276 NAS verify. See
 [docs/architecture/decisions/0275-phase-274-nas-live-verify-phase-273.md](docs/architecture/decisions/0275-phase-274-nas-live-verify-phase-273.md),
+[docs/architecture/decisions/0276-phase-275-ingest-primary-fetch-fallback.md](docs/architecture/decisions/0276-phase-275-ingest-primary-fetch-fallback.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

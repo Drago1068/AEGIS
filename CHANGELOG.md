@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 274 - NAS Live Verification of Phase 273 (draft)
+### Phase 276 - NAS Live Verification of Phase 275 (draft)
 
-Ops evidence gate after Phase 273 primary tip catch-up. See
+Ops evidence gate after Phase 275 ingest fallback diagnostic. See
+[docs/architecture/decisions/0277-phase-276-nas-live-verify-phase-275.md](docs/architecture/decisions/0277-phase-276-nas-live-verify-phase-275.md).
+
+### Phase 275 - Surface Primary Fetch Fallback on Ingest Results (draft)
+
+Expose ``full_to_compact`` (or null) on ingest symbol results. See
+[docs/architecture/decisions/0276-phase-275-ingest-primary-fetch-fallback.md](docs/architecture/decisions/0276-phase-275-ingest-primary-fetch-fallback.md).
+
+### Phase 274 - NAS Live Verification of Phase 273
+
+Ops evidence gate after Phase 273 AV compact tip catch-up. Live verify passed 2026-07-31
+(``99e0c8e``; AAPL ``primary_latest_trading_date=2026-07-31``,
+``latest_trading_date_source=alpha_vantage``). See
 [docs/architecture/decisions/0275-phase-274-nas-live-verify-phase-273.md](docs/architecture/decisions/0275-phase-274-nas-live-verify-phase-273.md).
+
+#### Added
+
+- ADR-0275: live primary tip catch-up evidence (checklist Phase 274 log).
+
+#### Explicitly out of scope
+
+Inventing closes, silent provenance swaps, orders.
 
 ### Phase 273 - Primary Tip Catch-Up When Full Output Is Premium-Gated
 

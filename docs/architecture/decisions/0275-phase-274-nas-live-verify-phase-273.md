@@ -1,32 +1,27 @@
-# ADR-0275: Phase 274 NAS Live Verification of Phase 273 (draft)
+# ADR-0275: Phase 274 NAS Live Verification of Phase 273
 
-- Status: Proposed (pending Phase 273 + live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
-Phase 273 would catch up primary tip when Alpha Vantage ``full`` is premium-gated
-(ADR-0274). Operators need a verified backend redeploy under lab TLS after that lands.
+Phase 273 added Alpha Vantage full→compact tip catch-up with a free-tier delay
+(ADR-0274). Operators needed a verified backend redeploy under lab TLS.
 
 ## Decisions
 
-### 1. Scope
+### 1. Scope completed
 
-1. Deploy ``HEAD`` TLS; recreate backend.
-2. ``verify.ps1`` pass; ingest logs ``primary_latest_trading_date`` advanced when compact
-   AV closes exist (still may lag polygon; never invent).
-3. Alembic ``0009`` / ``head``.
+1. Deployed ``99e0c8e`` TLS; rebuilt backend.
+2. ``verify.ps1`` passed; alembic ``0009`` / ``head``.
+3. Live AAPL ingest evidence:
+   ``primary_latest_trading_date=2026-07-31``,
+   ``latest_trading_date_source=alpha_vantage``,
+   ``stored=2`` / ``corrected=1`` (compact fallback landed real AV closes).
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout.
-
-## Resume
-
-```powershell
-# After Phase 273 on HEAD: git archive → NAS; rebuild backend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+Retain verify stdout as acceptance evidence.
 
 ## Related documents
 

@@ -673,8 +673,10 @@ Phase 272 live-verified ``post_lag=0`` with tip ``2026-07-31`` (see
 [decisions/0273-phase-272-nas-live-verify-phase-271.md](decisions/0273-phase-272-nas-live-verify-phase-271.md)).
 Phase 273 retries Alpha Vantage ``compact`` when ``full`` is premium-gated (see
 [decisions/0274-phase-273-primary-tip-catch-up-compact.md](decisions/0274-phase-273-primary-tip-catch-up-compact.md)).
-Phase 274 (draft) live-verifies primary tip catch-up (see
+Phase 274 live-verified primary tip ``2026-07-31`` via compact fallback (see
 [decisions/0275-phase-274-nas-live-verify-phase-273.md](decisions/0275-phase-274-nas-live-verify-phase-273.md)).
+Phase 275 (draft) proposes surfacing that fallback on ingest results (see
+[decisions/0276-phase-275-ingest-primary-fetch-fallback.md](decisions/0276-phase-275-ingest-primary-fetch-fallback.md)).
 
 ## System context
 

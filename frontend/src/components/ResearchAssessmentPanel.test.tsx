@@ -253,6 +253,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.queryByTestId("evidence-unlabeled-label-ready-empty-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-mixed-unlabeled-backlog-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-partial-labeled-upgrade-callout")).toBeNull();
+    expect(screen.queryByTestId("evidence-min-horizon-unlock-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-primary-fetch-fallback-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics-active-count")).toBeNull();
@@ -1688,6 +1689,16 @@ describe("ResearchAssessmentPanel", () => {
     await waitFor(() => {
       expect(loadScan).not.toBeDisabled();
     });
+    expect(screen.getByTestId("evidence-min-horizon-unlock-callout")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("evidence-min-horizon-unlock-callout-shortfall"),
+    ).toHaveTextContent("latest_assessment_min_horizon_forward_bar_shortfall=0");
+    expect(screen.getByTestId("evidence-min-horizon-unlock-callout-tip-ready")).toHaveTextContent(
+      "latest_assessment_is_label_ready=false",
+    );
+    expect(screen.getByTestId("evidence-min-horizon-unlock-callout-cta")).toHaveTextContent(
+      "use_toolbar=Compute ready-horizon labels",
+    );
     fireEvent.click(loadScan);
     await waitFor(() => {
       expect(screen.getByTestId("outcome-label-empty-state")).toBeInTheDocument();

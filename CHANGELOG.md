@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 321 min-horizon unlock CTA. See
 [docs/architecture/decisions/0323-phase-322-nas-live-verify-phase-321.md](docs/architecture/decisions/0323-phase-322-nas-live-verify-phase-321.md).
 
-### Phase 321 - Min-Horizon Unlock Ready-Horizons CTA (draft)
+### Phase 321 - Min-Horizon Unlock Ready-Horizons CTA
 
 Elevate ready-horizons CTA when min-horizon shortfall is 0 but tip is not fully ready. See
 [docs/architecture/decisions/0322-phase-321-min-horizon-unlock-cta.md](docs/architecture/decisions/0322-phase-321-min-horizon-unlock-cta.md).
+
+#### Added
+
+- Labeling-diagnostics callout from existing min-horizon / tip-ready fields; UI tests;
+  ``verify.ps1`` Phase 322 field-bundle log + diagnostics trigger.
+
+#### Explicitly out of scope
+
+New API scalars, auto-labeling, inventing bars, orders.
 
 ### Phase 320 - NAS Live Verification of Phase 319
 

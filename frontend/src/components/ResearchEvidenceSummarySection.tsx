@@ -37,12 +37,19 @@ export function ResearchEvidenceSummarySection({
     typeof partialLabeledCount === "number" &&
     Number.isFinite(partialLabeledCount) &&
     partialLabeledCount > 0;
+  const minHorizonShortfall = evidenceSummary.latest_assessment_min_horizon_forward_bar_shortfall;
+  const showMinHorizonUnlockCallout =
+    evidenceSummary.latest_assessment_is_label_ready === false &&
+    typeof minHorizonShortfall === "number" &&
+    Number.isFinite(minHorizonShortfall) &&
+    minHorizonShortfall === 0;
   const labelingActiveCalloutCount =
     Number(showLabelReadinessCallout) +
     Number(showLabeledFreshnessLagCallout) +
     Number(showUnlabeledLabelReadyEmptyCallout) +
     Number(showMixedUnlabeledBacklogCallout) +
-    Number(showPartialLabeledUpgradeCallout);
+    Number(showPartialLabeledUpgradeCallout) +
+    Number(showMinHorizonUnlockCallout);
   const showLabelingDiagnostics = labelingActiveCalloutCount > 0;
   const primaryFetchFallback = evidenceSummary.latest_primary_fetch_fallback;
   const showPrimaryFetchFallbackCallout =
@@ -303,6 +310,44 @@ export function ResearchEvidenceSummarySection({
               <p className="mt-1 text-xs text-aegis-muted">
                 Eligible for append-only full-horizon backfill once max horizon unlocks;
                 not auto-run; not a signal or recommendation.
+              </p>
+            </aside>
+          ) : null}
+          {showMinHorizonUnlockCallout ? (
+            <aside
+              className="rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+              role="status"
+              data-testid="evidence-min-horizon-unlock-callout"
+            >
+              <p className="font-semibold text-aegis-warn">
+                Min horizon unlocked — tip eligible for ready-horizon labels (research-only)
+              </p>
+              <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+                <li data-testid="evidence-min-horizon-unlock-callout-shortfall">
+                  latest_assessment_min_horizon_forward_bar_shortfall={minHorizonShortfall}
+                </li>
+                <li data-testid="evidence-min-horizon-unlock-callout-tip-ready">
+                  latest_assessment_is_label_ready=false
+                </li>
+                {evidenceSummary.latest_assessment_min_horizon_required_label_end_date != null ? (
+                  <li data-testid="evidence-min-horizon-unlock-callout-min-end">
+                    min_horizon_required_label_end_date=
+                    {evidenceSummary.latest_assessment_min_horizon_required_label_end_date}
+                  </li>
+                ) : null}
+                {evidenceSummary.latest_assessment_forward_bar_shortfall != null ? (
+                  <li data-testid="evidence-min-horizon-unlock-callout-tip-shortfall">
+                    tip_forward_bar_shortfall=
+                    {evidenceSummary.latest_assessment_forward_bar_shortfall}
+                  </li>
+                ) : null}
+                <li data-testid="evidence-min-horizon-unlock-callout-cta">
+                  use_toolbar=Compute ready-horizon labels
+                </li>
+              </ul>
+              <p className="mt-1 text-xs text-aegis-muted">
+                Opt-in only via existing toolbar action; not auto-run; not a signal or
+                recommendation.
               </p>
             </aside>
           ) : null}

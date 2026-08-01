@@ -1,37 +1,26 @@
-# ADR-0322: Phase 321 Min-Horizon Unlock Ready-Horizons CTA (draft)
+# ADR-0322: Phase 321 Min-Horizon Unlock Ready-Horizons CTA
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
 
-Live AAPL tip remains blocked on max horizon (``forward_bar_shortfall=20``,
-``required_end=2026-08-28``) while min horizon unlocks sooner
-(``min_horizon_shortfall=5``, ``min_horizon_end=2026-08-07``). Operators already have
-ready-horizons actions, but when ``min_horizon_shortfall`` hits ``0`` while tip is still
-not fully label-ready, nothing elevates that the tip is now eligible for
-ready-horizons compute.
+Live AAPL tip remains blocked on max horizon while min horizon unlocks sooner. Operators
+already have ready-horizons actions, but when ``min_horizon_shortfall`` hits ``0`` while tip
+is still not fully label-ready, nothing elevated tip eligibility for ready-horizons compute.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. Frontier-driven CTA (UI-only)
 
 - When ``latest_assessment_min_horizon_forward_bar_shortfall === 0`` and
-  ``latest_assessment_is_label_ready === false``, elevate a research-only callout / CTA
-  hint pointing at existing ``Compute ready-horizon labels`` (no auto-run).
+  ``latest_assessment_is_label_ready === false``, elevate a research-only labeling-diagnostics
+  callout pointing at existing ``Compute ready-horizon labels`` (no auto-run).
 - Source of truth remains existing frontier fields; no new API scalars.
 
 ### 2. Out of scope
 
 Auto-labeling, inventing bars, orders, full-horizon auto-upgrade, expanding scan window.
-
-## Resume
-
-```powershell
-# Implement Phase 321 min-horizon unlock CTA; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
 
 ## Related documents
 

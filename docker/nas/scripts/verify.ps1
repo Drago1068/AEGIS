@@ -158,22 +158,23 @@ function Write-VerifyChecklist {
     Write-Host "118. Authenticated evidence-summary Phase 294 labeling diagnostics disclosure open-by-default (UI unit-tested)"
     Write-Host "119. Authenticated evidence-summary Phase 298 labeling diagnostics summary active count (UI unit-tested)"
     Write-Host "120. Authenticated assessments list Phase 300 research_index history chart fields (UI unit-tested)"
-    Write-Host "121. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
-    Write-Host "122. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
-    Write-Host "123. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
-    Write-Host "124. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
-    Write-Host "125. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
-    Write-Host "126. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
-    Write-Host "127. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
-    Write-Host "128. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
-    Write-Host "129. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
-    Write-Host "130. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
-    Write-Host "131. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-    Write-Host "132. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
-    Write-Host "133. Authenticated evidence-summary Phase 296 primary fetch-fallback callout field bundle (UI unit-tested)"
-    Write-Host "134. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
-    Write-Host "135. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
-    Write-Host "136. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "121. Authenticated assessments list Phase 302 limit=100 denser research_index chart (UI unit-tested)"
+    Write-Host "122. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
+    Write-Host "123. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
+    Write-Host "124. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
+    Write-Host "125. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
+    Write-Host "126. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
+    Write-Host "127. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
+    Write-Host "128. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
+    Write-Host "129. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
+    Write-Host "130. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
+    Write-Host "131. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
+    Write-Host "132. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
+    Write-Host "133. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
+    Write-Host "134. Authenticated evidence-summary Phase 296 primary fetch-fallback callout field bundle (UI unit-tested)"
+    Write-Host "135. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
+    Write-Host "136. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
+    Write-Host "137. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -395,7 +396,7 @@ try {
     Assert-Status -Label "GET $api/research/$verifySymbol/assessments/latest (auth)" -Actual $latestCode -Expected @(200, 404)
 
     # Phase 29: assessment history list (empty array is valid).
-    $assessListUrl = "$api/research/$verifySymbol/assessments?limit=20"
+    $assessListUrl = "$api/research/$verifySymbol/assessments?limit=100"
     $assessListPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.assessments.json" -f [guid]::NewGuid().ToString("N"))
     try {
         $assessCode = & curl.exe -sS @curlInsecure -o $assessListPath -w "%{http_code}" --max-time 30 `
@@ -434,6 +435,7 @@ try {
             $chartPoints++
         }
         Write-Host "OK  Phase 300 research_index history chart fields list_count=$(@($assessBody).Count) chartable_points=$chartPoints (UI unit-tested; skip non-finite)"
+        Write-Host "OK  Phase 302 assessment history limit=100 list_count=$(@($assessBody).Count) chartable_points=$chartPoints (UI unit-tested; denser series)"
     } finally {
         if (Test-Path -LiteralPath $assessListPath) {
             Remove-Item -LiteralPath $assessListPath -Force -ErrorAction SilentlyContinue
@@ -441,7 +443,7 @@ try {
     }
 
     # Phase 39: assessment history JSON export (attachment; [] OK).
-    $assessExportUrl = "$api/research/$verifySymbol/assessments/export?limit=20"
+    $assessExportUrl = "$api/research/$verifySymbol/assessments/export?limit=100"
     $assessExportPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.assess-export.json" -f [guid]::NewGuid().ToString("N"))
     $assessExportHeadersPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.assess-export.hdr" -f [guid]::NewGuid().ToString("N"))
     try {

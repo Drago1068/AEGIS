@@ -410,7 +410,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(listResearchAssessments).toHaveBeenCalledWith(
         "http://localhost:8000",
         "AAPL",
-        20,
+        100,
         { componentSource: null },
       );
     });
@@ -1501,7 +1501,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(downloadResearchAssessments).toHaveBeenCalledWith(
         "http://localhost:8000",
         "AAPL",
-        20,
+        100,
         { componentSource: null },
       );
     });
@@ -1528,7 +1528,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(listResearchAssessments).toHaveBeenCalledWith(
         "http://localhost:8000",
         "AAPL",
-        20,
+        100,
         { componentSource: "mixed" },
       );
       expect(screen.getByText(/src=mixed/)).toBeInTheDocument();
@@ -1667,7 +1667,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(listResearchAssessments).toHaveBeenCalledWith(
         "http://localhost:8000",
         "AAPL",
-        20,
+        100,
         { componentSource: "mixed" },
       );
       expect(screen.getByLabelText(/history source filter/i)).toHaveValue("mixed");

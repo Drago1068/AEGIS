@@ -99,7 +99,7 @@ export function ResearchAssessmentPanel({
 
   async function loadAssessmentHistory(componentSource?: string) {
     const source = componentSource ?? assessmentSourceFilter;
-    const rows = await listResearchAssessments(baseUrl, symbol, 20, {
+    const rows = await listResearchAssessments(baseUrl, symbol, 100, {
       componentSource: source || null,
     });
     setAssessmentHistory(rows);
@@ -408,7 +408,7 @@ export function ResearchAssessmentPanel({
     startTransition(async () => {
       setError(null);
       try {
-        await downloadResearchAssessments(baseUrl, symbol, 20, {
+        await downloadResearchAssessments(baseUrl, symbol, 100, {
           componentSource: assessmentSourceFilter || null,
         });
       } catch (err) {

@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 300 - NAS Live Verification of Phase 299 (draft)
+### Phase 302 - NAS Live Verification of Phase 301 (draft)
 
-Ops evidence gate after Phase 299 research-index history chart. See
+Ops evidence gate after Phase 301 assessment history limit 100. See
+[docs/architecture/decisions/0303-phase-302-nas-live-verify-phase-301.md](docs/architecture/decisions/0303-phase-302-nas-live-verify-phase-301.md).
+
+### Phase 301 - Assessment History Limit 100
+
+Raise assessment history list/export fetch to 100 for denser research-index chart series.
+See
+[docs/architecture/decisions/0302-phase-301-assessment-history-limit-100.md](docs/architecture/decisions/0302-phase-301-assessment-history-limit-100.md).
+
+#### Added
+
+- Panel history + assessments JSON download use ``limit=100``; unit tests; ``verify.ps1``
+  Phase 302 denser-series log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing assessments, orders.
+
+### Phase 300 - NAS Live Verification of Phase 299
+
+Ops evidence gate after Phase 299 research-index history chart. Live verify passed
+2026-08-01 (``ae48dd0``; ``list_count=20`` ``chartable_points=2`` after as_of dedupe). See
 [docs/architecture/decisions/0301-phase-300-nas-live-verify-phase-299.md](docs/architecture/decisions/0301-phase-300-nas-live-verify-phase-299.md).
+
+#### Added
+
+- ADR-0301: live research_index chart field-bundle evidence (checklist Phase 300 log).
+
+#### Explicitly out of scope
+
+Inventing assessments, orders.
 
 ### Phase 299 - Research Index History Chart
 

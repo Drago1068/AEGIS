@@ -734,8 +734,12 @@ Phase 298 live-verified that count (``active_count=4``; see
 [decisions/0299-phase-298-nas-live-verify-phase-297.md](decisions/0299-phase-298-nas-live-verify-phase-297.md)).
 Phase 299 adds a research-index history chart from the assessments list (see
 [decisions/0300-phase-299-research-index-history-chart.md](decisions/0300-phase-299-research-index-history-chart.md)).
-Phase 300 (draft) live-verifies that chart on the NAS (see
+Phase 300 live-verified that chart (``chartable_points=2`` at limit 20; see
 [decisions/0301-phase-300-nas-live-verify-phase-299.md](decisions/0301-phase-300-nas-live-verify-phase-299.md)).
+Phase 301 raises assessment history list/export limit to 100 for denser chart series (see
+[decisions/0302-phase-301-assessment-history-limit-100.md](decisions/0302-phase-301-assessment-history-limit-100.md)).
+Phase 302 (draft) live-verifies that denser series on the NAS (see
+[decisions/0303-phase-302-nas-live-verify-phase-301.md](decisions/0303-phase-302-nas-live-verify-phase-301.md)).
 
 ## System context
 

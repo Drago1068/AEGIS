@@ -7,10 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 299 closed (research-index history chart).**
-Next (draft): Phase 300 NAS live verify of Phase 299 (ADR-0301). See
-[docs/architecture/decisions/0300-phase-299-research-index-history-chart.md](docs/architecture/decisions/0300-phase-299-research-index-history-chart.md),
+**Current phase: Phase 301 closed (assessment history limit 100; Phase 300 verified).**
+Next (draft): Phase 302 NAS live verify of Phase 301 (ADR-0303). See
 [docs/architecture/decisions/0301-phase-300-nas-live-verify-phase-299.md](docs/architecture/decisions/0301-phase-300-nas-live-verify-phase-299.md),
+[docs/architecture/decisions/0302-phase-301-assessment-history-limit-100.md](docs/architecture/decisions/0302-phase-301-assessment-history-limit-100.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

@@ -2,6 +2,7 @@
 
 import type { ResearchAssessment } from "@/lib/api-client";
 
+import { CoverageConfidenceHistoryChart } from "./CoverageConfidenceHistoryChart";
 import { ResearchIndexHistoryChart } from "./ResearchIndexHistoryChart";
 import {
   ASSESSMENT_SOURCE_FILTER_OPTIONS,
@@ -55,7 +56,13 @@ export function ResearchAssessmentHistorySection({
         </label>
       </div>
       {assessmentHistory.length > 0 ? (
-        <ResearchIndexHistoryChart symbol={symbol} assessments={assessmentHistory} />
+        <>
+          <ResearchIndexHistoryChart symbol={symbol} assessments={assessmentHistory} />
+          <CoverageConfidenceHistoryChart
+            symbol={symbol}
+            assessments={assessmentHistory}
+          />
+        </>
       ) : null}
       {assessmentHistory.length === 0 ? (
         <p className="mt-2 font-mono text-xs text-aegis-muted">

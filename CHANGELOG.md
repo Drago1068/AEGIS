@@ -12,11 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 303 coverage-confidence history chart. See
 [docs/architecture/decisions/0305-phase-304-nas-live-verify-phase-303.md](docs/architecture/decisions/0305-phase-304-nas-live-verify-phase-303.md).
 
-### Phase 303 - Coverage Confidence History Chart (draft)
+### Phase 303 - Coverage Confidence History Chart
 
 Research-only chart of ``coverage_confidence`` vs ``as_of_trading_date`` from the
 assessments list (distinct from probability confidence / research_index). See
 [docs/architecture/decisions/0304-phase-303-coverage-confidence-history-chart.md](docs/architecture/decisions/0304-phase-303-coverage-confidence-history-chart.md).
+
+#### Added
+
+- ``toCoverageConfidenceHistoryChartData`` adapter; ``CoverageConfidenceHistoryChart`` on
+  assessment history; unit tests; ``verify.ps1`` Phase 304 coverage chartable-points log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing assessments, merging coverage into probability, orders.
 
 ### Phase 302 - NAS Live Verification of Phase 301
 

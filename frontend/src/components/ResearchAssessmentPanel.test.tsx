@@ -396,9 +396,15 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("assessment-history-section")).toBeInTheDocument();
       expect(screen.getByText(/assessment history \(newest first\)/i)).toBeInTheDocument();
       expect(screen.getByTestId("research-index-history-chart")).toBeInTheDocument();
+      expect(screen.getByTestId("coverage-confidence-history-chart")).toBeInTheDocument();
       expect(
         screen.getByRole("img", {
           name: "AAPL research_index history chart (research-only)",
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("img", {
+          name: "AAPL coverage_confidence history chart (research-only)",
         }),
       ).toBeInTheDocument();
       expect(

@@ -27,10 +27,16 @@ export function ResearchEvidenceSummarySection({
   const unlabeledReadyCount = evidenceSummary.scan_unlabeled_label_ready_count;
   const showUnlabeledLabelReadyEmptyCallout =
     unlabeledReadyCount === 0 && evidenceSummary.most_recent_unlabeled_assessment_id != null;
+  const mixedUnlabeledCount = evidenceSummary.mixed_unlabeled_assessment_count;
+  const showMixedUnlabeledBacklogCallout =
+    typeof mixedUnlabeledCount === "number" &&
+    Number.isFinite(mixedUnlabeledCount) &&
+    mixedUnlabeledCount > 0;
   const showLabelingDiagnostics =
     showLabelReadinessCallout ||
     showLabeledFreshnessLagCallout ||
-    showUnlabeledLabelReadyEmptyCallout;
+    showUnlabeledLabelReadyEmptyCallout ||
+    showMixedUnlabeledBacklogCallout;
 
   return (
     <div
@@ -162,6 +168,43 @@ export function ResearchEvidenceSummarySection({
               </ul>
               <p className="mt-1 text-xs text-aegis-muted">
                 Fail-closed: no invented labels; not a signal or recommendation.
+              </p>
+            </aside>
+          ) : null}
+          {showMixedUnlabeledBacklogCallout ? (
+            <aside
+              className="rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+              role="status"
+              data-testid="evidence-mixed-unlabeled-backlog-callout"
+            >
+              <p className="font-semibold text-aegis-warn">
+                Mixed-source unlabeled backlog (research-only)
+              </p>
+              <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+                <li data-testid="evidence-mixed-unlabeled-backlog-callout-count">
+                  mixed_unlabeled_assessment_count={mixedUnlabeledCount}
+                </li>
+                {evidenceSummary.mixed_component_source_assessment_count != null ? (
+                  <li data-testid="evidence-mixed-unlabeled-backlog-callout-mixed-total">
+                    mixed_component_source_assessment_count=
+                    {evidenceSummary.mixed_component_source_assessment_count}
+                  </li>
+                ) : null}
+                {evidenceSummary.mixed_labeled_assessment_count != null ? (
+                  <li data-testid="evidence-mixed-unlabeled-backlog-callout-mixed-labeled">
+                    mixed_labeled_assessment_count=
+                    {evidenceSummary.mixed_labeled_assessment_count}
+                  </li>
+                ) : null}
+                {evidenceSummary.latest_mixed_label_bar_source != null ? (
+                  <li data-testid="evidence-mixed-unlabeled-backlog-callout-label-bar-source">
+                    latest_mixed_label_bar_source=
+                    {evidenceSummary.latest_mixed_label_bar_source}
+                  </li>
+                ) : null}
+              </ul>
+              <p className="mt-1 text-xs text-aegis-muted">
+                Fail-closed: backlog is diagnostic only; not a signal or recommendation.
               </p>
             </aside>
           ) : null}

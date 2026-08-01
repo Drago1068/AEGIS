@@ -1,6 +1,6 @@
 # ADR-0292: Phase 291 Mixed-Unlabeled Backlog Callout
 
-- Status: Proposed (Phase 290 closed; ready to implement)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -8,7 +8,7 @@
 Phases 283–290 elevated and grouped tip label-readiness, freshness lag, and empty
 unlabeled-ready diagnostics. Live verify still shows ``mixed_unlabeled_assessment_count=7``
 (with ``mixed_component_source_assessment_count=26``). Operators already have the
-scalars; the labeling-diagnostics group does not elevate mixed-source unlabeled backlog.
+scalars; the labeling-diagnostics group did not elevate mixed-source unlabeled backlog.
 
 Prefer a fail-closed UI callout inside the existing diagnostics group over new API
 scalars.
@@ -18,9 +18,8 @@ scalars.
 ### 1. Mixed-unlabeled backlog callout
 
 When ``mixed_unlabeled_assessment_count`` is a positive integer, show a research-only
-callout inside ``evidence-labeling-diagnostics`` (which already appears when any
-labeling trigger fires; if only this trigger is true, the group still appears) using
-existing fields only:
+callout inside ``evidence-labeling-diagnostics`` (group appears when any labeling
+trigger fires, including this one) using existing fields only:
 
 - ``mixed_unlabeled_assessment_count``
 - ``mixed_component_source_assessment_count`` when present

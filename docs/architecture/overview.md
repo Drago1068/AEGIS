@@ -713,9 +713,11 @@ Phase 289 groups the three labeling callouts under one diagnostics region (see
 [decisions/0290-phase-289-labeling-diagnostics-group.md](decisions/0290-phase-289-labeling-diagnostics-group.md)).
 Phase 290 live-verified that group (triggers ``tip_not_ready,freshness_lag,unlabeled_empty``;
 see [decisions/0291-phase-290-nas-live-verify-phase-289.md](decisions/0291-phase-290-nas-live-verify-phase-289.md)).
-Phase 291 (draft) proposes elevating mixed-unlabeled backlog inside that group (live count
-``7``; see
+Phase 291 elevates mixed-unlabeled backlog inside labeling diagnostics when
+``mixed_unlabeled_assessment_count > 0`` (see
 [decisions/0292-phase-291-mixed-unlabeled-backlog-callout.md](decisions/0292-phase-291-mixed-unlabeled-backlog-callout.md)).
+Phase 292 (draft) is the NAS live verify gate (see
+[decisions/0293-phase-292-nas-live-verify-phase-291.md](decisions/0293-phase-292-nas-live-verify-phase-291.md)).
 
 ## System context
 

@@ -224,6 +224,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.queryByTestId("evidence-latest-label-readiness-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-labeled-freshness-lag-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-unlabeled-label-ready-empty-callout")).toBeNull();
+    expect(screen.queryByTestId("evidence-mixed-unlabeled-backlog-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics")).toBeNull();
   });
 
@@ -534,9 +535,9 @@ describe("ResearchAssessmentPanel", () => {
       calibration_count: 1,
       latest_component_source: "mixed",
       latest_resolved_label_bar_source: "alpha_vantage",
-      mixed_component_source_assessment_count: 1,
-      mixed_unlabeled_assessment_count: 0,
-      mixed_labeled_assessment_count: 1,
+      mixed_component_source_assessment_count: 26,
+      mixed_unlabeled_assessment_count: 7,
+      mixed_labeled_assessment_count: 19,
       latest_mixed_label_bar_source: "alpha_vantage",
       most_recent_labeled_assessment_id: 1,
       most_recent_labeled_outcome_label: {
@@ -757,6 +758,21 @@ describe("ResearchAssessmentPanel", () => {
         screen.getByTestId("evidence-unlabeled-ready-empty-callout-required-end"),
       ).toHaveTextContent("tip_required_label_end_date=2024-02-28");
       expect(
+        screen.getByTestId("evidence-mixed-unlabeled-backlog-callout"),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId("evidence-mixed-unlabeled-backlog-callout-count")).toHaveTextContent(
+        "mixed_unlabeled_assessment_count=7",
+      );
+      expect(
+        screen.getByTestId("evidence-mixed-unlabeled-backlog-callout-mixed-total"),
+      ).toHaveTextContent("mixed_component_source_assessment_count=26");
+      expect(
+        screen.getByTestId("evidence-mixed-unlabeled-backlog-callout-mixed-labeled"),
+      ).toHaveTextContent("mixed_labeled_assessment_count=19");
+      expect(
+        screen.getByTestId("evidence-mixed-unlabeled-backlog-callout-label-bar-source"),
+      ).toHaveTextContent("latest_mixed_label_bar_source=alpha_vantage");
+      expect(
         screen.getByTestId("evidence-latest-assessment-label-block-reason"),
       ).toHaveTextContent("insufficient_forward_bars");
       expect(
@@ -849,7 +865,7 @@ describe("ResearchAssessmentPanel", () => {
       ).toHaveTextContent("1");
       expect(screen.getByText(/mixed unlabeled \(scanned\)/i)).toBeInTheDocument();
       expect(screen.getByText(/mixed labeled \(scanned\)/i)).toBeInTheDocument();
-      expect(screen.getByText(/of 1 mixed/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/of 26 mixed/i).length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText(/latest mixed label bar source/i)).toBeInTheDocument();
       expect(screen.getByText(/latest forward_return_5/i)).toBeInTheDocument();
       expect(screen.getByText(/latest forward_return_20/i)).toBeInTheDocument();

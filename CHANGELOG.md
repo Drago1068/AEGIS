@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 291 mixed-unlabeled backlog callout. See
 [docs/architecture/decisions/0293-phase-292-nas-live-verify-phase-291.md](docs/architecture/decisions/0293-phase-292-nas-live-verify-phase-291.md).
 
-### Phase 291 - Mixed-Unlabeled Backlog Callout (draft)
+### Phase 291 - Mixed-Unlabeled Backlog Callout
 
 Elevate existing mixed-unlabeled count inside labeling diagnostics. See
 [docs/architecture/decisions/0292-phase-291-mixed-unlabeled-backlog-callout.md](docs/architecture/decisions/0292-phase-291-mixed-unlabeled-backlog-callout.md).
+
+#### Added
+
+- Evidence-summary callout when ``mixed_unlabeled_assessment_count > 0`` inside
+  labeling diagnostics; unit tests; ``verify.ps1`` Phase 292 field bundle log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing labels/closes, orders.
 
 ### Phase 290 - NAS Live Verification of Phase 289
 

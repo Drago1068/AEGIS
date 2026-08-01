@@ -667,8 +667,10 @@ Phase 269 merges Polygon ``/prev`` when range aggregates lag the settled session
 [decisions/0270-phase-269-advance-store-tip-current-session.md](decisions/0270-phase-269-advance-store-tip-current-session.md)).
 Phase 270 live-verified tip ``2026-07-31`` catch-up (see
 [decisions/0271-phase-270-nas-live-verify-phase-269.md](decisions/0271-phase-270-nas-live-verify-phase-269.md)).
-Phase 271 (draft) fixes verify logging so lag ``0`` is not shown as null (see
+Phase 271 fixes verify logging so lag ``0`` is not shown as null (see
 [decisions/0272-phase-271-fix-verify-lag-zero-as-null.md](decisions/0272-phase-271-fix-verify-lag-zero-as-null.md)).
+Phase 272 (draft) live-verifies that display (see
+[decisions/0273-phase-272-nas-live-verify-phase-271.md](decisions/0273-phase-272-nas-live-verify-phase-271.md)).
 
 ## System context
 

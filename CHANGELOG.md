@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 272 - NAS Live Verification of Phase 271 (draft)
+### Phase 274 - NAS Live Verification of Phase 273 (draft)
 
-Ops evidence gate after Phase 271 verify lag display fix. See
+Ops evidence gate after Phase 273 primary tip catch-up. See
+[docs/architecture/decisions/0275-phase-274-nas-live-verify-phase-273.md](docs/architecture/decisions/0275-phase-274-nas-live-verify-phase-273.md).
+
+### Phase 273 - Primary Tip Catch-Up When Full Output Is Premium-Gated (draft)
+
+When AV ``full`` is premium-gated, catch up primary tip with real compact closes. See
+[docs/architecture/decisions/0274-phase-273-primary-tip-catch-up-compact.md](docs/architecture/decisions/0274-phase-273-primary-tip-catch-up-compact.md).
+
+### Phase 272 - NAS Live Verification of Phase 271
+
+Ops evidence gate after Phase 271 verify lag display fix. Live verify passed 2026-07-31
+(``post_lag=0``, tip ``2026-07-31``). See
 [docs/architecture/decisions/0273-phase-272-nas-live-verify-phase-271.md](docs/architecture/decisions/0273-phase-272-nas-live-verify-phase-271.md).
+
+#### Added
+
+- ADR-0273: live lag-zero display evidence.
+
+#### Explicitly out of scope
+
+API schema changes, inventing closes, orders.
 
 ### Phase 271 - Fix Verify Lag Zero Displayed as Null
 

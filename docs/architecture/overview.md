@@ -707,8 +707,12 @@ Phase 286 live-verified that callout field bundle (lag ``121``; see
 Phase 287 elevates empty unlabeled label-ready scan count in the research UI when
 ``scan_unlabeled_label_ready_count === 0`` and an unlabeled assessment exists (see
 [decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md](decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md)).
-Phase 288 (draft) is the NAS live verify gate (see
+Phase 288 live-verified that callout field bundle (ready_count ``0``; see
 [decisions/0289-phase-288-nas-live-verify-phase-287.md](decisions/0289-phase-288-nas-live-verify-phase-287.md)).
+Phase 289 groups the three labeling callouts under one diagnostics region (see
+[decisions/0290-phase-289-labeling-diagnostics-group.md](decisions/0290-phase-289-labeling-diagnostics-group.md)).
+Phase 290 (draft) is the NAS live verify gate (see
+[decisions/0291-phase-290-nas-live-verify-phase-289.md](decisions/0291-phase-290-nas-live-verify-phase-289.md)).
 
 ## System context
 

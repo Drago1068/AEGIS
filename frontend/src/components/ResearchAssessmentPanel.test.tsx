@@ -224,6 +224,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.queryByTestId("evidence-latest-label-readiness-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-labeled-freshness-lag-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-unlabeled-label-ready-empty-callout")).toBeNull();
+    expect(screen.queryByTestId("evidence-labeling-diagnostics")).toBeNull();
   });
 
   it("renders an initial latest assessment from the API payload", () => {
@@ -706,6 +707,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-latest-label-readiness-callout"),
       ).toBeInTheDocument();
+      expect(screen.getByTestId("evidence-labeling-diagnostics")).toBeInTheDocument();
       expect(
         screen.getByTestId("evidence-label-readiness-callout-block-reason"),
       ).toHaveTextContent("block_reason=insufficient_forward_bars");

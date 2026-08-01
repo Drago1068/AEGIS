@@ -27,6 +27,10 @@ export function ResearchEvidenceSummarySection({
   const unlabeledReadyCount = evidenceSummary.scan_unlabeled_label_ready_count;
   const showUnlabeledLabelReadyEmptyCallout =
     unlabeledReadyCount === 0 && evidenceSummary.most_recent_unlabeled_assessment_id != null;
+  const showLabelingDiagnostics =
+    showLabelReadinessCallout ||
+    showLabeledFreshnessLagCallout ||
+    showUnlabeledLabelReadyEmptyCallout;
 
   return (
     <div
@@ -36,121 +40,132 @@ export function ResearchEvidenceSummarySection({
       <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
         Evidence summary (research-only — not advice)
       </p>
-      {showLabelReadinessCallout ? (
-        <aside
-          className="mt-3 rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
-          role="status"
-          data-testid="evidence-latest-label-readiness-callout"
+      {showLabelingDiagnostics ? (
+        <section
+          className="mt-3 space-y-2"
+          aria-label="Labeling diagnostics"
+          data-testid="evidence-labeling-diagnostics"
         >
-          <p className="font-semibold text-aegis-warn">
-            Latest assessment is not label-ready (research-only)
+          <p className="text-xs font-semibold uppercase tracking-wide text-aegis-warn">
+            Labeling diagnostics (research-only — not advice)
           </p>
-          <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
-            <li data-testid="evidence-label-readiness-callout-block-reason">
-              block_reason={evidenceSummary.latest_assessment_label_block_reason ?? "null"}
-            </li>
-            <li data-testid="evidence-label-readiness-callout-forward-shortfall">
-              forward_bar_shortfall=
-              {evidenceSummary.latest_assessment_forward_bar_shortfall ?? "null"}
-              {evidenceSummary.latest_assessment_min_horizon_forward_bar_shortfall != null
-                ? ` (min_horizon=${evidenceSummary.latest_assessment_min_horizon_forward_bar_shortfall})`
-                : ""}
-            </li>
-            <li data-testid="evidence-label-readiness-callout-required-end-date">
-              required_label_end_date=
-              {evidenceSummary.latest_assessment_required_label_end_date ?? "null"}
-              {evidenceSummary.latest_assessment_min_horizon_required_label_end_date != null
-                ? ` (min_horizon=${evidenceSummary.latest_assessment_min_horizon_required_label_end_date})`
-                : ""}
-            </li>
-            {evidenceSummary.most_recent_labelable_as_of_trading_date != null ? (
-              <li data-testid="evidence-label-readiness-callout-most-recent-labelable">
-                most_recent_labelable_as_of=
-                {evidenceSummary.most_recent_labelable_as_of_trading_date}
-              </li>
-            ) : null}
-          </ul>
-          <p className="mt-1 text-xs text-aegis-muted">
-            Fail-closed: no invented closes; not a signal or recommendation.
-          </p>
-        </aside>
-      ) : null}
-      {showLabeledFreshnessLagCallout ? (
-        <aside
-          className="mt-3 rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
-          role="status"
-          data-testid="evidence-labeled-freshness-lag-callout"
-        >
-          <p className="font-semibold text-aegis-warn">
-            Labeled corpus freshness lag (research-only)
-          </p>
-          <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
-            <li data-testid="evidence-freshness-lag-callout-days">
-              scan_labeled_freshness_lag_trading_days={freshnessLag}
-            </li>
-            {evidenceSummary.most_recent_labeled_outcome_label_as_of_trading_date != null ? (
-              <li data-testid="evidence-freshness-lag-callout-most-recent-labeled-as-of">
-                most_recent_labeled_as_of=
-                {evidenceSummary.most_recent_labeled_outcome_label_as_of_trading_date}
-              </li>
-            ) : null}
-            {evidenceSummary.most_recent_labelable_as_of_trading_date != null ? (
-              <li data-testid="evidence-freshness-lag-callout-most-recent-labelable">
-                most_recent_labelable_as_of=
-                {evidenceSummary.most_recent_labelable_as_of_trading_date}
-              </li>
-            ) : null}
-            {evidenceSummary.latest_as_of_trading_date != null ? (
-              <li data-testid="evidence-freshness-lag-callout-latest-as-of">
-                tip_as_of={evidenceSummary.latest_as_of_trading_date}
-              </li>
-            ) : null}
-          </ul>
-          <p className="mt-1 text-xs text-aegis-muted">
-            Fail-closed: lag is diagnostic only; not a signal or recommendation.
-          </p>
-        </aside>
-      ) : null}
-      {showUnlabeledLabelReadyEmptyCallout ? (
-        <aside
-          className="mt-3 rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
-          role="status"
-          data-testid="evidence-unlabeled-label-ready-empty-callout"
-        >
-          <p className="font-semibold text-aegis-warn">
-            No unlabeled assessments are label-ready (research-only)
-          </p>
-          <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
-            <li data-testid="evidence-unlabeled-ready-empty-callout-count">
-              scan_unlabeled_label_ready_count={unlabeledReadyCount}
-            </li>
-            {evidenceSummary.most_recent_unlabeled_as_of_trading_date != null ? (
-              <li data-testid="evidence-unlabeled-ready-empty-callout-unlabeled-as-of">
-                most_recent_unlabeled_as_of=
-                {evidenceSummary.most_recent_unlabeled_as_of_trading_date}
-              </li>
-            ) : null}
-            <li data-testid="evidence-unlabeled-ready-empty-callout-unlabeled-labelable">
-              most_recent_unlabeled_labelable_as_of=
-              {evidenceSummary.most_recent_unlabeled_labelable_as_of_trading_date ?? "null"}
-            </li>
-            {evidenceSummary.latest_assessment_is_label_ready === false ? (
-              <>
-                <li data-testid="evidence-unlabeled-ready-empty-callout-forward-shortfall">
-                  tip_forward_bar_shortfall=
+          {showLabelReadinessCallout ? (
+            <aside
+              className="rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+              role="status"
+              data-testid="evidence-latest-label-readiness-callout"
+            >
+              <p className="font-semibold text-aegis-warn">
+                Latest assessment is not label-ready (research-only)
+              </p>
+              <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+                <li data-testid="evidence-label-readiness-callout-block-reason">
+                  block_reason={evidenceSummary.latest_assessment_label_block_reason ?? "null"}
+                </li>
+                <li data-testid="evidence-label-readiness-callout-forward-shortfall">
+                  forward_bar_shortfall=
                   {evidenceSummary.latest_assessment_forward_bar_shortfall ?? "null"}
+                  {evidenceSummary.latest_assessment_min_horizon_forward_bar_shortfall != null
+                    ? ` (min_horizon=${evidenceSummary.latest_assessment_min_horizon_forward_bar_shortfall})`
+                    : ""}
                 </li>
-                <li data-testid="evidence-unlabeled-ready-empty-callout-required-end">
-                  tip_required_label_end_date=
+                <li data-testid="evidence-label-readiness-callout-required-end-date">
+                  required_label_end_date=
                   {evidenceSummary.latest_assessment_required_label_end_date ?? "null"}
+                  {evidenceSummary.latest_assessment_min_horizon_required_label_end_date != null
+                    ? ` (min_horizon=${evidenceSummary.latest_assessment_min_horizon_required_label_end_date})`
+                    : ""}
                 </li>
-              </>
-            ) : null}
-          </ul>
-          <p className="mt-1 text-xs text-aegis-muted">
-            Fail-closed: no invented labels; not a signal or recommendation.
-          </p>
-        </aside>
+                {evidenceSummary.most_recent_labelable_as_of_trading_date != null ? (
+                  <li data-testid="evidence-label-readiness-callout-most-recent-labelable">
+                    most_recent_labelable_as_of=
+                    {evidenceSummary.most_recent_labelable_as_of_trading_date}
+                  </li>
+                ) : null}
+              </ul>
+              <p className="mt-1 text-xs text-aegis-muted">
+                Fail-closed: no invented closes; not a signal or recommendation.
+              </p>
+            </aside>
+          ) : null}
+          {showLabeledFreshnessLagCallout ? (
+            <aside
+              className="rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+              role="status"
+              data-testid="evidence-labeled-freshness-lag-callout"
+            >
+              <p className="font-semibold text-aegis-warn">
+                Labeled corpus freshness lag (research-only)
+              </p>
+              <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+                <li data-testid="evidence-freshness-lag-callout-days">
+                  scan_labeled_freshness_lag_trading_days={freshnessLag}
+                </li>
+                {evidenceSummary.most_recent_labeled_outcome_label_as_of_trading_date != null ? (
+                  <li data-testid="evidence-freshness-lag-callout-most-recent-labeled-as-of">
+                    most_recent_labeled_as_of=
+                    {evidenceSummary.most_recent_labeled_outcome_label_as_of_trading_date}
+                  </li>
+                ) : null}
+                {evidenceSummary.most_recent_labelable_as_of_trading_date != null ? (
+                  <li data-testid="evidence-freshness-lag-callout-most-recent-labelable">
+                    most_recent_labelable_as_of=
+                    {evidenceSummary.most_recent_labelable_as_of_trading_date}
+                  </li>
+                ) : null}
+                {evidenceSummary.latest_as_of_trading_date != null ? (
+                  <li data-testid="evidence-freshness-lag-callout-latest-as-of">
+                    tip_as_of={evidenceSummary.latest_as_of_trading_date}
+                  </li>
+                ) : null}
+              </ul>
+              <p className="mt-1 text-xs text-aegis-muted">
+                Fail-closed: lag is diagnostic only; not a signal or recommendation.
+              </p>
+            </aside>
+          ) : null}
+          {showUnlabeledLabelReadyEmptyCallout ? (
+            <aside
+              className="rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+              role="status"
+              data-testid="evidence-unlabeled-label-ready-empty-callout"
+            >
+              <p className="font-semibold text-aegis-warn">
+                No unlabeled assessments are label-ready (research-only)
+              </p>
+              <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+                <li data-testid="evidence-unlabeled-ready-empty-callout-count">
+                  scan_unlabeled_label_ready_count={unlabeledReadyCount}
+                </li>
+                {evidenceSummary.most_recent_unlabeled_as_of_trading_date != null ? (
+                  <li data-testid="evidence-unlabeled-ready-empty-callout-unlabeled-as-of">
+                    most_recent_unlabeled_as_of=
+                    {evidenceSummary.most_recent_unlabeled_as_of_trading_date}
+                  </li>
+                ) : null}
+                <li data-testid="evidence-unlabeled-ready-empty-callout-unlabeled-labelable">
+                  most_recent_unlabeled_labelable_as_of=
+                  {evidenceSummary.most_recent_unlabeled_labelable_as_of_trading_date ?? "null"}
+                </li>
+                {evidenceSummary.latest_assessment_is_label_ready === false ? (
+                  <>
+                    <li data-testid="evidence-unlabeled-ready-empty-callout-forward-shortfall">
+                      tip_forward_bar_shortfall=
+                      {evidenceSummary.latest_assessment_forward_bar_shortfall ?? "null"}
+                    </li>
+                    <li data-testid="evidence-unlabeled-ready-empty-callout-required-end">
+                      tip_required_label_end_date=
+                      {evidenceSummary.latest_assessment_required_label_end_date ?? "null"}
+                    </li>
+                  </>
+                ) : null}
+              </ul>
+              <p className="mt-1 text-xs text-aegis-muted">
+                Fail-closed: no invented labels; not a signal or recommendation.
+              </p>
+            </aside>
+          ) : null}
+        </section>
       ) : null}
       <dl className="mt-2 grid gap-2 sm:grid-cols-2">
         <div>

@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 288 - NAS Live Verification of Phase 287 (draft)
+### Phase 290 - NAS Live Verification of Phase 289 (draft)
 
-Ops evidence gate after Phase 287 unlabeled label-ready empty callout. See
+Ops evidence gate after Phase 289 labeling diagnostics group. See
+[docs/architecture/decisions/0291-phase-290-nas-live-verify-phase-289.md](docs/architecture/decisions/0291-phase-290-nas-live-verify-phase-289.md).
+
+### Phase 289 - Labeling Diagnostics Group
+
+Group tip / freshness / unlabeled-empty callouts under one research-only region. See
+[docs/architecture/decisions/0290-phase-289-labeling-diagnostics-group.md](docs/architecture/decisions/0290-phase-289-labeling-diagnostics-group.md).
+
+#### Added
+
+- ``evidence-labeling-diagnostics`` wrapper when any labeling callout elevates; unit tests;
+  ``verify.ps1`` Phase 290 trigger log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing labels/closes, orders.
+
+### Phase 288 - NAS Live Verification of Phase 287
+
+Ops evidence gate after Phase 287 unlabeled label-ready empty callout. Live verify passed
+2026-07-31 (``1c1ee45``; ready_count ``0`` unlabeled_id ``180`` unlabeled_as_of
+``2026-07-31``). See
 [docs/architecture/decisions/0289-phase-288-nas-live-verify-phase-287.md](docs/architecture/decisions/0289-phase-288-nas-live-verify-phase-287.md).
+
+#### Added
+
+- ADR-0289: live unlabeled label-ready empty callout field-bundle evidence (checklist Phase 288 log).
+
+#### Explicitly out of scope
+
+Inventing closes, orders.
 
 ### Phase 287 - Unlabeled Label-Ready Empty Callout
 

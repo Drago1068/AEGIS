@@ -344,6 +344,7 @@ describe("market data client", () => {
             latest_trading_date: "2024-01-02",
             latest_trading_date_source: "alpha_vantage",
             primary_latest_trading_date: "2024-01-01",
+            primary_fetch_fallback: "full_to_compact",
           },
         ],
       },
@@ -353,6 +354,7 @@ describe("market data client", () => {
     expect(run.results[0]?.latest_trading_date).toBe("2024-01-02");
     expect(run.results[0]?.latest_trading_date_source).toBe("alpha_vantage");
     expect(run.results[0]?.primary_latest_trading_date).toBe("2024-01-01");
+    expect(run.results[0]?.primary_fetch_fallback).toBe("full_to_compact");
   });
 
   it("throws on non-ok ingest", async () => {

@@ -65,6 +65,7 @@ export function IngestPanel() {
                 <th className="py-2 pr-4 font-medium">Provider tip</th>
                 <th className="py-2 pr-4 font-medium">Tip source</th>
                 <th className="py-2 pr-4 font-medium">Primary tip</th>
+                <th className="py-2 pr-4 font-medium">Primary fallback</th>
                 <th className="py-2 font-medium">Error</th>
               </tr>
             </thead>
@@ -92,6 +93,12 @@ export function IngestPanel() {
                     data-testid={`ingest-primary-latest-trading-date-${row.symbol}`}
                   >
                     {row.primary_latest_trading_date ?? "—"}
+                  </td>
+                  <td
+                    className="py-2 pr-4 font-mono"
+                    data-testid={`ingest-primary-fetch-fallback-${row.symbol}`}
+                  >
+                    {row.primary_fetch_fallback ?? "—"}
                   </td>
                   <td className="py-2 text-aegis-warn">{row.error ?? "—"}</td>
                 </tr>

@@ -679,8 +679,10 @@ Phase 275 surfaces ``primary_fetch_fallback`` on ingest results (see
 [decisions/0276-phase-275-ingest-primary-fetch-fallback.md](decisions/0276-phase-275-ingest-primary-fetch-fallback.md)).
 Phase 276 live-verified AAPL ``primary_fetch_fallback=full_to_compact`` (see
 [decisions/0277-phase-276-nas-live-verify-phase-275.md](decisions/0277-phase-276-nas-live-verify-phase-275.md)).
-Phase 277 (draft) proposes showing that label on the operator IngestPanel (see
+Phase 277 shows that label on the operator IngestPanel (see
 [decisions/0278-phase-277-ingest-ui-primary-fetch-fallback.md](decisions/0278-phase-277-ingest-ui-primary-fetch-fallback.md)).
+Phase 278 (draft) is the NAS live verify gate (see
+[decisions/0279-phase-278-nas-live-verify-phase-277.md](decisions/0279-phase-278-nas-live-verify-phase-277.md)).
 
 ## System context
 

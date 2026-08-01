@@ -12,10 +12,18 @@ delivery workflow).
 Ops evidence gate after Phase 277 ingest UI fallback diagnostic. See
 [docs/architecture/decisions/0279-phase-278-nas-live-verify-phase-277.md](docs/architecture/decisions/0279-phase-278-nas-live-verify-phase-277.md).
 
-### Phase 277 - Surface Primary Fetch Fallback in Ingest UI (draft)
+### Phase 277 - Surface Primary Fetch Fallback in Ingest UI
 
 Show ``primary_fetch_fallback`` on the operator IngestPanel. See
 [docs/architecture/decisions/0278-phase-277-ingest-ui-primary-fetch-fallback.md](docs/architecture/decisions/0278-phase-277-ingest-ui-primary-fetch-fallback.md).
+
+#### Added
+
+- ``api-client`` field; IngestPanel **Primary fallback** column; component + client tests.
+
+#### Explicitly out of scope
+
+Evidence-summary fields, inventing closes, orders.
 
 ### Phase 276 - NAS Live Verification of Phase 275
 

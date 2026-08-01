@@ -61,6 +61,8 @@ export interface IngestionSymbolResult {
   latest_trading_date_source?: string | null;
   /** Primary provider tip for this symbol; null when primary empty/error (ADR-0264). */
   primary_latest_trading_date?: string | null;
+  /** ``full_to_compact`` when AV compact fallback supplied primary bars; else null (ADR-0276). */
+  primary_fetch_fallback?: string | null;
 }
 
 export interface IngestionRunResponse {

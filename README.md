@@ -7,10 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 313 implemented (partial-label full-backfill upgrade; NAS verify pending).**
-Next: Phase 314 NAS live verify (ADR-0315). See
-[docs/architecture/decisions/0314-phase-313-full-horizon-upgrade-backfill.md](docs/architecture/decisions/0314-phase-313-full-horizon-upgrade-backfill.md),
-[docs/architecture/decisions/0315-phase-314-nas-live-verify-phase-313.md](docs/architecture/decisions/0315-phase-314-nas-live-verify-phase-313.md),
+**Current phase: Phases 313–314 closed (full-horizon upgrade eligibility + NAS verify).**
+Next: Phase 315 partial vs complete label coverage counts (ADR-0316). See
+[docs/architecture/decisions/0316-phase-315-partial-complete-label-coverage.md](docs/architecture/decisions/0316-phase-315-partial-complete-label-coverage.md),
+[docs/architecture/decisions/0317-phase-316-nas-live-verify-phase-315.md](docs/architecture/decisions/0317-phase-316-nas-live-verify-phase-315.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

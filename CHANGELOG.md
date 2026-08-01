@@ -7,10 +7,31 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 314 - NAS Live Verification of Phase 313 (draft)
+### Phase 316 - NAS Live Verification of Phase 315 (draft)
 
-Ops evidence gate after Phase 313 full-horizon upgrade backfill. See
+Ops evidence gate after Phase 315 partial/complete label coverage counts. See
+[docs/architecture/decisions/0317-phase-316-nas-live-verify-phase-315.md](docs/architecture/decisions/0317-phase-316-nas-live-verify-phase-315.md).
+
+### Phase 315 - Partial vs Complete Label Coverage Counts (draft)
+
+Expose scan-window complete vs partial labeled assessment counts on evidence-summary.
+See
+[docs/architecture/decisions/0316-phase-315-partial-complete-label-coverage.md](docs/architecture/decisions/0316-phase-315-partial-complete-label-coverage.md).
+
+### Phase 314 - NAS Live Verification of Phase 313
+
+Ops evidence gate after Phase 313 full-horizon upgrade backfill. Live verify passed
+2026-08-01 (``9810086``; tip still calendar-blocked; upgrade persists may be ``0``). See
 [docs/architecture/decisions/0315-phase-314-nas-live-verify-phase-313.md](docs/architecture/decisions/0315-phase-314-nas-live-verify-phase-313.md).
+
+#### Added
+
+- ADR-0315: live complete-horizon skip / upgrade-eligibility evidence (checklist Phase 314
+  log).
+
+#### Explicitly out of scope
+
+Inventing bars, orders.
 
 ### Phase 313 - Full-Horizon Upgrade Backfill for Partial Labels
 

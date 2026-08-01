@@ -30,4 +30,5 @@ stacking, default-on scheduling.
 
 - [0313-phase-312-nas-live-verify-phase-311.md](0313-phase-312-nas-live-verify-phase-311.md)
 - [0315-phase-314-nas-live-verify-phase-313.md](0315-phase-314-nas-live-verify-phase-313.md)
+- [0316-phase-315-partial-complete-label-coverage.md](0316-phase-315-partial-complete-label-coverage.md)
 - [0312-phase-311-ready-horizons-backfill.md](0312-phase-311-ready-horizons-backfill.md)

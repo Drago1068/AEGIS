@@ -769,8 +769,13 @@ Phase 312 live-verified that backfill (``persisted=15``; see
 Phase 313 keeps partial ready-horizons labels eligible for full-horizon backfill once max
 horizon unlocks (see
 [decisions/0314-phase-313-full-horizon-upgrade-backfill.md](decisions/0314-phase-313-full-horizon-upgrade-backfill.md)).
-Phase 314 (draft) is the NAS live-verify gate for that upgrade path (see
+Phase 314 live-verified that upgrade path (see
 [decisions/0315-phase-314-nas-live-verify-phase-313.md](decisions/0315-phase-314-nas-live-verify-phase-313.md)).
+Phase 315 (draft) would split evidence-summary labeled counts into complete vs partial
+(see
+[decisions/0316-phase-315-partial-complete-label-coverage.md](decisions/0316-phase-315-partial-complete-label-coverage.md)).
+Phase 316 (draft) is the NAS live-verify gate for those counts (see
+[decisions/0317-phase-316-nas-live-verify-phase-315.md](decisions/0317-phase-316-nas-live-verify-phase-315.md)).
 
 ## System context
 

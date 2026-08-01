@@ -738,8 +738,10 @@ Phase 300 live-verified that chart (``chartable_points=2`` at limit 20; see
 [decisions/0301-phase-300-nas-live-verify-phase-299.md](decisions/0301-phase-300-nas-live-verify-phase-299.md)).
 Phase 301 raises assessment history list/export limit to 100 for denser chart series (see
 [decisions/0302-phase-301-assessment-history-limit-100.md](decisions/0302-phase-301-assessment-history-limit-100.md)).
-Phase 302 (draft) live-verifies that denser series on the NAS (see
+Phase 302 live-verified denser series (``chartable_points=77``; see
 [decisions/0303-phase-302-nas-live-verify-phase-301.md](decisions/0303-phase-302-nas-live-verify-phase-301.md)).
+Phase 303 (draft) proposes a coverage-confidence history chart from the same list (see
+[decisions/0304-phase-303-coverage-confidence-history-chart.md](decisions/0304-phase-303-coverage-confidence-history-chart.md)).
 
 ## System context
 

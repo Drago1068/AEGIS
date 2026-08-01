@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 333 tip-not-ready CTA. See
 [docs/architecture/decisions/0335-phase-334-nas-live-verify-phase-333.md](docs/architecture/decisions/0335-phase-334-nas-live-verify-phase-333.md).
 
-### Phase 333 - Tip-Not-Ready Ready-Horizon CTA (draft)
+### Phase 333 - Tip-Not-Ready Ready-Horizon CTA
 
 Elevate Compute ready-horizon labels CTA on the tip-not-ready callout. See
 [docs/architecture/decisions/0334-phase-333-tip-not-ready-cta.md](docs/architecture/decisions/0334-phase-333-tip-not-ready-cta.md).
+
+#### Added
+
+- ADR-0334: tip-not-ready callout CTA pointing at ``Compute ready-horizon labels``
+  (no auto-run; existing fields only; complements Phase 321 min-horizon unlock).
+- ``evidence-label-readiness-callout-cta`` UI + vitest; ``verify.ps1`` Phase 334 log.
+
+#### Explicitly out of scope
+
+Auto-labeling, inventing bars, orders, changing shortfall math.
 
 ### Phase 332 - NAS Live Verification of Phase 331
 

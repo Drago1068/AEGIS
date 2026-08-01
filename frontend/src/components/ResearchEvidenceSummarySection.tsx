@@ -166,9 +166,13 @@ export function ResearchEvidenceSummarySection({
                     {evidenceSummary.most_recent_labelable_as_of_trading_date}
                   </li>
                 ) : null}
+                <li data-testid="evidence-label-readiness-callout-cta">
+                  use_toolbar=Compute ready-horizon labels
+                </li>
               </ul>
               <p className="mt-1 text-xs text-aegis-muted">
-                Fail-closed: no invented closes; not a signal or recommendation.
+                Opt-in only via existing toolbar action; not auto-run; no invented closes;
+                not a signal or recommendation.
               </p>
             </aside>
           ) : null}

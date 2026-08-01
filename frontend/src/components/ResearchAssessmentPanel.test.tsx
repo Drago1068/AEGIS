@@ -948,6 +948,10 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-label-readiness-callout-most-recent-labelable"),
       ).toHaveTextContent("most_recent_labelable_as_of=2024-01-26");
+      expect(screen.getByTestId("evidence-label-readiness-callout-cta")).toHaveTextContent(
+        "use_toolbar=Compute ready-horizon labels",
+      );
+      expect(screen.getByTestId("compute-ready-horizon-labels")).toBeInTheDocument();
       expect(
         screen.getByTestId("evidence-labeled-freshness-lag-callout"),
       ).toBeInTheDocument();

@@ -1,6 +1,6 @@
-# ADR-0334: Phase 333 Tip-Not-Ready Ready-Horizon CTA (draft)
+# ADR-0334: Phase 333 Tip-Not-Ready Ready-Horizon CTA
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
@@ -8,10 +8,10 @@
 Phases 283–284 surface a tip-not-ready callout when
 ``latest_assessment_is_label_ready === false``. Live NAS remains calendar-blocked
 (``forward_shortfall=20`` until ~2026-08-28; ``min_shortfall=5`` until ~2026-08-07).
-Other labeling callouts now carry opt-in CTAs; tip-not-ready still does not point at
+Other labeling callouts now carry opt-in CTAs; tip-not-ready did not point at
 ``Compute ready-horizon labels`` for the earliest unlock path.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. Tip-not-ready CTA (UI-only)
 
@@ -20,18 +20,11 @@ Other labeling callouts now carry opt-in CTAs; tip-not-ready still does not poin
 - Source of truth: existing evidence-summary fields only; no new API scalars.
 - Complements (does not replace) the Phase 321 min-horizon unlock CTA when
   ``min_horizon_shortfall === 0``.
+- Callout CTA ``data-testid="evidence-label-readiness-callout-cta"``.
 
 ### 2. Out of scope
 
 Auto-labeling, inventing bars, orders, changing shortfall math, changing unlock gates.
-
-## Resume
-
-```powershell
-# Implement ADR-0334; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
 
 ## Related documents
 

@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 324 - NAS Live Verification of Phase 323 (draft)
+### Phase 326 - NAS Live Verification of Phase 325 (draft)
 
-Ops evidence gate after Phase 323 full-horizon unlock CTA. See
+Ops evidence gate after Phase 325 mixed-unlabeled backlog CTA. See
+[docs/architecture/decisions/0327-phase-326-nas-live-verify-phase-325.md](docs/architecture/decisions/0327-phase-326-nas-live-verify-phase-325.md).
+
+### Phase 325 - Mixed-Unlabeled Backlog CTA (draft)
+
+Elevate backfill CTA on the mixed-unlabeled backlog callout. See
+[docs/architecture/decisions/0326-phase-325-mixed-unlabeled-backlog-cta.md](docs/architecture/decisions/0326-phase-325-mixed-unlabeled-backlog-cta.md).
+
+### Phase 324 - NAS Live Verification of Phase 323
+
+Ops evidence gate after Phase 323 full-horizon unlock CTA. Live verify passed 2026-08-01
+(``6afff3f``; tip still ``forward_shortfall=20``; CTA elevates when tip_ready+unlabeled). See
 [docs/architecture/decisions/0325-phase-324-nas-live-verify-phase-323.md](docs/architecture/decisions/0325-phase-324-nas-live-verify-phase-323.md).
+
+#### Added
+
+- ADR-0325: live full-horizon unlock CTA field-bundle evidence (checklist Phase 324 log).
+
+#### Explicitly out of scope
+
+Auto-labeling, inventing bars, orders.
 
 ### Phase 323 - Full-Horizon Unlock Outcome-Label CTA
 

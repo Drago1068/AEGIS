@@ -32,3 +32,4 @@ selection, actionable promotion.
 - [0314-phase-313-full-horizon-upgrade-backfill.md](0314-phase-313-full-horizon-upgrade-backfill.md)
 - [0315-phase-314-nas-live-verify-phase-313.md](0315-phase-314-nas-live-verify-phase-313.md)
 - [0317-phase-316-nas-live-verify-phase-315.md](0317-phase-316-nas-live-verify-phase-315.md)
+- [0318-phase-317-partial-label-upgrade-callout.md](0318-phase-317-partial-label-upgrade-callout.md)

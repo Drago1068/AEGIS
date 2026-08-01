@@ -1,32 +1,26 @@
-# ADR-0269: Phase 268 NAS Live Verification of Phase 267 (draft)
+# ADR-0269: Phase 268 NAS Live Verification of Phase 267
 
-- Status: Proposed (pending Phase 267 + live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
-Phase 267 would resolve mixed label bar source in evidence-summary (ADR-0268). Operators
-need a verified backend redeploy under lab TLS after that lands.
+Phase 267 resolved mixed label bar source in evidence-summary with stored bars
+(ADR-0268). Operators needed a verified backend redeploy under lab TLS.
 
 ## Decisions
 
-### 1. Scope
+### 1. Scope completed
 
-1. Deploy ``HEAD`` TLS; recreate backend.
-2. ``verify.ps1`` pass; evidence-summary ``latest_resolved_label_bar_source`` is concrete
-   when mixed assessment has resolvable as-of close (``mixed`` OK only when unresolved).
-3. Alembic ``0009`` / ``head``.
+1. Deployed ``7a55d7b`` TLS; rebuilt backend.
+2. ``verify.ps1`` passed; alembic ``0009`` / ``head``.
+3. Live AAPL evidence-summary:
+   ``component_source=mixed``, ``latest_resolved_label_bar_source=polygon``
+   (concrete; no longer opaque ``mixed``).
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout.
-
-## Resume
-
-```powershell
-# After Phase 267 on HEAD: git archive → NAS; rebuild backend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+Retain verify stdout as acceptance evidence.
 
 ## Related documents
 

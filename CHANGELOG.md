@@ -7,10 +7,31 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 268 - NAS Live Verification of Phase 267 (draft)
+### Phase 270 - NAS Live Verification of Phase 269 (draft)
 
-Ops evidence gate after Phase 267 mixed label bar source resolution. See
+Ops evidence gate after Phase 269 tip lag fix. See
+[docs/architecture/decisions/0271-phase-270-nas-live-verify-phase-269.md](docs/architecture/decisions/0271-phase-270-nas-live-verify-phase-269.md).
+
+### Phase 269 - Advance Store Tip When Provider Has Current Session (draft)
+
+Diagnose/fix remaining calendar lag when providers already expose the current
+session close. See
+[docs/architecture/decisions/0270-phase-269-advance-store-tip-current-session.md](docs/architecture/decisions/0270-phase-269-advance-store-tip-current-session.md).
+
+### Phase 268 - NAS Live Verification of Phase 267
+
+Ops evidence gate after Phase 267 mixed label bar source resolution. Live verify passed
+2026-07-31 (``7a55d7b``; AAPL ``component_source=mixed``,
+``latest_resolved_label_bar_source=polygon``). See
 [docs/architecture/decisions/0269-phase-268-nas-live-verify-phase-267.md](docs/architecture/decisions/0269-phase-268-nas-live-verify-phase-267.md).
+
+#### Added
+
+- ADR-0269: live mixed label bar source resolution evidence (checklist Phase 268 log).
+
+#### Explicitly out of scope
+
+Inventing closes, default-on calibration, orders.
 
 ### Phase 267 - Resolve Mixed Label Bar Source in Evidence Summary
 

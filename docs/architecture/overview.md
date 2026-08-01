@@ -661,8 +661,11 @@ Phase 266 live-verified that fallback (see
 Phase 267 resolves mixed ``latest_resolved_label_bar_source`` with stored bars in
 evidence-summary (see
 [decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md](decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md)).
-Phase 268 (draft) live-verifies that resolution (see
+Phase 268 live-verified concrete ``polygon`` resolution on mixed AAPL (see
 [decisions/0269-phase-268-nas-live-verify-phase-267.md](decisions/0269-phase-268-nas-live-verify-phase-267.md)).
+Phase 269 (draft) proposes advancing store tip when providers already have the current
+session (see
+[decisions/0270-phase-269-advance-store-tip-current-session.md](decisions/0270-phase-269-advance-store-tip-current-session.md)).
 
 ## System context
 

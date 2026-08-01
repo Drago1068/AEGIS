@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 322 - NAS Live Verification of Phase 321 (draft)
+### Phase 324 - NAS Live Verification of Phase 323 (draft)
 
-Ops evidence gate after Phase 321 min-horizon unlock CTA. See
+Ops evidence gate after Phase 323 full-horizon unlock CTA. See
+[docs/architecture/decisions/0325-phase-324-nas-live-verify-phase-323.md](docs/architecture/decisions/0325-phase-324-nas-live-verify-phase-323.md).
+
+### Phase 323 - Full-Horizon Unlock Outcome-Label CTA (draft)
+
+Elevate compute-outcome-labels CTA when tip is label-ready but unlabeled. See
+[docs/architecture/decisions/0324-phase-323-full-horizon-unlock-cta.md](docs/architecture/decisions/0324-phase-323-full-horizon-unlock-cta.md).
+
+### Phase 322 - NAS Live Verification of Phase 321
+
+Ops evidence gate after Phase 321 min-horizon unlock CTA. Live verify passed 2026-08-01
+(``2103beb``; ``min_shortfall=5``; CTA elevates when shortfall=0). See
 [docs/architecture/decisions/0323-phase-322-nas-live-verify-phase-321.md](docs/architecture/decisions/0323-phase-322-nas-live-verify-phase-321.md).
+
+#### Added
+
+- ADR-0323: live min-horizon unlock CTA field-bundle evidence (checklist Phase 322 log).
+
+#### Explicitly out of scope
+
+Inventing bars, orders.
 
 ### Phase 321 - Min-Horizon Unlock Ready-Horizons CTA
 

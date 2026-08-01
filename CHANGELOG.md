@@ -12,11 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 299 research-index history chart. See
 [docs/architecture/decisions/0301-phase-300-nas-live-verify-phase-299.md](docs/architecture/decisions/0301-phase-300-nas-live-verify-phase-299.md).
 
-### Phase 299 - Research Index History Chart (draft)
+### Phase 299 - Research Index History Chart
 
 Research-only chart of ``research_index`` vs ``as_of_trading_date`` from the assessments
 list (prefer product signal over further callout stacking). See
 [docs/architecture/decisions/0300-phase-299-research-index-history-chart.md](docs/architecture/decisions/0300-phase-299-research-index-history-chart.md).
+
+#### Added
+
+- ``toResearchIndexHistoryChartData`` adapter; ``ResearchIndexHistoryChart`` on assessment
+  history; unit tests; ``verify.ps1`` Phase 300 chartable-points log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing assessments, orders, additional labeling callouts.
 
 ### Phase 298 - NAS Live Verification of Phase 297
 

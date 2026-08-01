@@ -1,6 +1,6 @@
-# ADR-0300: Phase 299 Research Index History Chart (draft)
+# ADR-0300: Phase 299 Research Index History Chart
 
-- Status: Proposed (Phase 298 closed; ready to implement after gate approval)
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
@@ -11,30 +11,24 @@ and empty unlabeled-ready count — calendar-bound until forward bars arrive. Fu
 callout stacking adds little operator value.
 
 ``lightweight-charts`` is already a frontend dependency. Assessment history already
-exposes ``research_index`` and ``as_of_trading_date`` via the list API. Operators lack
+exposes ``research_index`` and ``as_of_trading_date`` via the list API. Operators lacked
 a research-only time series of research_index to see trend without opening each row.
 
 ## Decisions
 
 ### 1. Research-index history chart
 
-Add a research-only chart (or sparkline) on the assessment panel fed from the existing
+Add a research-only line chart on the assessment history section fed from the existing
 assessments list payload (``research_index`` vs ``as_of_trading_date``). Label clearly
 as research-only / not advice. Fail closed on empty or non-finite points (skip; do not
-invent). No new backend scalars unless a documented gap appears.
+invent). Dedupe colliding ``as_of`` by keeping the newest list row. No new backend
+scalars. Adapter: ``toResearchIndexHistoryChartData``; UI:
+``research-index-history-chart``.
 
 ### 2. Out of scope
 
 Live orders, actionable promotion, inventing assessments/labels, calibration
 default-on, additional labeling callouts.
-
-## Resume
-
-```powershell
-# Implement Phase 299 chart from assessments list; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
 
 ## Related documents
 

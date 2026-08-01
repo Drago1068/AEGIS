@@ -2,6 +2,7 @@
 
 import type { ResearchAssessment } from "@/lib/api-client";
 
+import { ResearchIndexHistoryChart } from "./ResearchIndexHistoryChart";
 import {
   ASSESSMENT_SOURCE_FILTER_OPTIONS,
   formatAssessmentHistoryRow,
@@ -12,6 +13,7 @@ export type ResearchAssessmentHistorySectionProps = {
   assessmentSourceFilter: string;
   isPending: boolean;
   onAssessmentSourceFilterChange: (value: string) => void;
+  symbol: string;
 };
 
 export function ResearchAssessmentHistorySection({
@@ -19,6 +21,7 @@ export function ResearchAssessmentHistorySection({
   assessmentSourceFilter,
   isPending,
   onAssessmentSourceFilterChange,
+  symbol,
 }: ResearchAssessmentHistorySectionProps) {
   return (
     <div
@@ -51,6 +54,9 @@ export function ResearchAssessmentHistorySection({
           </select>
         </label>
       </div>
+      {assessmentHistory.length > 0 ? (
+        <ResearchIndexHistoryChart symbol={symbol} assessments={assessmentHistory} />
+      ) : null}
       {assessmentHistory.length === 0 ? (
         <p className="mt-2 font-mono text-xs text-aegis-muted">
           {assessmentSourceFilter

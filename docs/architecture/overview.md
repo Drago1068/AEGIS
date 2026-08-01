@@ -732,9 +732,10 @@ same callout booleans (see
 [decisions/0298-phase-297-labeling-diagnostics-summary-count.md](decisions/0298-phase-297-labeling-diagnostics-summary-count.md)).
 Phase 298 live-verified that count (``active_count=4``; see
 [decisions/0299-phase-298-nas-live-verify-phase-297.md](decisions/0299-phase-298-nas-live-verify-phase-297.md)).
-Phase 299 (draft) proposes a research-index history chart from the assessments list
-rather than further callout stacking (see
+Phase 299 adds a research-index history chart from the assessments list (see
 [decisions/0300-phase-299-research-index-history-chart.md](decisions/0300-phase-299-research-index-history-chart.md)).
+Phase 300 (draft) live-verifies that chart on the NAS (see
+[decisions/0301-phase-300-nas-live-verify-phase-299.md](decisions/0301-phase-300-nas-live-verify-phase-299.md)).
 
 ## System context
 

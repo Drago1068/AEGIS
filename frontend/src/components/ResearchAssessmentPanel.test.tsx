@@ -1,6 +1,27 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+class ResizeObserverStub {
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
+
+vi.stubGlobal("ResizeObserver", ResizeObserverStub);
+
+vi.mock("lightweight-charts", () => ({
+  createChart: vi.fn(() => ({
+    addSeries: vi.fn(() => ({ setData: vi.fn() })),
+    timeScale: () => ({ fitContent: vi.fn() }),
+    applyOptions: vi.fn(),
+    remove: vi.fn(),
+  })),
+  LineSeries: { type: "Line" },
+  CandlestickSeries: { type: "Candlestick" },
+  HistogramSeries: { type: "Histogram" },
+  ColorType: { Solid: "solid" },
+}));
+
 import { ResearchAssessmentPanel } from "./ResearchAssessmentPanel";
 
 vi.mock("@/lib/api-client", async () => {
@@ -374,6 +395,12 @@ describe("ResearchAssessmentPanel", () => {
     await waitFor(() => {
       expect(screen.getByTestId("assessment-history-section")).toBeInTheDocument();
       expect(screen.getByText(/assessment history \(newest first\)/i)).toBeInTheDocument();
+      expect(screen.getByTestId("research-index-history-chart")).toBeInTheDocument();
+      expect(
+        screen.getByRole("img", {
+          name: "AAPL research_index history chart (research-only)",
+        }),
+      ).toBeInTheDocument();
       expect(
         screen.getByText(/2024-01-26T18:00:00Z · index=0\.4600 · cov=0\.9500 · p=0\.6200 · src=alpha_vantage/),
       ).toBeInTheDocument();

@@ -498,6 +498,7 @@ export function ResearchAssessmentPanel({
         <div className="space-y-3 text-sm">
           <ResearchLatestAssessmentSection latest={latest} />
           <ResearchAssessmentHistorySection
+            symbol={symbol}
             assessmentHistory={assessmentHistory}
             assessmentSourceFilter={assessmentSourceFilter}
             isPending={isPending}

@@ -157,22 +157,23 @@ function Write-VerifyChecklist {
     Write-Host "117. Authenticated evidence-summary Phase 292 mixed-unlabeled backlog callout field bundle (UI unit-tested)"
     Write-Host "118. Authenticated evidence-summary Phase 294 labeling diagnostics disclosure open-by-default (UI unit-tested)"
     Write-Host "119. Authenticated evidence-summary Phase 298 labeling diagnostics summary active count (UI unit-tested)"
-    Write-Host "120. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
-    Write-Host "121. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
-    Write-Host "122. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
-    Write-Host "123. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
-    Write-Host "124. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
-    Write-Host "125. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
-    Write-Host "126. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
-    Write-Host "127. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
-    Write-Host "128. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
-    Write-Host "129. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
-    Write-Host "130. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-    Write-Host "131. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
-    Write-Host "132. Authenticated evidence-summary Phase 296 primary fetch-fallback callout field bundle (UI unit-tested)"
-    Write-Host "133. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
-    Write-Host "134. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
-    Write-Host "135. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "120. Authenticated assessments list Phase 300 research_index history chart fields (UI unit-tested)"
+    Write-Host "121. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
+    Write-Host "122. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
+    Write-Host "123. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
+    Write-Host "124. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
+    Write-Host "125. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
+    Write-Host "126. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
+    Write-Host "127. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
+    Write-Host "128. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
+    Write-Host "129. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
+    Write-Host "130. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
+    Write-Host "131. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
+    Write-Host "132. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
+    Write-Host "133. Authenticated evidence-summary Phase 296 primary fetch-fallback callout field bundle (UI unit-tested)"
+    Write-Host "134. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
+    Write-Host "135. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
+    Write-Host "136. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -404,6 +405,35 @@ try {
         $assessBody = Get-Content -LiteralPath $assessListPath -Raw | ConvertFrom-Json
         if ($null -eq $assessBody) { throw "assessments list body was null" }
         Write-Host "OK  assessments list is JSON array (count=$(@($assessBody).Count))"
+        # Phase 300: UI chart from research_index vs as_of (ADR-0300); count chartable points.
+        $chartPoints = 0
+        $seenAsOf = @{}
+        foreach ($row in @($assessBody)) {
+            if ($null -eq $row) { continue }
+            $asOf = $null
+            if ($row.PSObject.Properties.Name -contains "as_of_trading_date") {
+                $asOf = [string]$row.as_of_trading_date
+            }
+            if ([string]::IsNullOrWhiteSpace($asOf) -or $asOf -notmatch '^\d{4}-\d{2}-\d{2}$') { continue }
+            if ($seenAsOf.ContainsKey($asOf)) { continue }
+            $idx = $null
+            if (($row.PSObject.Properties.Name -contains "components") -and ($null -ne $row.components) `
+                -and ($row.components.PSObject.Properties.Name -contains "research_index")) {
+                $idx = $row.components.research_index
+            }
+            if ($null -eq $idx) { continue }
+            # Do not treat 0 as empty: in PowerShell `0 -eq ""` is $true.
+            if ($idx -is [string] -and [string]::IsNullOrWhiteSpace([string]$idx)) { continue }
+            try {
+                $num = [double]$idx
+            } catch {
+                continue
+            }
+            if ([double]::IsNaN($num) -or [double]::IsInfinity($num)) { continue }
+            $seenAsOf[$asOf] = $true
+            $chartPoints++
+        }
+        Write-Host "OK  Phase 300 research_index history chart fields list_count=$(@($assessBody).Count) chartable_points=$chartPoints (UI unit-tested; skip non-finite)"
     } finally {
         if (Test-Path -LiteralPath $assessListPath) {
             Remove-Item -LiteralPath $assessListPath -Force -ErrorAction SilentlyContinue

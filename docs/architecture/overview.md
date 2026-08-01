@@ -702,8 +702,10 @@ see [decisions/0285-phase-284-nas-live-verify-phase-283.md](decisions/0285-phase
 Phase 285 elevates labeled corpus freshness lag in the research UI when
 ``scan_labeled_freshness_lag_trading_days > 0`` (see
 [decisions/0286-phase-285-labeled-freshness-lag-callout.md](decisions/0286-phase-285-labeled-freshness-lag-callout.md)).
-Phase 286 (draft) is the NAS live verify gate (see
+Phase 286 live-verified that callout field bundle (lag ``121``; see
 [decisions/0287-phase-286-nas-live-verify-phase-285.md](decisions/0287-phase-286-nas-live-verify-phase-285.md)).
+Phase 287 (draft) proposes elevating empty unlabeled label-ready scan count (live ``0``;
+see [decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md](decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md)).
 
 ## System context
 

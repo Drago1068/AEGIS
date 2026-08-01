@@ -20,7 +20,7 @@ When AV ``full`` is premium-gated, retry ``compact`` with labeled provenance. Se
 #### Added
 
 - ``AlphaVantageProvider`` full→compact fallback; ``raw_payload`` audit labels;
-  unit tests.
+  ``~1.25s`` delay before compact retry; unit tests.
 
 #### Explicitly out of scope
 

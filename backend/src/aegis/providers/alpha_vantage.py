@@ -13,6 +13,7 @@ bars are labeled in ``raw_payload`` (never invent closes; never swap provenance)
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import date
 from decimal import Decimal, InvalidOperation
@@ -42,6 +43,8 @@ _FIELD_VOLUME = "5. volume"
 
 _FALLBACK_OUTPUT_SIZE = "compact"
 _FALLBACK_LABEL = "full_to_compact"
+# Free-tier AV allows ~1 request/second; pause before compact retry (ADR-0274).
+_COMPACT_FALLBACK_DELAY_SECONDS = 1.25
 
 logger = logging.getLogger(__name__)
 
@@ -77,8 +80,13 @@ class AlphaVantageProvider:
                 raise
             logger.warning(
                 "alpha_vantage_full_premium_or_rate_limit_retry_compact",
-                extra={"symbol": symbol, "configured_output_size": output_size},
+                extra={
+                    "symbol": symbol,
+                    "configured_output_size": output_size,
+                    "fallback_delay_seconds": _COMPACT_FALLBACK_DELAY_SECONDS,
+                },
             )
+            await asyncio.sleep(_COMPACT_FALLBACK_DELAY_SECONDS)
             bars = await self._fetch_daily_bars(symbol, output_size=_FALLBACK_OUTPUT_SIZE)
             return [_with_compact_fallback_label(bar) for bar in bars]
 

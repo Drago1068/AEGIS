@@ -26,8 +26,10 @@ Successful compact bars keep ``source=alpha_vantage`` and add audit labels in
 - ``aegis_output_size=compact``
 - ``aegis_fetch_fallback=full_to_compact``
 
-If compact also fails, the original rate-limit error path remains (secondary / stored
-primary tip fallback unchanged). Never copy polygon closes onto alpha_vantage.
+A short delay (``~1.25s``) precedes the compact retry so free-tier ``1 request/second``
+limits are not tripped by the immediate follow-up call. If compact also fails, the
+original rate-limit error path remains (secondary / stored primary tip fallback
+unchanged). Never copy polygon closes onto alpha_vantage.
 
 ### 2. Out of scope
 

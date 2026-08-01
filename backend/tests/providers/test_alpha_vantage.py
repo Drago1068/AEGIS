@@ -170,9 +170,15 @@ async def test_fetch_daily_bars_raises_rate_limit_on_information() -> None:
 
 
 @pytest.mark.asyncio
-async def test_fetch_daily_bars_retries_compact_when_full_premium_gated() -> None:
+async def test_fetch_daily_bars_retries_compact_when_full_premium_gated(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """ADR-0274: full premium gate falls back to compact with labeled provenance."""
 
+    monkeypatch.setattr(
+        "aegis.providers.alpha_vantage._COMPACT_FALLBACK_DELAY_SECONDS",
+        0.0,
+    )
     premium = {
         "Information": (
             "Thank you for using Alpha Vantage! The outputsize=full parameter value is a "

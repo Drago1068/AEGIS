@@ -7,10 +7,24 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 336 - NAS Live Verification of Phase 335 (draft)
+### Phase 337 - Calendar Unlock Ops Checkpoint (draft)
 
-Ops evidence gate after Phase 335 partial-labeled upgrade CTA. See
+Wait for min-horizon calendar unlock; live-verify ready-horizon CTA paths. See
+[docs/architecture/decisions/0338-phase-337-calendar-unlock-ops-checkpoint.md](docs/architecture/decisions/0338-phase-337-calendar-unlock-ops-checkpoint.md).
+
+### Phase 336 - NAS Live Verification of Phase 335
+
+Ops evidence gate after Phase 335 partial-labeled upgrade CTA. Live verify passed
+2026-08-01 (``ace6781``; ``partial=0``; CTA elevates when count>0). See
 [docs/architecture/decisions/0337-phase-336-nas-live-verify-phase-335.md](docs/architecture/decisions/0337-phase-336-nas-live-verify-phase-335.md).
+
+#### Added
+
+- ADR-0337: live partial-labeled upgrade CTA evidence (checklist Phase 336 log).
+
+#### Explicitly out of scope
+
+Auto-backfill, inventing bars, orders.
 
 ### Phase 335 - Partial-Labeled Upgrade CTA
 

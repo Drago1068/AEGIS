@@ -697,8 +697,10 @@ primary compact fallback remains labeled on ingest/evidence-summary (see
 Phase 283 elevates latest label-readiness block reason/shortfall in the research UI when
 ``latest_assessment_is_label_ready=false`` (see
 [decisions/0284-phase-283-latest-label-readiness-callout.md](decisions/0284-phase-283-latest-label-readiness-callout.md)).
-Phase 284 (draft) is the NAS live verify gate (see
-[decisions/0285-phase-284-nas-live-verify-phase-283.md](decisions/0285-phase-284-nas-live-verify-phase-283.md)).
+Phase 284 live-verified that callout field bundle (``label_ready=False``, shortfall ``20``;
+see [decisions/0285-phase-284-nas-live-verify-phase-283.md](decisions/0285-phase-284-nas-live-verify-phase-283.md)).
+Phase 285 (draft) proposes elevating labeled corpus freshness lag (live lag ``121``; see
+[decisions/0286-phase-285-labeled-freshness-lag-callout.md](decisions/0286-phase-285-labeled-freshness-lag-callout.md)).
 
 ## System context
 

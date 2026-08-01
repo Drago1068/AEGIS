@@ -751,9 +751,11 @@ show-all (see
 Phase 306 live-verified that list mode (``distinct_as_of=75`` / ``hidden_duplicates=25``;
 see
 [decisions/0307-phase-306-nas-live-verify-phase-305.md](decisions/0307-phase-306-nas-live-verify-phase-305.md)).
-Phase 307 (draft) proposes a labeling frontier readout from existing shortfall fields
+Phase 307 adds a labeling frontier readout from existing shortfall / required-end fields
 (see
 [decisions/0308-phase-307-labeling-frontier-readout.md](decisions/0308-phase-307-labeling-frontier-readout.md)).
+Phase 308 (draft) is the NAS live-verify gate for that readout (see
+[decisions/0309-phase-308-nas-live-verify-phase-307.md](decisions/0309-phase-308-nas-live-verify-phase-307.md)).
 
 ## System context
 

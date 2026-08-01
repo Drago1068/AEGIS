@@ -7,11 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 306 closed (distinct-as_of history live-verified).**
-Next (draft): Phase 307 labeling frontier readout (ADR-0308), then Phase 308 NAS
-verify. See
-[docs/architecture/decisions/0307-phase-306-nas-live-verify-phase-305.md](docs/architecture/decisions/0307-phase-306-nas-live-verify-phase-305.md),
+**Current phase: Phase 307 implemented (labeling frontier readout; NAS verify pending).**
+Next: Phase 308 NAS live verify (ADR-0309). See
 [docs/architecture/decisions/0308-phase-307-labeling-frontier-readout.md](docs/architecture/decisions/0308-phase-307-labeling-frontier-readout.md),
+[docs/architecture/decisions/0309-phase-308-nas-live-verify-phase-307.md](docs/architecture/decisions/0309-phase-308-nas-live-verify-phase-307.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

@@ -1,6 +1,6 @@
-# ADR-0308: Phase 307 Labeling Frontier Readout (draft)
+# ADR-0308: Phase 307 Labeling Frontier Readout
 
-- Status: Proposed (Phase 306 closed; ready to implement after gate approval)
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
@@ -19,22 +19,17 @@ scalars; never invent closes.
 
 ### 1. Labeling frontier readout
 
-Add a research-only strip (outside or above labeling-diagnostics callouts) that surfaces
-tip labeling unlock dates/shortfalls from fields already on evidence-summary. Keep
-fail-closed wording (not a signal). Leave callouts unchanged.
+Add a research-only strip above labeling-diagnostics that surfaces tip labeling unlock
+dates/shortfalls from fields already on evidence-summary
+(``latest_assessment_is_label_ready``, ``latest_assessment_forward_bar_shortfall``,
+``latest_assessment_required_label_end_date``, min-horizon shortfall/end,
+``latest_assessment_last_available_label_bar_date``). Keep fail-closed wording (not a
+signal). Leave callouts unchanged.
 
 ### 2. Out of scope
 
 Live orders, inventing bars/labels, auto-labeling when ready, calibration default-on,
-additional charts.
-
-## Resume
-
-```powershell
-# Implement Phase 307 labeling frontier readout; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+additional charts, new API scalars.
 
 ## Related documents
 

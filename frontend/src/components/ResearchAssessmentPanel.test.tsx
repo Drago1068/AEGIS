@@ -249,6 +249,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.queryByTestId("evidence-primary-fetch-fallback-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics-active-count")).toBeNull();
+    expect(screen.queryByTestId("evidence-labeling-frontier-readout")).toBeNull();
   });
 
   it("renders an initial latest assessment from the API payload", () => {
@@ -757,6 +758,25 @@ describe("ResearchAssessmentPanel", () => {
       ).toHaveTextContent("121");
       expect(screen.getByTestId("evidence-latest-assessment-is-label-ready")).toHaveTextContent(
         "false",
+      );
+      expect(screen.getByTestId("evidence-labeling-frontier-readout")).toBeInTheDocument();
+      expect(screen.getByTestId("evidence-labeling-frontier-tip-ready")).toHaveTextContent(
+        "tip_label_ready=false",
+      );
+      expect(screen.getByTestId("evidence-labeling-frontier-forward-shortfall")).toHaveTextContent(
+        "forward_bar_shortfall=20",
+      );
+      expect(screen.getByTestId("evidence-labeling-frontier-required-end")).toHaveTextContent(
+        "required_label_end_date=2024-02-28",
+      );
+      expect(
+        screen.getByTestId("evidence-labeling-frontier-min-horizon-shortfall"),
+      ).toHaveTextContent("min_horizon_forward_bar_shortfall=5");
+      expect(screen.getByTestId("evidence-labeling-frontier-min-horizon-end")).toHaveTextContent(
+        "min_horizon_required_label_end_date=2024-02-16",
+      );
+      expect(screen.getByTestId("evidence-labeling-frontier-last-available")).toHaveTextContent(
+        "last_available_label_bar_date=2024-02-09",
       );
       expect(
         screen.getByTestId("evidence-latest-label-readiness-callout"),

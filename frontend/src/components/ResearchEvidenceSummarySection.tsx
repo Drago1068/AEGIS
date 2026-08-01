@@ -41,6 +41,13 @@ export function ResearchEvidenceSummarySection({
   const primaryFetchFallback = evidenceSummary.latest_primary_fetch_fallback;
   const showPrimaryFetchFallbackCallout =
     typeof primaryFetchFallback === "string" && primaryFetchFallback.trim().length > 0;
+  const showLabelingFrontier =
+    evidenceSummary.latest_assessment_is_label_ready != null ||
+    evidenceSummary.latest_assessment_forward_bar_shortfall != null ||
+    evidenceSummary.latest_assessment_required_label_end_date != null ||
+    evidenceSummary.latest_assessment_last_available_label_bar_date != null ||
+    evidenceSummary.latest_assessment_min_horizon_forward_bar_shortfall != null ||
+    evidenceSummary.latest_assessment_min_horizon_required_label_end_date != null;
 
   return (
     <div
@@ -50,6 +57,49 @@ export function ResearchEvidenceSummarySection({
       <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
         Evidence summary (research-only — not advice)
       </p>
+      {showLabelingFrontier ? (
+        <aside
+          className="mt-3 rounded border border-aegis-line bg-white/80 px-3 py-2 text-sm text-aegis-ink"
+          role="status"
+          data-testid="evidence-labeling-frontier-readout"
+        >
+          <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
+            Labeling frontier (research-only — not advice)
+          </p>
+          <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+            <li data-testid="evidence-labeling-frontier-tip-ready">
+              tip_label_ready=
+              {evidenceSummary.latest_assessment_is_label_ready == null
+                ? "null"
+                : String(evidenceSummary.latest_assessment_is_label_ready)}
+            </li>
+            <li data-testid="evidence-labeling-frontier-forward-shortfall">
+              forward_bar_shortfall=
+              {evidenceSummary.latest_assessment_forward_bar_shortfall ?? "null"}
+            </li>
+            <li data-testid="evidence-labeling-frontier-required-end">
+              required_label_end_date=
+              {evidenceSummary.latest_assessment_required_label_end_date ?? "null"}
+            </li>
+            <li data-testid="evidence-labeling-frontier-min-horizon-shortfall">
+              min_horizon_forward_bar_shortfall=
+              {evidenceSummary.latest_assessment_min_horizon_forward_bar_shortfall ?? "null"}
+            </li>
+            <li data-testid="evidence-labeling-frontier-min-horizon-end">
+              min_horizon_required_label_end_date=
+              {evidenceSummary.latest_assessment_min_horizon_required_label_end_date ?? "null"}
+            </li>
+            <li data-testid="evidence-labeling-frontier-last-available">
+              last_available_label_bar_date=
+              {evidenceSummary.latest_assessment_last_available_label_bar_date ?? "null"}
+            </li>
+          </ul>
+          <p className="mt-1 text-xs text-aegis-muted">
+            Fail-closed: calendar unlock from stored fields only; not a signal or
+            recommendation.
+          </p>
+        </aside>
+      ) : null}
       {showLabelingDiagnostics ? (
         <details
           className="mt-3"

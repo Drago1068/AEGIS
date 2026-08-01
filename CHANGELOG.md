@@ -12,11 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 307 labeling frontier readout. See
 [docs/architecture/decisions/0309-phase-308-nas-live-verify-phase-307.md](docs/architecture/decisions/0309-phase-308-nas-live-verify-phase-307.md).
 
-### Phase 307 - Labeling Frontier Readout (draft)
+### Phase 307 - Labeling Frontier Readout
 
 Compact research-only tip labeling unlock readout from existing shortfall / required-end
 fields (calendar-bound product gap). See
 [docs/architecture/decisions/0308-phase-307-labeling-frontier-readout.md](docs/architecture/decisions/0308-phase-307-labeling-frontier-readout.md).
+
+#### Added
+
+- ``evidence-labeling-frontier-readout`` above labeling diagnostics from existing
+  evidence-summary fields; unit tests; ``verify.ps1`` Phase 308 frontier field-bundle log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing bars/labels, auto-labeling, orders, additional charts.
 
 ### Phase 306 - NAS Live Verification of Phase 305
 

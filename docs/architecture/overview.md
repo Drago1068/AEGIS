@@ -799,8 +799,7 @@ actions (see
 [decisions/0326-phase-325-mixed-unlabeled-backlog-cta.md](decisions/0326-phase-325-mixed-unlabeled-backlog-cta.md)).
 Phase 326 live-verified that CTA (see
 [decisions/0327-phase-326-nas-live-verify-phase-325.md](decisions/0327-phase-326-nas-live-verify-phase-325.md)).
-Phase 327 (draft) would elevate a freshness-lag CTA pointing at ready-horizon backfill
-(see
+Phase 327 elevates a freshness-lag CTA pointing at ready-horizon backfill (see
 [decisions/0328-phase-327-freshness-lag-cta.md](decisions/0328-phase-327-freshness-lag-cta.md)).
 Phase 328 (draft) is the NAS live-verify gate for that CTA (see
 [decisions/0329-phase-328-nas-live-verify-phase-327.md](decisions/0329-phase-328-nas-live-verify-phase-327.md)).

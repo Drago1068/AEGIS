@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 327 freshness-lag CTA. See
 [docs/architecture/decisions/0329-phase-328-nas-live-verify-phase-327.md](docs/architecture/decisions/0329-phase-328-nas-live-verify-phase-327.md).
 
-### Phase 327 - Freshness-Lag Backfill CTA (draft)
+### Phase 327 - Freshness-Lag Backfill CTA
 
 Elevate ready-horizon backfill CTA on the freshness-lag callout. See
 [docs/architecture/decisions/0328-phase-327-freshness-lag-cta.md](docs/architecture/decisions/0328-phase-327-freshness-lag-cta.md).
+
+#### Added
+
+- ADR-0328: freshness-lag callout CTA pointing at ``Backfill ready-horizon labels``
+  (no auto-run; existing fields only).
+- ``evidence-freshness-lag-callout-cta`` UI + vitest; ``verify.ps1`` Phase 328 log.
+
+#### Explicitly out of scope
+
+Auto-backfill, inventing bars, orders, changing lag computation.
 
 ### Phase 326 - NAS Live Verification of Phase 325
 

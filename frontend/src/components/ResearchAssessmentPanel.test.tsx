@@ -963,6 +963,10 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("evidence-freshness-lag-callout-latest-as-of")).toHaveTextContent(
         "tip_as_of=2024-01-26",
       );
+      expect(screen.getByTestId("evidence-freshness-lag-callout-cta")).toHaveTextContent(
+        "use_toolbar=Backfill ready-horizon labels",
+      );
+      expect(screen.getByTestId("backfill-ready-horizon-labels")).toBeInTheDocument();
       expect(
         screen.getByTestId("evidence-unlabeled-label-ready-empty-callout"),
       ).toBeInTheDocument();

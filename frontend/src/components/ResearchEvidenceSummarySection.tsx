@@ -202,9 +202,13 @@ export function ResearchEvidenceSummarySection({
                     tip_as_of={evidenceSummary.latest_as_of_trading_date}
                   </li>
                 ) : null}
+                <li data-testid="evidence-freshness-lag-callout-cta">
+                  use_toolbar=Backfill ready-horizon labels
+                </li>
               </ul>
               <p className="mt-1 text-xs text-aegis-muted">
-                Fail-closed: lag is diagnostic only; not a signal or recommendation.
+                Opt-in only via existing toolbar action; not auto-run; not a signal or
+                recommendation.
               </p>
             </aside>
           ) : null}

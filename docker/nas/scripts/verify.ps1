@@ -1241,7 +1241,8 @@ try {
             throw "evidence-summary missing stored_bar_calendar_lag_trading_days (Phase 255/256)"
         }
         $barLag = $summary.stored_bar_calendar_lag_trading_days
-        $barLagPart = if ($null -eq $barLag -or $barLag -eq "") { "null" } else { [string]$barLag }
+        # Do not treat 0 as empty: in PowerShell `0 -eq ""` is $true (ADR-0272).
+        $barLagPart = if ($null -eq $barLag) { "null" } else { [string]$barLag }
         Write-Host "OK  Phase 256 stored_bar_calendar_lag_trading_days=$barLagPart"
         # Phase 258: on-demand ingest tip refresh (Phase 257). Unchanged lag/tip OK when
         # providers have no newer closes — never invent; fail only on HTTP/contract errors.
@@ -1297,7 +1298,8 @@ try {
                 throw "post-ingest evidence-summary missing latest_assessment_last_available_label_bar_date (Phase 257/258)"
             }
             $postLag = $postSummary.stored_bar_calendar_lag_trading_days
-            $postLagPart = if ($null -eq $postLag -or $postLag -eq "") { "null" } else { [string]$postLag }
+            # Do not treat 0 as empty: in PowerShell `0 -eq ""` is $true (ADR-0272 / Phase 271).
+            $postLagPart = if ($null -eq $postLag) { "null" } else { [string]$postLag }
             $postTip = $postSummary.latest_assessment_last_available_label_bar_date
             $postTipPart = if ($null -eq $postTip -or $postTip -eq "") { "null" } else { [string]$postTip }
             $postAsOf = $postSummary.latest_as_of_trading_date
@@ -1305,6 +1307,7 @@ try {
             Write-Host "OK  Phase 258 ingest tip refresh pre_lag=$preLagPart post_lag=$postLagPart pre_tip=$preTipPart post_tip=$postTipPart pre_as_of=$preAsOfPart post_as_of=$postAsOfPart (unchanged OK)"
             # Phase 270: Polygon /prev merge should advance tip when range lagged (ADR-0270).
             Write-Host "OK  Phase 270 tip catch-up check post_tip=$postTipPart post_lag=$postLagPart (lag=0 preferred when provider /prev has session)"
+            Write-Host "OK  Phase 272 post_lag display=$postLagPart (0 must not render as null)"
         } finally {
             if (Test-Path -LiteralPath $ingestPath) {
                 Remove-Item -LiteralPath $ingestPath -Force -ErrorAction SilentlyContinue

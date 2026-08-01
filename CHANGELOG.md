@@ -12,10 +12,18 @@ delivery workflow).
 Ops evidence gate after Phase 271 verify lag display fix. See
 [docs/architecture/decisions/0273-phase-272-nas-live-verify-phase-271.md](docs/architecture/decisions/0273-phase-272-nas-live-verify-phase-271.md).
 
-### Phase 271 - Fix Verify Lag Zero Displayed as Null (draft)
+### Phase 271 - Fix Verify Lag Zero Displayed as Null
 
 PowerShell verify treated lag ``0`` as null (``0 -eq ""``). See
 [docs/architecture/decisions/0272-phase-271-fix-verify-lag-zero-as-null.md](docs/architecture/decisions/0272-phase-271-fix-verify-lag-zero-as-null.md).
+
+#### Changed
+
+- ``verify.ps1`` null-only checks for ``stored_bar_calendar_lag_trading_days`` logging.
+
+#### Explicitly out of scope
+
+API schema changes, inventing closes, orders.
 
 ### Phase 270 - NAS Live Verification of Phase 269
 

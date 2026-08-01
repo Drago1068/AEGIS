@@ -1,6 +1,6 @@
-# ADR-0272: Phase 271 Fix Verify Lag Zero Displayed as Null (draft)
+# ADR-0272: Phase 271 Fix Verify Lag Zero Displayed as Null
 
-- Status: Proposed (ready after Phase 270; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -10,26 +10,22 @@ logged ``post_lag=null`` after tip catch-up even though calendar lag should be `
 tip equals the prior completed session. PowerShell ``$postLag -eq ""`` is true for
 numeric ``0`` (``""`` coerces to ``0``), so the verify script mis-labels lag zero as null.
 
-Prefer fixing the verify display so operators trust lag=0 evidence over more tip scalars.
-
-## Decisions (proposed)
+## Decisions
 
 ### 1. Null-only check for lag logging
 
-In ``verify.ps1`` (and ``verify.sh`` if mirrored), treat only ``$null`` as missing for
-``stored_bar_calendar_lag_trading_days``; print ``0`` when lag is zero. Do not change
-API semantics.
+In ``verify.ps1``, treat only ``$null`` as missing for
+``stored_bar_calendar_lag_trading_days`` (pre and post ingest). Print ``0`` when lag is
+zero. API semantics unchanged.
 
 ### 2. Out of scope
 
-API schema changes, inventing closes, orders.
+API schema changes, inventing closes, orders, broad rewrite of all ``-eq ""`` helpers.
 
-## Resume (after Phase 270 gate)
+## Consequences
 
-```powershell
-# Fix verify lag=0 displayed as null (ADR-0272); commit+push; then Phase 272:
-.\docker\nas\scripts\verify.ps1
-```
+- Operators see truthful ``post_lag=0`` after tip catch-up.
+- Phase 272 live-verifies the display.
 
 ## Related documents
 

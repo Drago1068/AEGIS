@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 276 - NAS Live Verification of Phase 275 (draft)
+### Phase 278 - NAS Live Verification of Phase 277 (draft)
 
-Ops evidence gate after Phase 275 ingest fallback diagnostic. See
+Ops evidence gate after Phase 277 ingest UI fallback diagnostic. See
+[docs/architecture/decisions/0279-phase-278-nas-live-verify-phase-277.md](docs/architecture/decisions/0279-phase-278-nas-live-verify-phase-277.md).
+
+### Phase 277 - Surface Primary Fetch Fallback in Ingest UI (draft)
+
+Show ``primary_fetch_fallback`` on the operator IngestPanel. See
+[docs/architecture/decisions/0278-phase-277-ingest-ui-primary-fetch-fallback.md](docs/architecture/decisions/0278-phase-277-ingest-ui-primary-fetch-fallback.md).
+
+### Phase 276 - NAS Live Verification of Phase 275
+
+Ops evidence gate after Phase 275 ingest fallback diagnostic. Live verify passed
+2026-07-31 (``d4cafbc``; AAPL ``primary_fetch_fallback=full_to_compact``,
+``primary_latest_trading_date=2026-07-31``). See
 [docs/architecture/decisions/0277-phase-276-nas-live-verify-phase-275.md](docs/architecture/decisions/0277-phase-276-nas-live-verify-phase-275.md).
+
+#### Added
+
+- ADR-0277: live ingest fallback diagnostic evidence (checklist Phase 276 log).
+
+#### Explicitly out of scope
+
+Inventing closes, silent provenance swaps, orders.
 
 ### Phase 275 - Surface Primary Fetch Fallback on Ingest Results
 

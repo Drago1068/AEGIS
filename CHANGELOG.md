@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 304 - NAS Live Verification of Phase 303 (draft)
+### Phase 306 - NAS Live Verification of Phase 305 (draft)
 
-Ops evidence gate after Phase 303 coverage-confidence history chart. See
+Ops evidence gate after Phase 305 distinct-as_of assessment history. See
+[docs/architecture/decisions/0307-phase-306-nas-live-verify-phase-305.md](docs/architecture/decisions/0307-phase-306-nas-live-verify-phase-305.md).
+
+### Phase 305 - Distinct-as-of Assessment History (draft)
+
+Default assessment history list to one newest row per ``as_of_trading_date`` (match
+chart dedupe), with optional show-all. See
+[docs/architecture/decisions/0306-phase-305-distinct-as-of-assessment-history.md](docs/architecture/decisions/0306-phase-305-distinct-as-of-assessment-history.md).
+
+### Phase 304 - NAS Live Verification of Phase 303
+
+Ops evidence gate after Phase 303 coverage-confidence history chart. Live verify passed
+2026-08-01 (``704ed4e``; ``list_count=100`` coverage ``chartable_points=76``). See
 [docs/architecture/decisions/0305-phase-304-nas-live-verify-phase-303.md](docs/architecture/decisions/0305-phase-304-nas-live-verify-phase-303.md).
+
+#### Added
+
+- ADR-0305: live coverage_confidence chart field-bundle evidence (checklist Phase 304 log).
+
+#### Explicitly out of scope
+
+Inventing assessments, orders.
 
 ### Phase 303 - Coverage Confidence History Chart
 

@@ -743,8 +743,10 @@ Phase 302 live-verified denser series (``chartable_points=77``; see
 Phase 303 adds a coverage-confidence history chart from the same list, labeled distinct
 from probability confidence (see
 [decisions/0304-phase-303-coverage-confidence-history-chart.md](decisions/0304-phase-303-coverage-confidence-history-chart.md)).
-Phase 304 (draft) live-verifies that chart on the NAS (see
+Phase 304 live-verified that chart (coverage ``chartable_points=76``; see
 [decisions/0305-phase-304-nas-live-verify-phase-303.md](decisions/0305-phase-304-nas-live-verify-phase-303.md)).
+Phase 305 (draft) proposes distinct-as_of assessment history list default (see
+[decisions/0306-phase-305-distinct-as-of-assessment-history.md](decisions/0306-phase-305-distinct-as-of-assessment-history.md)).
 
 ## System context
 

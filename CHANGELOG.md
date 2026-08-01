@@ -7,12 +7,33 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 306 - NAS Live Verification of Phase 305 (draft)
+### Phase 308 - NAS Live Verification of Phase 307 (draft)
 
-Ops evidence gate after Phase 305 distinct-as_of assessment history. See
+Ops evidence gate after Phase 307 labeling frontier readout. See
+[docs/architecture/decisions/0309-phase-308-nas-live-verify-phase-307.md](docs/architecture/decisions/0309-phase-308-nas-live-verify-phase-307.md).
+
+### Phase 307 - Labeling Frontier Readout (draft)
+
+Compact research-only tip labeling unlock readout from existing shortfall / required-end
+fields (calendar-bound product gap). See
+[docs/architecture/decisions/0308-phase-307-labeling-frontier-readout.md](docs/architecture/decisions/0308-phase-307-labeling-frontier-readout.md).
+
+### Phase 306 - NAS Live Verification of Phase 305
+
+Ops evidence gate after Phase 305 distinct-as_of assessment history. Live verify passed
+2026-08-01 (``9413364``; ``list_count=100`` ``distinct_as_of=75``
+``hidden_duplicates=25``). See
 [docs/architecture/decisions/0307-phase-306-nas-live-verify-phase-305.md](docs/architecture/decisions/0307-phase-306-nas-live-verify-phase-305.md).
 
-### Phase 305 - Distinct-as-of Assessment History
+#### Added
+
+- ADR-0307: live distinct-as_of history count evidence (checklist Phase 306 log).
+
+#### Explicitly out of scope
+
+Inventing assessments, orders.
+
+### Phase 305 - Distinct-as_of Assessment History
 
 Default assessment history list to one newest row per ``as_of_trading_date`` (match
 chart dedupe), with optional show-all. See

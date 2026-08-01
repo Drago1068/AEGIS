@@ -748,8 +748,12 @@ Phase 304 live-verified that chart (coverage ``chartable_points=76``; see
 Phase 305 defaults assessment history list to distinct ``as_of`` rows with optional
 show-all (see
 [decisions/0306-phase-305-distinct-as-of-assessment-history.md](decisions/0306-phase-305-distinct-as-of-assessment-history.md)).
-Phase 306 (draft) live-verifies that list mode on the NAS (see
+Phase 306 live-verified that list mode (``distinct_as_of=75`` / ``hidden_duplicates=25``;
+see
 [decisions/0307-phase-306-nas-live-verify-phase-305.md](decisions/0307-phase-306-nas-live-verify-phase-305.md)).
+Phase 307 (draft) proposes a labeling frontier readout from existing shortfall fields
+(see
+[decisions/0308-phase-307-labeling-frontier-readout.md](decisions/0308-phase-307-labeling-frontier-readout.md)).
 
 ## System context
 

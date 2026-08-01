@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 334 - NAS Live Verification of Phase 333 (draft)
+### Phase 336 - NAS Live Verification of Phase 335 (draft)
 
-Ops evidence gate after Phase 333 tip-not-ready CTA. See
+Ops evidence gate after Phase 335 partial-labeled upgrade CTA. See
+[docs/architecture/decisions/0337-phase-336-nas-live-verify-phase-335.md](docs/architecture/decisions/0337-phase-336-nas-live-verify-phase-335.md).
+
+### Phase 335 - Partial-Labeled Upgrade CTA
+
+Elevate Backfill outcome labels CTA on the partial-labeled upgrade callout. See
+[docs/architecture/decisions/0336-phase-335-partial-labeled-upgrade-cta.md](docs/architecture/decisions/0336-phase-335-partial-labeled-upgrade-cta.md).
+
+#### Added
+
+- ADR-0336: partial-labeled callout CTA pointing at ``Backfill outcome labels``
+  (no auto-run; existing fields only).
+- ``evidence-partial-labeled-upgrade-callout-cta`` UI + vitest; ``verify.ps1`` Phase 336 log.
+
+#### Explicitly out of scope
+
+Auto-backfill, inventing bars, orders.
+
+### Phase 334 - NAS Live Verification of Phase 333
+
+Ops evidence gate after Phase 333 tip-not-ready CTA. Live verify passed 2026-08-01
+(``ccdadbe``; tip_ready=False elevates CTA). See
 [docs/architecture/decisions/0335-phase-334-nas-live-verify-phase-333.md](docs/architecture/decisions/0335-phase-334-nas-live-verify-phase-333.md).
+
+#### Added
+
+- ADR-0335: live tip-not-ready CTA evidence (checklist Phase 334 log).
+
+#### Explicitly out of scope
+
+Auto-labeling, inventing bars, orders.
 
 ### Phase 333 - Tip-Not-Ready Ready-Horizon CTA
 

@@ -326,10 +326,13 @@ export function ResearchEvidenceSummarySection({
                     labeled_assessment_count={evidenceSummary.labeled_assessment_count}
                   </li>
                 ) : null}
+                <li data-testid="evidence-partial-labeled-upgrade-callout-cta">
+                  use_toolbar=Backfill outcome labels
+                </li>
               </ul>
               <p className="mt-1 text-xs text-aegis-muted">
-                Eligible for append-only full-horizon backfill once max horizon unlocks;
-                not auto-run; not a signal or recommendation.
+                Opt-in only via existing toolbar action once max horizon unlocks; not
+                auto-run; not a signal or recommendation.
               </p>
             </aside>
           ) : null}

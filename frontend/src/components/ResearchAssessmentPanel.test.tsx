@@ -1023,6 +1023,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-partial-labeled-upgrade-callout-labeled"),
       ).toHaveTextContent("labeled_assessment_count=1");
+      expect(screen.getByTestId("evidence-partial-labeled-upgrade-callout-cta")).toHaveTextContent(
+        "use_toolbar=Backfill outcome labels",
+      );
       expect(
         screen.getByTestId("evidence-latest-assessment-label-block-reason"),
       ).toHaveTextContent("insufficient_forward_bars");

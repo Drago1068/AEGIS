@@ -32,3 +32,4 @@ Auto-labeling, inventing bars, orders, changing shortfall math, changing unlock 
 - [0284-phase-283-latest-label-readiness-callout.md](0284-phase-283-latest-label-readiness-callout.md)
 - [0322-phase-321-min-horizon-unlock-cta.md](0322-phase-321-min-horizon-unlock-cta.md)
 - [0335-phase-334-nas-live-verify-phase-333.md](0335-phase-334-nas-live-verify-phase-333.md)
+- [0336-phase-335-partial-labeled-upgrade-cta.md](0336-phase-335-partial-labeled-upgrade-cta.md)

@@ -813,8 +813,13 @@ Phase 332 live-verified that CTA (see
 [decisions/0333-phase-332-nas-live-verify-phase-331.md](decisions/0333-phase-332-nas-live-verify-phase-331.md)).
 Phase 333 elevates a tip-not-ready CTA pointing at ``Compute ready-horizon labels`` (see
 [decisions/0334-phase-333-tip-not-ready-cta.md](decisions/0334-phase-333-tip-not-ready-cta.md)).
-Phase 334 (draft) is the NAS live-verify gate for that CTA (see
+Phase 334 live-verified that CTA (see
 [decisions/0335-phase-334-nas-live-verify-phase-333.md](decisions/0335-phase-334-nas-live-verify-phase-333.md)).
+Phase 335 elevates a partial-labeled upgrade CTA pointing at ``Backfill outcome labels``
+(see
+[decisions/0336-phase-335-partial-labeled-upgrade-cta.md](decisions/0336-phase-335-partial-labeled-upgrade-cta.md)).
+Phase 336 (draft) is the NAS live-verify gate for that CTA (see
+[decisions/0337-phase-336-nas-live-verify-phase-335.md](decisions/0337-phase-336-nas-live-verify-phase-335.md)).
 
 ## System context
 

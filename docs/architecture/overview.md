@@ -794,8 +794,8 @@ Phase 323 elevates a full-horizon outcome-label CTA when tip is label-ready but 
 [decisions/0324-phase-323-full-horizon-unlock-cta.md](decisions/0324-phase-323-full-horizon-unlock-cta.md)).
 Phase 324 live-verified that CTA (see
 [decisions/0325-phase-324-nas-live-verify-phase-323.md](decisions/0325-phase-324-nas-live-verify-phase-323.md)).
-Phase 325 (draft) would elevate a mixed-unlabeled backlog CTA pointing at existing
-backfill toolbar actions (see
+Phase 325 elevates a mixed-unlabeled backlog CTA pointing at existing backfill toolbar
+actions (see
 [decisions/0326-phase-325-mixed-unlabeled-backlog-cta.md](decisions/0326-phase-325-mixed-unlabeled-backlog-cta.md)).
 Phase 326 (draft) is the NAS live-verify gate for that CTA (see
 [decisions/0327-phase-326-nas-live-verify-phase-325.md](decisions/0327-phase-326-nas-live-verify-phase-325.md)).

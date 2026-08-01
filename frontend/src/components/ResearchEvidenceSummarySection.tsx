@@ -280,9 +280,13 @@ export function ResearchEvidenceSummarySection({
                     {evidenceSummary.latest_mixed_label_bar_source}
                   </li>
                 ) : null}
+                <li data-testid="evidence-mixed-unlabeled-backlog-callout-cta">
+                  use_toolbar=Backfill outcome labels
+                </li>
               </ul>
               <p className="mt-1 text-xs text-aegis-muted">
-                Fail-closed: backlog is diagnostic only; not a signal or recommendation.
+                Opt-in only via existing toolbar action; not auto-run; not a signal or
+                recommendation.
               </p>
             </aside>
           ) : null}

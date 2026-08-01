@@ -996,6 +996,10 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-mixed-unlabeled-backlog-callout-label-bar-source"),
       ).toHaveTextContent("latest_mixed_label_bar_source=alpha_vantage");
+      expect(screen.getByTestId("evidence-mixed-unlabeled-backlog-callout-cta")).toHaveTextContent(
+        "use_toolbar=Backfill outcome labels",
+      );
+      expect(screen.getByTestId("backfill-outcome-labels")).toBeInTheDocument();
       expect(
         screen.getByTestId("evidence-partial-labeled-upgrade-callout"),
       ).toBeInTheDocument();

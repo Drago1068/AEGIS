@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 325 mixed-unlabeled backlog CTA. See
 [docs/architecture/decisions/0327-phase-326-nas-live-verify-phase-325.md](docs/architecture/decisions/0327-phase-326-nas-live-verify-phase-325.md).
 
-### Phase 325 - Mixed-Unlabeled Backlog CTA (draft)
+### Phase 325 - Mixed-Unlabeled Backlog CTA
 
 Elevate backfill CTA on the mixed-unlabeled backlog callout. See
 [docs/architecture/decisions/0326-phase-325-mixed-unlabeled-backlog-cta.md](docs/architecture/decisions/0326-phase-325-mixed-unlabeled-backlog-cta.md).
+
+#### Added
+
+- ADR-0326: mixed-unlabeled callout CTA pointing at ``Backfill outcome labels``
+  (no auto-run; existing fields only).
+- ``evidence-mixed-unlabeled-backlog-callout-cta`` UI + vitest; ``verify.ps1`` Phase 326 log.
+
+#### Explicitly out of scope
+
+Auto-backfill, inventing bars, orders, changing backfill semantics.
 
 ### Phase 324 - NAS Live Verification of Phase 323
 

@@ -31,3 +31,4 @@ Auto-labeling, inventing bars, orders, changing backfill, ready-horizons CTA cha
 - [0323-phase-322-nas-live-verify-phase-321.md](0323-phase-322-nas-live-verify-phase-321.md)
 - [0322-phase-321-min-horizon-unlock-cta.md](0322-phase-321-min-horizon-unlock-cta.md)
 - [0325-phase-324-nas-live-verify-phase-323.md](0325-phase-324-nas-live-verify-phase-323.md)
+- [0326-phase-325-mixed-unlabeled-backlog-cta.md](0326-phase-325-mixed-unlabeled-backlog-cta.md)

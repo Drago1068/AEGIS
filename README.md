@@ -7,8 +7,8 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phases 323–324 closed (full-horizon unlock CTA + NAS verify).**
-Next: Phase 325 mixed-unlabeled backlog CTA (ADR-0326). See
+**Current phase: Phase 325 closed (mixed-unlabeled backlog CTA).**
+Next: Phase 326 NAS live verify (ADR-0327). See
 [docs/architecture/decisions/0326-phase-325-mixed-unlabeled-backlog-cta.md](docs/architecture/decisions/0326-phase-325-mixed-unlabeled-backlog-cta.md),
 [docs/architecture/decisions/0327-phase-326-nas-live-verify-phase-325.md](docs/architecture/decisions/0327-phase-326-nas-live-verify-phase-325.md),
 and [CHANGELOG.md](CHANGELOG.md).

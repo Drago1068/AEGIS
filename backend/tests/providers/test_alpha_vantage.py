@@ -167,3 +167,68 @@ async def test_fetch_daily_bars_raises_rate_limit_on_information() -> None:
 
     with pytest.raises(ProviderRateLimitError):
         await provider.fetch_daily_bars("AAPL")
+
+
+@pytest.mark.asyncio
+async def test_fetch_daily_bars_retries_compact_when_full_premium_gated() -> None:
+    """ADR-0274: full premium gate falls back to compact with labeled provenance."""
+
+    premium = {
+        "Information": (
+            "Thank you for using Alpha Vantage! The outputsize=full parameter value is a "
+            "premium feature for the TIME_SERIES_DAILY endpoint."
+        )
+    }
+    seen_sizes: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        size = request.url.params.get("outputsize", "")
+        seen_sizes.append(size)
+        if size == "full":
+            return httpx.Response(200, json=premium)
+        return httpx.Response(200, json=_VALID_BODY)
+
+    provider = _make_provider(
+        handler,
+        settings=Settings(
+            environment="test",
+            alpha_vantage_api_key="test-key",
+            daily_bar_output_size="full",
+        ),
+    )
+
+    bars = await provider.fetch_daily_bars("AAPL")
+
+    assert seen_sizes == ["full", "compact"]
+    assert [bar.trading_date for bar in bars] == [date(2024, 1, 1), date(2024, 1, 2)]
+    assert bars[-1].raw_payload["aegis_output_size"] == "compact"
+    assert bars[-1].raw_payload["aegis_fetch_fallback"] == "full_to_compact"
+
+
+@pytest.mark.asyncio
+async def test_fetch_daily_bars_does_not_retry_compact_when_already_compact() -> None:
+    body = {
+        "Note": (
+            "Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls "
+            "per minute."
+        )
+    }
+    seen_sizes: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen_sizes.append(request.url.params.get("outputsize", ""))
+        return httpx.Response(200, json=body)
+
+    provider = _make_provider(
+        handler,
+        settings=Settings(
+            environment="test",
+            alpha_vantage_api_key="test-key",
+            daily_bar_output_size="compact",
+        ),
+    )
+
+    with pytest.raises(ProviderRateLimitError, match="rate limit"):
+        await provider.fetch_daily_bars("AAPL")
+
+    assert seen_sizes == ["compact"]

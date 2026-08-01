@@ -5,10 +5,15 @@ implementation. Alpha Vantage returns HTTP 200 even when it is reporting an erro
 symbol, rate limit, or a premium-tier gate), so this adapter inspects the response body for
 those shapes and raises a typed error instead of letting a caller mistake an error body for an
 empty (but valid) result.
+
+Phase 273 (ADR-0274): when ``daily_bar_output_size=full`` hits a premium/rate-limit gate,
+retry once with ``compact`` so recent primary closes can advance the tip. Compact-fallback
+bars are labeled in ``raw_payload`` (never invent closes; never swap provenance).
 """
 
 from __future__ import annotations
 
+import logging
 from datetime import date
 from decimal import Decimal, InvalidOperation
 from typing import Any, cast
@@ -35,6 +40,11 @@ _FIELD_LOW = "3. low"
 _FIELD_CLOSE = "4. close"
 _FIELD_VOLUME = "5. volume"
 
+_FALLBACK_OUTPUT_SIZE = "compact"
+_FALLBACK_LABEL = "full_to_compact"
+
+logger = logging.getLogger(__name__)
+
 
 class AlphaVantageProvider:
     """Fetches daily bars from Alpha Vantage over HTTP.
@@ -56,9 +66,23 @@ class AlphaVantageProvider:
             ProviderError: the response body could not be parsed, or Alpha Vantage reported a
                 non-rate-limit error.
             ProviderRateLimitError: Alpha Vantage reported a rate limit or premium-tier gate
-                in the JSON body (or via HTTP 429).
+                in the JSON body (or via HTTP 429), including after a compact fallback attempt.
         """
 
+        output_size = self._settings.daily_bar_output_size
+        try:
+            return await self._fetch_daily_bars(symbol, output_size=output_size)
+        except ProviderRateLimitError:
+            if output_size != "full":
+                raise
+            logger.warning(
+                "alpha_vantage_full_premium_or_rate_limit_retry_compact",
+                extra={"symbol": symbol, "configured_output_size": output_size},
+            )
+            bars = await self._fetch_daily_bars(symbol, output_size=_FALLBACK_OUTPUT_SIZE)
+            return [_with_compact_fallback_label(bar) for bar in bars]
+
+    async def _fetch_daily_bars(self, symbol: str, *, output_size: str) -> list[DailyBar]:
         if not self._settings.alpha_vantage_api_key:
             raise ProviderUnavailableError("Alpha Vantage API key is not configured")
 
@@ -68,7 +92,7 @@ class AlphaVantageProvider:
                 params={
                     "function": _FUNCTION,
                     "symbol": symbol,
-                    "outputsize": self._settings.daily_bar_output_size,
+                    "outputsize": output_size,
                     "apikey": self._settings.alpha_vantage_api_key,
                 },
             )
@@ -112,6 +136,25 @@ class AlphaVantageProvider:
         ]
         bars.sort(key=lambda bar: bar.trading_date)
         return bars
+
+
+def _with_compact_fallback_label(bar: DailyBar) -> DailyBar:
+    """Mark bars fetched via full→compact fallback for audit (ADR-0274)."""
+
+    return DailyBar(
+        symbol=bar.symbol,
+        trading_date=bar.trading_date,
+        open=bar.open,
+        high=bar.high,
+        low=bar.low,
+        close=bar.close,
+        volume=bar.volume,
+        raw_payload={
+            **bar.raw_payload,
+            "aegis_output_size": _FALLBACK_OUTPUT_SIZE,
+            "aegis_fetch_fallback": _FALLBACK_LABEL,
+        },
+    )
 
 
 def _raise_for_error_body(payload: dict[str, Any], symbol: str) -> None:

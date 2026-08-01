@@ -669,8 +669,12 @@ Phase 270 live-verified tip ``2026-07-31`` catch-up (see
 [decisions/0271-phase-270-nas-live-verify-phase-269.md](decisions/0271-phase-270-nas-live-verify-phase-269.md)).
 Phase 271 fixes verify logging so lag ``0`` is not shown as null (see
 [decisions/0272-phase-271-fix-verify-lag-zero-as-null.md](decisions/0272-phase-271-fix-verify-lag-zero-as-null.md)).
-Phase 272 (draft) live-verifies that display (see
+Phase 272 live-verified ``post_lag=0`` with tip ``2026-07-31`` (see
 [decisions/0273-phase-272-nas-live-verify-phase-271.md](decisions/0273-phase-272-nas-live-verify-phase-271.md)).
+Phase 273 retries Alpha Vantage ``compact`` when ``full`` is premium-gated (see
+[decisions/0274-phase-273-primary-tip-catch-up-compact.md](decisions/0274-phase-273-primary-tip-catch-up-compact.md)).
+Phase 274 (draft) live-verifies primary tip catch-up (see
+[decisions/0275-phase-274-nas-live-verify-phase-273.md](decisions/0275-phase-274-nas-live-verify-phase-273.md)).
 
 ## System context
 

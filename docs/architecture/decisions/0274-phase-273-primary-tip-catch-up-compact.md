@@ -1,41 +1,47 @@
-# ADR-0274: Phase 273 Primary Tip Catch-Up When Full Output Is Premium-Gated (draft)
+# ADR-0274: Phase 273 Primary Tip Catch-Up When Full Output Is Premium-Gated
 
-- Status: Proposed (ready after Phase 272; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
 Phases 269–272 closed Polygon tip catch-up (``/prev``) and truthful lag=0 display. Live
-AAPL still shows ``primary_latest_trading_date=2026-07-29`` while polygon tip is
-``2026-07-31``. Alpha Vantage ``outputsize=full`` remains premium-gated (rate-limit /
-failover), so primary store tip lags even when compact daily history might expose a newer
-primary close.
+AAPL still showed ``primary_latest_trading_date=2026-07-29`` while polygon tip was
+``2026-07-31``. Alpha Vantage ``outputsize=full`` is premium-gated on free keys, so the
+primary fetch failed and only the stored primary tip surfaced (ADR-0266) even when
+``compact`` daily history would expose newer real AV closes.
 
-Prefer a fail-closed primary tip catch-up (compact retry or equivalent real AV closes)
-over inventing primary bars from polygon.
+Prefer a fail-closed compact retry with labeled provenance over inventing primary bars
+from polygon.
 
-## Decisions (proposed)
+## Decisions
 
-### 1. Fail-closed primary tip
+### 1. Compact fallback on full gate
 
-When primary ``full`` fetch fails with a premium/rate-limit gate, attempt a compact
-primary fetch (or documented equivalent) solely to advance primary tip with real AV
-closes. Never copy polygon closes onto ``alpha_vantage`` provenance.
+When ``daily_bar_output_size=full`` and Alpha Vantage raises ``ProviderRateLimitError``
+(premium gate or throttle), ``AlphaVantageProvider`` retries once with ``compact``.
+Successful compact bars keep ``source=alpha_vantage`` and add audit labels in
+``raw_payload``:
+
+- ``aegis_output_size=compact``
+- ``aegis_fetch_fallback=full_to_compact``
+
+If compact also fails, the original rate-limit error path remains (secondary / stored
+primary tip fallback unchanged). Never copy polygon closes onto alpha_vantage.
 
 ### 2. Out of scope
 
 Inventing closes, silent provenance swaps, default-on calibration, orders.
 
-## Resume (after Phase 272 gate)
+## Consequences
 
-```powershell
-# Primary tip catch-up when AV full is premium-gated (ADR-0274); tests; commit+push; then Phase 274:
-# git archive HEAD → NAS; rebuild backend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+- Primary tip can advance with real AV compact closes when full is gated.
+- Operators can audit fallback via stored ``raw_payload`` labels and structured logs.
+- Phase 274 live-verifies under lab TLS.
 
 ## Related documents
 
 - [0273-phase-272-nas-live-verify-phase-271.md](0273-phase-272-nas-live-verify-phase-271.md)
 - [0275-phase-274-nas-live-verify-phase-273.md](0275-phase-274-nas-live-verify-phase-273.md)
 - [0266-phase-265-stored-primary-tip-fallback.md](0266-phase-265-stored-primary-tip-fallback.md)
+- [0002-phase-1-market-data-foundation.md](0002-phase-1-market-data-foundation.md)

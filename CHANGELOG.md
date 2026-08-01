@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 273 primary tip catch-up. See
 [docs/architecture/decisions/0275-phase-274-nas-live-verify-phase-273.md](docs/architecture/decisions/0275-phase-274-nas-live-verify-phase-273.md).
 
-### Phase 273 - Primary Tip Catch-Up When Full Output Is Premium-Gated (draft)
+### Phase 273 - Primary Tip Catch-Up When Full Output Is Premium-Gated
 
-When AV ``full`` is premium-gated, catch up primary tip with real compact closes. See
+When AV ``full`` is premium-gated, retry ``compact`` with labeled provenance. See
 [docs/architecture/decisions/0274-phase-273-primary-tip-catch-up-compact.md](docs/architecture/decisions/0274-phase-273-primary-tip-catch-up-compact.md).
+
+#### Added
+
+- ``AlphaVantageProvider`` full→compact fallback; ``raw_payload`` audit labels;
+  unit tests.
+
+#### Explicitly out of scope
+
+Inventing closes, silent provenance swaps, calibration default-on, orders.
 
 ### Phase 272 - NAS Live Verification of Phase 271
 

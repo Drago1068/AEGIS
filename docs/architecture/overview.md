@@ -773,8 +773,13 @@ Phase 314 live-verified that upgrade path (see
 [decisions/0315-phase-314-nas-live-verify-phase-313.md](decisions/0315-phase-314-nas-live-verify-phase-313.md)).
 Phase 315 splits evidence-summary labeled counts into complete vs partial (see
 [decisions/0316-phase-315-partial-complete-label-coverage.md](decisions/0316-phase-315-partial-complete-label-coverage.md)).
-Phase 316 (draft) is the NAS live-verify gate for those counts (see
+Phase 316 live-verified those counts (``complete=67`` ``partial=0``; see
 [decisions/0317-phase-316-nas-live-verify-phase-315.md](decisions/0317-phase-316-nas-live-verify-phase-315.md)).
+Phase 317 (draft) would elevate a labeling-diagnostics callout when partial labeled count
+is greater than zero (see
+[decisions/0318-phase-317-partial-label-upgrade-callout.md](decisions/0318-phase-317-partial-label-upgrade-callout.md)).
+Phase 318 (draft) is the NAS live-verify gate for that callout (see
+[decisions/0319-phase-318-nas-live-verify-phase-317.md](decisions/0319-phase-318-nas-live-verify-phase-317.md)).
 
 ## System context
 

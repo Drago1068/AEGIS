@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 316 - NAS Live Verification of Phase 315 (draft)
+### Phase 318 - NAS Live Verification of Phase 317 (draft)
 
-Ops evidence gate after Phase 315 partial/complete label coverage counts. See
+Ops evidence gate after Phase 317 partial-label upgrade backlog callout. See
+[docs/architecture/decisions/0319-phase-318-nas-live-verify-phase-317.md](docs/architecture/decisions/0319-phase-318-nas-live-verify-phase-317.md).
+
+### Phase 317 - Partial-Label Upgrade Backlog Callout (draft)
+
+Elevate labeling diagnostics when ``partial_labeled_assessment_count > 0``. See
+[docs/architecture/decisions/0318-phase-317-partial-label-upgrade-callout.md](docs/architecture/decisions/0318-phase-317-partial-label-upgrade-callout.md).
+
+### Phase 316 - NAS Live Verification of Phase 315
+
+Ops evidence gate after Phase 315 partial/complete label coverage counts. Live verify
+passed 2026-08-01 (``2ad567e``; ``complete=67`` ``partial=0`` ``labeled=67``). See
 [docs/architecture/decisions/0317-phase-316-nas-live-verify-phase-315.md](docs/architecture/decisions/0317-phase-316-nas-live-verify-phase-315.md).
+
+#### Added
+
+- ADR-0317: live complete/partial labeled coverage evidence (checklist Phase 316 log).
+
+#### Explicitly out of scope
+
+Inventing bars, orders.
 
 ### Phase 315 - Partial vs Complete Label Coverage Counts
 

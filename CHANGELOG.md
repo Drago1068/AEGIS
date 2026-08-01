@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 317 partial-label upgrade backlog callout. See
 [docs/architecture/decisions/0319-phase-318-nas-live-verify-phase-317.md](docs/architecture/decisions/0319-phase-318-nas-live-verify-phase-317.md).
 
-### Phase 317 - Partial-Label Upgrade Backlog Callout (draft)
+### Phase 317 - Partial-Label Upgrade Backlog Callout
 
 Elevate labeling diagnostics when ``partial_labeled_assessment_count > 0``. See
 [docs/architecture/decisions/0318-phase-317-partial-label-upgrade-callout.md](docs/architecture/decisions/0318-phase-317-partial-label-upgrade-callout.md).
+
+#### Added
+
+- Labeling-diagnostics callout from existing complete/partial/labeled counts; UI tests;
+  ``verify.ps1`` Phase 318 field-bundle log + diagnostics trigger.
+
+#### Explicitly out of scope
+
+New API scalars, inventing bars, auto upgrade, orders.
 
 ### Phase 316 - NAS Live Verification of Phase 315
 

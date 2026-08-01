@@ -1,36 +1,27 @@
-# ADR-0318: Phase 317 Partial-Label Upgrade Backlog Callout (draft)
+# ADR-0318: Phase 317 Partial-Label Upgrade Backlog Callout
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
 
-Phase 315–316 exposed ``partial_labeled_assessment_count`` on evidence-summary. Live AAPL
-currently shows ``partial=0`` in the ≤100 scan (ready-horizons partials may have scrolled
-out), but when partials are present operators still need an elevated labeling-diagnostics
-callout so the upgrade backlog is not missed among dense summary fields.
+Phase 315–316 exposed ``partial_labeled_assessment_count`` on evidence-summary. When
+partials are present operators need an elevated labeling-diagnostics callout so the
+upgrade backlog is not missed among dense summary fields.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. Diagnostics callout
 
 - When ``partial_labeled_assessment_count > 0``, surface a research-only callout inside the
   existing labeling-diagnostics group (same pattern as mixed-unlabeled / freshness lag).
 - Copy states upgrade eligibility once max horizon unlocks; no auto-run.
-- Keep counts as the source of truth; callout is display-only.
+- Counts remain the source of truth; callout is display-only from existing fields.
 
 ### 2. Out of scope
 
 Inventing bars, auto full-horizon upgrade, changing backfill selection, orders,
-expanding the ≤100 scan window.
-
-## Resume
-
-```powershell
-# Implement Phase 317 partial-label upgrade backlog callout; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild frontend (+ backend if needed); then:
-.\docker\nas\scripts\verify.ps1
-```
+expanding the ≤100 scan window, new API scalars.
 
 ## Related documents
 

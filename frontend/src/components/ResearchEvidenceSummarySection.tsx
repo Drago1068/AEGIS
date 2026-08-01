@@ -32,11 +32,17 @@ export function ResearchEvidenceSummarySection({
     typeof mixedUnlabeledCount === "number" &&
     Number.isFinite(mixedUnlabeledCount) &&
     mixedUnlabeledCount > 0;
+  const partialLabeledCount = evidenceSummary.partial_labeled_assessment_count;
+  const showPartialLabeledUpgradeCallout =
+    typeof partialLabeledCount === "number" &&
+    Number.isFinite(partialLabeledCount) &&
+    partialLabeledCount > 0;
   const labelingActiveCalloutCount =
     Number(showLabelReadinessCallout) +
     Number(showLabeledFreshnessLagCallout) +
     Number(showUnlabeledLabelReadyEmptyCallout) +
-    Number(showMixedUnlabeledBacklogCallout);
+    Number(showMixedUnlabeledBacklogCallout) +
+    Number(showPartialLabeledUpgradeCallout);
   const showLabelingDiagnostics = labelingActiveCalloutCount > 0;
   const primaryFetchFallback = evidenceSummary.latest_primary_fetch_fallback;
   const showPrimaryFetchFallbackCallout =
@@ -266,6 +272,37 @@ export function ResearchEvidenceSummarySection({
               </ul>
               <p className="mt-1 text-xs text-aegis-muted">
                 Fail-closed: backlog is diagnostic only; not a signal or recommendation.
+              </p>
+            </aside>
+          ) : null}
+          {showPartialLabeledUpgradeCallout ? (
+            <aside
+              className="rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+              role="status"
+              data-testid="evidence-partial-labeled-upgrade-callout"
+            >
+              <p className="font-semibold text-aegis-warn">
+                Partial-horizon labels await full-horizon upgrade (research-only)
+              </p>
+              <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+                <li data-testid="evidence-partial-labeled-upgrade-callout-count">
+                  partial_labeled_assessment_count={partialLabeledCount}
+                </li>
+                {evidenceSummary.complete_labeled_assessment_count != null ? (
+                  <li data-testid="evidence-partial-labeled-upgrade-callout-complete">
+                    complete_labeled_assessment_count=
+                    {evidenceSummary.complete_labeled_assessment_count}
+                  </li>
+                ) : null}
+                {evidenceSummary.labeled_assessment_count != null ? (
+                  <li data-testid="evidence-partial-labeled-upgrade-callout-labeled">
+                    labeled_assessment_count={evidenceSummary.labeled_assessment_count}
+                  </li>
+                ) : null}
+              </ul>
+              <p className="mt-1 text-xs text-aegis-muted">
+                Eligible for append-only full-horizon backfill once max horizon unlocks;
+                not auto-run; not a signal or recommendation.
               </p>
             </aside>
           ) : null}

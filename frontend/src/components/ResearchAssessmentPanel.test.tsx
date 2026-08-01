@@ -252,6 +252,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.queryByTestId("evidence-labeled-freshness-lag-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-unlabeled-label-ready-empty-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-mixed-unlabeled-backlog-callout")).toBeNull();
+    expect(screen.queryByTestId("evidence-partial-labeled-upgrade-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-primary-fetch-fallback-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics-active-count")).toBeNull();
@@ -799,7 +800,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("evidence-labeling-diagnostics")).toHaveAttribute("open");
       expect(
         screen.getByTestId("evidence-labeling-diagnostics-active-count"),
-      ).toHaveTextContent("· 4 active");
+      ).toHaveTextContent("· 5 active");
       expect(
         screen.getByTestId("evidence-label-readiness-callout-block-reason"),
       ).toHaveTextContent("block_reason=insufficient_forward_bars");
@@ -863,6 +864,18 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-mixed-unlabeled-backlog-callout-label-bar-source"),
       ).toHaveTextContent("latest_mixed_label_bar_source=alpha_vantage");
+      expect(
+        screen.getByTestId("evidence-partial-labeled-upgrade-callout"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByTestId("evidence-partial-labeled-upgrade-callout-count"),
+      ).toHaveTextContent("partial_labeled_assessment_count=1");
+      expect(
+        screen.getByTestId("evidence-partial-labeled-upgrade-callout-complete"),
+      ).toHaveTextContent("complete_labeled_assessment_count=0");
+      expect(
+        screen.getByTestId("evidence-partial-labeled-upgrade-callout-labeled"),
+      ).toHaveTextContent("labeled_assessment_count=1");
       expect(
         screen.getByTestId("evidence-latest-assessment-label-block-reason"),
       ).toHaveTextContent("insufficient_forward_bars");

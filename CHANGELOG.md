@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 262 - NAS Live Verification of Phase 261 (draft)
+### Phase 264 - NAS Live Verification of Phase 263 (draft)
 
-Ops evidence gate after Phase 261 provider-tip-ahead-of-store fix. See
+Ops evidence gate after Phase 263 ingest primary tip diagnostic. See
+[docs/architecture/decisions/0265-phase-264-nas-live-verify-phase-263.md](docs/architecture/decisions/0265-phase-264-nas-live-verify-phase-263.md).
+
+### Phase 263 - Ingest Primary Tip Diagnostic (draft)
+
+Surface primary tip beside winning ingest tip when dual-source tips diverge. See
+[docs/architecture/decisions/0264-phase-263-ingest-primary-tip-diagnostic.md](docs/architecture/decisions/0264-phase-263-ingest-primary-tip-diagnostic.md).
+
+### Phase 262 - NAS Live Verification of Phase 261
+
+Ops evidence gate after Phase 261 tip fix. Live verify passed 2026-07-31 (``d092cf2``;
+AAPL tip advanced ``2026-07-29`` → ``2026-07-30``, lag ``2`` → ``1``, tip source
+``polygon``). See
 [docs/architecture/decisions/0263-phase-262-nas-live-verify-phase-261.md](docs/architecture/decisions/0263-phase-262-nas-live-verify-phase-261.md).
+
+#### Added
+
+- ADR-0263: live tip refresh evidence for dual-source / cross-source fill fix.
+
+#### Explicitly out of scope
+
+Inventing closes, default-on calibration, orders.
 
 ### Phase 261 - Provider Tip Ahead of Store Tip
 

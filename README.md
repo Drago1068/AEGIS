@@ -7,11 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 261 shipped (provider tip ahead of store tip).** Next: Phase 262 NAS
-live verify (ADR-0263). Dual-source ingest tip catch-up + cross-source fill tip extension;
-never invent closes. See
-[docs/architecture/decisions/0262-phase-261-provider-tip-ahead-of-store.md](docs/architecture/decisions/0262-phase-261-provider-tip-ahead-of-store.md),
+**Current phase: Phase 262 closed (tip fix live-verified).** Next (draft): Phase 263 ingest
+primary tip diagnostic (ADR-0264), then Phase 264 NAS verify. Prefer primary-vs-winning tip
+attribution over further unlock scalars / UI modularization. See
 [docs/architecture/decisions/0263-phase-262-nas-live-verify-phase-261.md](docs/architecture/decisions/0263-phase-262-nas-live-verify-phase-261.md),
+[docs/architecture/decisions/0264-phase-263-ingest-primary-tip-diagnostic.md](docs/architecture/decisions/0264-phase-263-ingest-primary-tip-diagnostic.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

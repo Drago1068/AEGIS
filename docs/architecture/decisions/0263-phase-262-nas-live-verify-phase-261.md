@@ -1,32 +1,33 @@
-# ADR-0263: Phase 262 NAS Live Verification of Phase 261 (draft)
+# ADR-0263: Phase 262 NAS Live Verification of Phase 261
 
-- Status: Proposed (pending Phase 261 + live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
-Phase 261 would reconcile provider tip ahead of store tip (ADR-0262). Operators need a
-verified backend redeploy under lab TLS after that lands.
+Phase 261 dual-source ingest tip catch-up and cross-source fill tip extension (ADR-0262)
+needed live evidence under lab TLS.
 
 ## Decisions
 
-### 1. Scope
+### 1. Scope completed
 
-1. Deploy ``HEAD`` TLS; recreate backend (frontend if changed).
-2. ``verify.ps1`` pass; ingest + evidence-summary show tip behavior consistent with the fix
-   (provider tip / store tip / lag logged; never invent).
+1. Deployed ``d092cf2`` TLS; rebuilt backend + frontend.
+2. ``verify.ps1`` passed.
 3. Alembic ``0009`` / ``head``.
 
-### 2. Upload ≠ verified
+### 2. Live evidence (AAPL)
 
-Retain live verify stdout.
+- Ingest: ``stored=0 skipped_existing=500 latest_trading_date=2026-07-30
+  latest_trading_date_source=polygon``.
+- Tip refresh: ``pre_lag=2 post_lag=1 pre_tip=2026-07-29 post_tip=2026-07-30
+  pre_as_of=2026-07-29 post_as_of=2026-07-30``.
+- Provider tip advanced store / assessment tip without inventing closes. Remaining lag=1
+  is fail-closed (expected session ahead of stored tip).
 
-## Resume
+### 3. Upload ≠ verified
 
-```powershell
-# After Phase 261 on HEAD: git archive → NAS; rebuild backend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+Retain verify stdout as acceptance evidence.
 
 ## Related documents
 

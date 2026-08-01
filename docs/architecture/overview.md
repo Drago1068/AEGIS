@@ -764,8 +764,10 @@ see
 [decisions/0311-phase-310-nas-live-verify-phase-309.md](decisions/0311-phase-310-nas-live-verify-phase-309.md)).
 Phase 311 adds ready-horizons backfill for unlabeled historical assessments (see
 [decisions/0312-phase-311-ready-horizons-backfill.md](decisions/0312-phase-311-ready-horizons-backfill.md)).
-Phase 312 (draft) is the NAS live-verify gate for that backfill (see
+Phase 312 live-verified that backfill (``persisted=15``; see
 [decisions/0313-phase-312-nas-live-verify-phase-311.md](decisions/0313-phase-312-nas-live-verify-phase-311.md)).
+Phase 313 (draft) proposes full-horizon upgrade eligibility for partial labels (see
+[decisions/0314-phase-313-full-horizon-upgrade-backfill.md](decisions/0314-phase-313-full-horizon-upgrade-backfill.md)).
 
 ## System context
 

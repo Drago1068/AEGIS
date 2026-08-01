@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 312 - NAS Live Verification of Phase 311 (draft)
+### Phase 314 - NAS Live Verification of Phase 313 (draft)
 
-Ops evidence gate after Phase 311 ready-horizons backfill. See
+Ops evidence gate after Phase 313 full-horizon upgrade backfill. See
+[docs/architecture/decisions/0315-phase-314-nas-live-verify-phase-313.md](docs/architecture/decisions/0315-phase-314-nas-live-verify-phase-313.md).
+
+### Phase 313 - Full-Horizon Upgrade Backfill for Partial Labels (draft)
+
+Keep partially labeled assessments eligible for full-horizon backfill once max horizon
+unlocks. See
+[docs/architecture/decisions/0314-phase-313-full-horizon-upgrade-backfill.md](docs/architecture/decisions/0314-phase-313-full-horizon-upgrade-backfill.md).
+
+### Phase 312 - NAS Live Verification of Phase 311
+
+Ops evidence gate after Phase 311 ready-horizons backfill. Live verify passed 2026-08-01
+(``e0cc736``; ``assessment_count=15`` ``persisted=15`` ``skipped=0``). See
 [docs/architecture/decisions/0313-phase-312-nas-live-verify-phase-311.md](docs/architecture/decisions/0313-phase-312-nas-live-verify-phase-311.md).
+
+#### Added
+
+- ADR-0313: live ready-horizons backfill summary evidence (checklist Phase 312 log).
+
+#### Explicitly out of scope
+
+Inventing bars, orders.
 
 ### Phase 311 - Ready-Horizons Label Backfill
 

@@ -1,6 +1,6 @@
 # ADR-0296: Phase 295 Primary Fetch Fallback Callout
 
-- Status: Proposed (Phase 294 closed; ready to implement)
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
@@ -8,7 +8,7 @@
 Labeling diagnostics are elevated and collapsible (Phases 283–294). Live verify still
 often reports ``latest_primary_fetch_fallback=full_to_compact`` on evidence-summary
 while multi-source daily-bars tip may be polygon with null fallback. Operators already
-have the scalar in the grid; the panel does not elevate primary compact-fallback as a
+have the scalar in the grid; the panel did not elevate primary compact-fallback as a
 data-quality note separate from labeling.
 
 Prefer a fail-closed UI callout from the existing field over new tip scalars.

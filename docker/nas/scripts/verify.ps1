@@ -168,9 +168,10 @@ function Write-VerifyChecklist {
     Write-Host "128. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
     Write-Host "129. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
     Write-Host "130. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
-    Write-Host "131. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
-    Write-Host "132. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
-    Write-Host "133. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "131. Authenticated evidence-summary Phase 296 primary fetch-fallback callout field bundle (UI unit-tested)"
+    Write-Host "132. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
+    Write-Host "133. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
+    Write-Host "134. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1337,6 +1338,18 @@ try {
         $primaryFallback = $summary.latest_primary_fetch_fallback
         $primaryFallbackPart = if ($null -eq $primaryFallback -or $primaryFallback -eq "") { "null" } else { [string]$primaryFallback }
         Write-Host "OK  Phase 280 latest_primary_fetch_fallback=$primaryFallbackPart (full_to_compact when AV compact tip; null OK)"
+        # Phase 296: UI callout when latest_primary_fetch_fallback is non-empty (ADR-0296).
+        $inputSrcPart = "null"
+        if ($summary.PSObject.Properties.Name -contains "latest_input_source") {
+            $is = $summary.latest_input_source
+            if ($null -ne $is -and $is -ne "") { $inputSrcPart = [string]$is }
+        }
+        $asOfPart = "null"
+        if ($summary.PSObject.Properties.Name -contains "latest_as_of_trading_date") {
+            $ao = $summary.latest_as_of_trading_date
+            if ($null -ne $ao -and $ao -ne "") { $asOfPart = [string]$ao }
+        }
+        Write-Host "OK  Phase 296 primary fetch-fallback callout fields fallback=$primaryFallbackPart input_source=$inputSrcPart tip_as_of=$asOfPart (UI unit-tested; non-empty elevates callout)"
         # Phase 282: daily-bars tip fetch_fallback from stored raw_payload (ADR-0282).
         $barsPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.daily-bars.json" -f [guid]::NewGuid().ToString("N"))
         try {

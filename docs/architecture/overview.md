@@ -722,9 +722,11 @@ Phase 293 makes labeling diagnostics a collapsible disclosure open by default (s
 [decisions/0294-phase-293-collapsible-labeling-diagnostics.md](decisions/0294-phase-293-collapsible-labeling-diagnostics.md)).
 Phase 294 live-verified that disclosure (see
 [decisions/0295-phase-294-nas-live-verify-phase-293.md](decisions/0295-phase-294-nas-live-verify-phase-293.md)).
-Phase 295 (draft) proposes elevating ``latest_primary_fetch_fallback`` as a data-quality
-callout (see
+Phase 295 elevates ``latest_primary_fetch_fallback`` as a data-quality callout when
+non-empty (see
 [decisions/0296-phase-295-primary-fetch-fallback-callout.md](decisions/0296-phase-295-primary-fetch-fallback-callout.md)).
+Phase 296 (draft) is the NAS live verify gate (see
+[decisions/0297-phase-296-nas-live-verify-phase-295.md](decisions/0297-phase-296-nas-live-verify-phase-295.md)).
 
 ## System context
 

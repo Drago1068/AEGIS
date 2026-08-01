@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 295 primary fetch-fallback callout. See
 [docs/architecture/decisions/0297-phase-296-nas-live-verify-phase-295.md](docs/architecture/decisions/0297-phase-296-nas-live-verify-phase-295.md).
 
-### Phase 295 - Primary Fetch Fallback Callout (draft)
+### Phase 295 - Primary Fetch Fallback Callout
 
 Elevate existing ``latest_primary_fetch_fallback`` as a data-quality callout. See
 [docs/architecture/decisions/0296-phase-295-primary-fetch-fallback-callout.md](docs/architecture/decisions/0296-phase-295-primary-fetch-fallback-callout.md).
+
+#### Added
+
+- Evidence-summary callout when ``latest_primary_fetch_fallback`` is non-empty; unit
+  tests; ``verify.ps1`` Phase 296 field bundle log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing bars/closes, orders.
 
 ### Phase 294 - NAS Live Verification of Phase 293
 

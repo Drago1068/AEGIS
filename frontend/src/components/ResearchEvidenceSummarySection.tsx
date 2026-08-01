@@ -37,6 +37,9 @@ export function ResearchEvidenceSummarySection({
     showLabeledFreshnessLagCallout ||
     showUnlabeledLabelReadyEmptyCallout ||
     showMixedUnlabeledBacklogCallout;
+  const primaryFetchFallback = evidenceSummary.latest_primary_fetch_fallback;
+  const showPrimaryFetchFallbackCallout =
+    typeof primaryFetchFallback === "string" && primaryFetchFallback.trim().length > 0;
 
   return (
     <div
@@ -211,6 +214,36 @@ export function ResearchEvidenceSummarySection({
           ) : null}
           </div>
         </details>
+      ) : null}
+      {showPrimaryFetchFallbackCallout ? (
+        <aside
+          className="mt-3 rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+          role="status"
+          data-testid="evidence-primary-fetch-fallback-callout"
+        >
+          <p className="font-semibold text-aegis-warn">
+            Primary fetch used a fallback path (research-only)
+          </p>
+          <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+            <li data-testid="evidence-primary-fetch-fallback-callout-value">
+              latest_primary_fetch_fallback={primaryFetchFallback}
+            </li>
+            {evidenceSummary.latest_input_source != null ? (
+              <li data-testid="evidence-primary-fetch-fallback-callout-input-source">
+                latest_input_source={evidenceSummary.latest_input_source}
+              </li>
+            ) : null}
+            {evidenceSummary.latest_as_of_trading_date != null ? (
+              <li data-testid="evidence-primary-fetch-fallback-callout-as-of">
+                tip_as_of={evidenceSummary.latest_as_of_trading_date}
+              </li>
+            ) : null}
+          </ul>
+          <p className="mt-1 text-xs text-aegis-muted">
+            Fail-closed: compact fallback is labeled provenance, not invented bars; not a
+            signal or recommendation.
+          </p>
+        </aside>
       ) : null}
       <dl className="mt-2 grid gap-2 sm:grid-cols-2">
         <div>

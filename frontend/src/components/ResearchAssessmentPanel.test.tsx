@@ -225,6 +225,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.queryByTestId("evidence-labeled-freshness-lag-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-unlabeled-label-ready-empty-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-mixed-unlabeled-backlog-callout")).toBeNull();
+    expect(screen.queryByTestId("evidence-primary-fetch-fallback-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics")).toBeNull();
   });
 
@@ -579,7 +580,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_min_horizon_forward_bar_shortfall: 5,
       latest_assessment_min_horizon_required_label_end_date: "2024-02-16",
       stored_bar_calendar_lag_trading_days: 2,
-      latest_primary_fetch_fallback: null,
+      latest_primary_fetch_fallback: "full_to_compact",
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -810,7 +811,19 @@ describe("ResearchAssessmentPanel", () => {
         screen.getByTestId("evidence-stored-bar-calendar-lag-trading-days"),
       ).toHaveTextContent("2");
       expect(screen.getByTestId("evidence-latest-primary-fetch-fallback")).toHaveTextContent(
-        "null",
+        "full_to_compact",
+      );
+      expect(
+        screen.getByTestId("evidence-primary-fetch-fallback-callout"),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId("evidence-primary-fetch-fallback-callout-value")).toHaveTextContent(
+        "latest_primary_fetch_fallback=full_to_compact",
+      );
+      expect(
+        screen.getByTestId("evidence-primary-fetch-fallback-callout-input-source"),
+      ).toHaveTextContent("latest_input_source=alpha_vantage");
+      expect(screen.getByTestId("evidence-primary-fetch-fallback-callout-as-of")).toHaveTextContent(
+        "tip_as_of=2024-01-26",
       );
       expect(screen.getByTestId("evidence-latest-outcome-label-computed-at")).toHaveTextContent(
         "2024-01-26T19:00:00Z",

@@ -254,10 +254,127 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.queryByTestId("evidence-mixed-unlabeled-backlog-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-partial-labeled-upgrade-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-min-horizon-unlock-callout")).toBeNull();
+    expect(screen.queryByTestId("evidence-full-horizon-unlock-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-primary-fetch-fallback-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics-active-count")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-frontier-readout")).toBeNull();
+  });
+
+  it("shows full-horizon unlock outcome-label CTA when tip is label-ready but unlabeled", async () => {
+    vi.mocked(getResearchEvidenceSummary).mockResolvedValue({
+      symbol: "AAPL",
+      state: "research_only",
+      latest_assessment: sampleAssessment,
+      calibration_readiness: {
+        symbol: "AAPL",
+        status: "insufficient_labeled_corpus",
+        assessment_snapshot_id: 1,
+        research_index: 0.46,
+        corpus_count: 3,
+        bucket_count: 2,
+        min_corpus: 10,
+        min_bucket: 5,
+        index_bucket_width: 0.15,
+        calibration_method_id: "research_calibration_v1",
+        detail: "need at least 10 labeled historical examples, found 3",
+      },
+      latest_outcome_label: null,
+      latest_calibration: null,
+      assessment_count: 1,
+      labeled_assessment_count: 0,
+      unlabeled_assessment_count: 1,
+      complete_labeled_assessment_count: 0,
+      partial_labeled_assessment_count: 0,
+      outcome_label_count: 0,
+      calibration_count: 0,
+      latest_component_source: "alpha_vantage",
+      latest_resolved_label_bar_source: null,
+      mixed_component_source_assessment_count: 0,
+      mixed_unlabeled_assessment_count: 0,
+      mixed_labeled_assessment_count: 0,
+      latest_mixed_label_bar_source: null,
+      most_recent_labeled_assessment_id: null,
+      most_recent_labeled_outcome_label: null,
+      most_recent_labeled_outcome_label_id: null,
+      most_recent_labeled_outcome_label_method_id: null,
+      most_recent_labeled_outcome_label_method_version: null,
+      most_recent_labeled_outcome_label_schema_version: null,
+      most_recent_labeled_outcome_label_state: null,
+      most_recent_labeled_outcome_label_bar_source: null,
+      most_recent_labeled_outcome_label_computed_at: null,
+      most_recent_labeled_outcome_label_as_of_trading_date: null,
+      scan_labeled_freshness_lag_trading_days: 0,
+      latest_assessment_is_label_ready: true,
+      latest_assessment_label_block_reason: null,
+      most_recent_labelable_as_of_trading_date: "2024-01-26",
+      most_recent_unlabeled_labelable_as_of_trading_date: "2024-01-26",
+      scan_unlabeled_label_ready_count: 1,
+      most_recent_unlabeled_assessment_id: 1,
+      most_recent_unlabeled_as_of_trading_date: "2024-01-26",
+      latest_assessment_forward_bar_shortfall: 0,
+      latest_assessment_required_label_end_date: "2024-02-23",
+      latest_assessment_last_available_label_bar_date: "2024-02-23",
+      latest_assessment_min_horizon_forward_bar_shortfall: 0,
+      latest_assessment_min_horizon_required_label_end_date: "2024-02-02",
+      stored_bar_calendar_lag_trading_days: 0,
+      latest_primary_fetch_fallback: null,
+      latest_coverage_confidence: 0.95,
+      latest_research_index: 0.46,
+      latest_as_of_trading_date: "2024-01-26",
+      latest_bar_count: 20,
+      latest_input_source: "alpha_vantage",
+      latest_method_id: "daily_bar_research_v1",
+      latest_method_version: 1,
+      latest_lookback_end_date: "2024-01-26",
+      latest_lookback_start_date: "2023-12-27",
+      latest_schema_version: 1,
+      latest_computed_at: "2024-01-26T18:00:00Z",
+      latest_event_time: "2024-01-26T23:59:59Z",
+      latest_probability_confidence: null,
+      latest_assessment_id: 1,
+      latest_outcome_label_id: null,
+      latest_outcome_label_computed_at: null,
+      latest_outcome_label_method_id: null,
+      latest_outcome_label_method_version: null,
+      latest_outcome_label_schema_version: null,
+      latest_outcome_label_state: null,
+      latest_outcome_label_bar_source: null,
+      latest_outcome_label_as_of_trading_date: null,
+      latest_calibration_id: null,
+      latest_calibration_horizon_key: null,
+      latest_calibration_computed_at: null,
+      latest_calibration_corpus_count: null,
+      latest_calibration_bucket_count: null,
+      latest_calibration_method_id: null,
+      latest_calibration_method_version: null,
+      latest_calibration_schema_version: null,
+      latest_calibration_state: null,
+      latest_calibration_probability_confidence: null,
+      latest_calibration_assessment_snapshot_id: null,
+      detail:
+        "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
+    });
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /refresh evidence summary/i }));
+    await waitFor(() => {
+      expect(screen.getByTestId("evidence-full-horizon-unlock-callout")).toBeInTheDocument();
+    });
+    expect(screen.getByTestId("evidence-full-horizon-unlock-callout-tip-ready")).toHaveTextContent(
+      "latest_assessment_is_label_ready=true",
+    );
+    expect(screen.getByTestId("evidence-full-horizon-unlock-callout-label-id")).toHaveTextContent(
+      "latest_outcome_label_id=null",
+    );
+    expect(screen.getByTestId("evidence-full-horizon-unlock-callout-cta")).toHaveTextContent(
+      "use_toolbar=Compute outcome labels",
+    );
+    expect(screen.queryByTestId("evidence-min-horizon-unlock-callout")).toBeNull();
+    expect(screen.getByTestId("evidence-labeling-diagnostics-active-count")).toHaveTextContent(
+      "· 1 active",
+    );
+    expect(screen.getByTestId("compute-outcome-labels")).toBeInTheDocument();
   });
 
   it("renders an initial latest assessment from the API payload", () => {

@@ -787,8 +787,13 @@ Phase 320 live-verified that badge (see
 Phase 321 elevates a ready-horizons CTA when min-horizon shortfall hits zero while tip
 remains blocked (see
 [decisions/0322-phase-321-min-horizon-unlock-cta.md](decisions/0322-phase-321-min-horizon-unlock-cta.md)).
-Phase 322 (draft) is the NAS live-verify gate for that CTA (see
+Phase 322 live-verified that CTA (see
 [decisions/0323-phase-322-nas-live-verify-phase-321.md](decisions/0323-phase-322-nas-live-verify-phase-321.md)).
+Phase 323 elevates a full-horizon outcome-label CTA when tip is label-ready but unlabeled
+(see
+[decisions/0324-phase-323-full-horizon-unlock-cta.md](decisions/0324-phase-323-full-horizon-unlock-cta.md)).
+Phase 324 (draft) is the NAS live-verify gate for that CTA (see
+[decisions/0325-phase-324-nas-live-verify-phase-323.md](decisions/0325-phase-324-nas-live-verify-phase-323.md)).
 
 ## System context
 

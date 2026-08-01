@@ -43,13 +43,17 @@ export function ResearchEvidenceSummarySection({
     typeof minHorizonShortfall === "number" &&
     Number.isFinite(minHorizonShortfall) &&
     minHorizonShortfall === 0;
+  const showFullHorizonUnlockCallout =
+    evidenceSummary.latest_assessment_is_label_ready === true &&
+    evidenceSummary.latest_outcome_label_id == null;
   const labelingActiveCalloutCount =
     Number(showLabelReadinessCallout) +
     Number(showLabeledFreshnessLagCallout) +
     Number(showUnlabeledLabelReadyEmptyCallout) +
     Number(showMixedUnlabeledBacklogCallout) +
     Number(showPartialLabeledUpgradeCallout) +
-    Number(showMinHorizonUnlockCallout);
+    Number(showMinHorizonUnlockCallout) +
+    Number(showFullHorizonUnlockCallout);
   const showLabelingDiagnostics = labelingActiveCalloutCount > 0;
   const primaryFetchFallback = evidenceSummary.latest_primary_fetch_fallback;
   const showPrimaryFetchFallbackCallout =
@@ -343,6 +347,43 @@ export function ResearchEvidenceSummarySection({
                 ) : null}
                 <li data-testid="evidence-min-horizon-unlock-callout-cta">
                   use_toolbar=Compute ready-horizon labels
+                </li>
+              </ul>
+              <p className="mt-1 text-xs text-aegis-muted">
+                Opt-in only via existing toolbar action; not auto-run; not a signal or
+                recommendation.
+              </p>
+            </aside>
+          ) : null}
+          {showFullHorizonUnlockCallout ? (
+            <aside
+              className="rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+              role="status"
+              data-testid="evidence-full-horizon-unlock-callout"
+            >
+              <p className="font-semibold text-aegis-warn">
+                Tip label-ready — eligible for full-horizon outcome labels (research-only)
+              </p>
+              <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+                <li data-testid="evidence-full-horizon-unlock-callout-tip-ready">
+                  latest_assessment_is_label_ready=true
+                </li>
+                <li data-testid="evidence-full-horizon-unlock-callout-label-id">
+                  latest_outcome_label_id=null
+                </li>
+                {evidenceSummary.latest_assessment_id != null ? (
+                  <li data-testid="evidence-full-horizon-unlock-callout-assessment-id">
+                    latest_assessment_id={evidenceSummary.latest_assessment_id}
+                  </li>
+                ) : null}
+                {evidenceSummary.latest_assessment_forward_bar_shortfall != null ? (
+                  <li data-testid="evidence-full-horizon-unlock-callout-forward-shortfall">
+                    tip_forward_bar_shortfall=
+                    {evidenceSummary.latest_assessment_forward_bar_shortfall}
+                  </li>
+                ) : null}
+                <li data-testid="evidence-full-horizon-unlock-callout-cta">
+                  use_toolbar=Compute outcome labels
                 </li>
               </ul>
               <p className="mt-1 text-xs text-aegis-muted">

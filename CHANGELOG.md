@@ -12,10 +12,21 @@ delivery workflow).
 Ops evidence gate after Phase 323 full-horizon unlock CTA. See
 [docs/architecture/decisions/0325-phase-324-nas-live-verify-phase-323.md](docs/architecture/decisions/0325-phase-324-nas-live-verify-phase-323.md).
 
-### Phase 323 - Full-Horizon Unlock Outcome-Label CTA (draft)
+### Phase 323 - Full-Horizon Unlock Outcome-Label CTA
 
 Elevate compute-outcome-labels CTA when tip is label-ready but unlabeled. See
 [docs/architecture/decisions/0324-phase-323-full-horizon-unlock-cta.md](docs/architecture/decisions/0324-phase-323-full-horizon-unlock-cta.md).
+
+#### Added
+
+- ADR-0324: tip-ready unlabeled labeling-diagnostics callout pointing at
+  ``Compute outcome labels`` (no auto-run; existing fields only).
+- ``evidence-full-horizon-unlock-callout`` UI + vitest; ``verify.ps1`` Phase 324
+  field-bundle log + diagnostics trigger ``full_horizon_unlock``.
+
+#### Explicitly out of scope
+
+Auto-labeling, inventing bars, orders, changing backfill.
 
 ### Phase 322 - NAS Live Verification of Phase 321
 

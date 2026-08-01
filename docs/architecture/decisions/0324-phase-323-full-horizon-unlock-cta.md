@@ -1,6 +1,6 @@
-# ADR-0324: Phase 323 Full-Horizon Unlock Outcome-Label CTA (draft)
+# ADR-0324: Phase 323 Full-Horizon Unlock Outcome-Label CTA
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
@@ -11,7 +11,7 @@ blocked. The symmetric gap: when tip becomes fully label-ready
 (``latest_outcome_label_id == null``), nothing elevates the existing
 ``Compute outcome labels`` toolbar action.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. Tip-ready unlabeled CTA (UI-only)
 
@@ -19,18 +19,12 @@ blocked. The symmetric gap: when tip becomes fully label-ready
   elevate a research-only labeling-diagnostics callout pointing at
   ``Compute outcome labels`` (no auto-run).
 - Source of truth: existing evidence-summary fields only; no new API scalars.
+- Callout ``data-testid="evidence-full-horizon-unlock-callout"``; included in labeling
+  diagnostics active count / ``verify.ps1`` trigger ``full_horizon_unlock``.
 
 ### 2. Out of scope
 
 Auto-labeling, inventing bars, orders, changing backfill, ready-horizons CTA changes.
-
-## Resume
-
-```powershell
-# Implement Phase 323 full-horizon unlock CTA; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
 
 ## Related documents
 

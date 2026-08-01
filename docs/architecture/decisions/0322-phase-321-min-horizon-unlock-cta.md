@@ -27,3 +27,4 @@ Auto-labeling, inventing bars, orders, full-horizon auto-upgrade, expanding scan
 - [0321-phase-320-nas-live-verify-phase-319.md](0321-phase-320-nas-live-verify-phase-319.md)
 - [0310-phase-309-min-horizon-label-path.md](0310-phase-309-min-horizon-label-path.md)
 - [0323-phase-322-nas-live-verify-phase-321.md](0323-phase-322-nas-live-verify-phase-321.md)
+- [0324-phase-323-full-horizon-unlock-cta.md](0324-phase-323-full-horizon-unlock-cta.md)

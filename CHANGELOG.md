@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 320 - NAS Live Verification of Phase 319 (draft)
+### Phase 322 - NAS Live Verification of Phase 321 (draft)
 
-Ops evidence gate after Phase 319 outcome-label horizon coverage badge. See
+Ops evidence gate after Phase 321 min-horizon unlock CTA. See
+[docs/architecture/decisions/0323-phase-322-nas-live-verify-phase-321.md](docs/architecture/decisions/0323-phase-322-nas-live-verify-phase-321.md).
+
+### Phase 321 - Min-Horizon Unlock Ready-Horizons CTA (draft)
+
+Elevate ready-horizons CTA when min-horizon shortfall is 0 but tip is not fully ready. See
+[docs/architecture/decisions/0322-phase-321-min-horizon-unlock-cta.md](docs/architecture/decisions/0322-phase-321-min-horizon-unlock-cta.md).
+
+### Phase 320 - NAS Live Verification of Phase 319
+
+Ops evidence gate after Phase 319 outcome-label horizon coverage badge. Live verify passed
+2026-08-01 (``36f9a8a``; Phase 320 badge log). See
 [docs/architecture/decisions/0321-phase-320-nas-live-verify-phase-319.md](docs/architecture/decisions/0321-phase-320-nas-live-verify-phase-319.md).
+
+#### Added
+
+- ADR-0321: live horizon coverage badge evidence (checklist Phase 320 log).
+
+#### Explicitly out of scope
+
+Inventing bars, orders.
 
 ### Phase 319 - Outcome-Label Horizon Coverage Badge
 

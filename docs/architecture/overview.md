@@ -782,8 +782,13 @@ Phase 318 live-verified that callout path (see
 [decisions/0319-phase-318-nas-live-verify-phase-317.md](decisions/0319-phase-318-nas-live-verify-phase-317.md)).
 Phase 319 adds a complete/partial badge on outcome-label history rows (see
 [decisions/0320-phase-319-outcome-label-horizon-coverage-badge.md](decisions/0320-phase-319-outcome-label-horizon-coverage-badge.md)).
-Phase 320 (draft) is the NAS live-verify gate for that badge (see
+Phase 320 live-verified that badge (see
 [decisions/0321-phase-320-nas-live-verify-phase-319.md](decisions/0321-phase-320-nas-live-verify-phase-319.md)).
+Phase 321 (draft) would elevate a ready-horizons CTA when min-horizon shortfall hits zero
+while tip remains blocked (see
+[decisions/0322-phase-321-min-horizon-unlock-cta.md](decisions/0322-phase-321-min-horizon-unlock-cta.md)).
+Phase 322 (draft) is the NAS live-verify gate for that CTA (see
+[decisions/0323-phase-322-nas-live-verify-phase-321.md](decisions/0323-phase-322-nas-live-verify-phase-321.md)).
 
 ## System context
 

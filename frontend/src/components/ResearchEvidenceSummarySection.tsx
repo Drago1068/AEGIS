@@ -24,6 +24,9 @@ export function ResearchEvidenceSummarySection({
   const freshnessLag = evidenceSummary.scan_labeled_freshness_lag_trading_days;
   const showLabeledFreshnessLagCallout =
     typeof freshnessLag === "number" && Number.isFinite(freshnessLag) && freshnessLag > 0;
+  const unlabeledReadyCount = evidenceSummary.scan_unlabeled_label_ready_count;
+  const showUnlabeledLabelReadyEmptyCallout =
+    unlabeledReadyCount === 0 && evidenceSummary.most_recent_unlabeled_assessment_id != null;
 
   return (
     <div
@@ -105,6 +108,47 @@ export function ResearchEvidenceSummarySection({
           </ul>
           <p className="mt-1 text-xs text-aegis-muted">
             Fail-closed: lag is diagnostic only; not a signal or recommendation.
+          </p>
+        </aside>
+      ) : null}
+      {showUnlabeledLabelReadyEmptyCallout ? (
+        <aside
+          className="mt-3 rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+          role="status"
+          data-testid="evidence-unlabeled-label-ready-empty-callout"
+        >
+          <p className="font-semibold text-aegis-warn">
+            No unlabeled assessments are label-ready (research-only)
+          </p>
+          <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+            <li data-testid="evidence-unlabeled-ready-empty-callout-count">
+              scan_unlabeled_label_ready_count={unlabeledReadyCount}
+            </li>
+            {evidenceSummary.most_recent_unlabeled_as_of_trading_date != null ? (
+              <li data-testid="evidence-unlabeled-ready-empty-callout-unlabeled-as-of">
+                most_recent_unlabeled_as_of=
+                {evidenceSummary.most_recent_unlabeled_as_of_trading_date}
+              </li>
+            ) : null}
+            <li data-testid="evidence-unlabeled-ready-empty-callout-unlabeled-labelable">
+              most_recent_unlabeled_labelable_as_of=
+              {evidenceSummary.most_recent_unlabeled_labelable_as_of_trading_date ?? "null"}
+            </li>
+            {evidenceSummary.latest_assessment_is_label_ready === false ? (
+              <>
+                <li data-testid="evidence-unlabeled-ready-empty-callout-forward-shortfall">
+                  tip_forward_bar_shortfall=
+                  {evidenceSummary.latest_assessment_forward_bar_shortfall ?? "null"}
+                </li>
+                <li data-testid="evidence-unlabeled-ready-empty-callout-required-end">
+                  tip_required_label_end_date=
+                  {evidenceSummary.latest_assessment_required_label_end_date ?? "null"}
+                </li>
+              </>
+            ) : null}
+          </ul>
+          <p className="mt-1 text-xs text-aegis-muted">
+            Fail-closed: no invented labels; not a signal or recommendation.
           </p>
         </aside>
       ) : null}

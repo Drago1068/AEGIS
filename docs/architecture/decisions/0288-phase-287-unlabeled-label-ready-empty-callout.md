@@ -1,6 +1,6 @@
 # ADR-0288: Phase 287 Unlabeled Label-Ready Empty Callout
 
-- Status: Proposed (Phase 286 closed; ready to implement)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -8,7 +8,7 @@
 Phases 283–286 elevated tip label-readiness and labeled-corpus freshness lag. Live
 verify still shows ``scan_unlabeled_label_ready_count=0`` with unlabeled tip present
 (``most_recent_unlabeled_assessment_id`` set; ``most_recent_unlabeled_labelable_as_of``
-null). Operators already have the scalars; the research panel does not elevate that
+null). Operators already have the scalars; the research panel did not elevate that
 there are currently no unlabeled label-ready candidates in the scan window.
 
 Prefer a fail-closed UI callout over new tip/fallback scalars.
@@ -24,7 +24,7 @@ only:
 
 - ``scan_unlabeled_label_ready_count``
 - ``most_recent_unlabeled_as_of_trading_date`` when present
-- ``most_recent_unlabeled_labelable_as_of_trading_date`` when present (often null)
+- ``most_recent_unlabeled_labelable_as_of_trading_date`` (shows null explicitly)
 - ``latest_assessment_forward_bar_shortfall`` / ``latest_assessment_required_label_end_date``
   when tip is also not label-ready
 

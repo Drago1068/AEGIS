@@ -214,7 +214,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.getByRole("button", { name: /compute calibration/i })).toBeDisabled();
   });
 
-  it("hides label-readiness and freshness-lag callouts when fields are null or non-positive", async () => {
+  it("hides label-readiness, freshness-lag, and unlabeled-ready-empty callouts when inactive", async () => {
     render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={null} />);
     fireEvent.click(screen.getByRole("button", { name: /refresh evidence summary/i }));
 
@@ -223,6 +223,7 @@ describe("ResearchAssessmentPanel", () => {
     });
     expect(screen.queryByTestId("evidence-latest-label-readiness-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-labeled-freshness-lag-callout")).toBeNull();
+    expect(screen.queryByTestId("evidence-unlabeled-label-ready-empty-callout")).toBeNull();
   });
 
   it("renders an initial latest assessment from the API payload", () => {
@@ -566,8 +567,8 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_is_label_ready: false,
       latest_assessment_label_block_reason: "insufficient_forward_bars",
       most_recent_labelable_as_of_trading_date: "2024-01-26",
-      most_recent_unlabeled_labelable_as_of_trading_date: "2024-01-20",
-      scan_unlabeled_label_ready_count: 1,
+      most_recent_unlabeled_labelable_as_of_trading_date: null,
+      scan_unlabeled_label_ready_count: 0,
       most_recent_unlabeled_assessment_id: 2,
       most_recent_unlabeled_as_of_trading_date: "2024-02-09",
       latest_assessment_forward_bar_shortfall: 20,
@@ -736,6 +737,24 @@ describe("ResearchAssessmentPanel", () => {
         "tip_as_of=2024-01-26",
       );
       expect(
+        screen.getByTestId("evidence-unlabeled-label-ready-empty-callout"),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId("evidence-unlabeled-ready-empty-callout-count")).toHaveTextContent(
+        "scan_unlabeled_label_ready_count=0",
+      );
+      expect(
+        screen.getByTestId("evidence-unlabeled-ready-empty-callout-unlabeled-as-of"),
+      ).toHaveTextContent("most_recent_unlabeled_as_of=2024-02-09");
+      expect(
+        screen.getByTestId("evidence-unlabeled-ready-empty-callout-unlabeled-labelable"),
+      ).toHaveTextContent("most_recent_unlabeled_labelable_as_of=null");
+      expect(
+        screen.getByTestId("evidence-unlabeled-ready-empty-callout-forward-shortfall"),
+      ).toHaveTextContent("tip_forward_bar_shortfall=20");
+      expect(
+        screen.getByTestId("evidence-unlabeled-ready-empty-callout-required-end"),
+      ).toHaveTextContent("tip_required_label_end_date=2024-02-28");
+      expect(
         screen.getByTestId("evidence-latest-assessment-label-block-reason"),
       ).toHaveTextContent("insufficient_forward_bars");
       expect(
@@ -743,9 +762,9 @@ describe("ResearchAssessmentPanel", () => {
       ).toHaveTextContent("2024-01-26");
       expect(
         screen.getByTestId("evidence-most-recent-unlabeled-labelable-as-of-trading-date"),
-      ).toHaveTextContent("2024-01-20");
+      ).toHaveTextContent("null");
       expect(screen.getByTestId("evidence-scan-unlabeled-label-ready-count")).toHaveTextContent(
-        "1",
+        "0",
       );
       expect(
         screen.getByTestId("evidence-most-recent-unlabeled-assessment-id"),

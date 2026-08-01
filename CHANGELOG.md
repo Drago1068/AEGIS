@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 287 unlabeled label-ready empty callout. See
 [docs/architecture/decisions/0289-phase-288-nas-live-verify-phase-287.md](docs/architecture/decisions/0289-phase-288-nas-live-verify-phase-287.md).
 
-### Phase 287 - Unlabeled Label-Ready Empty Callout (draft)
+### Phase 287 - Unlabeled Label-Ready Empty Callout
 
 Elevate existing evidence-summary unlabeled-ready emptiness in the research UI. See
 [docs/architecture/decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md](docs/architecture/decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md).
+
+#### Added
+
+- Evidence-summary callout when ``scan_unlabeled_label_ready_count === 0`` and an
+  unlabeled assessment exists; unit tests; ``verify.ps1`` Phase 288 field bundle log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing labels/closes, orders.
 
 ### Phase 286 - NAS Live Verification of Phase 285
 

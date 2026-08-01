@@ -704,8 +704,11 @@ Phase 285 elevates labeled corpus freshness lag in the research UI when
 [decisions/0286-phase-285-labeled-freshness-lag-callout.md](decisions/0286-phase-285-labeled-freshness-lag-callout.md)).
 Phase 286 live-verified that callout field bundle (lag ``121``; see
 [decisions/0287-phase-286-nas-live-verify-phase-285.md](decisions/0287-phase-286-nas-live-verify-phase-285.md)).
-Phase 287 (draft) proposes elevating empty unlabeled label-ready scan count (live ``0``;
-see [decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md](decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md)).
+Phase 287 elevates empty unlabeled label-ready scan count in the research UI when
+``scan_unlabeled_label_ready_count === 0`` and an unlabeled assessment exists (see
+[decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md](decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md)).
+Phase 288 (draft) is the NAS live verify gate (see
+[decisions/0289-phase-288-nas-live-verify-phase-287.md](decisions/0289-phase-288-nas-live-verify-phase-287.md)).
 
 ## System context
 

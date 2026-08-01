@@ -5,11 +5,13 @@ import {
   formatAssessmentHistoryRow,
   formatCalibrationActionAriaLabel,
   formatCalibrationActionIdChip,
+  formatLabelHorizonCoverage,
   formatLabelHorizonSummary,
   formatOutcomeLabelActionAriaLabel,
   formatOutcomeLabelActionIdChip,
   formatOutcomeLabelBackfillAriaLabel,
   formatReadyHorizonsBackfillAriaLabel,
+  labelCoversConfiguredHorizons,
   resolveOutcomeLabelHistoryLoadKind,
   sortedLabelEntries,
 } from "./research-assessment-panel-helpers";
@@ -133,6 +135,33 @@ describe("sortedLabelEntries", () => {
         a_other: 2,
       }).map(([k]) => k),
     ).toEqual(["forward_return_5", "forward_return_20", "a_other", "z_other"]);
+  });
+});
+
+describe("labelCoversConfiguredHorizons / formatLabelHorizonCoverage", () => {
+  it("treats all configured keys as complete and missing keys as partial", () => {
+    expect(
+      labelCoversConfiguredHorizons({
+        forward_return_5: 0.05,
+        forward_return_20: 0.1,
+      }),
+    ).toBe(true);
+    expect(labelCoversConfiguredHorizons({ forward_return_5: 0.05 })).toBe(false);
+    expect(formatLabelHorizonCoverage({ forward_return_5: 0.05 })).toEqual({
+      coverage: "partial",
+      presentKeys: "forward_return_5",
+      missingKeys: "forward_return_20",
+    });
+    expect(
+      formatLabelHorizonCoverage({
+        forward_return_5: 0.05,
+        forward_return_20: 0.1,
+      }),
+    ).toEqual({
+      coverage: "complete",
+      presentKeys: "forward_return_5,forward_return_20",
+      missingKeys: "none",
+    });
   });
 });
 

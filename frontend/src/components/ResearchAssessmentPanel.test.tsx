@@ -470,7 +470,10 @@ describe("ResearchAssessmentPanel", () => {
       ...newer,
       id: 19,
       computed_at: "2024-01-26T18:00:00Z",
-      labels: { forward_return_5: 0.03, forward_return_20: 0.08 },
+      labels: { forward_return_5: 0.03 },
+      label_end_dates: {
+        forward_return_5: "2024-02-02",
+      },
     };
     vi.mocked(getLatestResearchAssessment).mockResolvedValue(sampleAssessment);
     vi.mocked(listOutcomeLabels).mockResolvedValue([newer, older]);
@@ -485,16 +488,27 @@ describe("ResearchAssessmentPanel", () => {
         /assessment id 1/i,
       );
       expect(screen.getByTestId("outcome-label-history-load-kind")).toHaveTextContent(/latest/i);
+      expect(screen.getByTestId("outcome-label-horizon-coverage")).toHaveAttribute(
+        "data-coverage",
+        "complete",
+      );
+      expect(screen.getByTestId("outcome-label-horizon-coverage")).toHaveTextContent(
+        "horizon_coverage=complete",
+      );
+      expect(screen.getByTestId("outcome-label-history-coverage-20")).toHaveAttribute(
+        "data-coverage",
+        "complete",
+      );
+      expect(screen.getByTestId("outcome-label-history-coverage-19")).toHaveAttribute(
+        "data-coverage",
+        "partial",
+      );
       expect(
         screen.getByText(
           /fwd5=0\.0500 end=2024-02-02 · fwd20=0\.1000 end=2024-02-23/,
         ),
       ).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          /fwd5=0\.0300 end=2024-02-02 · fwd20=0\.0800 end=2024-02-23/,
-        ),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/fwd5=0\.0300 end=2024-02-02/)).toBeInTheDocument();
       expect(screen.getByText(/0\.050000 · end 2024-02-02/)).toBeInTheDocument();
       expect(screen.getByText(/0\.100000 · end 2024-02-23/)).toBeInTheDocument();
     });

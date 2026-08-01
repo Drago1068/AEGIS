@@ -3,6 +3,7 @@
 import type { OutcomeLabel } from "@/lib/api-client";
 
 import {
+  formatLabelHorizonCoverage,
   formatLabelHorizonSummary,
   sortedLabelEntries,
   type OutcomeLabelHistoryLoadKind,
@@ -30,6 +31,9 @@ export function ResearchOutcomeLabelHistorySection({
   if (outcomeLabel == null && outcomeLabelHistoryAssessmentId == null) {
     return null;
   }
+
+  const latestCoverage =
+    outcomeLabel != null ? formatLabelHorizonCoverage(outcomeLabel.labels) : null;
 
   return (
     <div
@@ -73,6 +77,19 @@ export function ResearchOutcomeLabelHistorySection({
       ) : null}
       {outcomeLabel ? (
         <>
+          {latestCoverage != null ? (
+            <p
+              className="mt-2 font-mono text-xs text-aegis-ink"
+              data-testid="outcome-label-horizon-coverage"
+              data-coverage={latestCoverage.coverage}
+            >
+              horizon_coverage={latestCoverage.coverage}
+              <span className="text-aegis-muted">
+                {" "}
+                · present={latestCoverage.presentKeys} · missing={latestCoverage.missingKeys}
+              </span>
+            </p>
+          ) : null}
           <dl className="mt-2 grid gap-2 sm:grid-cols-2">
             {sortedLabelEntries(outcomeLabel.labels).map(([key, value]) => {
               const end = outcomeLabel.label_end_dates[key];
@@ -99,8 +116,15 @@ export function ResearchOutcomeLabelHistorySection({
               <ul className="mt-2 space-y-1 font-mono text-xs text-aegis-ink">
                 {outcomeLabelHistory.map((row) => {
                   const horizons = formatLabelHorizonSummary(row.labels, row.label_end_dates);
+                  const coverage = formatLabelHorizonCoverage(row.labels);
                   return (
                     <li key={row.id ?? `${row.computed_at}-${horizons}`}>
+                      <span
+                        data-testid={`outcome-label-history-coverage-${row.id ?? "row"}`}
+                        data-coverage={coverage.coverage}
+                      >
+                        [{coverage.coverage}]
+                      </span>{" "}
                       {row.computed_at} · {horizons} · {row.bar_source}
                     </li>
                   );

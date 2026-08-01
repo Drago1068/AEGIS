@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 319 outcome-label horizon coverage badge. See
 [docs/architecture/decisions/0321-phase-320-nas-live-verify-phase-319.md](docs/architecture/decisions/0321-phase-320-nas-live-verify-phase-319.md).
 
-### Phase 319 - Outcome-Label Horizon Coverage Badge (draft)
+### Phase 319 - Outcome-Label Horizon Coverage Badge
 
 Per-row complete/partial badge on outcome-label history from existing ``labels`` keys. See
 [docs/architecture/decisions/0320-phase-319-outcome-label-horizon-coverage-badge.md](docs/architecture/decisions/0320-phase-319-outcome-label-horizon-coverage-badge.md).
+
+#### Added
+
+- ``labelCoversConfiguredHorizons`` / ``formatLabelHorizonCoverage`` helpers; history +
+  detail badges; UI tests; ``verify.ps1`` Phase 320 log.
+
+#### Explicitly out of scope
+
+New API fields, inventing bars, auto upgrade, orders.
 
 ### Phase 318 - NAS Live Verification of Phase 317
 

@@ -5,6 +5,36 @@
 
 export type OutcomeLabelHistoryLoadKind = "latest" | "scan_labeled";
 
+/** Matches backend FORWARD_HORIZON_SESSIONS (ADR-0314 / ADR-0320). Display-only; never invents values. */
+export const CONFIGURED_FORWARD_HORIZON_SESSIONS = [5, 20] as const;
+
+/** True when ``labels`` includes every configured ``forward_return_N`` key (ADR-0320). */
+export function labelCoversConfiguredHorizons(
+  labels: Record<string, number>,
+  horizons: readonly number[] = CONFIGURED_FORWARD_HORIZON_SESSIONS,
+): boolean {
+  return horizons.every((horizon) =>
+    Object.prototype.hasOwnProperty.call(labels, `forward_return_${horizon}`),
+  );
+}
+
+/** Research-only complete/partial coverage label from existing keys only. */
+export function formatLabelHorizonCoverage(
+  labels: Record<string, number>,
+  horizons: readonly number[] = CONFIGURED_FORWARD_HORIZON_SESSIONS,
+): { coverage: "complete" | "partial"; presentKeys: string; missingKeys: string } {
+  const required = horizons.map((horizon) => `forward_return_${horizon}`);
+  const present = required.filter((key) =>
+    Object.prototype.hasOwnProperty.call(labels, key),
+  );
+  const missing = required.filter((key) => !Object.prototype.hasOwnProperty.call(labels, key));
+  return {
+    coverage: missing.length === 0 ? "complete" : "partial",
+    presentKeys: present.length > 0 ? present.join(",") : "none",
+    missingKeys: missing.length > 0 ? missing.join(",") : "none",
+  };
+}
+
 /** Sort API label keys: forward_return_N by N ascending, then other keys. Never invent values. */
 export function sortedLabelEntries(labels: Record<string, number>): [string, number][] {
   return Object.entries(labels).sort(([a], [b]) => {

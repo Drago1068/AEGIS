@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from decimal import Decimal
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
+from aegis.domain.market_data_ingestion import fetch_fallback_label_from_payload
 from aegis.domain.market_data_validation import RejectionReason
 
 
@@ -26,6 +28,23 @@ class DailyBarResponse(BaseModel):
     data_quality: str
     schema_version: int
     ingested_at: datetime
+    fetch_fallback: str | None = Field(
+        default=None,
+        description=(
+            "aegis_fetch_fallback from this observation's raw_payload "
+            "(e.g. full_to_compact). Null when absent. Never invents closes; "
+            "does not expose unrelated raw provider secrets."
+        ),
+    )
+
+    @classmethod
+    def from_observation(cls, bar: Any) -> DailyBarResponse:
+        """Build a response from a stored observation without exposing raw_payload."""
+
+        base = cls.model_validate(bar)
+        return base.model_copy(
+            update={"fetch_fallback": fetch_fallback_label_from_payload(bar.raw_payload)}
+        )
 
 
 class IngestionSymbolResult(BaseModel):

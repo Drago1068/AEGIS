@@ -162,8 +162,9 @@ function Write-VerifyChecklist {
     Write-Host "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
     Write-Host "123. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
     Write-Host "124. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
-    Write-Host "125. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
-    Write-Host "126. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "125. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
+    Write-Host "126. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
+    Write-Host "127. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -304,6 +305,28 @@ try {
         throw "POST /auth/login request failed (curl exit $LASTEXITCODE)"
     }
     Assert-Status -Label "POST $api/auth/login" -Actual ([int]$loginCode) -Expected @(200)
+
+    # Phase 282: daily-bars tip fetch_fallback from stored raw_payload (ADR-0282).
+    $barsPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.daily-bars.json" -f [guid]::NewGuid().ToString("N"))
+    try {
+        $barsCode = & curl.exe -sS @curlInsecure -o $barsPath -w "%{http_code}" --max-time 60 `
+            -b $cookieJar -H "Accept: application/json" "$api/market-data/$verifySymbol/daily-bars?limit=5"
+        if ($LASTEXITCODE -ne 0) { throw "GET daily-bars (auth) failed (curl exit $LASTEXITCODE)" }
+        Assert-Status -Label "GET daily-bars (auth)" -Actual ([int]$barsCode) -Expected @(200)
+        $barsBody = Get-Content -LiteralPath $barsPath -Raw | ConvertFrom-Json
+        $tipBar = @($barsBody) | Select-Object -First 1
+        if ($null -eq $tipBar) { throw "daily-bars returned empty array (Phase 281/282)" }
+        if (-not ($tipBar.PSObject.Properties.Name -contains "fetch_fallback")) {
+            throw "daily-bars tip missing fetch_fallback (Phase 281/282)"
+        }
+        $tipFallback = $tipBar.fetch_fallback
+        $tipFallbackPart = if ($null -eq $tipFallback -or $tipFallback -eq "") { "null" } else { [string]$tipFallback }
+        Write-Host "OK  Phase 282 daily-bars tip fetch_fallback=$tipFallbackPart trading_date=$($tipBar.trading_date) source=$($tipBar.source) (full_to_compact when AV compact tip; null OK)"
+    } finally {
+        if (Test-Path -LiteralPath $barsPath) {
+            Remove-Item -LiteralPath $barsPath -Force -ErrorAction SilentlyContinue
+        }
+    }
 
     $readyCode = Get-HttpStatus "$api/research/$verifySymbol/calibration-readiness" -CookieJar $cookieJar
     Assert-Status -Label "GET $api/research/$verifySymbol/calibration-readiness (auth)" -Actual $readyCode -Expected @(200)
@@ -1252,6 +1275,30 @@ try {
         $primaryFallback = $summary.latest_primary_fetch_fallback
         $primaryFallbackPart = if ($null -eq $primaryFallback -or $primaryFallback -eq "") { "null" } else { [string]$primaryFallback }
         Write-Host "OK  Phase 280 latest_primary_fetch_fallback=$primaryFallbackPart (full_to_compact when AV compact tip; null OK)"
+        # Phase 282: daily-bars tip fetch_fallback from stored raw_payload (ADR-0282).
+        $barsPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.daily-bars.json" -f [guid]::NewGuid().ToString("N"))
+        try {
+            $barsCode = & curl.exe -sS @curlInsecure -o $barsPath -w "%{http_code}" --max-time 60 `
+                -b $cookieJar -H "Accept: application/json" "$api/market-data/$verifySymbol/daily-bars?limit=5"
+            if ($LASTEXITCODE -ne 0) { throw "GET daily-bars (auth) failed (curl exit $LASTEXITCODE)" }
+            Assert-Status -Label "GET daily-bars (auth tip fallback)" -Actual ([int]$barsCode) -Expected @(200)
+            $barsBody = Get-Content -LiteralPath $barsPath -Raw | ConvertFrom-Json
+            $tipBar = @($barsBody) | Select-Object -First 1
+            if ($null -eq $tipBar) { throw "daily-bars empty after 200 (Phase 281/282)" }
+            if (-not ($tipBar.PSObject.Properties.Name -contains "fetch_fallback")) {
+                throw "daily-bars tip missing fetch_fallback (Phase 281/282)"
+            }
+            if ($tipBar.PSObject.Properties.Name -contains "raw_payload") {
+                throw "daily-bars must not expose raw_payload (Phase 281/282)"
+            }
+            $tipFallback = $tipBar.fetch_fallback
+            $tipFallbackPart = if ($null -eq $tipFallback -or $tipFallback -eq "") { "null" } else { [string]$tipFallback }
+            Write-Host "OK  Phase 282 daily-bars tip fetch_fallback=$tipFallbackPart source=$($tipBar.source) date=$($tipBar.trading_date) (full_to_compact OK; null OK)"
+        } finally {
+            if (Test-Path -LiteralPath $barsPath) {
+                Remove-Item -LiteralPath $barsPath -Force -ErrorAction SilentlyContinue
+            }
+        }
         # Phase 258: on-demand ingest tip refresh (Phase 257). Unchanged lag/tip OK when
         # providers have no newer closes — never invent; fail only on HTTP/contract errors.
         $preLagPart = $barLagPart

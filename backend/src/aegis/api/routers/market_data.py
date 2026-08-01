@@ -118,4 +118,4 @@ async def get_daily_bars(
     bars = await repository.list_recent(symbol.upper(), limit)
     if not bars:
         raise HTTPException(status_code=404, detail=f"no stored daily bars for symbol {symbol!r}")
-    return [DailyBarResponse.model_validate(bar) for bar in bars]
+    return [DailyBarResponse.from_observation(bar) for bar in bars]

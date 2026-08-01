@@ -315,11 +315,37 @@ describe("market data client", () => {
           data_quality: "primary",
           schema_version: 1,
           ingested_at: "2024-01-02T12:00:00Z",
+          fetch_fallback: null,
         },
       ],
     });
     const bars = await listDailyBars("http://localhost:8000", "AAPL");
     expect(bars[0]?.close).toBe("105");
+    expect(bars[0]?.fetch_fallback).toBeNull();
+  });
+
+  it("surfaces fetch_fallback on daily bars", async () => {
+    mockFetch({
+      status: 200,
+      json: [
+        {
+          source: "alpha_vantage",
+          symbol: "AAPL",
+          trading_date: "2024-01-02",
+          open: "100",
+          high: "110",
+          low: "90",
+          close: "105",
+          volume: 1000,
+          data_quality: "primary",
+          schema_version: 1,
+          ingested_at: "2024-01-02T12:00:00Z",
+          fetch_fallback: "full_to_compact",
+        },
+      ],
+    });
+    const bars = await listDailyBars("http://localhost:8000", "AAPL");
+    expect(bars[0]?.fetch_fallback).toBe("full_to_compact");
   });
 
   it("throws ApiClientError on 404 for unknown symbol bars", async () => {

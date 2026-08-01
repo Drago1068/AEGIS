@@ -45,6 +45,8 @@ export interface DailyBar {
   data_quality: string;
   schema_version: number;
   ingested_at: string;
+  /** ``full_to_compact`` from stored raw_payload when present; else null (ADR-0282). */
+  fetch_fallback?: string | null;
 }
 
 export interface IngestionSymbolResult {

@@ -689,8 +689,10 @@ primary tip ``raw_payload`` (see
 [decisions/0280-phase-279-evidence-summary-primary-fetch-fallback.md](decisions/0280-phase-279-evidence-summary-primary-fetch-fallback.md)).
 Phase 280 live-verified AAPL ``latest_primary_fetch_fallback=full_to_compact`` (see
 [decisions/0281-phase-280-nas-live-verify-phase-279.md](decisions/0281-phase-280-nas-live-verify-phase-279.md)).
-Phase 281 (draft) proposes ``fetch_fallback`` on daily-bars responses (see
+Phase 281 surfaces ``fetch_fallback`` on daily-bars responses and the bars table (see
 [decisions/0282-phase-281-daily-bars-fetch-fallback.md](decisions/0282-phase-281-daily-bars-fetch-fallback.md)).
+Phase 282 (draft) is the NAS live verify gate (see
+[decisions/0283-phase-282-nas-live-verify-phase-281.md](decisions/0283-phase-282-nas-live-verify-phase-281.md)).
 
 ## System context
 

@@ -60,25 +60,27 @@ class _FakeRepository:
         return self._bars[:limit]
 
 
-def _bar(symbol: str = "AAPL") -> MarketDailyBarObservation:
-    return MarketDailyBarObservation(
-        id=1,
-        source="alpha_vantage",
-        symbol=symbol,
-        trading_date=date(2024, 1, 2),
-        event_time=datetime(2024, 1, 2, tzinfo=UTC),
-        ingested_at=datetime(2024, 1, 2, 12, tzinfo=UTC),
-        open=Decimal("100"),
-        high=Decimal("110"),
-        low=Decimal("90"),
-        close=Decimal("105"),
-        volume=1000,
-        data_quality="primary",
-        schema_version=1,
-        raw_payload={},
-        observation_kind="initial",
-        supersedes_observation_id=None,
-    )
+def _bar(symbol: str = "AAPL", **overrides: object) -> MarketDailyBarObservation:
+    defaults: dict[str, object] = {
+        "id": 1,
+        "source": "alpha_vantage",
+        "symbol": symbol,
+        "trading_date": date(2024, 1, 2),
+        "event_time": datetime(2024, 1, 2, tzinfo=UTC),
+        "ingested_at": datetime(2024, 1, 2, 12, tzinfo=UTC),
+        "open": Decimal("100"),
+        "high": Decimal("110"),
+        "low": Decimal("90"),
+        "close": Decimal("105"),
+        "volume": 1000,
+        "data_quality": "primary",
+        "schema_version": 1,
+        "raw_payload": {},
+        "observation_kind": "initial",
+        "supersedes_observation_id": None,
+    }
+    defaults.update(overrides)
+    return MarketDailyBarObservation(**defaults)  # type: ignore[arg-type]
 
 
 class _FakeResearchService:
@@ -291,6 +293,31 @@ async def test_get_daily_bars_returns_stored_bars() -> None:
     assert body[0]["symbol"] == "AAPL"
     assert Decimal(str(body[0]["open"])) == Decimal("100")
     assert body[0]["volume"] == 1000
+    assert body[0]["fetch_fallback"] is None
+    assert "raw_payload" not in body[0]
+
+
+async def test_get_daily_bars_surfaces_fetch_fallback() -> None:
+    repository = _FakeRepository(
+        [
+            _bar(
+                raw_payload={
+                    "aegis_fetch_fallback": "full_to_compact",
+                    "aegis_output_size": "compact",
+                    "secret_token": "must-not-leak",
+                }
+            )
+        ]
+    )
+
+    async with _client_with_overrides(repository=repository) as client:
+        response = await client.get("/market-data/AAPL/daily-bars")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body[0]["fetch_fallback"] == "full_to_compact"
+    assert "raw_payload" not in body[0]
+    assert "secret_token" not in body[0]
 
 
 async def test_get_daily_bars_returns_404_for_unknown_symbol() -> None:

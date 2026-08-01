@@ -12,10 +12,18 @@ delivery workflow).
 Ops evidence gate after Phase 281 daily-bars fetch fallback. See
 [docs/architecture/decisions/0283-phase-282-nas-live-verify-phase-281.md](docs/architecture/decisions/0283-phase-282-nas-live-verify-phase-281.md).
 
-### Phase 281 - Daily-Bars Tip Fetch Fallback (draft)
+### Phase 281 - Daily-Bars Tip Fetch Fallback
 
 Surface ``fetch_fallback`` on daily-bar API responses from stored ``raw_payload``. See
 [docs/architecture/decisions/0282-phase-281-daily-bars-fetch-fallback.md](docs/architecture/decisions/0282-phase-281-daily-bars-fetch-fallback.md).
+
+#### Added
+
+- ``DailyBarResponse.fetch_fallback`` (+ table column / verify checklist); API + UI tests.
+
+#### Explicitly out of scope
+
+Orders, inventing closes, further evidence-summary tip scalars.
 
 ### Phase 280 - NAS Live Verification of Phase 279
 

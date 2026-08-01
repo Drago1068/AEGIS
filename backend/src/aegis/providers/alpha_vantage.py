@@ -42,7 +42,10 @@ _FIELD_CLOSE = "4. close"
 _FIELD_VOLUME = "5. volume"
 
 _FALLBACK_OUTPUT_SIZE = "compact"
-_FALLBACK_LABEL = "full_to_compact"
+FETCH_FALLBACK_FULL_TO_COMPACT = "full_to_compact"
+"""Audit label when full→compact fallback supplied bars (ADR-0274 / ADR-0276)."""
+
+_FALLBACK_LABEL = FETCH_FALLBACK_FULL_TO_COMPACT
 # Free-tier AV allows ~1 request/second; pause before compact retry (ADR-0274).
 _COMPACT_FALLBACK_DELAY_SECONDS = 1.25
 

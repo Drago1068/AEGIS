@@ -1,37 +1,31 @@
-# ADR-0276: Phase 275 Surface Primary Fetch Fallback on Ingest Results (draft)
+# ADR-0276: Phase 275 Surface Primary Fetch Fallback on Ingest Results
 
-- Status: Proposed (ready after Phase 274; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
 Phases 273–274 closed AV full→compact tip catch-up (live primary tip ``2026-07-31``).
-Fallback is labeled only in bar ``raw_payload`` / logs; ingest API results do not tell
+Fallback was labeled only in bar ``raw_payload`` / logs; ingest API results did not tell
 operators whether the primary fetch used configured ``full`` or compact fallback without
 a DB inspect.
 
 Prefer a fail-closed ingest diagnostic scalar over further tip mechanics or UI
 modularization.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. Ingest diagnostic
 
-Add optional ``primary_fetch_fallback: string | null`` (or equivalent) on ingest symbol
-results: ``full_to_compact`` when ADR-0274 compact fallback supplied primary bars; null
-otherwise. Never invent closes; never change provenance ``source``.
+Optional ``primary_fetch_fallback: string | null`` on ingest symbol results:
+``full_to_compact`` when ADR-0274 compact fallback supplied primary bars (read from
+``raw_payload["aegis_fetch_fallback"]`` on primary-source bars); null otherwise.
+Never invent closes; never change provenance ``source``. Secondary-only writes leave
+the field null even if secondary bars carry unrelated labels.
 
 ### 2. Out of scope
 
 Inventing closes, UI modularization, orders, changing output_size defaults.
-
-## Resume (after Phase 274 gate)
-
-```powershell
-# Surface primary fetch fallback on ingest results (ADR-0276); tests; commit+push; then Phase 276:
-# git archive HEAD → NAS; rebuild backend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
 
 ## Related documents
 

@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 275 ingest fallback diagnostic. See
 [docs/architecture/decisions/0277-phase-276-nas-live-verify-phase-275.md](docs/architecture/decisions/0277-phase-276-nas-live-verify-phase-275.md).
 
-### Phase 275 - Surface Primary Fetch Fallback on Ingest Results (draft)
+### Phase 275 - Surface Primary Fetch Fallback on Ingest Results
 
-Expose ``full_to_compact`` (or null) on ingest symbol results. See
+Expose ``primary_fetch_fallback`` (``full_to_compact`` or null) on ingest symbol results
+so operators need not inspect bar ``raw_payload``. See
 [docs/architecture/decisions/0276-phase-275-ingest-primary-fetch-fallback.md](docs/architecture/decisions/0276-phase-275-ingest-primary-fetch-fallback.md).
+
+#### Added
+
+- Domain + API ``primary_fetch_fallback`` on ingest results; ``verify.ps1`` logs it;
+  unit/API tests.
+
+#### Explicitly out of scope
+
+Inventing closes, silent provenance swaps, UI modularization, orders.
 
 ### Phase 274 - NAS Live Verification of Phase 273
 

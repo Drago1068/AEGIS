@@ -164,7 +164,37 @@ async def test_valid_bars_are_stored() -> None:
     assert result.latest_trading_date == _AS_OF
     assert result.latest_trading_date_source == _SOURCE
     assert result.primary_latest_trading_date == _AS_OF
-    assert repository.saved_bars == bars
+    assert result.primary_fetch_fallback is None
+    assert repository.saved == [(_SOURCE, bars[0])]
+
+
+@pytest.mark.asyncio
+async def test_primary_fetch_fallback_surfaces_full_to_compact_label() -> None:
+    bars = [
+        _bar(
+            "AAPL",
+            _AS_OF,
+            raw_payload={
+                "aegis_fetch_fallback": "full_to_compact",
+                "aegis_output_size": "compact",
+            },
+        )
+    ]
+    secondary_bars = [_bar("AAPL", _AS_OF, close=Decimal("106"))]
+    primary = FakeProvider({"AAPL": bars})
+    secondary = FakeProvider({"AAPL": secondary_bars})
+    repository = FakeRepository()
+
+    run_result = await _service(
+        primary,
+        repository,
+        secondary_provider=secondary,
+        secondary_source=_SECONDARY_SOURCE,
+    ).run(["AAPL"])
+
+    result = run_result.results[0]
+    assert result.primary_fetch_fallback == "full_to_compact"
+    assert result.primary_latest_trading_date == _AS_OF
 
 
 @pytest.mark.asyncio
@@ -437,6 +467,7 @@ async def test_unavailable_on_primary_still_refreshes_secondary() -> None:
 
     assert repository.saved == [(_SECONDARY_SOURCE, secondary_bars[0])]
     assert run_result.results[0].stored_count == 1
+    assert run_result.results[0].primary_fetch_fallback is None
 
 
 @pytest.mark.asyncio
@@ -458,6 +489,7 @@ async def test_hard_primary_error_still_allows_secondary_tip_catch_up() -> None:
     assert secondary.requested_symbols == ["AAPL"]
     assert run_result.results[0].error is None
     assert run_result.results[0].stored_count == 1
+    assert run_result.results[0].primary_fetch_fallback is None
     assert repository.saved == [(_SECONDARY_SOURCE, secondary_bars[0])]
 
 

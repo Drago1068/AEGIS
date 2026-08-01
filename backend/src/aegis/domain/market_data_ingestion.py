@@ -11,7 +11,8 @@ successful write uses the producing adapter's ``source`` without silent provenan
 When a secondary is configured, both providers are refreshed independently per symbol so a
 primary rate-limit or lagging primary tip cannot hide a fresher secondary tip. When the
 primary fetch has no tip, ``primary_latest_trading_date`` falls back to the max stored
-primary close (ADR-0266) without inventing bars.
+primary close (ADR-0266) without inventing bars. When Alpha Vantage full→compact fallback
+supplied primary bars, ``primary_fetch_fallback`` surfaces ``full_to_compact`` (ADR-0276).
 
 Provider historical corrections (ADR-0013) insert append-only ``correction`` rows when a
 re-ingest materially differs from the current stored bar for the same trading date.
@@ -80,6 +81,7 @@ class SymbolIngestionResult:
     latest_trading_date: date | None = None
     latest_trading_date_source: str | None = None
     primary_latest_trading_date: date | None = None
+    primary_fetch_fallback: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -189,6 +191,7 @@ class MarketDataIngestionService:
                 rejected_count=0,
             )
 
+        fetch_fallback = _detect_fetch_fallback(bars) if source == self._source else None
         as_of = self._as_of if self._as_of is not None else date.today()
         latest_trading_date = max(bar.trading_date for bar in bars)
         trading_dates = {bar.trading_date for bar in bars}
@@ -277,7 +280,18 @@ class MarketDataIngestionService:
             rejections=rejections,
             latest_trading_date=latest_trading_date,
             latest_trading_date_source=source,
+            primary_fetch_fallback=fetch_fallback,
         )
+
+
+def _detect_fetch_fallback(bars: list[DailyBar]) -> str | None:
+    """Return provider fallback label from bar provenance when present (ADR-0276)."""
+
+    for bar in bars:
+        value = bar.raw_payload.get("aegis_fetch_fallback")
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return None
 
 
 def _with_primary_tip(
@@ -297,6 +311,7 @@ def _with_primary_tip(
         latest_trading_date=result.latest_trading_date,
         latest_trading_date_source=result.latest_trading_date_source,
         primary_latest_trading_date=primary_tip,
+        primary_fetch_fallback=result.primary_fetch_fallback,
     )
 
 
@@ -324,6 +339,7 @@ def _merge_symbol_results(
                 else (primary.error or secondary.error)
             ),
             primary_latest_trading_date=primary_tip,
+            primary_fetch_fallback=primary.primary_fetch_fallback,
         )
 
     parts = [part for part in (primary, secondary) if part.error is None]
@@ -382,6 +398,7 @@ def _merge_symbol_results(
         latest_trading_date=latest_trading_date,
         latest_trading_date_source=latest_trading_date_source,
         primary_latest_trading_date=primary_tip,
+        primary_fetch_fallback=primary.primary_fetch_fallback,
     )
 
 

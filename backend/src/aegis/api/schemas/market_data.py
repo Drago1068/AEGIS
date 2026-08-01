@@ -43,6 +43,8 @@ class IngestionSymbolResult(BaseModel):
     latest_trading_date: date | None = None
     latest_trading_date_source: str | None = None
     primary_latest_trading_date: date | None = None
+    # ``full_to_compact`` when AV compact fallback supplied primary bars; else null.
+    primary_fetch_fallback: str | None = None
 
 
 class IngestionRunResponse(BaseModel):

@@ -1270,6 +1270,9 @@ try {
                 if (-not ($verifyRow.PSObject.Properties.Name -contains "primary_latest_trading_date")) {
                     throw "market-data/ingest result missing primary_latest_trading_date (Phase 263/264)"
                 }
+                if (-not ($verifyRow.PSObject.Properties.Name -contains "primary_fetch_fallback")) {
+                    throw "market-data/ingest result missing primary_fetch_fallback (Phase 275/276)"
+                }
                 $providerTipPart = if ($null -eq $providerTip -or $providerTip -eq "") { "null" } else { [string]$providerTip }
                 $providerTipSource = $null
                 if ($verifyRow.PSObject.Properties.Name -contains "latest_trading_date_source") {
@@ -1278,11 +1281,17 @@ try {
                 $providerTipSourcePart = if ($null -eq $providerTipSource -or $providerTipSource -eq "") { "null" } else { [string]$providerTipSource }
                 $primaryTip = $verifyRow.primary_latest_trading_date
                 $primaryTipPart = if ($null -eq $primaryTip -or $primaryTip -eq "") { "null" } else { [string]$primaryTip }
+                $primaryFallback = $verifyRow.primary_fetch_fallback
+                $primaryFallbackPart = if ($null -eq $primaryFallback -or $primaryFallback -eq "") { "null" } else { [string]$primaryFallback }
                 Write-Host ("OK  Phase 266 ingest {0} stored={1} skipped_existing={2} corrected={3} rejected={4} latest_trading_date={5} latest_trading_date_source={6} primary_latest_trading_date={7} error={8}" -f `
                     $verifySymbol, $verifyRow.stored_count, $verifyRow.skipped_existing_count, `
                     $verifyRow.corrected_count, $verifyRow.rejected_count, $providerTipPart, `
                     $providerTipSourcePart, $primaryTipPart, `
                     $(if ($null -eq $verifyRow.error -or $verifyRow.error -eq "") { "null" } else { [string]$verifyRow.error }))
+                # Phase 274: AV compact fallback may advance primary tip when full is gated (ADR-0274).
+                Write-Host "OK  Phase 274 primary tip check primary_latest_trading_date=$primaryTipPart (compact fallback OK; may still lag polygon)"
+                # Phase 276: surface labeled primary fetch fallback without DB inspect (ADR-0276).
+                Write-Host "OK  Phase 276 primary_fetch_fallback=$primaryFallbackPart (full_to_compact when AV compact fallback; null OK)"
             } else {
                 Write-Host "OK  Phase 258 ingest results_count=$(@($ingestBody.results).Count) (verify symbol not in run; watchlist OK)"
             }

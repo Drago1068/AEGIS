@@ -809,8 +809,13 @@ Phase 330 live-verified that CTA (see
 [decisions/0331-phase-330-nas-live-verify-phase-329.md](decisions/0331-phase-330-nas-live-verify-phase-329.md)).
 Phase 331 elevates an unlabeled-empty CTA pointing at ready-horizon backfill (see
 [decisions/0332-phase-331-unlabeled-empty-cta.md](decisions/0332-phase-331-unlabeled-empty-cta.md)).
-Phase 332 (draft) is the NAS live-verify gate for that CTA (see
+Phase 332 live-verified that CTA (see
 [decisions/0333-phase-332-nas-live-verify-phase-331.md](decisions/0333-phase-332-nas-live-verify-phase-331.md)).
+Phase 333 (draft) would elevate a tip-not-ready CTA pointing at
+``Compute ready-horizon labels`` (see
+[decisions/0334-phase-333-tip-not-ready-cta.md](decisions/0334-phase-333-tip-not-ready-cta.md)).
+Phase 334 (draft) is the NAS live-verify gate for that CTA (see
+[decisions/0335-phase-334-nas-live-verify-phase-333.md](decisions/0335-phase-334-nas-live-verify-phase-333.md)).
 
 ## System context
 

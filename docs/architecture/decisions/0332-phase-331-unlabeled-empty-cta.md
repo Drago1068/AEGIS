@@ -29,3 +29,4 @@ Auto-backfill, inventing bars, orders, changing readiness counts, changing unloc
 - [0331-phase-330-nas-live-verify-phase-329.md](0331-phase-330-nas-live-verify-phase-329.md)
 - [0288-phase-287-unlabeled-label-ready-empty-callout.md](0288-phase-287-unlabeled-label-ready-empty-callout.md)
 - [0333-phase-332-nas-live-verify-phase-331.md](0333-phase-332-nas-live-verify-phase-331.md)
+- [0334-phase-333-tip-not-ready-cta.md](0334-phase-333-tip-not-ready-cta.md)

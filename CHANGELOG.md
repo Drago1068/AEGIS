@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 332 - NAS Live Verification of Phase 331 (draft)
+### Phase 334 - NAS Live Verification of Phase 333 (draft)
 
-Ops evidence gate after Phase 331 unlabeled-empty ready-horizon CTA. See
+Ops evidence gate after Phase 333 tip-not-ready CTA. See
+[docs/architecture/decisions/0335-phase-334-nas-live-verify-phase-333.md](docs/architecture/decisions/0335-phase-334-nas-live-verify-phase-333.md).
+
+### Phase 333 - Tip-Not-Ready Ready-Horizon CTA (draft)
+
+Elevate Compute ready-horizon labels CTA on the tip-not-ready callout. See
+[docs/architecture/decisions/0334-phase-333-tip-not-ready-cta.md](docs/architecture/decisions/0334-phase-333-tip-not-ready-cta.md).
+
+### Phase 332 - NAS Live Verification of Phase 331
+
+Ops evidence gate after Phase 331 unlabeled-empty ready-horizon CTA. Live verify passed
+2026-08-01 (``99e5676``; ``ready_count=0`` elevates CTA). See
 [docs/architecture/decisions/0333-phase-332-nas-live-verify-phase-331.md](docs/architecture/decisions/0333-phase-332-nas-live-verify-phase-331.md).
+
+#### Added
+
+- ADR-0333: live unlabeled-empty CTA evidence (checklist Phase 332 log).
+
+#### Explicitly out of scope
+
+Auto-backfill, inventing bars, orders.
 
 ### Phase 331 - Unlabeled-Empty Ready-Horizon CTA
 

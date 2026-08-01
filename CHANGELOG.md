@@ -7,10 +7,31 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 298 - NAS Live Verification of Phase 297 (draft)
+### Phase 300 - NAS Live Verification of Phase 299 (draft)
 
-Ops evidence gate after Phase 297 labeling diagnostics summary count. See
+Ops evidence gate after Phase 299 research-index history chart. See
+[docs/architecture/decisions/0301-phase-300-nas-live-verify-phase-299.md](docs/architecture/decisions/0301-phase-300-nas-live-verify-phase-299.md).
+
+### Phase 299 - Research Index History Chart (draft)
+
+Research-only chart of ``research_index`` vs ``as_of_trading_date`` from the assessments
+list (prefer product signal over further callout stacking). See
+[docs/architecture/decisions/0300-phase-299-research-index-history-chart.md](docs/architecture/decisions/0300-phase-299-research-index-history-chart.md).
+
+### Phase 298 - NAS Live Verification of Phase 297
+
+Ops evidence gate after Phase 297 labeling diagnostics summary count. Live verify passed
+2026-08-01 (``ab47a60``; ``active_count=4`` triggers tip_not_ready, freshness_lag,
+unlabeled_empty, mixed_unlabeled_backlog). See
 [docs/architecture/decisions/0299-phase-298-nas-live-verify-phase-297.md](docs/architecture/decisions/0299-phase-298-nas-live-verify-phase-297.md).
+
+#### Added
+
+- ADR-0299: live labeling-diagnostics summary active-count evidence (checklist Phase 298 log).
+
+#### Explicitly out of scope
+
+Inventing closes, orders.
 
 ### Phase 297 - Labeling Diagnostics Summary Count
 

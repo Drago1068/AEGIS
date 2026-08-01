@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 270 - NAS Live Verification of Phase 269 (draft)
+### Phase 272 - NAS Live Verification of Phase 271 (draft)
 
-Ops evidence gate after Phase 269 tip lag fix. See
+Ops evidence gate after Phase 271 verify lag display fix. See
+[docs/architecture/decisions/0273-phase-272-nas-live-verify-phase-271.md](docs/architecture/decisions/0273-phase-272-nas-live-verify-phase-271.md).
+
+### Phase 271 - Fix Verify Lag Zero Displayed as Null (draft)
+
+PowerShell verify treated lag ``0`` as null (``0 -eq ""``). See
+[docs/architecture/decisions/0272-phase-271-fix-verify-lag-zero-as-null.md](docs/architecture/decisions/0272-phase-271-fix-verify-lag-zero-as-null.md).
+
+### Phase 270 - NAS Live Verification of Phase 269
+
+Ops evidence gate after Phase 269 Polygon ``/prev`` tip catch-up. Live verify passed
+2026-07-31 (``f1ed164``; AAPL tip ``2026-07-30``→``2026-07-31``, ``stored=1``,
+``latest_trading_date_source=polygon``). See
 [docs/architecture/decisions/0271-phase-270-nas-live-verify-phase-269.md](docs/architecture/decisions/0271-phase-270-nas-live-verify-phase-269.md).
+
+#### Added
+
+- ADR-0271: live tip catch-up evidence (checklist Phase 270 log).
+
+#### Explicitly out of scope
+
+Inventing closes, default-on calibration, orders.
 
 ### Phase 269 - Advance Store Tip When Provider Has Current Session
 

@@ -7,10 +7,11 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 269 closed (Polygon /prev tip catch-up when range lags).**
-Next (draft): Phase 270 NAS live verify under lab TLS (ADR-0271). See
-[docs/architecture/decisions/0270-phase-269-advance-store-tip-current-session.md](docs/architecture/decisions/0270-phase-269-advance-store-tip-current-session.md),
+**Current phase: Phase 270 closed (Polygon /prev tip catch-up live-verified).**
+Next (draft): Phase 271 fix verify lag ``0`` displayed as null (ADR-0272), then Phase 272
+NAS verify. See
 [docs/architecture/decisions/0271-phase-270-nas-live-verify-phase-269.md](docs/architecture/decisions/0271-phase-270-nas-live-verify-phase-269.md),
+[docs/architecture/decisions/0272-phase-271-fix-verify-lag-zero-as-null.md](docs/architecture/decisions/0272-phase-271-fix-verify-lag-zero-as-null.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

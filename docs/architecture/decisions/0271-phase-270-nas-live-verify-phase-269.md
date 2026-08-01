@@ -1,34 +1,26 @@
-# ADR-0271: Phase 270 NAS Live Verification of Phase 269 (draft)
+# ADR-0271: Phase 270 NAS Live Verification of Phase 269
 
-- Status: Proposed (pending Phase 269 + live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
-Phase 269 would diagnose/fix remaining store tip calendar lag when providers already
-have the current session close (ADR-0270). Operators need a verified backend redeploy
-under lab TLS after that lands.
+Phase 269 merged Polygon ``/prev`` when range aggregates lag (ADR-0270). Operators needed
+a verified backend redeploy under lab TLS.
 
 ## Decisions
 
-### 1. Scope
+### 1. Scope completed
 
-1. Deploy ``HEAD`` TLS; recreate backend.
-2. ``verify.ps1`` pass; evidence tip / ``stored_bar_calendar_lag_trading_days`` reflects
-   real provider closes (lag=0 when session tip is stored; lag>0 only when providers
-   genuinely lack the close).
-3. Alembic ``0009`` / ``head``.
+1. Deployed ``f1ed164`` TLS; rebuilt backend.
+2. ``verify.ps1`` passed; alembic ``0009`` / ``head``.
+3. Live AAPL ingest evidence:
+   ``stored=1``, ``latest_trading_date=2026-07-31``,
+   ``latest_trading_date_source=polygon``, tip ``2026-07-30`` → ``2026-07-31``.
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout.
-
-## Resume
-
-```powershell
-# After Phase 269 on HEAD: git archive → NAS; rebuild backend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+Retain verify stdout as acceptance evidence.
 
 ## Related documents
 

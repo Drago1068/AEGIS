@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 282 - NAS Live Verification of Phase 281 (draft)
+### Phase 284 - NAS Live Verification of Phase 283 (draft)
 
-Ops evidence gate after Phase 281 daily-bars fetch fallback. See
+Ops evidence gate after Phase 283 label-readiness callout. See
+[docs/architecture/decisions/0285-phase-284-nas-live-verify-phase-283.md](docs/architecture/decisions/0285-phase-284-nas-live-verify-phase-283.md).
+
+### Phase 283 - Latest Assessment Label-Readiness Callout (draft)
+
+Elevate existing evidence-summary label-block fields in the research UI. See
+[docs/architecture/decisions/0284-phase-283-latest-label-readiness-callout.md](docs/architecture/decisions/0284-phase-283-latest-label-readiness-callout.md).
+
+### Phase 282 - NAS Live Verification of Phase 281
+
+Ops evidence gate after Phase 281 daily-bars fetch fallback. Live verify passed 2026-07-31
+(``58023db``; AAPL tip ``fetch_fallback=full_to_compact``, ``2026-07-31`` /
+``alpha_vantage``). See
 [docs/architecture/decisions/0283-phase-282-nas-live-verify-phase-281.md](docs/architecture/decisions/0283-phase-282-nas-live-verify-phase-281.md).
+
+#### Added
+
+- ADR-0283: live daily-bars tip fetch_fallback evidence (checklist Phase 282 log).
+
+#### Explicitly out of scope
+
+Inventing closes, orders.
 
 ### Phase 281 - Daily-Bars Tip Fetch Fallback
 

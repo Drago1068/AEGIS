@@ -20,6 +20,7 @@ export function ResearchEvidenceSummarySection({
   onLoadScanLabeledLabels,
 }: ResearchEvidenceSummarySectionProps) {
   const [expandedHorizonKey, setExpandedHorizonKey] = useState<string | null>(null);
+  const showLabelReadinessCallout = evidenceSummary.latest_assessment_is_label_ready === false;
 
   return (
     <div
@@ -29,6 +30,45 @@ export function ResearchEvidenceSummarySection({
       <p className="text-xs font-semibold uppercase tracking-wide text-aegis-muted">
         Evidence summary (research-only — not advice)
       </p>
+      {showLabelReadinessCallout ? (
+        <aside
+          className="mt-3 rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+          role="status"
+          data-testid="evidence-latest-label-readiness-callout"
+        >
+          <p className="font-semibold text-aegis-warn">
+            Latest assessment is not label-ready (research-only)
+          </p>
+          <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+            <li data-testid="evidence-label-readiness-callout-block-reason">
+              block_reason={evidenceSummary.latest_assessment_label_block_reason ?? "null"}
+            </li>
+            <li data-testid="evidence-label-readiness-callout-forward-shortfall">
+              forward_bar_shortfall=
+              {evidenceSummary.latest_assessment_forward_bar_shortfall ?? "null"}
+              {evidenceSummary.latest_assessment_min_horizon_forward_bar_shortfall != null
+                ? ` (min_horizon=${evidenceSummary.latest_assessment_min_horizon_forward_bar_shortfall})`
+                : ""}
+            </li>
+            <li data-testid="evidence-label-readiness-callout-required-end-date">
+              required_label_end_date=
+              {evidenceSummary.latest_assessment_required_label_end_date ?? "null"}
+              {evidenceSummary.latest_assessment_min_horizon_required_label_end_date != null
+                ? ` (min_horizon=${evidenceSummary.latest_assessment_min_horizon_required_label_end_date})`
+                : ""}
+            </li>
+            {evidenceSummary.most_recent_labelable_as_of_trading_date != null ? (
+              <li data-testid="evidence-label-readiness-callout-most-recent-labelable">
+                most_recent_labelable_as_of=
+                {evidenceSummary.most_recent_labelable_as_of_trading_date}
+              </li>
+            ) : null}
+          </ul>
+          <p className="mt-1 text-xs text-aegis-muted">
+            Fail-closed: no invented closes; not a signal or recommendation.
+          </p>
+        </aside>
+      ) : null}
       <dl className="mt-2 grid gap-2 sm:grid-cols-2">
         <div>
           <dt className="text-aegis-muted">State</dt>

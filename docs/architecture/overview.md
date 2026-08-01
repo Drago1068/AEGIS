@@ -694,9 +694,11 @@ Phase 281 surfaces ``fetch_fallback`` on daily-bars responses and the bars table
 Phase 282 live-verified multi-source tip ``fetch_fallback=null`` (``polygon``) while
 primary compact fallback remains labeled on ingest/evidence-summary (see
 [decisions/0283-phase-282-nas-live-verify-phase-281.md](decisions/0283-phase-282-nas-live-verify-phase-281.md)).
-Phase 283 (draft) proposes elevating latest label-readiness block reason/shortfall in the
-research UI (see
+Phase 283 elevates latest label-readiness block reason/shortfall in the research UI when
+``latest_assessment_is_label_ready=false`` (see
 [decisions/0284-phase-283-latest-label-readiness-callout.md](decisions/0284-phase-283-latest-label-readiness-callout.md)).
+Phase 284 (draft) is the NAS live verify gate (see
+[decisions/0285-phase-284-nas-live-verify-phase-283.md](decisions/0285-phase-284-nas-live-verify-phase-283.md)).
 
 ## System context
 

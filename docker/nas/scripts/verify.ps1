@@ -150,21 +150,22 @@ function Write-VerifyChecklist {
     Write-Host "110. Authenticated evidence-summary includes Phase 229 scan_labeled_freshness_lag_trading_days (Phase 230)"
     Write-Host "111. Authenticated evidence-summary includes Phase 231 latest_assessment_is_label_ready (Phase 232)"
     Write-Host "112. Authenticated evidence-summary includes Phase 233 latest_assessment_label_block_reason (Phase 234)"
-    Write-Host "113. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
-    Write-Host "114. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
-    Write-Host "115. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
-    Write-Host "116. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
-    Write-Host "117. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
-    Write-Host "118. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
-    Write-Host "119. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
-    Write-Host "120. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
-    Write-Host "121. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
-    Write-Host "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
-    Write-Host "123. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-    Write-Host "124. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
-    Write-Host "125. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
-    Write-Host "126. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
-    Write-Host "127. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "113. Authenticated evidence-summary Phase 284 label-readiness callout field bundle (UI unit-tested)"
+    Write-Host "114. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
+    Write-Host "115. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
+    Write-Host "116. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
+    Write-Host "117. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
+    Write-Host "118. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
+    Write-Host "119. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
+    Write-Host "120. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
+    Write-Host "121. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
+    Write-Host "122. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
+    Write-Host "123. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
+    Write-Host "124. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
+    Write-Host "125. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
+    Write-Host "126. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
+    Write-Host "127. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
+    Write-Host "128. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1191,6 +1192,18 @@ try {
         $blockReason = $summary.latest_assessment_label_block_reason
         $blockReasonPart = if ($null -eq $blockReason -or $blockReason -eq "") { "null" } else { [string]$blockReason }
         Write-Host "OK  Phase 234 latest_assessment_label_block_reason=$blockReasonPart"
+        # Phase 284: UI callout uses these existing fields when label_ready=false (ADR-0284).
+        $fwdShortfall = $null
+        if ($summary.PSObject.Properties.Name -contains "latest_assessment_forward_bar_shortfall") {
+            $fwdShortfall = $summary.latest_assessment_forward_bar_shortfall
+        }
+        $fwdShortfallPart = if ($null -eq $fwdShortfall) { "null" } else { [string]$fwdShortfall }
+        $reqEnd = $null
+        if ($summary.PSObject.Properties.Name -contains "latest_assessment_required_label_end_date") {
+            $reqEnd = $summary.latest_assessment_required_label_end_date
+        }
+        $reqEndPart = if ($null -eq $reqEnd -or $reqEnd -eq "") { "null" } else { [string]$reqEnd }
+        Write-Host "OK  Phase 284 label-readiness callout fields ready=$labelReadyPart block_reason=$blockReasonPart forward_shortfall=$fwdShortfallPart required_end=$reqEndPart (UI unit-tested; false elevates callout)"
         # Phase 236: most_recent_labelable_as_of_trading_date from Phase 235 (null OK when none label-ready).
         if (-not ($summary.PSObject.Properties.Name -contains "most_recent_labelable_as_of_trading_date")) {
             throw "evidence-summary missing most_recent_labelable_as_of_trading_date (Phase 235/236)"

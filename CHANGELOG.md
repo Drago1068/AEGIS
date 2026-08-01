@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 283 label-readiness callout. See
 [docs/architecture/decisions/0285-phase-284-nas-live-verify-phase-283.md](docs/architecture/decisions/0285-phase-284-nas-live-verify-phase-283.md).
 
-### Phase 283 - Latest Assessment Label-Readiness Callout (draft)
+### Phase 283 - Latest Assessment Label-Readiness Callout
 
 Elevate existing evidence-summary label-block fields in the research UI. See
 [docs/architecture/decisions/0284-phase-283-latest-label-readiness-callout.md](docs/architecture/decisions/0284-phase-283-latest-label-readiness-callout.md).
+
+#### Added
+
+- Evidence-summary callout when ``latest_assessment_is_label_ready=false``;
+  unit tests; ``verify.ps1`` Phase 284 field bundle log.
+
+#### Explicitly out of scope
+
+New tip/fallback scalars, inventing closes, orders.
 
 ### Phase 282 - NAS Live Verification of Phase 281
 

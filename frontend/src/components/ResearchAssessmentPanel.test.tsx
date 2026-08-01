@@ -214,6 +214,16 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.getByRole("button", { name: /compute calibration/i })).toBeDisabled();
   });
 
+  it("hides label-readiness callout when latest_assessment_is_label_ready is null", async () => {
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={null} />);
+    fireEvent.click(screen.getByRole("button", { name: /refresh evidence summary/i }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("evidence-summary-section")).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId("evidence-latest-label-readiness-callout")).toBeNull();
+  });
+
   it("renders an initial latest assessment from the API payload", () => {
     render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
 
@@ -691,6 +701,24 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("evidence-latest-assessment-is-label-ready")).toHaveTextContent(
         "false",
       );
+      expect(
+        screen.getByTestId("evidence-latest-label-readiness-callout"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByTestId("evidence-label-readiness-callout-block-reason"),
+      ).toHaveTextContent("block_reason=insufficient_forward_bars");
+      expect(
+        screen.getByTestId("evidence-label-readiness-callout-forward-shortfall"),
+      ).toHaveTextContent("forward_bar_shortfall=20");
+      expect(
+        screen.getByTestId("evidence-label-readiness-callout-forward-shortfall"),
+      ).toHaveTextContent("min_horizon=5");
+      expect(
+        screen.getByTestId("evidence-label-readiness-callout-required-end-date"),
+      ).toHaveTextContent("required_label_end_date=2024-02-28");
+      expect(
+        screen.getByTestId("evidence-label-readiness-callout-most-recent-labelable"),
+      ).toHaveTextContent("most_recent_labelable_as_of=2024-01-26");
       expect(
         screen.getByTestId("evidence-latest-assessment-label-block-reason"),
       ).toHaveTextContent("insufficient_forward_bars");

@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 302 - NAS Live Verification of Phase 301 (draft)
+### Phase 304 - NAS Live Verification of Phase 303 (draft)
 
-Ops evidence gate after Phase 301 assessment history limit 100. See
+Ops evidence gate after Phase 303 coverage-confidence history chart. See
+[docs/architecture/decisions/0305-phase-304-nas-live-verify-phase-303.md](docs/architecture/decisions/0305-phase-304-nas-live-verify-phase-303.md).
+
+### Phase 303 - Coverage Confidence History Chart (draft)
+
+Research-only chart of ``coverage_confidence`` vs ``as_of_trading_date`` from the
+assessments list (distinct from probability confidence / research_index). See
+[docs/architecture/decisions/0304-phase-303-coverage-confidence-history-chart.md](docs/architecture/decisions/0304-phase-303-coverage-confidence-history-chart.md).
+
+### Phase 302 - NAS Live Verification of Phase 301
+
+Ops evidence gate after Phase 301 assessment history limit 100. Live verify passed
+2026-08-01 (``0e4fb29``; ``list_count=100`` ``chartable_points=77``). See
 [docs/architecture/decisions/0303-phase-302-nas-live-verify-phase-301.md](docs/architecture/decisions/0303-phase-302-nas-live-verify-phase-301.md).
+
+#### Added
+
+- ADR-0303: live denser research_index chart evidence (checklist Phase 302 log).
+
+#### Explicitly out of scope
+
+Inventing assessments, orders.
 
 ### Phase 301 - Assessment History Limit 100
 

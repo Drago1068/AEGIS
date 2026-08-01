@@ -164,22 +164,23 @@ function Write-VerifyChecklist {
     Write-Host "124. Authenticated evidence-summary Phase 308 labeling frontier readout field bundle (UI unit-tested)"
     Write-Host "125. Authenticated POST outcome-labels/ready-horizons Phase 310 (200 partial or 422 fail-closed)"
     Write-Host "126. Authenticated POST outcome-labels/backfill/ready-horizons Phase 312 (summary counts; zeros OK)"
-    Write-Host "127. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
-    Write-Host "128. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
-    Write-Host "129. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
-    Write-Host "130. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
-    Write-Host "131. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
-    Write-Host "132. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
-    Write-Host "133. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
-    Write-Host "134. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
-    Write-Host "135. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
-    Write-Host "136. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
-    Write-Host "137. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-    Write-Host "138. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
-    Write-Host "139. Authenticated evidence-summary Phase 296 primary fetch-fallback callout field bundle (UI unit-tested)"
-    Write-Host "140. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
-    Write-Host "141. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
-    Write-Host "142. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "127. Authenticated POST outcome-labels/backfill Phase 314 complete-horizon upgrade eligibility (UI unit-tested)"
+    Write-Host "128. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
+    Write-Host "129. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
+    Write-Host "130. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
+    Write-Host "131. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
+    Write-Host "132. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
+    Write-Host "133. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
+    Write-Host "134. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
+    Write-Host "135. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
+    Write-Host "136. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
+    Write-Host "137. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
+    Write-Host "138. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
+    Write-Host "139. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
+    Write-Host "140. Authenticated evidence-summary Phase 296 primary fetch-fallback callout field bundle (UI unit-tested)"
+    Write-Host "141. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
+    Write-Host "142. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
+    Write-Host "143. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -642,6 +643,7 @@ try {
         $label100Persisted = [int]$backfill100Body.persisted_count
         $label100Skipped = [int]$backfill100Body.skipped_count
         Write-Host "OK  outcome-labels/backfill?limit=100 assessment_count=$label100Assess persisted=$label100Persisted skipped=$label100Skipped"
+        Write-Host "OK  Phase 314 full-horizon backfill uses complete-horizon skip (partial ready-horizons remain upgrade-eligible; unit-tested)"
         if ($label100Assess -gt 0 -and $label100Persisted -lt 1) {
             throw "Phase 58: limit=100 selected $label100Assess candidates but persisted=$label100Persisted (expected >=1 when source-ready candidates exist)"
         }

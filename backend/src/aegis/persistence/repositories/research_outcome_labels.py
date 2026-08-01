@@ -93,6 +93,37 @@ class ResearchOutcomeLabelRepository:
         result = await self._session.execute(stmt)
         return {int(row) for row in result.scalars().all()}
 
+    async def latest_labels_for_assessments(
+        self,
+        symbol: str,
+        assessment_ids: Sequence[int],
+        *,
+        label_method_id: str,
+    ) -> dict[int, OutcomeLabelData]:
+        """Return newest label per assessment for ``symbol`` / ``label_method_id``."""
+
+        if not assessment_ids:
+            return {}
+        stmt = (
+            select(ResearchAssessmentOutcomeLabel)
+            .where(
+                ResearchAssessmentOutcomeLabel.symbol == symbol.upper(),
+                ResearchAssessmentOutcomeLabel.label_method_id == label_method_id,
+                ResearchAssessmentOutcomeLabel.assessment_snapshot_id.in_(
+                    list(assessment_ids)
+                ),
+            )
+            .order_by(ResearchAssessmentOutcomeLabel.computed_at.desc())
+        )
+        result = await self._session.execute(stmt)
+        latest: dict[int, OutcomeLabelData] = {}
+        for row in result.scalars().all():
+            assessment_id = int(row.assessment_snapshot_id)
+            if assessment_id in latest:
+                continue
+            latest[assessment_id] = _to_data(row)
+        return latest
+
 
 def _to_data(row: ResearchAssessmentOutcomeLabel) -> OutcomeLabelData:
     labels: dict[str, float] = {}

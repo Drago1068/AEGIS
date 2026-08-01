@@ -20,6 +20,7 @@ from aegis.domain.research_outcome_labels import (
     OutcomeLabelUnavailableError,
     compute_forward_total_return_labels,
     forward_horizon_end_date,
+    label_covers_configured_horizons,
     ready_forward_horizons,
     snapshot_forward_bar_shortfall,
     snapshot_label_source_max_bar_date,
@@ -111,6 +112,14 @@ def test_ready_forward_horizons_partial_when_tip_blocked() -> None:
 def test_ready_forward_horizons_empty_when_none_ready() -> None:
     bars = [_bar(_AS_OF, Decimal("100"))]
     assert ready_forward_horizons(_snapshot(), bars, calendar_name="NYSE") == ()
+
+
+def test_label_covers_configured_horizons_partial_and_complete() -> None:
+    assert not label_covers_configured_horizons({"forward_return_5": 0.05})
+    assert label_covers_configured_horizons(
+        {"forward_return_5": 0.05, "forward_return_20": 0.1}
+    )
+    assert not label_covers_configured_horizons({})
 
 
 def test_insufficient_forward_bars_fail_closed() -> None:
@@ -380,6 +389,9 @@ class _MemLabelStore:
     async def get_latest_for_assessment(
         self, assessment_snapshot_id: int
     ) -> OutcomeLabelData | None:
+        for label in reversed(self.inserted):
+            if label.assessment_snapshot_id == assessment_snapshot_id:
+                return label
         return None
 
     async def list_for_assessment(
@@ -389,7 +401,13 @@ class _MemLabelStore:
         *,
         symbol: str | None = None,
     ) -> list[OutcomeLabelData]:
-        return []
+        rows = [
+            label
+            for label in reversed(self.inserted)
+            if label.assessment_snapshot_id == assessment_snapshot_id
+            and (symbol is None or label.symbol.upper() == symbol.upper())
+        ]
+        return rows[:limit]
 
     async def assessment_ids_with_labels(
         self,
@@ -398,7 +416,33 @@ class _MemLabelStore:
         *,
         label_method_id: str,
     ) -> set[int]:
-        return set()
+        return {
+            label.assessment_snapshot_id
+            for label in self.inserted
+            if label.symbol.upper() == symbol.upper()
+            and label.label_method_id == label_method_id
+            and label.assessment_snapshot_id in assessment_ids
+        }
+
+    async def latest_labels_for_assessments(
+        self,
+        symbol: str,
+        assessment_ids: Sequence[int],
+        *,
+        label_method_id: str,
+    ) -> dict[int, OutcomeLabelData]:
+        latest: dict[int, OutcomeLabelData] = {}
+        for label in reversed(self.inserted):
+            if label.symbol.upper() != symbol.upper():
+                continue
+            if label.label_method_id != label_method_id:
+                continue
+            if label.assessment_snapshot_id not in assessment_ids:
+                continue
+            if label.assessment_snapshot_id in latest:
+                continue
+            latest[label.assessment_snapshot_id] = label
+        return latest
 
 
 @pytest.mark.asyncio
@@ -440,3 +484,53 @@ async def test_label_assessment_ready_horizons_fail_closed_when_none_ready() -> 
         await service.label_assessment_ready_horizons("AAPL", 1)
     assert exc_info.value.reason == OutcomeLabelReason.INSUFFICIENT_FORWARD_BARS
     assert store.inserted == []
+
+
+@pytest.mark.asyncio
+async def test_assessment_ids_with_complete_labels_skips_partial() -> None:
+    from aegis.domain.research_outcome_labels import LABEL_METHOD_ID, OutcomeLabelService
+
+    store = _MemLabelStore()
+    await store.insert(
+        OutcomeLabelData(
+            assessment_snapshot_id=1,
+            symbol="AAPL",
+            label_method_id=LABEL_METHOD_ID,
+            label_method_version=1,
+            state="research_only",
+            as_of_trading_date=_AS_OF,
+            computed_at=datetime(2024, 1, 10, 12, tzinfo=UTC),
+            labels={"forward_return_5": 0.05},
+            label_end_dates={"forward_return_5": "2024-01-09"},
+            schema_version=1,
+            bar_source=_SOURCE,
+        )
+    )
+    await store.insert(
+        OutcomeLabelData(
+            assessment_snapshot_id=2,
+            symbol="AAPL",
+            label_method_id=LABEL_METHOD_ID,
+            label_method_version=1,
+            state="research_only",
+            as_of_trading_date=_AS_OF,
+            computed_at=datetime(2024, 1, 10, 12, tzinfo=UTC),
+            labels={"forward_return_5": 0.05, "forward_return_20": 0.1},
+            label_end_dates={
+                "forward_return_5": "2024-01-09",
+                "forward_return_20": "2024-02-01",
+            },
+            schema_version=1,
+            bar_source=_SOURCE,
+        )
+    )
+    service = OutcomeLabelService(
+        _MemAssessmentStore(_snapshot()),
+        _MemBarReader([]),
+        store,
+        calendar_name="NYSE",
+    )
+    complete = await service.assessment_ids_with_complete_labels("AAPL", [1, 2, 3])
+    assert complete == {2}
+    any_labeled = await service.assessment_ids_with_labels("AAPL", [1, 2, 3])
+    assert any_labeled == {1, 2}

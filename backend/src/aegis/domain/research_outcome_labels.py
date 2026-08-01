@@ -36,6 +36,28 @@ STATE_RESEARCH_ONLY_LABEL = STATE_RESEARCH_ONLY
 FORWARD_HORIZON_SESSIONS: tuple[int, ...] = (5, 20)
 
 
+def configured_horizon_label_keys(
+    horizons: tuple[int, ...] = FORWARD_HORIZON_SESSIONS,
+) -> frozenset[str]:
+    """Return the ``forward_return_N`` keys required for a complete label row."""
+
+    return frozenset(f"forward_return_{horizon}" for horizon in horizons)
+
+
+def label_covers_configured_horizons(
+    labels: dict[str, float],
+    *,
+    horizons: tuple[int, ...] = FORWARD_HORIZON_SESSIONS,
+) -> bool:
+    """True when ``labels`` includes every configured horizon key (ADR-0314).
+
+    Partial ready-horizons rows (e.g. only ``forward_return_5``) return False so full
+    backfill may append a complete row later. Never invents keys or values.
+    """
+
+    return configured_horizon_label_keys(horizons).issubset(labels.keys())
+
+
 class OutcomeLabelReason(StrEnum):
     """Structured fail-closed reason codes for HTTP 422 ``detail.reason``."""
 
@@ -102,6 +124,16 @@ class OutcomeLabelStore(Protocol):
         label_method_id: str,
     ) -> set[int]:
         """Return the subset of ``assessment_ids`` that already have a label row."""
+        ...
+
+    async def latest_labels_for_assessments(
+        self,
+        symbol: str,
+        assessment_ids: Sequence[int],
+        *,
+        label_method_id: str,
+    ) -> dict[int, OutcomeLabelData]:
+        """Return the newest label per assessment id (missing ids omitted)."""
         ...
 
 
@@ -771,24 +803,49 @@ class OutcomeLabelService:
             label_method_id=label_method_id,
         )
 
+    async def assessment_ids_with_complete_labels(
+        self,
+        symbol: str,
+        assessment_ids: list[int],
+        *,
+        label_method_id: str = LABEL_METHOD_ID,
+        horizons: tuple[int, ...] = FORWARD_HORIZON_SESSIONS,
+    ) -> set[int]:
+        """Return assessment ids whose latest label covers all ``horizons`` (ADR-0314)."""
+
+        latest = await self._label_store.latest_labels_for_assessments(
+            symbol,
+            assessment_ids,
+            label_method_id=label_method_id,
+        )
+        return {
+            assessment_id
+            for assessment_id, label in latest.items()
+            if label_covers_configured_horizons(label.labels, horizons=horizons)
+        }
+
     async def select_backfill_candidates(
         self,
         symbol: str,
         snapshots_newest_first: list[ResearchAssessmentSnapshotData],
         limit: int,
     ) -> list[tuple[str, int]]:
-        """Prefer unlabeled, label-ready assessments for Phase 49 backfill (ADR-0050)."""
+        """Prefer incomplete/unlabeled, fully label-ready assessments (ADR-0050 / ADR-0314).
+
+        Assessments whose latest label already covers all configured horizons are omitted.
+        Partial ready-horizons rows remain eligible once full gates pass.
+        """
 
         from aegis.domain.research_outcome_label_backfill import (
             select_label_backfill_candidates,
         )
 
         ids = [snapshot.id for snapshot in snapshots_newest_first if snapshot.id is not None]
-        labeled_ids = await self.assessment_ids_with_labels(symbol, ids)
+        complete_ids = await self.assessment_ids_with_complete_labels(symbol, ids)
         bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
         return select_label_backfill_candidates(
             snapshots_newest_first,
-            labeled_assessment_ids=labeled_ids,
+            labeled_assessment_ids=complete_ids,
             limit=limit,
             bars_newest_first=bars,
             calendar_name=self._calendar_name,

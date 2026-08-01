@@ -1,39 +1,30 @@
-# ADR-0314: Phase 313 Full-Horizon Upgrade Backfill for Partial Labels (draft)
+# ADR-0314: Phase 313 Full-Horizon Upgrade Backfill for Partial Labels
 
-- Status: Proposed (Phase 312 closed; ready to implement after gate approval)
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
 
 Phase 311–312 grew the ``forward_return_5`` corpus via ready-horizons backfill
-(``persisted=15`` on live AAPL). Those append-only rows mark assessments as “labeled” for
+(``persisted=15`` on live AAPL). Those append-only rows marked assessments as “labeled” for
 full-horizon backfill selection, so when the tip/max horizon later unlocks,
-``POST .../outcome-labels/backfill`` will skip them and never append a full
-``forward_return_5``+``forward_return_20`` row unless operators hit the single-assessment
-full path manually.
+``POST .../outcome-labels/backfill`` would skip them.
 
 ## Decisions
 
-### 1. Treat incomplete latest labels as full-backfill candidates
+### 1. Complete-horizon skip set
 
-When selecting full-horizon backfill candidates, treat an assessment as already complete
-only if its latest default-method label includes **all** configured
-``FORWARD_HORIZON_SESSIONS`` keys. Partially labeled (ready-horizons-only) rows remain
-eligible for ``label_assessment`` once full gates pass. Fail-closed; research-only; never
-invent bars; do not auto-schedule.
+- ``label_covers_configured_horizons`` / ``assessment_ids_with_complete_labels`` treat an
+  assessment as complete only when the latest default-method label includes all
+  ``FORWARD_HORIZON_SESSIONS`` keys.
+- Full backfill selection uses that complete set (not any-label). Partial ready-horizons
+  rows remain eligible once full gates pass; new complete rows are append-only.
+- Ready-horizons backfill still skips any-labeled assessments (unchanged).
 
 ### 2. Out of scope
 
-Changing ready-horizons backfill, inventing bars, orders, evidence-panel stacking,
-default-on scheduling.
-
-## Resume
-
-```powershell
-# Implement Phase 313 full-horizon upgrade for partial labels; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild backend (+ frontend if UI); then:
-.\docker\nas\scripts\verify.ps1
-```
+Changing ready-horizons backfill semantics, inventing bars, orders, evidence-panel
+stacking, default-on scheduling.
 
 ## Related documents
 

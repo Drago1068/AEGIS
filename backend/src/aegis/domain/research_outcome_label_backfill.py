@@ -1,10 +1,11 @@
-"""Outcome-label backfill candidate selection (Phase 49 / 57 / 65).
+"""Outcome-label backfill candidate selection (Phase 49 / 57 / 65 / 313).
 
-Prefer assessments that lack a default-method label and would pass Phase 13 compute
-gates for the resolved label bar source, so tip / already-labeled / false-ready rows
-do not consume the operator ``limit`` (ADR-0050, ADR-0058). Among eligible candidates,
-prefer ``component_source=mixed`` (newest-first within each tier) so cross-source rows
-are labeled sooner for calibration corpus growth (ADR-0066).
+Prefer assessments that lack a **complete** default-method label (all configured
+horizons) and would pass Phase 13 compute gates for the resolved label bar source, so
+tip / fully-labeled / false-ready rows do not consume the operator ``limit``
+(ADR-0050, ADR-0058, ADR-0314). Among eligible candidates, prefer
+``component_source=mixed`` (newest-first within each tier) so cross-source rows are
+labeled sooner for calibration corpus growth (ADR-0066).
 """
 
 from __future__ import annotations
@@ -65,10 +66,11 @@ def select_label_backfill_candidates(
     calendar_name: str | None = None,
     label_ready_as_of: set[date] | None = None,
 ) -> list[tuple[str, int]]:
-    """Return up to ``limit`` ``(symbol, id)`` pairs: unlabeled and label-ready.
+    """Return up to ``limit`` ``(symbol, id)`` pairs: incomplete/unlabeled and label-ready.
 
     ``snapshots_newest_first`` must already be newest-first. Assessments without an id or
-    already present in ``labeled_assessment_ids`` are omitted.
+    already present in ``labeled_assessment_ids`` (callers should pass **complete**-horizon
+    labeled ids per ADR-0314) are omitted.
 
     Readiness (when bars + calendar are provided) uses
     :func:`is_snapshot_label_ready` so selection matches compute source gates (ADR-0058).

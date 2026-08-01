@@ -174,6 +174,34 @@ def test_select_ready_horizons_excludes_labeled() -> None:
     assert pairs == []
 
 
+def test_select_full_backfill_includes_partial_when_complete_ids_empty() -> None:
+    """Partial-labeled ids are eligible when callers pass only complete-horizon ids."""
+
+    n = LOOKBACK_SESSIONS + DEFAULT_MIN_FORWARD_SESSIONS + 3
+    closes = [Decimal(str(100 + i)) for i in range(n)]
+    bars = _closes_to_bars(closes, end_date=date(2024, 1, 26))
+    chrono = list(reversed(bars))
+    ready_as_of = chrono[-(DEFAULT_MIN_FORWARD_SESSIONS + 1)].trading_date
+    snap = _snapshot(snapshot_id=11, as_of=ready_as_of)
+    # Treat as incomplete (not in complete_ids) even though "labeled" partially.
+    pairs = select_label_backfill_candidates(
+        [snap],
+        labeled_assessment_ids=set(),
+        limit=5,
+        bars_newest_first=bars,
+        calendar_name=_CALENDAR,
+    )
+    assert pairs == [("AAPL", 11)]
+    pairs_complete = select_label_backfill_candidates(
+        [snap],
+        labeled_assessment_ids={11},
+        limit=5,
+        bars_newest_first=bars,
+        calendar_name=_CALENDAR,
+    )
+    assert pairs_complete == []
+
+
 def test_select_unlabeled_without_ready_filter_keeps_tip() -> None:
     snapshots = [
         _snapshot(snapshot_id=10, as_of=date(2024, 1, 26)),

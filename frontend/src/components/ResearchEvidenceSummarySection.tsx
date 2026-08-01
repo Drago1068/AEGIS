@@ -426,10 +426,13 @@ export function ResearchEvidenceSummarySection({
                 tip_as_of={evidenceSummary.latest_as_of_trading_date}
               </li>
             ) : null}
+            <li data-testid="evidence-primary-fetch-fallback-callout-cta">
+              use_console=Run ingest
+            </li>
           </ul>
           <p className="mt-1 text-xs text-aegis-muted">
-            Fail-closed: compact fallback is labeled provenance, not invented bars; not a
-            signal or recommendation.
+            Opt-in only via existing operator-console ingest; not auto-run; compact fallback
+            is labeled provenance, not invented bars; not a signal or recommendation.
           </p>
         </aside>
       ) : null}

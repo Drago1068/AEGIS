@@ -12,10 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 329 primary fetch-fallback ingest CTA. See
 [docs/architecture/decisions/0331-phase-330-nas-live-verify-phase-329.md](docs/architecture/decisions/0331-phase-330-nas-live-verify-phase-329.md).
 
-### Phase 329 - Primary Fetch-Fallback Ingest CTA (draft)
+### Phase 329 - Primary Fetch-Fallback Ingest CTA
 
 Elevate Run ingest CTA on the primary fetch-fallback callout. See
 [docs/architecture/decisions/0330-phase-329-primary-fetch-fallback-cta.md](docs/architecture/decisions/0330-phase-329-primary-fetch-fallback-cta.md).
+
+#### Added
+
+- ADR-0330: primary fetch-fallback callout CTA pointing at ``Run ingest`` (no auto-run;
+  existing fields only).
+- ``evidence-primary-fetch-fallback-callout-cta`` UI + vitest; ``verify.ps1`` Phase 330 log.
+
+#### Explicitly out of scope
+
+Auto-ingest, inventing bars, orders, changing fallback detection.
 
 ### Phase 328 - NAS Live Verification of Phase 327
 

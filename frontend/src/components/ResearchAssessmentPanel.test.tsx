@@ -1067,6 +1067,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("evidence-primary-fetch-fallback-callout-as-of")).toHaveTextContent(
         "tip_as_of=2024-01-26",
       );
+      expect(screen.getByTestId("evidence-primary-fetch-fallback-callout-cta")).toHaveTextContent(
+        "use_console=Run ingest",
+      );
       expect(screen.getByTestId("evidence-latest-outcome-label-computed-at")).toHaveTextContent(
         "2024-01-26T19:00:00Z",
       );

@@ -803,8 +803,7 @@ Phase 327 elevates a freshness-lag CTA pointing at ready-horizon backfill (see
 [decisions/0328-phase-327-freshness-lag-cta.md](decisions/0328-phase-327-freshness-lag-cta.md)).
 Phase 328 live-verified that CTA (see
 [decisions/0329-phase-328-nas-live-verify-phase-327.md](decisions/0329-phase-328-nas-live-verify-phase-327.md)).
-Phase 329 (draft) would elevate a primary fetch-fallback CTA pointing at ``Run ingest``
-(see
+Phase 329 elevates a primary fetch-fallback CTA pointing at ``Run ingest`` (see
 [decisions/0330-phase-329-primary-fetch-fallback-cta.md](decisions/0330-phase-329-primary-fetch-fallback-cta.md)).
 Phase 330 (draft) is the NAS live-verify gate for that CTA (see
 [decisions/0331-phase-330-nas-live-verify-phase-329.md](decisions/0331-phase-330-nas-live-verify-phase-329.md)).

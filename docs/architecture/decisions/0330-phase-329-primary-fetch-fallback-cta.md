@@ -1,35 +1,29 @@
-# ADR-0330: Phase 329 Primary Fetch-Fallback Ingest CTA (draft)
+# ADR-0330: Phase 329 Primary Fetch-Fallback Ingest CTA
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
 
 Phase 296 surfaces a primary fetch-fallback callout when
 ``latest_primary_fetch_fallback`` is non-empty (live NAS often shows ``full_to_compact``).
-The callout does not point operators at the existing on-demand ingest control
+The callout did not point operators at the existing on-demand ingest control
 (``Run ingest`` on the operator console). Tip labeling remains calendar-blocked;
 ingest/fallback diagnostics are still actionable without inventing bars.
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. Primary fetch-fallback CTA (UI-only)
 
 - When ``latest_primary_fetch_fallback`` is a non-empty string (existing callout), add a
   research-only CTA line pointing at ``Run ingest`` (no auto-run).
 - Source of truth: existing evidence-summary fields only; no new API scalars.
+- Callout CTA ``data-testid="evidence-primary-fetch-fallback-callout-cta"`` with
+  ``use_console=Run ingest``.
 
 ### 2. Out of scope
 
 Auto-ingest, inventing bars, orders, changing fallback detection, changing labeling CTAs.
-
-## Resume
-
-```powershell
-# Implement ADR-0330; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild frontend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
 
 ## Related documents
 

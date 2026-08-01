@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 263 ingest primary tip diagnostic. See
 [docs/architecture/decisions/0265-phase-264-nas-live-verify-phase-263.md](docs/architecture/decisions/0265-phase-264-nas-live-verify-phase-263.md).
 
-### Phase 263 - Ingest Primary Tip Diagnostic (draft)
+### Phase 263 - Ingest Primary Tip Diagnostic
 
-Surface primary tip beside winning ingest tip when dual-source tips diverge. See
+Surface ``primary_latest_trading_date`` beside the winning ingest tip when dual-source tips
+diverge. See
 [docs/architecture/decisions/0264-phase-263-ingest-primary-tip-diagnostic.md](docs/architecture/decisions/0264-phase-263-ingest-primary-tip-diagnostic.md).
+
+#### Added
+
+- Ingest / API / panel / verify: ``primary_latest_trading_date``.
+
+#### Explicitly out of scope
+
+Inventing primary closes, calibration default-on, orders.
 
 ### Phase 262 - NAS Live Verification of Phase 261
 

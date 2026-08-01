@@ -73,6 +73,7 @@ class SymbolIngestionResult:
     error: str | None = None
     latest_trading_date: date | None = None
     latest_trading_date_source: str | None = None
+    primary_latest_trading_date: date | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -126,7 +127,7 @@ class MarketDataIngestionService:
     async def _ingest_symbol(self, symbol: str) -> SymbolIngestionResult:
         primary = await self._ingest_from_provider(symbol, self._provider, self._source)
         if self._secondary_provider is None or self._secondary_source is None:
-            return primary
+            return _with_primary_tip(primary)
 
         secondary = await self._ingest_from_provider(
             symbol,
@@ -261,6 +262,24 @@ class MarketDataIngestionService:
         )
 
 
+def _with_primary_tip(result: SymbolIngestionResult) -> SymbolIngestionResult:
+    """Attach primary tip diagnostic when only the primary provider ran (ADR-0264)."""
+
+    primary_tip = result.latest_trading_date if result.error is None else None
+    return SymbolIngestionResult(
+        symbol=result.symbol,
+        stored_count=result.stored_count,
+        skipped_existing_count=result.skipped_existing_count,
+        corrected_count=result.corrected_count,
+        rejected_count=result.rejected_count,
+        rejections=result.rejections,
+        error=result.error,
+        latest_trading_date=result.latest_trading_date,
+        latest_trading_date_source=result.latest_trading_date_source,
+        primary_latest_trading_date=primary_tip,
+    )
+
+
 def _merge_symbol_results(
     symbol: str,
     primary: SymbolIngestionResult,
@@ -270,6 +289,7 @@ def _merge_symbol_results(
 
     primary_ok = primary.error is None
     secondary_ok = secondary.error is None
+    primary_tip = primary.latest_trading_date if primary_ok else None
     if not primary_ok and not secondary_ok:
         return SymbolIngestionResult(
             symbol=symbol,
@@ -282,6 +302,7 @@ def _merge_symbol_results(
                 if primary.error and secondary.error
                 else (primary.error or secondary.error)
             ),
+            primary_latest_trading_date=None,
         )
 
     parts = [part for part in (primary, secondary) if part.error is None]
@@ -336,6 +357,7 @@ def _merge_symbol_results(
         rejections=rejections,
         latest_trading_date=latest_trading_date,
         latest_trading_date_source=latest_trading_date_source,
+        primary_latest_trading_date=primary_tip,
     )
 
 

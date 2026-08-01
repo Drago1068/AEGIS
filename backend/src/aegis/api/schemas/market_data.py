@@ -42,6 +42,7 @@ class IngestionSymbolResult(BaseModel):
     error: str | None = None
     latest_trading_date: date | None = None
     latest_trading_date_source: str | None = None
+    primary_latest_trading_date: date | None = None
 
 
 class IngestionRunResponse(BaseModel):

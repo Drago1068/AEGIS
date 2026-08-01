@@ -59,6 +59,8 @@ export interface IngestionSymbolResult {
   latest_trading_date: string | null;
   /** Observation source that produced latest_trading_date; null when tip is null. */
   latest_trading_date_source?: string | null;
+  /** Primary provider tip for this symbol; null when primary empty/error (ADR-0264). */
+  primary_latest_trading_date?: string | null;
 }
 
 export interface IngestionRunResponse {

@@ -152,6 +152,7 @@ async def test_valid_bars_are_stored() -> None:
     assert result.error is None
     assert result.latest_trading_date == _AS_OF
     assert result.latest_trading_date_source == _SOURCE
+    assert result.primary_latest_trading_date == _AS_OF
     assert repository.saved_bars == bars
 
 
@@ -203,6 +204,7 @@ async def test_latest_trading_date_null_when_provider_errors() -> None:
     result = run_result.results[0]
     assert result.error is not None
     assert result.latest_trading_date is None
+    assert result.primary_latest_trading_date is None
 
 
 @pytest.mark.asyncio
@@ -305,6 +307,7 @@ async def test_primary_success_also_refreshes_secondary_tip() -> None:
     assert result.stored_count == 2
     assert result.latest_trading_date == secondary_tip
     assert result.latest_trading_date_source == _SECONDARY_SOURCE
+    assert result.primary_latest_trading_date == _AS_OF
     assert repository.saved == [
         (_SOURCE, primary_bars[0]),
         (_SECONDARY_SOURCE, secondary_bars[0]),
@@ -332,6 +335,7 @@ async def test_rate_limit_on_primary_still_refreshes_secondary() -> None:
     assert run_result.results[0].error is None
     assert run_result.results[0].stored_count == 1
     assert run_result.results[0].latest_trading_date_source == _SECONDARY_SOURCE
+    assert run_result.results[0].primary_latest_trading_date is None
     assert repository.saved == [(_SECONDARY_SOURCE, secondary_bars[0])]
 
 

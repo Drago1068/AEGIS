@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  distinctAsOfAssessments,
   formatAssessmentHistoryRow,
   formatCalibrationActionAriaLabel,
   formatCalibrationActionIdChip,
@@ -142,5 +143,24 @@ describe("formatAssessmentHistoryRow", () => {
     ).toBe(
       "2024-01-01T00:00:00Z · index=0.1234 · cov=0.5000 · p=null · src=mixed",
     );
+  });
+});
+
+describe("distinctAsOfAssessments", () => {
+  it("returns empty for empty input", () => {
+    expect(distinctAsOfAssessments([])).toEqual([]);
+  });
+
+  it("keeps the newest row per as_of and skips invalid dates", () => {
+    const rows = [
+      { id: 3, as_of_trading_date: "2024-01-02", computed_at: "later" },
+      { id: 2, as_of_trading_date: "2024-01-02", computed_at: "earlier" },
+      { id: 1, as_of_trading_date: "2024-01-01", computed_at: "old" },
+      { id: 0, as_of_trading_date: "bad", computed_at: "skip" },
+    ];
+    expect(distinctAsOfAssessments(rows)).toEqual([
+      { id: 3, as_of_trading_date: "2024-01-02", computed_at: "later" },
+      { id: 1, as_of_trading_date: "2024-01-01", computed_at: "old" },
+    ]);
   });
 });

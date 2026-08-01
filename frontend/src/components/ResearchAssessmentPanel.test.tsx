@@ -386,8 +386,14 @@ describe("ResearchAssessmentPanel", () => {
       computed_at: "2024-01-26T18:00:00Z",
       probability_confidence: 0.62,
     };
-    vi.mocked(getLatestResearchAssessment).mockResolvedValue(newer);
-    vi.mocked(listResearchAssessments).mockResolvedValue([newer, older]);
+    const tipDuplicate = {
+      ...newer,
+      id: 4,
+      computed_at: "2024-01-26T19:00:00Z",
+      probability_confidence: 0.7,
+    };
+    vi.mocked(getLatestResearchAssessment).mockResolvedValue(tipDuplicate);
+    vi.mocked(listResearchAssessments).mockResolvedValue([tipDuplicate, newer, older]);
 
     render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
     fireEvent.click(screen.getByRole("button", { name: /refresh latest/i }));
@@ -397,19 +403,19 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/assessment history \(newest first\)/i)).toBeInTheDocument();
       expect(screen.getByTestId("research-index-history-chart")).toBeInTheDocument();
       expect(screen.getByTestId("coverage-confidence-history-chart")).toBeInTheDocument();
+      expect(screen.getByTestId("assessment-history-list")).toHaveAttribute(
+        "data-history-mode",
+        "distinct_as_of",
+      );
+      expect(screen.getByTestId("assessment-history-as-of-counts")).toHaveTextContent(
+        "2 distinct as_of · 1 hidden",
+      );
       expect(
-        screen.getByRole("img", {
-          name: "AAPL research_index history chart (research-only)",
-        }),
+        screen.getByText(/2024-01-26T19:00:00Z · index=0\.4600 · cov=0\.9500 · p=0\.7000 · src=alpha_vantage/),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("img", {
-          name: "AAPL coverage_confidence history chart (research-only)",
-        }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(/2024-01-26T18:00:00Z · index=0\.4600 · cov=0\.9500 · p=0\.6200 · src=alpha_vantage/),
-      ).toBeInTheDocument();
+        screen.queryByText(/2024-01-26T18:00:00Z · index=0\.4600 · cov=0\.9500 · p=0\.6200 · src=alpha_vantage/),
+      ).toBeNull();
       expect(
         screen.getByText(/2024-01-25T18:00:00Z · index=0\.4000 · cov=0\.9000 · p=null · src=alpha_vantage/),
       ).toBeInTheDocument();
@@ -420,6 +426,18 @@ describe("ResearchAssessmentPanel", () => {
         { componentSource: null },
       );
     });
+
+    fireEvent.click(screen.getByTestId("assessment-history-show-all-as-of"));
+    expect(screen.getByTestId("assessment-history-list")).toHaveAttribute(
+      "data-history-mode",
+      "all",
+    );
+    expect(
+      screen.getByText(/2024-01-26T18:00:00Z · index=0\.4600 · cov=0\.9500 · p=0\.6200 · src=alpha_vantage/),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("assessment-history-as-of-counts")).toHaveTextContent(
+      "2 distinct as_of · 3 total",
+    );
   });
 
   it("shows outcome label history when more than one row exists", async () => {

@@ -12,11 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 305 distinct-as_of assessment history. See
 [docs/architecture/decisions/0307-phase-306-nas-live-verify-phase-305.md](docs/architecture/decisions/0307-phase-306-nas-live-verify-phase-305.md).
 
-### Phase 305 - Distinct-as-of Assessment History (draft)
+### Phase 305 - Distinct-as-of Assessment History
 
 Default assessment history list to one newest row per ``as_of_trading_date`` (match
 chart dedupe), with optional show-all. See
 [docs/architecture/decisions/0306-phase-305-distinct-as-of-assessment-history.md](docs/architecture/decisions/0306-phase-305-distinct-as-of-assessment-history.md).
+
+#### Added
+
+- ``distinctAsOfAssessments`` helper; default distinct list + show-all toggle; unit
+  tests; ``verify.ps1`` Phase 306 distinct-as_of counts log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing/deleting assessments, orders, additional charts.
 
 ### Phase 304 - NAS Live Verification of Phase 303
 

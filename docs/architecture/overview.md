@@ -745,8 +745,11 @@ from probability confidence (see
 [decisions/0304-phase-303-coverage-confidence-history-chart.md](decisions/0304-phase-303-coverage-confidence-history-chart.md)).
 Phase 304 live-verified that chart (coverage ``chartable_points=76``; see
 [decisions/0305-phase-304-nas-live-verify-phase-303.md](decisions/0305-phase-304-nas-live-verify-phase-303.md)).
-Phase 305 (draft) proposes distinct-as_of assessment history list default (see
+Phase 305 defaults assessment history list to distinct ``as_of`` rows with optional
+show-all (see
 [decisions/0306-phase-305-distinct-as-of-assessment-history.md](decisions/0306-phase-305-distinct-as-of-assessment-history.md)).
+Phase 306 (draft) live-verifies that list mode on the NAS (see
+[decisions/0307-phase-306-nas-live-verify-phase-305.md](decisions/0307-phase-306-nas-live-verify-phase-305.md)).
 
 ## System context
 

@@ -144,6 +144,31 @@ export function formatAssessmentHistoryRow(row: {
   return `${row.computed_at} · ${indexLabel} · ${cov} · ${p} · src=${src}`;
 }
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Keep the newest assessment per as_of_trading_date (newest-first input).
+ * Matches chart as_of dedupe. Skips invalid dates; never invents rows (ADR-0306).
+ */
+export function distinctAsOfAssessments<
+  T extends { as_of_trading_date: string },
+>(assessments: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const row of assessments) {
+    const date = row.as_of_trading_date;
+    if (typeof date !== "string" || !ISO_DATE.test(date)) {
+      continue;
+    }
+    if (seen.has(date)) {
+      continue;
+    }
+    seen.add(date);
+    out.push(row);
+  }
+  return out;
+}
+
 export const ASSESSMENT_SOURCE_FILTER_OPTIONS = [
   { value: "", label: "All sources" },
   { value: "mixed", label: "mixed (cross-source fill)" },

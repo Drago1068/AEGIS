@@ -555,6 +555,34 @@ export async function createOutcomeLabels(
   return body as OutcomeLabel;
 }
 
+/** Explicit ready-horizons label path when tip/full set is blocked (Phase 309 / ADR-0310). */
+export async function createOutcomeLabelsReadyHorizons(
+  baseUrl: string,
+  symbol: string,
+  assessmentId: number,
+  options?: ApiRequestOptions,
+): Promise<OutcomeLabel> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/assessments/` +
+    `${assessmentId}/outcome-labels/ready-horizons`;
+  const { response, body } = await requestJson(
+    url,
+    {
+      method: "POST",
+      headers: { Accept: "application/json" },
+    },
+    options,
+  );
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected POST outcome-labels/ready-horizons status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as OutcomeLabel;
+}
+
 export interface OutcomeLabelBackfillItem {
   symbol: string;
   assessment_snapshot_id: number;

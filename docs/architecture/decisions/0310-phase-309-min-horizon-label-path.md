@@ -1,44 +1,33 @@
-# ADR-0310: Phase 309 Min-Horizon Label Path When Tip Blocked (draft)
+# ADR-0310: Phase 309 Min-Horizon Label Path When Tip Blocked
 
-- Status: Proposed (Phase 308 closed; ready to implement after gate approval)
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
 
 Phase 307–308 shipped a labeling frontier readout. Live AAPL remains tip-blocked
 (``forward_bar_shortfall=20``, ``required_end=2026-08-28``) while the min horizon is closer
-(``min_horizon_shortfall=5``, ``min_horizon_end=2026-08-07``). Current
+(``min_horizon_shortfall=5``, ``min_horizon_end=2026-08-07``). Full
 ``POST .../outcome-labels`` fail-closes the whole assessment when the tip/max horizon lacks
-forward bars, so operators cannot persist research-only ``forward_return_5`` labels when that
-horizon alone is ready.
-
-That is the next **product** gap (domain labeling path), not more evidence-panel UI stacking.
+forward bars, so operators could not persist research-only ``forward_return_5`` labels when
+that horizon alone is ready.
 
 ## Decisions
 
-### 1. Min-horizon (ready-horizons) label path
+### 1. Explicit ready-horizons path
 
-When an assessment is tip-blocked for the full horizon set but one or more configured
-horizons are individually label-ready, allow an explicit research-only request to compute
-and append labels **only for ready horizons**, fail-closed for unreadies. Do not invent
-bars; do not auto-run; keep ``research_only``; never place orders.
-
-Prefer reusing existing readiness/shortfall helpers; add the smallest API/UI surface needed
-(explicit opt-in, not silent partial success on the full-label endpoint unless ADR proves
-safe).
+- Domain: ``ready_forward_horizons`` + ``OutcomeLabelService.label_assessment_ready_horizons``
+  compute/persist only individually ready horizons from stored bars (never invent closes).
+- API: ``POST /research/{symbol}/assessments/{id}/outcome-labels/ready-horizons`` — opt-in;
+  full-label endpoint unchanged.
+- UI: ``Compute ready-horizon labels`` toolbar action (research-only).
+- Fail-closed ``422`` with ``insufficient_forward_bars`` / ``no_as_of_bar`` when none ready.
+- Append-only: full-label path remains available later when tip unlocks.
 
 ### 2. Out of scope
 
-Live orders, inventing forward bars, default-on auto-labeling, calibration default-on,
-additional evidence-panel callout stacking, watchlist multi-symbol polish.
-
-## Resume
-
-```powershell
-# Implement Phase 309 min-horizon ready-horizons label path; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild backend (+ frontend if UI); then:
-.\docker\nas\scripts\verify.ps1
-```
+Live orders, inventing forward bars, default-on auto-labeling, changing backfill to upgrade
+partial→full automatically, calibration default-on, evidence-panel callout stacking.
 
 ## Related documents
 

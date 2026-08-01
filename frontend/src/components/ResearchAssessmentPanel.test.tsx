@@ -32,6 +32,7 @@ vi.mock("@/lib/api-client", async () => {
     createResearchAssessment: vi.fn(),
     getLatestResearchAssessment: vi.fn(),
     createOutcomeLabels: vi.fn(),
+    createOutcomeLabelsReadyHorizons: vi.fn(),
     backfillOutcomeLabels: vi.fn(),
     backfillResearchAssessments: vi.fn(),
     listOutcomeLabels: vi.fn(),
@@ -60,6 +61,7 @@ import {
   downloadResearchAssessments,
   downloadResearchEvidenceSummary,
   createOutcomeLabels,
+  createOutcomeLabelsReadyHorizons,
   getCalibrationReadiness,
   getLatestResearchAssessment,
   getResearchEvidenceSummary,
@@ -1509,6 +1511,172 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("outcome-label-history-load-kind")).toHaveTextContent(
         /scan-labeled \(latest is 1\)/i,
       );
+    });
+  });
+
+  it("computes ready-horizon labels for scan-labeled assessment id", async () => {
+    vi.mocked(getResearchEvidenceSummary).mockResolvedValue({
+      symbol: "AAPL",
+      state: "research_only",
+      latest_assessment: sampleAssessment,
+      calibration_readiness: {
+        symbol: "AAPL",
+        status: "insufficient_corpus",
+        assessment_snapshot_id: 1,
+        research_index: 0.46,
+        corpus_count: 0,
+        bucket_count: 0,
+        min_corpus: 10,
+        min_bucket: 5,
+        index_bucket_width: 0.15,
+        calibration_method_id: "research_calibration_v1",
+        detail: "research only",
+      },
+      latest_outcome_label: null,
+      latest_calibration: null,
+      assessment_count: 2,
+      labeled_assessment_count: 1,
+      unlabeled_assessment_count: 1,
+      outcome_label_count: 0,
+      calibration_count: 0,
+      latest_component_source: "alpha_vantage",
+      latest_resolved_label_bar_source: null,
+      mixed_component_source_assessment_count: 0,
+      mixed_unlabeled_assessment_count: 0,
+      mixed_labeled_assessment_count: 0,
+      latest_mixed_label_bar_source: null,
+      most_recent_labeled_assessment_id: 3,
+      most_recent_labeled_outcome_label: {
+        id: 30,
+        assessment_snapshot_id: 3,
+        symbol: "AAPL",
+        label_method_id: "forward_total_return_v1",
+        label_method_version: 1,
+        state: "research_only",
+        as_of_trading_date: "2024-01-26",
+        computed_at: "2024-01-26T20:00:00Z",
+        labels: { forward_return_5: 0.02 },
+        label_end_dates: { forward_return_5: "2024-02-02" },
+        schema_version: 1,
+        bar_source: "polygon",
+      },
+      most_recent_labeled_outcome_label_id: 30,
+      most_recent_labeled_outcome_label_method_id: "forward_total_return_v1",
+      most_recent_labeled_outcome_label_method_version: 1,
+      most_recent_labeled_outcome_label_schema_version: 1,
+      most_recent_labeled_outcome_label_state: "research_only",
+      most_recent_labeled_outcome_label_bar_source: "alpha_vantage",
+      most_recent_labeled_outcome_label_computed_at: "2024-01-26T19:00:00Z",
+      most_recent_labeled_outcome_label_as_of_trading_date: "2024-01-26",
+      scan_labeled_freshness_lag_trading_days: 0,
+      latest_assessment_is_label_ready: false,
+      latest_assessment_label_block_reason: "insufficient_forward_bars",
+      most_recent_labelable_as_of_trading_date: "2024-01-26",
+      most_recent_unlabeled_labelable_as_of_trading_date: "2024-01-20",
+      scan_unlabeled_label_ready_count: 1,
+      most_recent_unlabeled_assessment_id: 2,
+      most_recent_unlabeled_as_of_trading_date: "2024-02-09",
+      latest_assessment_forward_bar_shortfall: 20,
+      latest_assessment_required_label_end_date: "2024-02-28",
+      latest_assessment_last_available_label_bar_date: "2024-02-09",
+      latest_assessment_min_horizon_forward_bar_shortfall: 0,
+      latest_assessment_min_horizon_required_label_end_date: "2024-02-02",
+      stored_bar_calendar_lag_trading_days: 2,
+      latest_primary_fetch_fallback: null,
+      latest_coverage_confidence: 0.95,
+      latest_research_index: 0.46,
+      latest_as_of_trading_date: "2024-01-26",
+      latest_bar_count: 20,
+      latest_input_source: "alpha_vantage",
+      latest_method_id: "daily_bar_research_v1",
+      latest_method_version: 1,
+      latest_lookback_end_date: "2024-01-26",
+      latest_lookback_start_date: "2023-12-27",
+      latest_schema_version: 1,
+      latest_computed_at: "2024-01-26T18:00:00Z",
+      latest_event_time: "2024-01-26T23:59:59Z",
+      latest_probability_confidence: null,
+      latest_assessment_id: 1,
+      latest_outcome_label_id: 10,
+      latest_outcome_label_computed_at: "2024-01-26T19:00:00Z",
+      latest_outcome_label_method_id: "forward_total_return_v1",
+      latest_outcome_label_method_version: 1,
+      latest_outcome_label_schema_version: 1,
+      latest_outcome_label_state: "research_only",
+      latest_outcome_label_bar_source: "alpha_vantage",
+      latest_outcome_label_as_of_trading_date: "2024-01-26",
+      latest_calibration_id: 7,
+      latest_calibration_horizon_key: "forward_return_5",
+      latest_calibration_computed_at: "2024-01-26T19:00:00Z",
+      latest_calibration_corpus_count: 12,
+      latest_calibration_bucket_count: 6,
+      latest_calibration_method_id: "research_calibration_v1",
+      latest_calibration_method_version: 1,
+      latest_calibration_schema_version: 1,
+      latest_calibration_state: "research_only",
+      latest_calibration_probability_confidence: 0.62,
+      latest_calibration_assessment_snapshot_id: 1,
+      detail:
+        "Research-only evidence summary — not advice; missing fields are null or zero, never invented.",
+    });
+    vi.mocked(listOutcomeLabels).mockResolvedValue([]);
+    vi.mocked(createOutcomeLabelsReadyHorizons).mockResolvedValue({
+      id: 32,
+      assessment_snapshot_id: 3,
+      symbol: "AAPL",
+      label_method_id: "forward_total_return_v1",
+      label_method_version: 1,
+      state: "research_only",
+      as_of_trading_date: "2024-01-26",
+      computed_at: "2024-01-26T21:05:00Z",
+      labels: { forward_return_5: 0.04 },
+      label_end_dates: { forward_return_5: "2024-02-02" },
+      schema_version: 1,
+      bar_source: "polygon",
+    } as never);
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByRole("button", { name: /refresh evidence summary/i }));
+    const loadScan = await screen.findByTestId("load-scan-labeled-labels");
+    await waitFor(() => {
+      expect(loadScan).not.toBeDisabled();
+    });
+    fireEvent.click(loadScan);
+    await waitFor(() => {
+      expect(screen.getByTestId("outcome-label-empty-state")).toBeInTheDocument();
+    });
+    expect(screen.getByTestId("compute-ready-horizon-labels")).toHaveAccessibleName(
+      /compute ready-horizon labels for assessment 3 \(scan-labeled\)/i,
+    );
+    vi.mocked(listOutcomeLabels).mockResolvedValue([
+      {
+        id: 32,
+        assessment_snapshot_id: 3,
+        symbol: "AAPL",
+        label_method_id: "forward_total_return_v1",
+        label_method_version: 1,
+        state: "research_only",
+        as_of_trading_date: "2024-01-26",
+        computed_at: "2024-01-26T21:05:00Z",
+        labels: { forward_return_5: 0.04 },
+        label_end_dates: { forward_return_5: "2024-02-02" },
+        schema_version: 1,
+        bar_source: "polygon",
+      },
+    ]);
+    const readyBtn = screen.getByTestId("compute-ready-horizon-labels");
+    await waitFor(() => {
+      expect(readyBtn).not.toBeDisabled();
+    });
+    fireEvent.click(readyBtn);
+
+    await waitFor(() => {
+      expect(createOutcomeLabelsReadyHorizons).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        3,
+      );
+      expect(screen.getByText(/0\.040000 · end 2024-02-02/)).toBeInTheDocument();
     });
   });
 

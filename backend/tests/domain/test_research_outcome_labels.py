@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import UTC, date, datetime
 from decimal import Decimal
 
@@ -14,10 +15,12 @@ from aegis.domain.research_assessment import (
     ResearchBarInput,
 )
 from aegis.domain.research_outcome_labels import (
+    OutcomeLabelData,
     OutcomeLabelReason,
     OutcomeLabelUnavailableError,
     compute_forward_total_return_labels,
     forward_horizon_end_date,
+    ready_forward_horizons,
     snapshot_forward_bar_shortfall,
     snapshot_label_source_max_bar_date,
     snapshot_last_available_label_bar_date,
@@ -83,6 +86,31 @@ def test_compute_forward_returns_with_sufficient_bars() -> None:
     )
     assert label.labels["forward_return_5"] == 0.05
     assert label.label_end_dates["forward_return_5"] == "2024-01-09"
+
+
+def test_ready_forward_horizons_partial_when_tip_blocked() -> None:
+    bars = [
+        _bar(_AS_OF, Decimal("100")),
+        _bar(date(2024, 1, 3), Decimal("101")),
+        _bar(date(2024, 1, 4), Decimal("102")),
+        _bar(date(2024, 1, 5), Decimal("103")),
+        _bar(date(2024, 1, 8), Decimal("104")),
+        _bar(date(2024, 1, 9), Decimal("105")),
+    ]
+    assert ready_forward_horizons(_snapshot(), bars, calendar_name="NYSE") == (5,)
+    label = compute_forward_total_return_labels(
+        _snapshot(),
+        bars,
+        calendar_name="NYSE",
+        horizons=(5,),
+    )
+    assert set(label.labels) == {"forward_return_5"}
+    assert "forward_return_20" not in label.labels
+
+
+def test_ready_forward_horizons_empty_when_none_ready() -> None:
+    bars = [_bar(_AS_OF, Decimal("100"))]
+    assert ready_forward_horizons(_snapshot(), bars, calendar_name="NYSE") == ()
 
 
 def test_insufficient_forward_bars_fail_closed() -> None:
@@ -307,3 +335,108 @@ def test_missing_snapshot_id_fail_closed() -> None:
             horizons=(5,),
         )
     assert exc_info.value.reason == OutcomeLabelReason.ASSESSMENT_NOT_FOUND
+
+
+class _MemAssessmentStore:
+    def __init__(self, snapshot: ResearchAssessmentSnapshotData | None) -> None:
+        self._snapshot = snapshot
+
+    async def get_by_id(self, assessment_id: int) -> ResearchAssessmentSnapshotData | None:
+        if self._snapshot is None or self._snapshot.id != assessment_id:
+            return None
+        return self._snapshot
+
+
+class _MemBarReader:
+    def __init__(self, bars: list[ResearchBarInput]) -> None:
+        self._bars = bars
+
+    async def list_recent_bars(self, symbol: str, limit: int) -> list[ResearchBarInput]:
+        return list(self._bars)[:limit]
+
+
+class _MemLabelStore:
+    def __init__(self) -> None:
+        self.inserted: list[OutcomeLabelData] = []
+
+    async def insert(self, label: OutcomeLabelData) -> OutcomeLabelData:
+        stored = OutcomeLabelData(
+            id=len(self.inserted) + 1,
+            assessment_snapshot_id=label.assessment_snapshot_id,
+            symbol=label.symbol,
+            label_method_id=label.label_method_id,
+            label_method_version=label.label_method_version,
+            state=label.state,
+            as_of_trading_date=label.as_of_trading_date,
+            computed_at=label.computed_at,
+            labels=dict(label.labels),
+            label_end_dates=dict(label.label_end_dates),
+            schema_version=label.schema_version,
+            bar_source=label.bar_source,
+        )
+        self.inserted.append(stored)
+        return stored
+
+    async def get_latest_for_assessment(
+        self, assessment_snapshot_id: int
+    ) -> OutcomeLabelData | None:
+        return None
+
+    async def list_for_assessment(
+        self,
+        assessment_snapshot_id: int,
+        limit: int,
+        *,
+        symbol: str | None = None,
+    ) -> list[OutcomeLabelData]:
+        return []
+
+    async def assessment_ids_with_labels(
+        self,
+        symbol: str,
+        assessment_ids: Sequence[int],
+        *,
+        label_method_id: str,
+    ) -> set[int]:
+        return set()
+
+
+@pytest.mark.asyncio
+async def test_label_assessment_ready_horizons_persists_partial_only() -> None:
+    from aegis.domain.research_outcome_labels import OutcomeLabelService
+
+    bars = [
+        _bar(_AS_OF, Decimal("100")),
+        _bar(date(2024, 1, 3), Decimal("101")),
+        _bar(date(2024, 1, 4), Decimal("102")),
+        _bar(date(2024, 1, 5), Decimal("103")),
+        _bar(date(2024, 1, 8), Decimal("104")),
+        _bar(date(2024, 1, 9), Decimal("105")),
+    ]
+    store = _MemLabelStore()
+    service = OutcomeLabelService(
+        _MemAssessmentStore(_snapshot()),
+        _MemBarReader(bars),
+        store,
+        calendar_name="NYSE",
+    )
+    label = await service.label_assessment_ready_horizons("AAPL", 1)
+    assert set(label.labels) == {"forward_return_5"}
+    assert len(store.inserted) == 1
+
+
+@pytest.mark.asyncio
+async def test_label_assessment_ready_horizons_fail_closed_when_none_ready() -> None:
+    from aegis.domain.research_outcome_labels import OutcomeLabelService
+
+    store = _MemLabelStore()
+    service = OutcomeLabelService(
+        _MemAssessmentStore(_snapshot()),
+        _MemBarReader([_bar(_AS_OF, Decimal("100"))]),
+        store,
+        calendar_name="NYSE",
+    )
+    with pytest.raises(OutcomeLabelUnavailableError) as exc_info:
+        await service.label_assessment_ready_horizons("AAPL", 1)
+    assert exc_info.value.reason == OutcomeLabelReason.INSUFFICIENT_FORWARD_BARS
+    assert store.inserted == []

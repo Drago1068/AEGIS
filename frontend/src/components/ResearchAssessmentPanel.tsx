@@ -14,6 +14,7 @@ import {
   backfillOutcomeLabels,
   backfillResearchAssessments,
   createOutcomeLabels,
+  createOutcomeLabelsReadyHorizons,
   createProbabilityCalibration,
   createResearchAssessment,
   downloadCalibrationReadiness,
@@ -229,6 +230,29 @@ export function ResearchAssessmentPanel({
       setError(null);
       try {
         await createOutcomeLabels(baseUrl, symbol, assessmentId);
+        await loadOutcomeLabelHistory(assessmentId, loadKind);
+        await loadReadiness();
+        await loadEvidenceSummary();
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
+  function onComputeReadyHorizonLabels() {
+    const assessmentId = activeOutcomeLabelAssessmentId;
+    if (assessmentId == null) {
+      return;
+    }
+    const loadKind = resolveOutcomeLabelHistoryLoadKind(
+      assessmentId,
+      outcomeLabelHistoryLoadKind,
+      latest?.id,
+    );
+    startTransition(async () => {
+      setError(null);
+      try {
+        await createOutcomeLabelsReadyHorizons(baseUrl, symbol, assessmentId);
         await loadOutcomeLabelHistory(assessmentId, loadKind);
         await loadReadiness();
         await loadEvidenceSummary();
@@ -469,6 +493,7 @@ export function ResearchAssessmentPanel({
           onDownloadAssessments={onDownloadAssessments}
           onBackfillAssessments={onBackfillAssessments}
           onComputeOutcomeLabels={onComputeOutcomeLabels}
+          onComputeReadyHorizonLabels={onComputeReadyHorizonLabels}
           onBackfillOutcomeLabels={onBackfillOutcomeLabels}
           onDownloadOutcomeLabels={onDownloadOutcomeLabels}
           onComputeCalibration={onComputeCalibration}

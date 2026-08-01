@@ -485,6 +485,31 @@ def is_snapshot_label_ready(
     )
 
 
+def ready_forward_horizons(
+    snapshot: ResearchAssessmentSnapshotData,
+    bars: Sequence[ResearchBarInput],
+    *,
+    calendar_name: str,
+    horizons: tuple[int, ...] = FORWARD_HORIZON_SESSIONS,
+) -> tuple[int, ...]:
+    """Return the subset of ``horizons`` that individually pass label compute gates.
+
+    Never invents closes. Empty when as-of is missing or no horizon end close is stored
+    (ADR-0310). Order matches ``horizons``.
+    """
+
+    ready: list[int] = []
+    for horizon in horizons:
+        if is_snapshot_label_ready(
+            snapshot,
+            bars,
+            calendar_name=calendar_name,
+            horizons=(horizon,),
+        ):
+            ready.append(horizon)
+    return tuple(ready)
+
+
 class OutcomeLabelService:
     """Load assessment + bars, compute labels, append on success."""
 
@@ -523,6 +548,69 @@ class OutcomeLabelService:
                 "symbol": symbol.upper(),
                 "assessment_snapshot_id": assessment_snapshot_id,
                 "horizons": list(label.labels.keys()),
+            },
+        )
+        return await self._label_store.insert(label)
+
+    async def label_assessment_ready_horizons(
+        self, symbol: str, assessment_snapshot_id: int
+    ) -> OutcomeLabelData:
+        """Compute labels only for individually ready horizons (ADR-0310).
+
+        Explicit opt-in when the full horizon set is tip-blocked. Fail-closed when no
+        configured horizon is ready. Never invents bars; does not change
+        :meth:`label_assessment`.
+        """
+
+        snapshot = await self._assessment_store.get_by_id(assessment_snapshot_id)
+        if snapshot is None or snapshot.symbol.upper() != symbol.upper():
+            raise OutcomeLabelUnavailableError(
+                OutcomeLabelReason.ASSESSMENT_NOT_FOUND,
+                f"no assessment {assessment_snapshot_id} for symbol {symbol!r}",
+            )
+
+        bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
+        bar_source = _resolve_label_bar_source(snapshot, bars)
+        closes_by_date = _index_closes(list(bars), bar_source)
+        if snapshot.as_of_trading_date not in closes_by_date:
+            raise OutcomeLabelUnavailableError(
+                OutcomeLabelReason.NO_AS_OF_BAR,
+                (
+                    f"no usable close for {snapshot.symbol!r} on "
+                    f"{snapshot.as_of_trading_date.isoformat()} "
+                    f"(source={bar_source!r})"
+                ),
+            )
+
+        ready = ready_forward_horizons(
+            snapshot,
+            bars,
+            calendar_name=self._calendar_name,
+        )
+        if not ready:
+            raise OutcomeLabelUnavailableError(
+                OutcomeLabelReason.INSUFFICIENT_FORWARD_BARS,
+                (
+                    "no configured forward horizons are label-ready for "
+                    f"assessment {assessment_snapshot_id} "
+                    f"(as_of={snapshot.as_of_trading_date.isoformat()}); "
+                    "ready-horizons path fail-closed"
+                ),
+            )
+
+        label = compute_forward_total_return_labels(
+            snapshot,
+            bars,
+            calendar_name=self._calendar_name,
+            horizons=ready,
+        )
+        logger.info(
+            "research_outcome_label_ready_horizons_computed",
+            extra={
+                "symbol": symbol.upper(),
+                "assessment_snapshot_id": assessment_snapshot_id,
+                "horizons": list(label.labels.keys()),
+                "ready_sessions": list(ready),
             },
         )
         return await self._label_store.insert(label)

@@ -54,13 +54,16 @@ class _FakeOutcomeLabelService:
         self,
         *,
         on_label: OutcomeLabelData | Exception | None = None,
+        on_ready_horizons: OutcomeLabelData | Exception | None = None,
         latest: OutcomeLabelData | None = None,
         listed: list[OutcomeLabelData] | None = None,
     ) -> None:
         self._on_label = on_label
+        self._on_ready_horizons = on_ready_horizons
         self._latest = latest
         self._listed = listed or []
         self.label_calls: list[tuple[str, int]] = []
+        self.ready_horizon_calls: list[tuple[str, int]] = []
         self.list_calls: list[tuple[str, int, int]] = []
 
     async def label_assessment(self, symbol: str, assessment_id: int) -> OutcomeLabelData:
@@ -69,6 +72,16 @@ class _FakeOutcomeLabelService:
             raise self._on_label
         assert isinstance(self._on_label, OutcomeLabelData)
         return self._on_label
+
+    async def label_assessment_ready_horizons(
+        self, symbol: str, assessment_id: int
+    ) -> OutcomeLabelData:
+        self.ready_horizon_calls.append((symbol, assessment_id))
+        payload = self._on_ready_horizons if self._on_ready_horizons is not None else self._on_label
+        if isinstance(payload, Exception):
+            raise payload
+        assert isinstance(payload, OutcomeLabelData)
+        return payload
 
     async def latest_label_for_assessment(
         self, assessment_snapshot_id: int
@@ -120,6 +133,44 @@ async def test_post_outcome_labels_422_on_fail_closed() -> None:
     assert response.status_code == 422
     detail = response.json()["detail"]
     assert detail["reason"] == "insufficient_forward_bars"
+
+
+async def test_post_outcome_labels_ready_horizons_returns_partial_payload() -> None:
+    partial = replace(
+        _label(),
+        labels={"forward_return_5": 0.05},
+        label_end_dates={"forward_return_5": "2024-01-09"},
+    )
+    service = _FakeOutcomeLabelService(on_ready_horizons=partial)
+
+    async with _client(service) as client:
+        response = await client.post(
+            "/research/AAPL/assessments/1/outcome-labels/ready-horizons"
+        )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["labels"] == {"forward_return_5": 0.05}
+    assert "forward_return_20" not in body["labels"]
+    assert service.ready_horizon_calls == [("AAPL", 1)]
+    assert service.label_calls == []
+
+
+async def test_post_outcome_labels_ready_horizons_422_when_none_ready() -> None:
+    service = _FakeOutcomeLabelService(
+        on_ready_horizons=OutcomeLabelUnavailableError(
+            OutcomeLabelReason.INSUFFICIENT_FORWARD_BARS,
+            "no configured forward horizons are label-ready",
+        )
+    )
+
+    async with _client(service) as client:
+        response = await client.post(
+            "/research/AAPL/assessments/1/outcome-labels/ready-horizons"
+        )
+
+    assert response.status_code == 422
+    assert response.json()["detail"]["reason"] == "insufficient_forward_bars"
 
 
 async def test_get_latest_outcome_labels() -> None:

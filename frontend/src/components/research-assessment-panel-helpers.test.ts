@@ -35,6 +35,9 @@ describe("formatOutcomeLabelActionAriaLabel", () => {
     expect(formatOutcomeLabelActionAriaLabel("Compute outcome labels", 1, null)).toBe(
       "Compute outcome labels for assessment 1",
     );
+    expect(formatOutcomeLabelActionAriaLabel("Compute ready-horizon labels", 1, null)).toBe(
+      "Compute ready-horizon labels for assessment 1",
+    );
   });
 
   it("appends scan-labeled or latest when load kind is tracked", () => {

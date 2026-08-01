@@ -221,6 +221,32 @@ async def create_outcome_labels(
     return OutcomeLabelResponse.model_validate(label)
 
 
+@router.post(
+    "/{symbol}/assessments/{assessment_id}/outcome-labels/ready-horizons",
+    response_model=OutcomeLabelResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def create_outcome_labels_ready_horizons(
+    symbol: str,
+    assessment_id: int,
+    service: OutcomeLabelService = Depends(get_outcome_label_service),
+) -> OutcomeLabelResponse:
+    """Compute labels only for individually ready horizons (ADR-0310).
+
+    Explicit research-only opt-in when the tip/full horizon set is blocked. Fail-closed
+    when no configured horizon is ready. Does not invent bars or change the full-label path.
+    """
+
+    try:
+        label = await service.label_assessment_ready_horizons(symbol, assessment_id)
+    except OutcomeLabelUnavailableError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail={"reason": exc.reason.value, "message": exc.detail},
+        ) from exc
+    return OutcomeLabelResponse.model_validate(label)
+
+
 @router.get(
     "/{symbol}/assessments/{assessment_id}/outcome-labels",
     response_model=list[OutcomeLabelResponse],

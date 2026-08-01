@@ -48,6 +48,7 @@ export type ResearchAssessmentActionToolbarProps = {
   onDownloadAssessments: () => void;
   onBackfillAssessments: () => void;
   onComputeOutcomeLabels: () => void;
+  onComputeReadyHorizonLabels: () => void;
   onBackfillOutcomeLabels: () => void;
   onDownloadOutcomeLabels: () => void;
   onComputeCalibration: () => void;
@@ -70,6 +71,7 @@ export function ResearchAssessmentActionToolbar({
   onDownloadAssessments,
   onBackfillAssessments,
   onComputeOutcomeLabels,
+  onComputeReadyHorizonLabels,
   onBackfillOutcomeLabels,
   onDownloadOutcomeLabels,
   onComputeCalibration,
@@ -160,6 +162,31 @@ export function ResearchAssessmentActionToolbar({
               <span
                 className="ml-1 font-mono text-xs text-aegis-muted"
                 data-testid="compute-outcome-labels-id-chip"
+              >
+                {formatOutcomeLabelActionIdChip(
+                  activeOutcomeLabelAssessmentId,
+                  outcomeLabelHistoryLoadKind,
+                )}
+              </span>
+            ) : null}
+          </button>
+          <button
+            type="button"
+            onClick={onComputeReadyHorizonLabels}
+            disabled={isPending || activeOutcomeLabelAssessmentId == null}
+            data-testid="compute-ready-horizon-labels"
+            aria-label={formatOutcomeLabelActionAriaLabel(
+              "Compute ready-horizon labels",
+              activeOutcomeLabelAssessmentId,
+              outcomeLabelHistoryLoadKind,
+            )}
+            className={BUTTON_CLASS}
+          >
+            Compute ready-horizon labels
+            {activeOutcomeLabelAssessmentId != null ? (
+              <span
+                className="ml-1 font-mono text-xs text-aegis-muted"
+                data-testid="compute-ready-horizon-labels-id-chip"
               >
                 {formatOutcomeLabelActionIdChip(
                   activeOutcomeLabelAssessmentId,

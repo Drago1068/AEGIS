@@ -9,14 +9,25 @@ delivery workflow).
 
 ### Phase 310 - NAS Live Verification of Phase 309 (draft)
 
-Ops evidence gate after Phase 309 min-horizon label path. See
+Ops evidence gate after Phase 309 min-horizon / ready-horizons label path. See
 [docs/architecture/decisions/0311-phase-310-nas-live-verify-phase-309.md](docs/architecture/decisions/0311-phase-310-nas-live-verify-phase-309.md).
 
-### Phase 309 - Min-Horizon Label Path When Tip Blocked (draft)
+### Phase 309 - Min-Horizon Label Path When Tip Blocked
 
 Explicit research-only ready-horizons outcome labeling when tip/max horizon is still
-blocked (product gap vs more UI stacking). See
+blocked. See
 [docs/architecture/decisions/0310-phase-309-min-horizon-label-path.md](docs/architecture/decisions/0310-phase-309-min-horizon-label-path.md).
+
+#### Added
+
+- ``ready_forward_horizons`` + ``label_assessment_ready_horizons``; ``POST
+  .../outcome-labels/ready-horizons``; UI compute-ready-horizon action; unit/API tests;
+  ``verify.ps1`` Phase 310 auth + live ready-horizons check.
+
+#### Explicitly out of scope
+
+Inventing bars, auto-labeling, silent partial success on full-label path, orders,
+backfill auto-upgrade of partial labels.
 
 ### Phase 308 - NAS Live Verification of Phase 307
 

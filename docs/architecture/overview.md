@@ -757,9 +757,10 @@ Phase 307 adds a labeling frontier readout from existing shortfall / required-en
 Phase 308 live-verified that readout (``forward_shortfall=20`` / ``min_horizon_end=2026-08-07``;
 see
 [decisions/0309-phase-308-nas-live-verify-phase-307.md](decisions/0309-phase-308-nas-live-verify-phase-307.md)).
-Phase 309 (draft) proposes an explicit min-horizon / ready-horizons label path when tip is
-still blocked (see
+Phase 309 adds an explicit ready-horizons outcome-label path when tip is still blocked (see
 [decisions/0310-phase-309-min-horizon-label-path.md](decisions/0310-phase-309-min-horizon-label-path.md)).
+Phase 310 (draft) is the NAS live-verify gate for that path (see
+[decisions/0311-phase-310-nas-live-verify-phase-309.md](decisions/0311-phase-310-nas-live-verify-phase-309.md)).
 
 ## System context
 

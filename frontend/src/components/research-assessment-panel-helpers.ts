@@ -52,9 +52,12 @@ export function resolveOutcomeLabelHistoryLoadKind(
   return loadKind ?? (latestId != null && assessmentId === latestId ? "latest" : "scan_labeled");
 }
 
-/** Accessible name for compute/download outcome-label actions (Phase 113). */
+/** Accessible name for compute/download outcome-label actions (Phase 113 / 309). */
 export function formatOutcomeLabelActionAriaLabel(
-  action: "Compute outcome labels" | "Download outcome labels JSON",
+  action:
+    | "Compute outcome labels"
+    | "Compute ready-horizon labels"
+    | "Download outcome labels JSON",
   assessmentId: number | null,
   loadKind: OutcomeLabelHistoryLoadKind | null,
 ): string {

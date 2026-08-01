@@ -20,6 +20,7 @@ from aegis.domain.research_assessment import (
 from aegis.domain.research_outcome_labels import (
     has_stored_forward_horizon_close,
     is_snapshot_label_ready,
+    ready_forward_horizons,
 )
 
 # Scan depth for unlabeled label-ready selection (ADR-0058; was 100 in ADR-0050).
@@ -102,6 +103,48 @@ def select_label_backfill_candidates(
             label_ready_as_of is not None
             and snapshot.as_of_trading_date not in label_ready_as_of
         ):
+            continue
+        pair = (snapshot.symbol, snapshot.id)
+        if is_mixed_component_source(snapshot):
+            mixed.append(pair)
+        else:
+            other.append(pair)
+
+    ordered = mixed + other
+    return ordered[:limit]
+
+
+def select_ready_horizons_backfill_candidates(
+    snapshots_newest_first: Sequence[ResearchAssessmentSnapshotData],
+    *,
+    labeled_assessment_ids: set[int],
+    limit: int,
+    bars_newest_first: Sequence[ResearchBarInput],
+    calendar_name: str,
+) -> list[tuple[str, int]]:
+    """Return up to ``limit`` unlabeled assessments with at least one ready horizon.
+
+    Uses :func:`ready_forward_horizons` so min-horizon-ready tip-blocked rows are eligible
+    (ADR-0312). Already-labeled assessments are omitted. Mixed-first, then newest-first.
+    Never invents closes.
+    """
+
+    if limit <= 0:
+        return []
+
+    mixed: list[tuple[str, int]] = []
+    other: list[tuple[str, int]] = []
+    for snapshot in snapshots_newest_first:
+        if snapshot.id is None:
+            continue
+        if snapshot.id in labeled_assessment_ids:
+            continue
+        ready = ready_forward_horizons(
+            snapshot,
+            bars_newest_first,
+            calendar_name=calendar_name,
+        )
+        if not ready:
             continue
         pair = (snapshot.symbol, snapshot.id)
         if is_mixed_component_source(snapshot):

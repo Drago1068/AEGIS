@@ -8,6 +8,7 @@ import {
   formatOutcomeLabelActionAriaLabel,
   formatOutcomeLabelActionIdChip,
   formatOutcomeLabelBackfillAriaLabel,
+  formatReadyHorizonsBackfillAriaLabel,
   type OutcomeLabelHistoryLoadKind,
 } from "./research-assessment-panel-helpers";
 
@@ -50,6 +51,7 @@ export type ResearchAssessmentActionToolbarProps = {
   onComputeOutcomeLabels: () => void;
   onComputeReadyHorizonLabels: () => void;
   onBackfillOutcomeLabels: () => void;
+  onBackfillReadyHorizonLabels: () => void;
   onDownloadOutcomeLabels: () => void;
   onComputeCalibration: () => void;
   onDownloadCalibrations: () => void;
@@ -73,6 +75,7 @@ export function ResearchAssessmentActionToolbar({
   onComputeOutcomeLabels,
   onComputeReadyHorizonLabels,
   onBackfillOutcomeLabels,
+  onBackfillReadyHorizonLabels,
   onDownloadOutcomeLabels,
   onComputeCalibration,
   onDownloadCalibrations,
@@ -211,6 +214,30 @@ export function ResearchAssessmentActionToolbar({
               <span
                 className="ml-1 font-mono text-xs text-aegis-muted"
                 data-testid="backfill-outcome-labels-id-chip"
+              >
+                {formatOutcomeLabelActionIdChip(
+                  activeOutcomeLabelAssessmentId,
+                  outcomeLabelHistoryLoadKind,
+                )}
+              </span>
+            ) : null}
+          </button>
+          <button
+            type="button"
+            onClick={onBackfillReadyHorizonLabels}
+            disabled={isPending}
+            data-testid="backfill-ready-horizon-labels"
+            aria-label={formatReadyHorizonsBackfillAriaLabel(
+              activeOutcomeLabelAssessmentId,
+              outcomeLabelHistoryLoadKind,
+            )}
+            className={BUTTON_CLASS}
+          >
+            Backfill ready-horizon labels
+            {activeOutcomeLabelAssessmentId != null ? (
+              <span
+                className="ml-1 font-mono text-xs text-aegis-muted"
+                data-testid="backfill-ready-horizon-labels-id-chip"
               >
                 {formatOutcomeLabelActionIdChip(
                   activeOutcomeLabelAssessmentId,

@@ -9,6 +9,7 @@ import {
   formatOutcomeLabelActionAriaLabel,
   formatOutcomeLabelActionIdChip,
   formatOutcomeLabelBackfillAriaLabel,
+  formatReadyHorizonsBackfillAriaLabel,
   resolveOutcomeLabelHistoryLoadKind,
   sortedLabelEntries,
 } from "./research-assessment-panel-helpers";
@@ -104,6 +105,20 @@ describe("formatOutcomeLabelBackfillAriaLabel", () => {
     );
     expect(formatOutcomeLabelBackfillAriaLabel(1, null)).toBe(
       "Backfill outcome labels then refresh assessment 1",
+    );
+  });
+});
+
+describe("formatReadyHorizonsBackfillAriaLabel", () => {
+  it("returns the bare action when assessment id is null", () => {
+    expect(formatReadyHorizonsBackfillAriaLabel(null, null)).toBe(
+      "Backfill ready-horizon labels",
+    );
+  });
+
+  it("names the refresh target assessment and load kind", () => {
+    expect(formatReadyHorizonsBackfillAriaLabel(3, "scan_labeled")).toBe(
+      "Backfill ready-horizon labels then refresh assessment 3 (scan-labeled)",
     );
   });
 });

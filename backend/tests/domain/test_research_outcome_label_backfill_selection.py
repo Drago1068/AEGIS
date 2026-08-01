@@ -16,8 +16,9 @@ from aegis.domain.research_assessment_backfill import DEFAULT_MIN_FORWARD_SESSIO
 from aegis.domain.research_outcome_label_backfill import (
     label_ready_as_of_dates,
     select_label_backfill_candidates,
+    select_ready_horizons_backfill_candidates,
 )
-from aegis.domain.research_outcome_labels import is_snapshot_label_ready
+from aegis.domain.research_outcome_labels import is_snapshot_label_ready, ready_forward_horizons
 
 _CALENDAR = "NYSE"
 
@@ -119,6 +120,58 @@ def test_select_excludes_labeled_and_prefers_label_ready() -> None:
         calendar_name=_CALENDAR,
     )
     assert pairs == [("AAPL", 3)]
+
+
+def test_select_ready_horizons_includes_min_ready_when_full_blocked() -> None:
+    """Min-horizon-ready as-of is eligible even when max horizon is still short."""
+
+    # Enough bars for 5-session horizon but not 20.
+    n = LOOKBACK_SESSIONS + 5 + 2
+    closes = [Decimal(str(100 + i)) for i in range(n)]
+    bars = _closes_to_bars(closes, end_date=date(2024, 1, 26))
+    tip = bars[0].trading_date
+    chrono = list(reversed(bars))
+    min_ready_as_of = chrono[-(5 + 1)].trading_date
+
+    tip_snap = _snapshot(snapshot_id=1, as_of=tip)
+    min_snap = _snapshot(snapshot_id=2, as_of=min_ready_as_of)
+    assert ready_forward_horizons(tip_snap, bars, calendar_name=_CALENDAR) == ()
+    assert ready_forward_horizons(min_snap, bars, calendar_name=_CALENDAR) == (5,)
+    assert not is_snapshot_label_ready(min_snap, bars, calendar_name=_CALENDAR)
+
+    pairs = select_ready_horizons_backfill_candidates(
+        [tip_snap, min_snap],
+        labeled_assessment_ids=set(),
+        limit=5,
+        bars_newest_first=bars,
+        calendar_name=_CALENDAR,
+    )
+    assert pairs == [("AAPL", 2)]
+    full_pairs = select_label_backfill_candidates(
+        [tip_snap, min_snap],
+        labeled_assessment_ids=set(),
+        limit=5,
+        bars_newest_first=bars,
+        calendar_name=_CALENDAR,
+    )
+    assert full_pairs == []
+
+
+def test_select_ready_horizons_excludes_labeled() -> None:
+    n = LOOKBACK_SESSIONS + 5 + 2
+    closes = [Decimal(str(100 + i)) for i in range(n)]
+    bars = _closes_to_bars(closes, end_date=date(2024, 1, 26))
+    chrono = list(reversed(bars))
+    min_ready_as_of = chrono[-(5 + 1)].trading_date
+    snap = _snapshot(snapshot_id=9, as_of=min_ready_as_of)
+    pairs = select_ready_horizons_backfill_candidates(
+        [snap],
+        labeled_assessment_ids={9},
+        limit=5,
+        bars_newest_first=bars,
+        calendar_name=_CALENDAR,
+    )
+    assert pairs == []
 
 
 def test_select_unlabeled_without_ready_filter_keeps_tip() -> None:

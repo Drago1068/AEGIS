@@ -120,6 +120,23 @@ export function formatOutcomeLabelBackfillAriaLabel(
   return `Backfill outcome labels then refresh assessment ${assessmentId}${kindSuffix}`;
 }
 
+/** Accessible name for ready-horizons backfill (Phase 311). */
+export function formatReadyHorizonsBackfillAriaLabel(
+  assessmentId: number | null,
+  loadKind: OutcomeLabelHistoryLoadKind | null,
+): string {
+  if (assessmentId == null) {
+    return "Backfill ready-horizon labels";
+  }
+  const kindSuffix =
+    loadKind === "scan_labeled"
+      ? " (scan-labeled)"
+      : loadKind === "latest"
+        ? " (latest)"
+        : "";
+  return `Backfill ready-horizon labels then refresh assessment ${assessmentId}${kindSuffix}`;
+}
+
 /** Compact assessment history line from API payload only (Phase 28/61). */
 export function formatAssessmentHistoryRow(row: {
   computed_at: string;

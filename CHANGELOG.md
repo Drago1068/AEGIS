@@ -12,11 +12,21 @@ delivery workflow).
 Ops evidence gate after Phase 311 ready-horizons backfill. See
 [docs/architecture/decisions/0313-phase-312-nas-live-verify-phase-311.md](docs/architecture/decisions/0313-phase-312-nas-live-verify-phase-311.md).
 
-### Phase 311 - Ready-Horizons Label Backfill (draft)
+### Phase 311 - Ready-Horizons Label Backfill
 
-Batch research-only ready-horizons labeling for historical assessments while tip waits.
-See
+Batch research-only ready-horizons labeling for unlabeled historical assessments while tip
+waits. See
 [docs/architecture/decisions/0312-phase-311-ready-horizons-backfill.md](docs/architecture/decisions/0312-phase-311-ready-horizons-backfill.md).
+
+#### Added
+
+- ``select_ready_horizons_backfill_candidates`` + ready-horizons batch runner;
+  ``POST .../outcome-labels/backfill/ready-horizons``; UI backfill action; tests;
+  ``verify.ps1`` Phase 312 auth + live summary log.
+
+#### Explicitly out of scope
+
+Auto-scheduling, inventing bars, changing full-horizon backfill, orders.
 
 ### Phase 310 - NAS Live Verification of Phase 309
 

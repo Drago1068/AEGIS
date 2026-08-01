@@ -34,6 +34,7 @@ vi.mock("@/lib/api-client", async () => {
     createOutcomeLabels: vi.fn(),
     createOutcomeLabelsReadyHorizons: vi.fn(),
     backfillOutcomeLabels: vi.fn(),
+    backfillOutcomeLabelsReadyHorizons: vi.fn(),
     backfillResearchAssessments: vi.fn(),
     listOutcomeLabels: vi.fn(),
     getCalibrationReadiness: vi.fn(),
@@ -52,6 +53,7 @@ vi.mock("@/lib/api-client", async () => {
 import {
   ApiClientError,
   backfillOutcomeLabels,
+  backfillOutcomeLabelsReadyHorizons,
   backfillResearchAssessments,
   createProbabilityCalibration,
   createResearchAssessment,
@@ -1961,6 +1963,43 @@ describe("ResearchAssessmentPanel", () => {
       /attempted=2.*labeled=1.*skipped=1/,
     );
     expect(screen.getByTestId("backfill-status-section")).toBeInTheDocument();
+  });
+
+  it("runs ready-horizon backfill and shows research-only summary counts", async () => {
+    vi.mocked(getLatestResearchAssessment).mockResolvedValue(sampleAssessment);
+    vi.mocked(backfillOutcomeLabelsReadyHorizons).mockResolvedValue({
+      symbol: "AAPL",
+      assessment_count: 3,
+      persisted_count: 2,
+      skipped_count: 1,
+      outcomes: [
+        { symbol: "AAPL", assessment_snapshot_id: 3, persisted: true },
+        { symbol: "AAPL", assessment_snapshot_id: 2, persisted: true },
+        {
+          symbol: "AAPL",
+          assessment_snapshot_id: 1,
+          persisted: false,
+          reason: "insufficient_forward_bars",
+          detail: "no ready horizons",
+        },
+      ],
+      detail:
+        "Research-only ready-horizons outcome-label backfill — not advice; skips are fail-closed, never invent confidence.",
+    });
+
+    render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={sampleAssessment} />);
+    fireEvent.click(screen.getByTestId("backfill-ready-horizon-labels"));
+
+    await waitFor(() => {
+      expect(backfillOutcomeLabelsReadyHorizons).toHaveBeenCalledWith(
+        "http://localhost:8000",
+        "AAPL",
+        100,
+      );
+    });
+    expect(await screen.findByTestId("outcome-label-backfill-summary")).toHaveTextContent(
+      /attempted=3.*labeled=2.*skipped=1/,
+    );
   });
 
   it("refreshes outcome labels for scan-labeled assessment after backfill", async () => {

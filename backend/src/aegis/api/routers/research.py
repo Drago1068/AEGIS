@@ -57,6 +57,7 @@ from aegis.domain.research_probability_calibration import (
 from aegis.domain.scheduled_calibration import try_calibrate_assessment_after_create
 from aegis.domain.scheduled_outcome_labels import (
     run_outcome_labels_after_assessments,
+    run_ready_horizons_outcome_labels_after_assessments,
     try_label_assessment_after_create,
 )
 from aegis.persistence.repositories.market_data import MarketDailyBarRepository
@@ -196,6 +197,52 @@ async def backfill_outcome_labels(
             )
             for outcome in summary.outcomes
         ],
+    )
+
+
+@router.post(
+    "/{symbol}/outcome-labels/backfill/ready-horizons",
+    response_model=OutcomeLabelBackfillResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def backfill_outcome_labels_ready_horizons(
+    symbol: str,
+    limit: int = Query(default=100, ge=1, le=252),
+    assessment_service: ResearchAssessmentService = Depends(get_research_assessment_service),
+    label_service: OutcomeLabelService = Depends(get_outcome_label_service),
+) -> OutcomeLabelBackfillResponse:
+    """Batch ready-horizons labeling for unlabeled assessments (ADR-0312).
+
+    Explicit opt-in; full-horizon backfill unchanged. Always returns 200 with per-row
+    fail-closed skips. Does not invent bars or enable auto-scheduling.
+    """
+
+    from aegis.domain.research_outcome_label_backfill import BACKFILL_SCAN_LIMIT
+
+    snapshots = await assessment_service.list_assessments(symbol, BACKFILL_SCAN_LIMIT)
+    pairs = await label_service.select_ready_horizons_backfill_candidates(
+        symbol, snapshots, limit
+    )
+    summary = await run_ready_horizons_outcome_labels_after_assessments(pairs, label_service)
+    return OutcomeLabelBackfillResponse(
+        symbol=symbol.upper(),
+        assessment_count=len(pairs),
+        persisted_count=summary.persisted_count,
+        skipped_count=summary.skipped_count,
+        outcomes=[
+            OutcomeLabelBackfillItem(
+                symbol=outcome.symbol,
+                assessment_snapshot_id=outcome.assessment_snapshot_id,
+                persisted=outcome.persisted,
+                reason=outcome.reason,
+                detail=outcome.detail,
+            )
+            for outcome in summary.outcomes
+        ],
+        detail=(
+            "Research-only ready-horizons outcome-label backfill — not advice; "
+            "skips are fail-closed, never invent confidence."
+        ),
     )
 
 

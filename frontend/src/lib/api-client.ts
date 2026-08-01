@@ -628,6 +628,34 @@ export async function backfillOutcomeLabels(
   return body as OutcomeLabelBackfillResponse;
 }
 
+/** Batch ready-horizons labeling for unlabeled assessments (Phase 311 / ADR-0312). */
+export async function backfillOutcomeLabelsReadyHorizons(
+  baseUrl: string,
+  symbol: string,
+  limit = 100,
+  options?: ApiRequestOptions,
+): Promise<OutcomeLabelBackfillResponse> {
+  const url =
+    `${baseUrl}/research/${encodeURIComponent(symbol)}/outcome-labels/backfill/ready-horizons` +
+    `?limit=${encodeURIComponent(String(limit))}`;
+  const { response, body } = await requestJson(
+    url,
+    {
+      method: "POST",
+      headers: { Accept: "application/json" },
+    },
+    options,
+  );
+  if (!response.ok) {
+    throw new ApiClientError(
+      `Unexpected POST outcome-labels/backfill/ready-horizons status: ${response.status}`,
+      response.status,
+      body,
+    );
+  }
+  return body as OutcomeLabelBackfillResponse;
+}
+
 export async function getLatestOutcomeLabels(
   baseUrl: string,
   symbol: string,

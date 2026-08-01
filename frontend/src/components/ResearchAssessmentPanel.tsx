@@ -12,6 +12,7 @@ import {
   ResearchAssessment,
   ResearchEvidenceSummary,
   backfillOutcomeLabels,
+  backfillOutcomeLabelsReadyHorizons,
   backfillResearchAssessments,
   createOutcomeLabels,
   createOutcomeLabelsReadyHorizons,
@@ -285,6 +286,29 @@ export function ResearchAssessmentPanel({
     });
   }
 
+  function onBackfillReadyHorizonLabels() {
+    startTransition(async () => {
+      setError(null);
+      try {
+        const summary = await backfillOutcomeLabelsReadyHorizons(baseUrl, symbol, 100);
+        setBackfillSummary(summary);
+        const assessmentId = activeOutcomeLabelAssessmentId;
+        if (assessmentId != null) {
+          const loadKind = resolveOutcomeLabelHistoryLoadKind(
+            assessmentId,
+            outcomeLabelHistoryLoadKind,
+            latest?.id,
+          );
+          await loadOutcomeLabelHistory(assessmentId, loadKind);
+        }
+        await loadReadiness();
+        await loadEvidenceSummary();
+      } catch (err) {
+        setError(formatAssessmentError(err));
+      }
+    });
+  }
+
   function onBackfillAssessments() {
     startTransition(async () => {
       setError(null);
@@ -495,6 +519,7 @@ export function ResearchAssessmentPanel({
           onComputeOutcomeLabels={onComputeOutcomeLabels}
           onComputeReadyHorizonLabels={onComputeReadyHorizonLabels}
           onBackfillOutcomeLabels={onBackfillOutcomeLabels}
+          onBackfillReadyHorizonLabels={onBackfillReadyHorizonLabels}
           onDownloadOutcomeLabels={onDownloadOutcomeLabels}
           onComputeCalibration={onComputeCalibration}
           onDownloadCalibrations={onDownloadCalibrations}

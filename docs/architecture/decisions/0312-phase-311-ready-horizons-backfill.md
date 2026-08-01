@@ -1,39 +1,32 @@
-# ADR-0312: Phase 311 Ready-Horizons Label Backfill (draft)
+# ADR-0312: Phase 311 Ready-Horizons Label Backfill
 
-- Status: Proposed (Phase 310 closed; ready to implement after gate approval)
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
 
 Phase 309–310 shipped an explicit per-assessment ready-horizons label path. Live tip
 AAPL still fail-closes (``min_horizon_shortfall=5`` until ~2026-08-07). Historical
-assessments may already be min-horizon ready while remaining unlabeled (or only
-partially labeled). Operators need a research-only batch path to grow the
-``forward_return_5`` corpus without waiting for tip/max-horizon unlock and without
-auto-running on schedule.
+assessments may already be min-horizon ready while remaining unlabeled. Operators need a
+research-only batch path to grow the ``forward_return_5`` corpus without waiting for
+tip/max-horizon unlock and without auto-running on schedule.
 
 ## Decisions
 
 ### 1. Ready-horizons backfill
 
-Add an authenticated opt-in backfill that scans recent assessments and applies
-``label_assessment_ready_horizons`` (or equivalent) per candidate: persist when at
-least one horizon is ready; fail-closed skip otherwise. Prefer unlabeled rows; do not
-invent bars; keep ``research_only``; never place orders. Full-horizon backfill remains
-unchanged.
+- Selection: ``select_ready_horizons_backfill_candidates`` — unlabeled only; eligible when
+  ``ready_forward_horizons`` is non-empty (mixed-first).
+- Runner: ``run_ready_horizons_outcome_labels_after_assessments`` applies
+  ``label_assessment_ready_horizons`` per candidate; per-row fail-closed.
+- API: ``POST /research/{symbol}/outcome-labels/backfill/ready-horizons`` (opt-in; full
+  backfill unchanged).
+- UI: ``Backfill ready-horizon labels`` toolbar action.
 
 ### 2. Out of scope
 
-Default-on scheduling, inventing bars, silent mutation of the full-label backfill,
-orders, evidence-panel callout stacking.
-
-## Resume
-
-```powershell
-# Implement Phase 311 ready-horizons label backfill; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild backend (+ frontend if UI); then:
-.\docker\nas\scripts\verify.ps1
-```
+Default-on scheduling, inventing bars, silent mutation of full-label backfill, orders,
+evidence-panel callout stacking, auto-upgrade of partial→full labels.
 
 ## Related documents
 

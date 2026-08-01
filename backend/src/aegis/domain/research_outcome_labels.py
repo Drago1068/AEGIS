@@ -794,6 +794,29 @@ class OutcomeLabelService:
             calendar_name=self._calendar_name,
         )
 
+    async def select_ready_horizons_backfill_candidates(
+        self,
+        symbol: str,
+        snapshots_newest_first: list[ResearchAssessmentSnapshotData],
+        limit: int,
+    ) -> list[tuple[str, int]]:
+        """Prefer unlabeled assessments with any ready horizon (ADR-0312)."""
+
+        from aegis.domain.research_outcome_label_backfill import (
+            select_ready_horizons_backfill_candidates,
+        )
+
+        ids = [snapshot.id for snapshot in snapshots_newest_first if snapshot.id is not None]
+        labeled_ids = await self.assessment_ids_with_labels(symbol, ids)
+        bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
+        return select_ready_horizons_backfill_candidates(
+            snapshots_newest_first,
+            labeled_assessment_ids=labeled_ids,
+            limit=limit,
+            bars_newest_first=bars,
+            calendar_name=self._calendar_name,
+        )
+
     async def latest_label_for_assessment(
         self, assessment_snapshot_id: int
     ) -> OutcomeLabelData | None:

@@ -762,8 +762,10 @@ Phase 309 adds an explicit ready-horizons outcome-label path when tip is still b
 Phase 310 live-verified that path (tip ``422`` fail-closed with ``min_horizon_shortfall=5``;
 see
 [decisions/0311-phase-310-nas-live-verify-phase-309.md](decisions/0311-phase-310-nas-live-verify-phase-309.md)).
-Phase 311 (draft) proposes ready-horizons backfill for historical assessments (see
+Phase 311 adds ready-horizons backfill for unlabeled historical assessments (see
 [decisions/0312-phase-311-ready-horizons-backfill.md](decisions/0312-phase-311-ready-horizons-backfill.md)).
+Phase 312 (draft) is the NAS live-verify gate for that backfill (see
+[decisions/0313-phase-312-nas-live-verify-phase-311.md](decisions/0313-phase-312-nas-live-verify-phase-311.md)).
 
 ## System context
 

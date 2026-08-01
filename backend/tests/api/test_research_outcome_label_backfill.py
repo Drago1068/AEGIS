@@ -101,11 +101,17 @@ class _FakeOutcomeLabelService:
         *,
         fail_ids: set[int] | None = None,
         selected: list[tuple[str, int]] | None = None,
+        ready_selected: list[tuple[str, int]] | None = None,
+        ready_fail_ids: set[int] | None = None,
     ) -> None:
         self._fail_ids = fail_ids or set()
         self._selected = selected
+        self._ready_selected = ready_selected
+        self._ready_fail_ids = ready_fail_ids or set()
         self.label_calls: list[tuple[str, int]] = []
+        self.ready_horizon_calls: list[tuple[str, int]] = []
         self.select_calls: list[tuple[str, int, int]] = []
+        self.ready_select_calls: list[tuple[str, int, int]] = []
 
     async def select_backfill_candidates(
         self,
@@ -124,6 +130,23 @@ class _FakeOutcomeLabelService:
                 break
         return pairs
 
+    async def select_ready_horizons_backfill_candidates(
+        self,
+        symbol: str,
+        snapshots: list[ResearchAssessmentSnapshotData],
+        limit: int,
+    ) -> list[tuple[str, int]]:
+        self.ready_select_calls.append((symbol, len(snapshots), limit))
+        if self._ready_selected is not None:
+            return self._ready_selected[:limit]
+        pairs: list[tuple[str, int]] = []
+        for snapshot in snapshots:
+            if snapshot.id is not None:
+                pairs.append((snapshot.symbol, snapshot.id))
+            if len(pairs) >= limit:
+                break
+        return pairs
+
     async def label_assessment(self, symbol: str, assessment_id: int) -> OutcomeLabelData:
         self.label_calls.append((symbol, assessment_id))
         if assessment_id in self._fail_ids:
@@ -132,6 +155,30 @@ class _FakeOutcomeLabelService:
                 "need more bars",
             )
         return _label(assessment_id=assessment_id)
+
+    async def label_assessment_ready_horizons(
+        self, symbol: str, assessment_id: int
+    ) -> OutcomeLabelData:
+        self.ready_horizon_calls.append((symbol, assessment_id))
+        if assessment_id in self._ready_fail_ids:
+            raise OutcomeLabelUnavailableError(
+                OutcomeLabelReason.INSUFFICIENT_FORWARD_BARS,
+                "no ready horizons",
+            )
+        return OutcomeLabelData(
+            id=11,
+            assessment_snapshot_id=assessment_id,
+            symbol="AAPL",
+            label_method_id=LABEL_METHOD_ID,
+            label_method_version=1,
+            state="research_only",
+            as_of_trading_date=date(2024, 1, 2),
+            computed_at=datetime(2024, 1, 10, 12, tzinfo=UTC),
+            labels={"forward_return_5": 0.05},
+            label_end_dates={"forward_return_5": "2024-01-09"},
+            schema_version=1,
+            bar_source="alpha_vantage",
+        )
 
 
 def _client(
@@ -205,3 +252,49 @@ async def test_backfill_empty_history_returns_zero_counts() -> None:
     assert assessment_service.list_calls == [("aapl", BACKFILL_SCAN_LIMIT)]
     assert label_service.select_calls == [("aapl", 0, 100)]
     assert BACKFILL_SCAN_LIMIT == 252
+
+
+async def test_ready_horizons_backfill_persists_and_skips_fail_closed() -> None:
+    assessment_service = _FakeAssessmentService(
+        [_snapshot(snapshot_id=2), _snapshot(snapshot_id=1)]
+    )
+    label_service = _FakeOutcomeLabelService(ready_fail_ids={1})
+
+    async with _client(assessment_service, label_service) as client:
+        response = await client.post(
+            "/research/AAPL/outcome-labels/backfill/ready-horizons?limit=20"
+        )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["symbol"] == "AAPL"
+    assert body["assessment_count"] == 2
+    assert body["persisted_count"] == 1
+    assert body["skipped_count"] == 1
+    assert body["outcomes"][0]["persisted"] is True
+    assert body["outcomes"][1]["persisted"] is False
+    assert body["outcomes"][1]["reason"] == "insufficient_forward_bars"
+    assert "ready-horizons" in body["detail"]
+    assert assessment_service.list_calls == [("AAPL", BACKFILL_SCAN_LIMIT)]
+    assert label_service.ready_select_calls == [("AAPL", 2, 20)]
+    assert label_service.ready_horizon_calls == [("AAPL", 2), ("AAPL", 1)]
+    assert label_service.label_calls == []
+
+
+async def test_ready_horizons_backfill_uses_selected_candidates_only() -> None:
+    assessment_service = _FakeAssessmentService(
+        [_snapshot(snapshot_id=3), _snapshot(snapshot_id=2), _snapshot(snapshot_id=1)]
+    )
+    label_service = _FakeOutcomeLabelService(ready_selected=[("AAPL", 1)])
+
+    async with _client(assessment_service, label_service) as client:
+        response = await client.post(
+            "/research/AAPL/outcome-labels/backfill/ready-horizons?limit=20"
+        )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["assessment_count"] == 1
+    assert body["persisted_count"] == 1
+    assert label_service.ready_horizon_calls == [("AAPL", 1)]
+    assert label_service.label_calls == []

@@ -163,22 +163,23 @@ function Write-VerifyChecklist {
     Write-Host "123. Authenticated assessments list Phase 306 distinct-as_of history counts (UI unit-tested)"
     Write-Host "124. Authenticated evidence-summary Phase 308 labeling frontier readout field bundle (UI unit-tested)"
     Write-Host "125. Authenticated POST outcome-labels/ready-horizons Phase 310 (200 partial or 422 fail-closed)"
-    Write-Host "126. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
-    Write-Host "127. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
-    Write-Host "128. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
-    Write-Host "129. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
-    Write-Host "130. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
-    Write-Host "131. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
-    Write-Host "132. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
-    Write-Host "133. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
-    Write-Host "134. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
-    Write-Host "135. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
-    Write-Host "136. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-    Write-Host "137. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
-    Write-Host "138. Authenticated evidence-summary Phase 296 primary fetch-fallback callout field bundle (UI unit-tested)"
-    Write-Host "139. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
-    Write-Host "140. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
-    Write-Host "141. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "126. Authenticated POST outcome-labels/backfill/ready-horizons Phase 312 (summary counts; zeros OK)"
+    Write-Host "127. Authenticated evidence-summary includes Phase 235 most_recent_labelable_as_of_trading_date (Phase 236)"
+    Write-Host "128. Authenticated evidence-summary includes Phase 237 most_recent_unlabeled_labelable_as_of_trading_date (Phase 238)"
+    Write-Host "129. Authenticated evidence-summary includes Phase 239 scan_unlabeled_label_ready_count (Phase 240)"
+    Write-Host "130. Authenticated evidence-summary includes Phase 241 most_recent_unlabeled_assessment_id (Phase 242)"
+    Write-Host "131. Authenticated evidence-summary includes Phase 243 most_recent_unlabeled_as_of_trading_date (Phase 244)"
+    Write-Host "132. Authenticated evidence-summary includes Phase 245 latest_assessment_forward_bar_shortfall (Phase 246)"
+    Write-Host "133. Authenticated evidence-summary includes Phase 247 latest_assessment_required_label_end_date (Phase 248)"
+    Write-Host "134. Authenticated evidence-summary includes Phase 249 latest_assessment_last_available_label_bar_date (Phase 250)"
+    Write-Host "135. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
+    Write-Host "136. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
+    Write-Host "137. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
+    Write-Host "138. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
+    Write-Host "139. Authenticated evidence-summary Phase 296 primary fetch-fallback callout field bundle (UI unit-tested)"
+    Write-Host "140. Authenticated GET daily-bars includes Phase 281 fetch_fallback (Phase 282)"
+    Write-Host "141. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
+    Write-Host "142. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -290,6 +291,11 @@ $readyHorizonsUnauthCode = & curl.exe -sS @curlInsecure -o NUL -w "%{http_code}"
     -H "Accept: application/json" -X POST $readyHorizonsUnauthUrl
 if ($LASTEXITCODE -ne 0) { throw "POST outcome-labels/ready-horizons (unauth) failed (curl exit $LASTEXITCODE)" }
 Assert-Status -Label "POST $readyHorizonsUnauthUrl (unauth)" -Actual ([int]$readyHorizonsUnauthCode) -Expected @(401)
+$readyHorizonsBackfillUnauthUrl = "$api/research/$verifySymbol/outcome-labels/backfill/ready-horizons?limit=20"
+$readyHorizonsBackfillUnauthCode = & curl.exe -sS @curlInsecure -o NUL -w "%{http_code}" --max-time 30 `
+    -H "Accept: application/json" -X POST $readyHorizonsBackfillUnauthUrl
+if ($LASTEXITCODE -ne 0) { throw "POST outcome-labels/backfill/ready-horizons (unauth) failed (curl exit $LASTEXITCODE)" }
+Assert-Status -Label "POST $readyHorizonsBackfillUnauthUrl (unauth)" -Actual ([int]$readyHorizonsBackfillUnauthCode) -Expected @(401)
 $backfillUnauthUrl = "$api/research/$verifySymbol/outcome-labels/backfill?limit=20"
 $backfillUnauthCode = & curl.exe -sS @curlInsecure -o NUL -w "%{http_code}" --max-time 30 `
     -H "Accept: application/json" -X POST $backfillUnauthUrl
@@ -712,6 +718,25 @@ try {
     } finally {
         if (Test-Path -LiteralPath $readyHorizonsPath) {
             Remove-Item -LiteralPath $readyHorizonsPath -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    # Phase 312: ready-horizons backfill (ADR-0312/0313). Always 200 summary; zeros OK.
+    $readyBackfillUrl = "$api/research/$verifySymbol/outcome-labels/backfill/ready-horizons?limit=100"
+    $readyBackfillPath = Join-Path ([System.IO.Path]::GetTempPath()) ("aegis-nas-verify-{0}.ready-backfill.json" -f [guid]::NewGuid().ToString("N"))
+    try {
+        $readyBackfillCode = & curl.exe -sS @curlInsecure -o $readyBackfillPath -w "%{http_code}" --max-time 120 `
+            -b $cookieJar -H "Accept: application/json" -X POST $readyBackfillUrl
+        if ($LASTEXITCODE -ne 0) { throw "POST outcome-labels/backfill/ready-horizons failed (curl exit $LASTEXITCODE)" }
+        Assert-Status -Label "POST $readyBackfillUrl (auth)" -Actual ([int]$readyBackfillCode) -Expected @(200)
+        $readyBackfillBody = Get-Content -LiteralPath $readyBackfillPath -Raw | ConvertFrom-Json
+        if ($null -eq $readyBackfillBody.assessment_count) { throw "ready-horizons backfill missing assessment_count" }
+        if ($null -eq $readyBackfillBody.persisted_count) { throw "ready-horizons backfill missing persisted_count" }
+        if ($null -eq $readyBackfillBody.skipped_count) { throw "ready-horizons backfill missing skipped_count" }
+        Write-Host "OK  Phase 312 ready-horizons backfill assessment_count=$($readyBackfillBody.assessment_count) persisted=$($readyBackfillBody.persisted_count) skipped=$($readyBackfillBody.skipped_count) (zeros OK; research-only)"
+    } finally {
+        if (Test-Path -LiteralPath $readyBackfillPath) {
+            Remove-Item -LiteralPath $readyBackfillPath -Force -ErrorAction SilentlyContinue
         }
     }
 

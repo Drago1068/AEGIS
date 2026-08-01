@@ -143,6 +143,86 @@ async def run_outcome_labels_after_research(
     return await run_outcome_labels_after_assessments(assessments, service)
 
 
+class ReadyHorizonsOutcomeLabeler(Protocol):
+    """Label boundary for ready-horizons backfill (ADR-0312)."""
+
+    async def label_assessment_ready_horizons(
+        self, symbol: str, assessment_snapshot_id: int
+    ) -> object:
+        """Compute and persist ready-horizon labels, or raise fail-closed."""
+        ...
+
+
+async def run_ready_horizons_outcome_labels_after_assessments(
+    assessments: list[tuple[str, int]],
+    service: ReadyHorizonsOutcomeLabeler,
+) -> OutcomeLabelAfterAssessmentSummary:
+    """Apply ready-horizons labeling per assessment; never abort the batch (ADR-0312)."""
+
+    outcomes: list[OutcomeLabelAfterAssessmentOutcome] = []
+    for symbol, assessment_snapshot_id in assessments:
+        normalized = symbol.upper()
+        try:
+            await service.label_assessment_ready_horizons(normalized, assessment_snapshot_id)
+        except OutcomeLabelUnavailableError as exc:
+            logger.info(
+                "outcome_label_ready_horizons_backfill_skipped",
+                extra={
+                    "symbol": normalized,
+                    "assessment_snapshot_id": assessment_snapshot_id,
+                    "reason": exc.reason.value,
+                    "detail": exc.detail,
+                },
+            )
+            outcomes.append(
+                OutcomeLabelAfterAssessmentOutcome(
+                    symbol=normalized,
+                    assessment_snapshot_id=assessment_snapshot_id,
+                    persisted=False,
+                    reason=exc.reason.value,
+                    detail=exc.detail,
+                )
+            )
+            continue
+        except Exception:  # noqa: BLE001 - per-assessment fail-closed; do not abort the batch.
+            logger.exception(
+                "outcome_label_ready_horizons_backfill_error",
+                extra={
+                    "symbol": normalized,
+                    "assessment_snapshot_id": assessment_snapshot_id,
+                },
+            )
+            outcomes.append(
+                OutcomeLabelAfterAssessmentOutcome(
+                    symbol=normalized,
+                    assessment_snapshot_id=assessment_snapshot_id,
+                    persisted=False,
+                    reason="unexpected_error",
+                    detail="ready-horizons labeling raised unexpectedly",
+                )
+            )
+            continue
+
+        outcomes.append(
+            OutcomeLabelAfterAssessmentOutcome(
+                symbol=normalized,
+                assessment_snapshot_id=assessment_snapshot_id,
+                persisted=True,
+            )
+        )
+
+    summary = OutcomeLabelAfterAssessmentSummary(outcomes=tuple(outcomes))
+    logger.info(
+        "outcome_label_ready_horizons_backfill_completed",
+        extra={
+            "assessment_count": len(assessments),
+            "persisted_count": summary.persisted_count,
+            "skipped_count": summary.skipped_count,
+        },
+    )
+    return summary
+
+
 async def try_label_assessment_after_create(
     snapshot: ResearchAssessmentSnapshotData,
     service: OutcomeLabeler,

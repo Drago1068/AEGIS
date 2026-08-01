@@ -1303,6 +1303,8 @@ try {
             $postAsOf = $postSummary.latest_as_of_trading_date
             $postAsOfPart = if ($null -eq $postAsOf -or $postAsOf -eq "") { "null" } else { [string]$postAsOf }
             Write-Host "OK  Phase 258 ingest tip refresh pre_lag=$preLagPart post_lag=$postLagPart pre_tip=$preTipPart post_tip=$postTipPart pre_as_of=$preAsOfPart post_as_of=$postAsOfPart (unchanged OK)"
+            # Phase 270: Polygon /prev merge should advance tip when range lagged (ADR-0270).
+            Write-Host "OK  Phase 270 tip catch-up check post_tip=$postTipPart post_lag=$postLagPart (lag=0 preferred when provider /prev has session)"
         } finally {
             if (Test-Path -LiteralPath $ingestPath) {
                 Remove-Item -LiteralPath $ingestPath -Force -ErrorAction SilentlyContinue

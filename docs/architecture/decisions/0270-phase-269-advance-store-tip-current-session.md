@@ -1,46 +1,51 @@
-# ADR-0270: Phase 269 Advance Store Tip When Provider Has Current Session (draft)
+# ADR-0270: Phase 269 Advance Store Tip When Provider Has Current Session
 
-- Status: Proposed (ready after Phase 268; do not start until gate approved)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
-Phases 267–268 closed opaque mixed ``latest_resolved_label_bar_source`` (now concrete
-``polygon`` on live AAPL). Live verify still shows ``stored_bar_calendar_lag_trading_days=1``
+Phases 267–268 closed opaque mixed ``latest_resolved_label_bar_source`` (concrete
+``polygon`` on live AAPL). Live verify still showed ``stored_bar_calendar_lag_trading_days=1``
 with winning tip ``2026-07-30`` after the ``2026-07-31`` session (post-close lab time).
-Primary tip remains ``2026-07-29``. Operators cannot tell whether lag is expected
-provider delay, AV failover, or a store/assessment short-circuit without another inspect.
 
-Prefer diagnosing and closing the remaining calendar lag (when providers already expose
-the current session close) over further evidence-summary scalars or UI modularization.
+NAS diagnosis (lab TLS backend):
 
-## Decisions (proposed)
+- Range aggregates ``/v2/aggs/.../range/1/day/...`` returned tip ``2026-07-30`` with
+  ``status=DELAYED`` (30-day and full windows).
+- ``/v1/open-close/AAPL/2026-07-31`` returned ``403`` (“today’s data before end of day”).
+- ``/v2/aggs/ticker/AAPL/prev`` returned the settled ``2026-07-31`` close (real provider
+  bar; not invented).
 
-### 1. Fail-closed tip advancement
+Prefer merging Polygon previous-close when it advances the tip over inventing closes or
+adding more evidence scalars.
 
-Investigate why ingest/store tip stays one session behind after market close when a
-configured provider has the session. Fix only with real provider closes; never invent
-bars. Keep research-only / no orders.
+## Decisions
+
+### 1. Polygon ``/prev`` tip catch-up
+
+After a successful range fetch, ``PolygonProvider`` calls ``/v2/aggs/ticker/{ticker}/prev``
+(unadjusted) and appends that bar when its trading date is absent from the range results.
+Prev failures soft-skip so a healthy range response is retained. Validation / ingest still
+reject unusable bars; no invented closes.
 
 ### 2. Out of scope
 
-Inventing closes, default-on calibration, actionable promotion, orders.
+Inventing closes, Alpha Vantage tip invention, default-on calibration, orders.
 
 ### 3. Why this next
 
-Label-bar provenance is clear; remaining operator gap is calendar lag=1 after session
-close.
+Label-bar provenance was clear; remaining operator gap was calendar lag while Polygon
+already exposed the session via ``/prev``.
 
-## Resume (after Phase 268 gate)
+## Consequences
 
-```powershell
-# Diagnose/fix store tip lag when provider has current session (ADR-0270); tests; commit+push; then Phase 270:
-# git archive HEAD → NAS; rebuild backend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+- Ingest can store the settled session when range aggregates lag.
+- Phase 270 live-verifies tip / lag under lab TLS.
 
 ## Related documents
 
 - [0269-phase-268-nas-live-verify-phase-267.md](0269-phase-268-nas-live-verify-phase-267.md)
 - [0271-phase-270-nas-live-verify-phase-269.md](0271-phase-270-nas-live-verify-phase-269.md)
 - [0262-phase-261-provider-tip-ahead-of-store.md](0262-phase-261-provider-tip-ahead-of-store.md)
+- [0011-phase-10-second-market-data-provider.md](0011-phase-10-second-market-data-provider.md)

@@ -663,9 +663,10 @@ evidence-summary (see
 [decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md](decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md)).
 Phase 268 live-verified concrete ``polygon`` resolution on mixed AAPL (see
 [decisions/0269-phase-268-nas-live-verify-phase-267.md](decisions/0269-phase-268-nas-live-verify-phase-267.md)).
-Phase 269 (draft) proposes advancing store tip when providers already have the current
-session (see
+Phase 269 merges Polygon ``/prev`` when range aggregates lag the settled session (see
 [decisions/0270-phase-269-advance-store-tip-current-session.md](decisions/0270-phase-269-advance-store-tip-current-session.md)).
+Phase 270 (draft) live-verifies that tip catch-up (see
+[decisions/0271-phase-270-nas-live-verify-phase-269.md](decisions/0271-phase-270-nas-live-verify-phase-269.md)).
 
 ## System context
 

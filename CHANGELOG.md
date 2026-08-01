@@ -12,11 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 269 tip lag fix. See
 [docs/architecture/decisions/0271-phase-270-nas-live-verify-phase-269.md](docs/architecture/decisions/0271-phase-270-nas-live-verify-phase-269.md).
 
-### Phase 269 - Advance Store Tip When Provider Has Current Session (draft)
+### Phase 269 - Advance Store Tip When Provider Has Current Session
 
-Diagnose/fix remaining calendar lag when providers already expose the current
-session close. See
+Merge Polygon ``/prev`` settled close when range aggregates lag (DELAYED tip). See
 [docs/architecture/decisions/0270-phase-269-advance-store-tip-current-session.md](docs/architecture/decisions/0270-phase-269-advance-store-tip-current-session.md).
+
+#### Added
+
+- ``PolygonProvider`` previous-close tip merge after range fetch; unit tests for merge /
+  duplicate skip / prev soft-fail.
+
+#### Explicitly out of scope
+
+Inventing closes, Alpha Vantage invention, calibration default-on, orders.
 
 ### Phase 268 - NAS Live Verification of Phase 267
 

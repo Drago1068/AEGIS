@@ -4,10 +4,15 @@ Per ADR-0011, this is the second concrete :class:`~aegis.providers.market_data.D
 implementation. It calls ``GET /v2/aggs/ticker/{ticker}/range/1/day/{from}/{to}`` with
 unadjusted bars (``adjusted=false``) so results align with Alpha Vantage
 ``TIME_SERIES_DAILY``. The API key is sent as ``Authorization: Bearer`` and never logged.
+
+Phase 269 (ADR-0270): after the range fetch, merge ``GET /v2/aggs/ticker/{ticker}/prev``
+when that previous-close bar is newer than the range tip. Free/delayed range responses
+often lag the settled prior session that ``/prev`` already exposes; never invent closes.
 """
 
 from __future__ import annotations
 
+import logging
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from typing import Any, cast
@@ -30,6 +35,9 @@ _ET = ZoneInfo("America/New_York")
 _COMPACT_LOOKBACK_DAYS = 160
 _FULL_LOOKBACK_DAYS = 730
 _AGG_PATH = "/v2/aggs/ticker/{ticker}/range/1/day/{from_date}/{to_date}"
+_PREV_PATH = "/v2/aggs/ticker/{ticker}/prev"
+
+logger = logging.getLogger(__name__)
 
 
 class PolygonProvider:
@@ -106,15 +114,99 @@ class PolygonProvider:
 
         results_raw = payload.get("results")
         if results_raw is None:
-            return []
-        if not isinstance(results_raw, list):
+            bars: list[DailyBar] = []
+        elif not isinstance(results_raw, list):
             raise ProviderError(
                 f"Polygon response for {symbol!r} has a malformed results field"
             )
-
-        bars = [_parse_bar(symbol, item) for item in cast("list[Any]", results_raw)]
+        else:
+            bars = [_parse_bar(symbol, item) for item in cast("list[Any]", results_raw)]
         bars.sort(key=lambda bar: bar.trading_date)
-        return bars
+        return await self._merge_previous_close(symbol, bars)
+
+    async def _merge_previous_close(
+        self,
+        symbol: str,
+        bars: list[DailyBar],
+    ) -> list[DailyBar]:
+        """Append ``/prev`` when it exposes a newer settled close than the range tip.
+
+        Soft-fails on prev errors so a healthy range response is not discarded (ADR-0270).
+        """
+
+        try:
+            previous = await self._fetch_previous_close(symbol)
+        except (ProviderError, ProviderUnavailableError, ProviderRateLimitError) as exc:
+            logger.warning(
+                "polygon_prev_tip_merge_skipped",
+                extra={"symbol": symbol, "reason": str(exc)},
+            )
+            return bars
+        if previous is None:
+            return bars
+        existing_dates = {bar.trading_date for bar in bars}
+        if previous.trading_date in existing_dates:
+            return bars
+        merged = [*bars, previous]
+        merged.sort(key=lambda bar: bar.trading_date)
+        logger.info(
+            "polygon_prev_tip_merged",
+            extra={
+                "symbol": symbol,
+                "prev_trading_date": previous.trading_date.isoformat(),
+                "range_tip": bars[-1].trading_date.isoformat() if bars else None,
+            },
+        )
+        return merged
+
+    async def _fetch_previous_close(self, symbol: str) -> DailyBar | None:
+        """Return the Polygon previous-close aggregate, or None when absent."""
+
+        path = _PREV_PATH.format(ticker=symbol)
+        url = f"{self._settings.polygon_base_url.rstrip('/')}{path}"
+        try:
+            response = await self._client.get(
+                url,
+                params={"adjusted": "false"},
+                headers={"Authorization": f"Bearer {self._settings.polygon_api_key}"},
+            )
+        except httpx.HTTPError as exc:
+            raise ProviderUnavailableError(
+                f"Polygon prev request failed for {symbol!r}: {exc}"
+            ) from exc
+
+        if response.status_code == 429:
+            raise ProviderRateLimitError(
+                f"Polygon prev rate limit for {symbol!r}: HTTP 429"
+            )
+        if response.status_code >= 500:
+            raise ProviderUnavailableError(
+                f"Polygon prev returned HTTP {response.status_code} for {symbol!r}"
+            )
+        if response.status_code != 200:
+            raise ProviderError(
+                f"Polygon prev returned HTTP {response.status_code} for {symbol!r}"
+            )
+
+        try:
+            payload: dict[str, Any] = response.json()
+        except ValueError as exc:
+            raise ProviderError(
+                f"Polygon prev returned a non-JSON response for {symbol!r}"
+            ) from exc
+
+        status = payload.get("status")
+        if isinstance(status, str) and status.upper() not in {"OK", "DELAYED"}:
+            raise ProviderError(
+                f"Polygon prev error status for {symbol!r}: {status}"
+            )
+
+        results_raw = payload.get("results")
+        if results_raw is None:
+            return None
+        if not isinstance(results_raw, list) or not results_raw:
+            return None
+        return _parse_bar(symbol, results_raw[0])
 
 
 def _lookback_days(output_size: str) -> int:

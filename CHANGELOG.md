@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 296 - NAS Live Verification of Phase 295 (draft)
+### Phase 298 - NAS Live Verification of Phase 297 (draft)
 
-Ops evidence gate after Phase 295 primary fetch-fallback callout. See
+Ops evidence gate after Phase 297 labeling diagnostics summary count. See
+[docs/architecture/decisions/0299-phase-298-nas-live-verify-phase-297.md](docs/architecture/decisions/0299-phase-298-nas-live-verify-phase-297.md).
+
+### Phase 297 - Labeling Diagnostics Summary Count (draft)
+
+Show active callout count on the labeling-diagnostics summary control. See
+[docs/architecture/decisions/0298-phase-297-labeling-diagnostics-summary-count.md](docs/architecture/decisions/0298-phase-297-labeling-diagnostics-summary-count.md).
+
+### Phase 296 - NAS Live Verification of Phase 295
+
+Ops evidence gate after Phase 295 primary fetch-fallback callout. Live verify passed
+2026-08-01 (``c33bcd5``; fallback ``full_to_compact`` input_source ``alpha_vantage``
+tip_as_of ``2026-07-31``). See
 [docs/architecture/decisions/0297-phase-296-nas-live-verify-phase-295.md](docs/architecture/decisions/0297-phase-296-nas-live-verify-phase-295.md).
+
+#### Added
+
+- ADR-0297: live primary fetch-fallback callout field-bundle evidence (checklist Phase 296 log).
+
+#### Explicitly out of scope
+
+Inventing closes, orders.
 
 ### Phase 295 - Primary Fetch Fallback Callout
 

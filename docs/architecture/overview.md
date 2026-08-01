@@ -725,8 +725,11 @@ Phase 294 live-verified that disclosure (see
 Phase 295 elevates ``latest_primary_fetch_fallback`` as a data-quality callout when
 non-empty (see
 [decisions/0296-phase-295-primary-fetch-fallback-callout.md](decisions/0296-phase-295-primary-fetch-fallback-callout.md)).
-Phase 296 (draft) is the NAS live verify gate (see
+Phase 296 live-verified that callout (``full_to_compact``; see
 [decisions/0297-phase-296-nas-live-verify-phase-295.md](decisions/0297-phase-296-nas-live-verify-phase-295.md)).
+Phase 297 (draft) proposes an active-count badge on the labeling-diagnostics summary
+(see
+[decisions/0298-phase-297-labeling-diagnostics-summary-count.md](decisions/0298-phase-297-labeling-diagnostics-summary-count.md)).
 
 ## System context
 

@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 294 - NAS Live Verification of Phase 293 (draft)
+### Phase 296 - NAS Live Verification of Phase 295 (draft)
 
-Ops evidence gate after Phase 293 collapsible labeling diagnostics. See
+Ops evidence gate after Phase 295 primary fetch-fallback callout. See
+[docs/architecture/decisions/0297-phase-296-nas-live-verify-phase-295.md](docs/architecture/decisions/0297-phase-296-nas-live-verify-phase-295.md).
+
+### Phase 295 - Primary Fetch Fallback Callout (draft)
+
+Elevate existing ``latest_primary_fetch_fallback`` as a data-quality callout. See
+[docs/architecture/decisions/0296-phase-295-primary-fetch-fallback-callout.md](docs/architecture/decisions/0296-phase-295-primary-fetch-fallback-callout.md).
+
+### Phase 294 - NAS Live Verification of Phase 293
+
+Ops evidence gate after Phase 293 collapsible labeling diagnostics. Live verify passed
+2026-08-01 (``b8e72bc``; disclosure open-by-default with four labeling triggers). See
 [docs/architecture/decisions/0295-phase-294-nas-live-verify-phase-293.md](docs/architecture/decisions/0295-phase-294-nas-live-verify-phase-293.md).
+
+#### Added
+
+- ADR-0295: live labeling-diagnostics disclosure evidence (checklist Phase 294 log).
+
+#### Explicitly out of scope
+
+Inventing closes, orders.
 
 ### Phase 293 - Collapsible Labeling Diagnostics
 

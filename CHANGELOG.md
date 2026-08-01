@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 290 - NAS Live Verification of Phase 289 (draft)
+### Phase 292 - NAS Live Verification of Phase 291 (draft)
 
-Ops evidence gate after Phase 289 labeling diagnostics group. See
+Ops evidence gate after Phase 291 mixed-unlabeled backlog callout. See
+[docs/architecture/decisions/0293-phase-292-nas-live-verify-phase-291.md](docs/architecture/decisions/0293-phase-292-nas-live-verify-phase-291.md).
+
+### Phase 291 - Mixed-Unlabeled Backlog Callout (draft)
+
+Elevate existing mixed-unlabeled count inside labeling diagnostics. See
+[docs/architecture/decisions/0292-phase-291-mixed-unlabeled-backlog-callout.md](docs/architecture/decisions/0292-phase-291-mixed-unlabeled-backlog-callout.md).
+
+### Phase 290 - NAS Live Verification of Phase 289
+
+Ops evidence gate after Phase 289 labeling diagnostics group. Live verify passed
+2026-07-31 (``39ff608``; triggers ``tip_not_ready,freshness_lag,unlabeled_empty``). See
 [docs/architecture/decisions/0291-phase-290-nas-live-verify-phase-289.md](docs/architecture/decisions/0291-phase-290-nas-live-verify-phase-289.md).
+
+#### Added
+
+- ADR-0291: live labeling-diagnostics group trigger evidence (checklist Phase 290 log).
+
+#### Explicitly out of scope
+
+Inventing closes, orders.
 
 ### Phase 289 - Labeling Diagnostics Group
 

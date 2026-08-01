@@ -29,3 +29,4 @@ Auto-backfill, inventing bars, orders, changing lag computation, changing unlock
 - [0327-phase-326-nas-live-verify-phase-325.md](0327-phase-326-nas-live-verify-phase-325.md)
 - [0286-phase-285-labeled-freshness-lag-callout.md](0286-phase-285-labeled-freshness-lag-callout.md)
 - [0329-phase-328-nas-live-verify-phase-327.md](0329-phase-328-nas-live-verify-phase-327.md)
+- [0330-phase-329-primary-fetch-fallback-cta.md](0330-phase-329-primary-fetch-fallback-cta.md)

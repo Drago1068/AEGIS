@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 328 - NAS Live Verification of Phase 327 (draft)
+### Phase 330 - NAS Live Verification of Phase 329 (draft)
 
-Ops evidence gate after Phase 327 freshness-lag CTA. See
+Ops evidence gate after Phase 329 primary fetch-fallback ingest CTA. See
+[docs/architecture/decisions/0331-phase-330-nas-live-verify-phase-329.md](docs/architecture/decisions/0331-phase-330-nas-live-verify-phase-329.md).
+
+### Phase 329 - Primary Fetch-Fallback Ingest CTA (draft)
+
+Elevate Run ingest CTA on the primary fetch-fallback callout. See
+[docs/architecture/decisions/0330-phase-329-primary-fetch-fallback-cta.md](docs/architecture/decisions/0330-phase-329-primary-fetch-fallback-cta.md).
+
+### Phase 328 - NAS Live Verification of Phase 327
+
+Ops evidence gate after Phase 327 freshness-lag CTA. Live verify passed 2026-08-01
+(``00d8853``; ``lag=121`` elevates CTA). See
 [docs/architecture/decisions/0329-phase-328-nas-live-verify-phase-327.md](docs/architecture/decisions/0329-phase-328-nas-live-verify-phase-327.md).
+
+#### Added
+
+- ADR-0329: live freshness-lag CTA field-bundle evidence (checklist Phase 328 log).
+
+#### Explicitly out of scope
+
+Auto-backfill, inventing bars, orders.
 
 ### Phase 327 - Freshness-Lag Backfill CTA
 

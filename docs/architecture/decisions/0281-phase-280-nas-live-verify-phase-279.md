@@ -1,32 +1,27 @@
-# ADR-0281: Phase 280 NAS Live Verification of Phase 279 (draft)
+# ADR-0281: Phase 280 NAS Live Verification of Phase 279
 
-- Status: Proposed (pending Phase 279 + live evidence)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
 
-Phase 279 would surface latest primary fetch fallback on evidence-summary (ADR-0280).
-Operators need a verified backend redeploy under lab TLS after that lands.
+Phase 279 surfaced ``latest_primary_fetch_fallback`` on evidence-summary from the
+stored primary tip ``raw_payload`` (ADR-0280). Operators needed a verified
+backend+frontend redeploy under lab TLS.
 
 ## Decisions
 
-### 1. Scope
+### 1. Scope completed
 
-1. Deploy ``HEAD`` TLS; recreate backend.
-2. ``verify.ps1`` pass; log evidence-summary ``latest_primary_fetch_fallback`` when present
-   (``full_to_compact`` expected when latest AV tip bar used compact; null OK otherwise).
-3. Alembic ``0009`` / ``head``.
+1. Deployed ``13ff029`` TLS; rebuilt backend + frontend.
+2. ``verify.ps1`` passed; alembic ``0009`` / ``head``.
+3. Live AAPL evidence-summary:
+   ``latest_primary_fetch_fallback=full_to_compact``,
+   ``stored_bar_calendar_lag_trading_days=0``.
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout.
-
-## Resume
-
-```powershell
-# After Phase 279 on HEAD: git archive → NAS; rebuild backend TLS; then:
-.\docker\nas\scripts\verify.ps1
-```
+Retain verify stdout as acceptance evidence.
 
 ## Related documents
 

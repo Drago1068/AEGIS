@@ -687,8 +687,10 @@ Phase 278 live-verified frontend redeploy with ingest still reporting
 Phase 279 surfaces ``latest_primary_fetch_fallback`` on evidence-summary from the stored
 primary tip ``raw_payload`` (see
 [decisions/0280-phase-279-evidence-summary-primary-fetch-fallback.md](decisions/0280-phase-279-evidence-summary-primary-fetch-fallback.md)).
-Phase 280 (draft) is the NAS live verify gate (see
+Phase 280 live-verified AAPL ``latest_primary_fetch_fallback=full_to_compact`` (see
 [decisions/0281-phase-280-nas-live-verify-phase-279.md](decisions/0281-phase-280-nas-live-verify-phase-279.md)).
+Phase 281 (draft) proposes ``fetch_fallback`` on daily-bars responses (see
+[decisions/0282-phase-281-daily-bars-fetch-fallback.md](decisions/0282-phase-281-daily-bars-fetch-fallback.md)).
 
 ## System context
 

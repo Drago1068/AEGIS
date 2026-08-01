@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 280 - NAS Live Verification of Phase 279 (draft)
+### Phase 282 - NAS Live Verification of Phase 281 (draft)
 
-Ops evidence gate after Phase 279 evidence-summary fallback diagnostic. See
+Ops evidence gate after Phase 281 daily-bars fetch fallback. See
+[docs/architecture/decisions/0283-phase-282-nas-live-verify-phase-281.md](docs/architecture/decisions/0283-phase-282-nas-live-verify-phase-281.md).
+
+### Phase 281 - Daily-Bars Tip Fetch Fallback (draft)
+
+Surface ``fetch_fallback`` on daily-bar API responses from stored ``raw_payload``. See
+[docs/architecture/decisions/0282-phase-281-daily-bars-fetch-fallback.md](docs/architecture/decisions/0282-phase-281-daily-bars-fetch-fallback.md).
+
+### Phase 280 - NAS Live Verification of Phase 279
+
+Ops evidence gate after Phase 279 evidence-summary fallback diagnostic. Live verify
+passed 2026-07-31 (``13ff029``; AAPL ``latest_primary_fetch_fallback=full_to_compact``).
+See
 [docs/architecture/decisions/0281-phase-280-nas-live-verify-phase-279.md](docs/architecture/decisions/0281-phase-280-nas-live-verify-phase-279.md).
+
+#### Added
+
+- ADR-0281: live evidence-summary fallback diagnostic evidence (checklist Phase 280 log).
+
+#### Explicitly out of scope
+
+Inventing closes, orders.
 
 ### Phase 279 - Evidence-Summary Primary Fetch Fallback
 

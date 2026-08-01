@@ -8,6 +8,7 @@ from decimal import Decimal
 from httpx import ASGITransport, AsyncClient
 
 from aegis.api.dependencies import (
+    get_market_data_repository,
     get_outcome_label_service,
     get_research_assessment_service,
     get_research_calibration_repository,
@@ -334,6 +335,27 @@ class _FakeCalibrationRepository:
         return None
 
 
+class _FakeMarketDataTip:
+    def __init__(self, raw_payload: dict[str, object]) -> None:
+        self.raw_payload = raw_payload
+
+
+class _FakeMarketDataRepository:
+    def __init__(self, tip_raw_payload: dict[str, object] | None = None) -> None:
+        self._tip_raw_payload = tip_raw_payload
+
+    async def list_recent(
+        self,
+        symbol: str,
+        limit: int,
+        *,
+        sources: list[str] | None = None,
+    ) -> list[_FakeMarketDataTip]:
+        if self._tip_raw_payload is None or limit < 1:
+            return []
+        return [_FakeMarketDataTip(self._tip_raw_payload)]
+
+
 def _client(
     *,
     assessments: list[ResearchAssessmentSnapshotData] | None = None,
@@ -351,6 +373,7 @@ def _client(
     min_horizon_required_label_end_date: date | None = date(2024, 2, 2),
     stored_bar_calendar_lag_trading_days: int | None = 2,
     resolve_bars: list[ResearchBarInput] | None = None,
+    primary_tip_raw_payload: dict[str, object] | None = None,
 ) -> AsyncClient:
     app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
     app.dependency_overrides[require_operator] = _operator
@@ -377,6 +400,9 @@ def _client(
     )
     app.dependency_overrides[get_research_calibration_repository] = lambda: (
         _FakeCalibrationRepository()
+    )
+    app.dependency_overrides[get_market_data_repository] = lambda: _FakeMarketDataRepository(
+        primary_tip_raw_payload
     )
     return AsyncClient(transport=ASGITransport(app=app), base_url="http://testserver")
 
@@ -440,6 +466,7 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["latest_assessment_min_horizon_forward_bar_shortfall"] is None
     assert body["latest_assessment_min_horizon_required_label_end_date"] is None
     assert body["stored_bar_calendar_lag_trading_days"] is None
+    assert body["latest_primary_fetch_fallback"] is None
     assert body["latest_coverage_confidence"] is None
     assert body["latest_research_index"] is None
     assert body["latest_as_of_trading_date"] is None
@@ -504,6 +531,7 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["latest_assessment_min_horizon_forward_bar_shortfall"] == 0
     assert body["latest_assessment_min_horizon_required_label_end_date"] == "2024-02-02"
     assert body["stored_bar_calendar_lag_trading_days"] == 0
+    assert body["latest_primary_fetch_fallback"] is None
     assert body["latest_coverage_confidence"] == 0.95
     assert body["latest_research_index"] == 0.46
     assert body["latest_as_of_trading_date"] == "2024-01-26"
@@ -727,6 +755,33 @@ async def test_evidence_summary_stored_bar_calendar_lag_trading_days() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["stored_bar_calendar_lag_trading_days"] == 4
+
+
+async def test_evidence_summary_latest_primary_fetch_fallback() -> None:
+    async with _client(
+        assessments=[_snapshot()],
+        labels=[],
+        primary_tip_raw_payload={
+            "aegis_fetch_fallback": "full_to_compact",
+            "aegis_output_size": "compact",
+        },
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    assert response.json()["latest_primary_fetch_fallback"] == "full_to_compact"
+
+
+async def test_evidence_summary_latest_primary_fetch_fallback_null_without_label() -> None:
+    async with _client(
+        assessments=[_snapshot()],
+        labels=[],
+        primary_tip_raw_payload={"aegis_output_size": "full"},
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    assert response.json()["latest_primary_fetch_fallback"] is None
 
 
 async def test_evidence_summary_most_recent_labelable_as_of_trading_date() -> None:

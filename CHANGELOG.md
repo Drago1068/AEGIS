@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 279 evidence-summary fallback diagnostic. See
 [docs/architecture/decisions/0281-phase-280-nas-live-verify-phase-279.md](docs/architecture/decisions/0281-phase-280-nas-live-verify-phase-279.md).
 
-### Phase 279 - Evidence-Summary Primary Fetch Fallback (draft)
+### Phase 279 - Evidence-Summary Primary Fetch Fallback
 
 Surface latest stored primary ``aegis_fetch_fallback`` on evidence-summary. See
 [docs/architecture/decisions/0280-phase-279-evidence-summary-primary-fetch-fallback.md](docs/architecture/decisions/0280-phase-279-evidence-summary-primary-fetch-fallback.md).
+
+#### Added
+
+- ``latest_primary_fetch_fallback`` on evidence-summary (+ export/UI/verify);
+  ``fetch_fallback_label_from_payload`` helper; API + frontend tests.
+
+#### Explicitly out of scope
+
+Inventing closes, silent provenance swaps, orders.
 
 ### Phase 278 - NAS Live Verification of Phase 277
 

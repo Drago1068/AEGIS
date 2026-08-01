@@ -1061,6 +1061,11 @@ export interface ResearchEvidenceSummary {
    * 0 when current; null when no assessment or no tip. Never invents closes.
    */
   stored_bar_calendar_lag_trading_days: number | null;
+  /**
+   * aegis_fetch_fallback from the current max primary-source stored bar
+   * (e.g. full_to_compact). Null when no primary tip or no label. Never invented.
+   */
+  latest_primary_fetch_fallback: string | null;
   /** coverage_confidence from latest assessment; null when none. Distinct from probability. */
   latest_coverage_confidence: number | null;
   /** research_index from latest assessment components when numeric; null otherwise. */

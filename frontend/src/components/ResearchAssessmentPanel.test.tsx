@@ -162,6 +162,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_min_horizon_forward_bar_shortfall: null,
       latest_assessment_min_horizon_required_label_end_date: null,
       stored_bar_calendar_lag_trading_days: null,
+      latest_primary_fetch_fallback: null,
       latest_coverage_confidence: null,
       latest_research_index: null,
       latest_as_of_trading_date: null,
@@ -564,6 +565,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_min_horizon_forward_bar_shortfall: 5,
       latest_assessment_min_horizon_required_label_end_date: "2024-02-16",
       stored_bar_calendar_lag_trading_days: 2,
+      latest_primary_fetch_fallback: null,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -725,6 +727,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-stored-bar-calendar-lag-trading-days"),
       ).toHaveTextContent("2");
+      expect(screen.getByTestId("evidence-latest-primary-fetch-fallback")).toHaveTextContent(
+        "null",
+      );
       expect(screen.getByTestId("evidence-latest-outcome-label-computed-at")).toHaveTextContent(
         "2024-01-26T19:00:00Z",
       );
@@ -918,6 +923,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_min_horizon_forward_bar_shortfall: 5,
       latest_assessment_min_horizon_required_label_end_date: "2024-02-16",
       stored_bar_calendar_lag_trading_days: 2,
+      latest_primary_fetch_fallback: null,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1076,6 +1082,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_min_horizon_forward_bar_shortfall: 5,
       latest_assessment_min_horizon_required_label_end_date: "2024-02-16",
       stored_bar_calendar_lag_trading_days: 2,
+      latest_primary_fetch_fallback: null,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1232,6 +1239,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_min_horizon_forward_bar_shortfall: 5,
       latest_assessment_min_horizon_required_label_end_date: "2024-02-16",
       stored_bar_calendar_lag_trading_days: 2,
+      latest_primary_fetch_fallback: null,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1478,6 +1486,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_min_horizon_forward_bar_shortfall: 5,
       latest_assessment_min_horizon_required_label_end_date: "2024-02-16",
       stored_bar_calendar_lag_trading_days: 2,
+      latest_primary_fetch_fallback: null,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1684,6 +1693,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_min_horizon_forward_bar_shortfall: 5,
       latest_assessment_min_horizon_required_label_end_date: "2024-02-16",
       stored_bar_calendar_lag_trading_days: 2,
+      latest_primary_fetch_fallback: null,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",
@@ -1886,6 +1896,7 @@ describe("ResearchAssessmentPanel", () => {
       latest_assessment_min_horizon_forward_bar_shortfall: 5,
       latest_assessment_min_horizon_required_label_end_date: "2024-02-16",
       stored_bar_calendar_lag_trading_days: 2,
+      latest_primary_fetch_fallback: null,
       latest_coverage_confidence: 0.95,
       latest_research_index: 0.46,
       latest_as_of_trading_date: "2024-01-26",

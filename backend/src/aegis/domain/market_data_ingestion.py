@@ -21,10 +21,11 @@ re-ingest materially differs from the current stored bar for the same trading da
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
-from typing import Protocol
+from typing import Protocol, cast
 
 from aegis.domain.market_data_corrections import StoredBarSnapshot, bars_materially_differ
 from aegis.domain.market_data_validation import RejectionReason, validate_daily_bar
@@ -288,9 +289,21 @@ def _detect_fetch_fallback(bars: list[DailyBar]) -> str | None:
     """Return provider fallback label from bar provenance when present (ADR-0276)."""
 
     for bar in bars:
-        value = bar.raw_payload.get("aegis_fetch_fallback")
-        if isinstance(value, str) and value.strip():
-            return value.strip()
+        label = fetch_fallback_label_from_payload(bar.raw_payload)
+        if label is not None:
+            return label
+    return None
+
+
+def fetch_fallback_label_from_payload(raw_payload: object) -> str | None:
+    """Return ``aegis_fetch_fallback`` from a bar raw_payload when present (ADR-0276/0280)."""
+
+    if not isinstance(raw_payload, Mapping):
+        return None
+    payload = cast(Mapping[str, object], raw_payload)
+    value = payload.get("aegis_fetch_fallback")
+    if isinstance(value, str) and value.strip():
+        return value.strip()
     return None
 
 

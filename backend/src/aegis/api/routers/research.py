@@ -15,6 +15,7 @@ from aegis.api.dependencies import (
     build_outcome_label_service,
     build_research_calibration_service,
     enrich_assessment_with_calibration,
+    get_market_data_repository,
     get_outcome_label_service,
     get_research_assessment_service,
     get_research_calibration_repository,
@@ -35,6 +36,7 @@ from aegis.api.schemas.research_outcome_labels import (
 )
 from aegis.api.schemas.research_probability_calibration import ProbabilityCalibrationResponse
 from aegis.domain.calendars import count_trading_days_strictly_between
+from aegis.domain.market_data_ingestion import fetch_fallback_label_from_payload
 from aegis.domain.research_assessment import (
     ASSESSMENT_FILTER_SCAN_LIMIT,
     ResearchAssessmentService,
@@ -381,6 +383,8 @@ async def _build_research_evidence_summary(
     outcome_label_service: OutcomeLabelService,
     calibration_service: ResearchProbabilityCalibrationService,
     calibration_repository: ResearchProbabilityCalibrationRepository,
+    market_data_repository: MarketDailyBarRepository,
+    primary_source: str,
     calendar_name: str,
 ) -> ResearchEvidenceSummaryResponse:
     """Compose the Phase 22 research-only evidence aggregate (null/zero missing fields)."""
@@ -427,6 +431,15 @@ async def _build_research_evidence_summary(
         latest_assessment_label_block_reason = (
             None if block_reason is None else block_reason.value
         )
+
+    primary_tip_bars = await market_data_repository.list_recent(
+        symbol.upper(), 1, sources=[primary_source]
+    )
+    latest_primary_fetch_fallback = (
+        fetch_fallback_label_from_payload(primary_tip_bars[0].raw_payload)
+        if primary_tip_bars
+        else None
+    )
 
     latest_assessment = None
     latest_outcome_label = None
@@ -710,6 +723,7 @@ async def _build_research_evidence_summary(
         latest_assessment_min_horizon_forward_bar_shortfall=latest_assessment_min_horizon_forward_bar_shortfall,
         latest_assessment_min_horizon_required_label_end_date=latest_assessment_min_horizon_required_label_end_date,
         stored_bar_calendar_lag_trading_days=stored_bar_calendar_lag_trading_days,
+        latest_primary_fetch_fallback=latest_primary_fetch_fallback,
         latest_coverage_confidence=latest_coverage_confidence,
         latest_research_index=latest_research_index,
         latest_as_of_trading_date=latest_as_of_trading_date,
@@ -765,16 +779,20 @@ async def get_research_evidence_summary(
     calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
         get_research_calibration_repository
     ),
+    market_data_repository: MarketDailyBarRepository = Depends(get_market_data_repository),
 ) -> ResearchEvidenceSummaryResponse:
     """Return a read-only research evidence aggregate for ``symbol`` (ADR-0023)."""
 
+    settings = request.app.state.settings
     return await _build_research_evidence_summary(
         symbol,
         assessment_service=assessment_service,
         outcome_label_service=outcome_label_service,
         calibration_service=calibration_service,
         calibration_repository=calibration_repository,
-        calendar_name=request.app.state.settings.exchange_calendar_name,
+        market_data_repository=market_data_repository,
+        primary_source=settings.daily_bar_primary_source,
+        calendar_name=settings.exchange_calendar_name,
     )
 
 
@@ -790,16 +808,20 @@ async def export_research_evidence_summary(
     calibration_repository: ResearchProbabilityCalibrationRepository = Depends(
         get_research_calibration_repository
     ),
+    market_data_repository: MarketDailyBarRepository = Depends(get_market_data_repository),
 ) -> JSONResponse:
     """Download the research evidence aggregate as a JSON attachment (ADR-0025)."""
 
+    settings = request.app.state.settings
     summary = await _build_research_evidence_summary(
         symbol,
         assessment_service=assessment_service,
         outcome_label_service=outcome_label_service,
         calibration_service=calibration_service,
         calibration_repository=calibration_repository,
-        calendar_name=request.app.state.settings.exchange_calendar_name,
+        market_data_repository=market_data_repository,
+        primary_source=settings.daily_bar_primary_source,
+        calendar_name=settings.exchange_calendar_name,
     )
     filename = f"aegis-{summary.symbol}-evidence-summary.json"
     return JSONResponse(

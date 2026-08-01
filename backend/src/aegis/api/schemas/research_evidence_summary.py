@@ -289,6 +289,14 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "assessment or no stored tip. Never invents closes."
         ),
     )
+    latest_primary_fetch_fallback: str | None = Field(
+        default=None,
+        description=(
+            "aegis_fetch_fallback from the current max primary-source stored bar "
+            "(e.g. full_to_compact when AV compact fallback supplied that tip). "
+            "Null when no primary tip or no label. Never invents closes."
+        ),
+    )
     latest_coverage_confidence: float | None = Field(
         default=None,
         ge=0.0,

@@ -161,8 +161,9 @@ function Write-VerifyChecklist {
     Write-Host "121. Authenticated evidence-summary includes Phase 251 latest_assessment_min_horizon_forward_bar_shortfall (Phase 252)"
     Write-Host "122. Authenticated evidence-summary includes Phase 253 latest_assessment_min_horizon_required_label_end_date (Phase 254)"
     Write-Host "123. Authenticated evidence-summary includes Phase 255 stored_bar_calendar_lag_trading_days (Phase 256)"
-    Write-Host "124. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
-    Write-Host "125. TLS profile: https:// URLs + Secure cookies when enabled"
+    Write-Host "124. Authenticated evidence-summary includes Phase 279 latest_primary_fetch_fallback (Phase 280)"
+    Write-Host "125. Authenticated POST /market-data/ingest tip refresh + latest_trading_date (Phase 257-266; unchanged lag OK)"
+    Write-Host "126. TLS profile: https:// URLs + Secure cookies when enabled"
 }
 
 if ($DryRun) {
@@ -1244,6 +1245,13 @@ try {
         # Do not treat 0 as empty: in PowerShell `0 -eq ""` is $true (ADR-0272).
         $barLagPart = if ($null -eq $barLag) { "null" } else { [string]$barLag }
         Write-Host "OK  Phase 256 stored_bar_calendar_lag_trading_days=$barLagPart"
+        # Phase 280: latest_primary_fetch_fallback from stored primary tip raw_payload (ADR-0280).
+        if (-not ($summary.PSObject.Properties.Name -contains "latest_primary_fetch_fallback")) {
+            throw "evidence-summary missing latest_primary_fetch_fallback (Phase 279/280)"
+        }
+        $primaryFallback = $summary.latest_primary_fetch_fallback
+        $primaryFallbackPart = if ($null -eq $primaryFallback -or $primaryFallback -eq "") { "null" } else { [string]$primaryFallback }
+        Write-Host "OK  Phase 280 latest_primary_fetch_fallback=$primaryFallbackPart (full_to_compact when AV compact tip; null OK)"
         # Phase 258: on-demand ingest tip refresh (Phase 257). Unchanged lag/tip OK when
         # providers have no newer closes — never invent; fail only on HTTP/contract errors.
         $preLagPart = $barLagPart
@@ -1539,6 +1547,9 @@ try {
         }
         if (-not ($exportBody.PSObject.Properties.Name -contains "stored_bar_calendar_lag_trading_days")) {
             throw "evidence-summary/export missing stored_bar_calendar_lag_trading_days (Phase 255/256)"
+        }
+        if (-not ($exportBody.PSObject.Properties.Name -contains "latest_primary_fetch_fallback")) {
+            throw "evidence-summary/export missing latest_primary_fetch_fallback (Phase 279/280)"
         }
         if ($null -eq $exportBody.calibration_readiness -or $null -eq $exportBody.calibration_readiness.by_horizon) {
             throw "evidence-summary/export.calibration_readiness missing by_horizon (Phase 75)"

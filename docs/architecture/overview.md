@@ -684,9 +684,11 @@ Phase 277 shows that label on the operator IngestPanel (see
 Phase 278 live-verified frontend redeploy with ingest still reporting
 ``primary_fetch_fallback=full_to_compact`` (see
 [decisions/0279-phase-278-nas-live-verify-phase-277.md](decisions/0279-phase-278-nas-live-verify-phase-277.md)).
-Phase 279 (draft) proposes evidence-summary surfacing of the latest stored primary
-fallback label (see
+Phase 279 surfaces ``latest_primary_fetch_fallback`` on evidence-summary from the stored
+primary tip ``raw_payload`` (see
 [decisions/0280-phase-279-evidence-summary-primary-fetch-fallback.md](decisions/0280-phase-279-evidence-summary-primary-fetch-fallback.md)).
+Phase 280 (draft) is the NAS live verify gate (see
+[decisions/0281-phase-280-nas-live-verify-phase-279.md](decisions/0281-phase-280-nas-live-verify-phase-279.md)).
 
 ## System context
 

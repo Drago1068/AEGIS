@@ -28,3 +28,4 @@ Auto-backfill, inventing bars, orders, changing complete/partial counts, changin
 - [0335-phase-334-nas-live-verify-phase-333.md](0335-phase-334-nas-live-verify-phase-333.md)
 - [0318-phase-317-partial-label-upgrade-callout.md](0318-phase-317-partial-label-upgrade-callout.md)
 - [0337-phase-336-nas-live-verify-phase-335.md](0337-phase-336-nas-live-verify-phase-335.md)
+- [0338-phase-337-calendar-unlock-ops-checkpoint.md](0338-phase-337-calendar-unlock-ops-checkpoint.md)

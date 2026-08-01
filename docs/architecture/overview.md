@@ -818,8 +818,10 @@ Phase 334 live-verified that CTA (see
 Phase 335 elevates a partial-labeled upgrade CTA pointing at ``Backfill outcome labels``
 (see
 [decisions/0336-phase-335-partial-labeled-upgrade-cta.md](decisions/0336-phase-335-partial-labeled-upgrade-cta.md)).
-Phase 336 (draft) is the NAS live-verify gate for that CTA (see
+Phase 336 live-verified that CTA (see
 [decisions/0337-phase-336-nas-live-verify-phase-335.md](decisions/0337-phase-336-nas-live-verify-phase-335.md)).
+Phase 337 (draft) is a calendar unlock ops checkpoint after min-horizon bars arrive (see
+[decisions/0338-phase-337-calendar-unlock-ops-checkpoint.md](decisions/0338-phase-337-calendar-unlock-ops-checkpoint.md)).
 
 ## System context
 

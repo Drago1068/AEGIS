@@ -12,10 +12,26 @@ delivery workflow).
 Ops evidence gate after Phase 267 mixed label bar source resolution. See
 [docs/architecture/decisions/0269-phase-268-nas-live-verify-phase-267.md](docs/architecture/decisions/0269-phase-268-nas-live-verify-phase-267.md).
 
-### Phase 267 - Resolve Mixed Label Bar Source in Evidence Summary (draft)
+### Phase 267 - Resolve Mixed Label Bar Source in Evidence Summary
 
-Resolve ``latest_resolved_label_bar_source`` with bars for mixed assessments. See
+Resolve ``latest_resolved_label_bar_source`` with stored bars for mixed assessments
+(same rules as Phase 65 / ADR-0066). See
 [docs/architecture/decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md](docs/architecture/decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md).
+
+#### Added
+
+- ``OutcomeLabelService.resolve_label_bar_source_for_assessment``; evidence-summary uses it
+  when the latest assessment has no persisted label.
+- Evidence-summary tests for concrete vs unresolved mixed label bar source.
+
+#### Changed
+
+- ``latest_resolved_label_bar_source`` schema description; verify scripts log Phase 268
+  mixed resolution.
+
+#### Explicitly out of scope
+
+Inventing closes, changing assessment ``input_source``, calibration default-on, orders.
 
 ### Phase 266 - NAS Live Verification of Phase 265
 

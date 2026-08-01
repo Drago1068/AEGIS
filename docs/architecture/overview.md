@@ -658,10 +658,11 @@ Phase 265 falls back to stored primary tip when primary fetch fails (see
 [decisions/0266-phase-265-stored-primary-tip-fallback.md](decisions/0266-phase-265-stored-primary-tip-fallback.md)).
 Phase 266 live-verified that fallback (see
 [decisions/0267-phase-266-nas-live-verify-phase-265.md](decisions/0267-phase-266-nas-live-verify-phase-265.md)).
-Phase 267 (draft) proposes resolving mixed label bar source in evidence-summary (see
+Phase 267 resolves mixed ``latest_resolved_label_bar_source`` with stored bars in
+evidence-summary (see
 [decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md](decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md)).
-Phase 262 (draft) would live-verify that fix (see
-[decisions/0263-phase-262-nas-live-verify-phase-261.md](decisions/0263-phase-262-nas-live-verify-phase-261.md)).
+Phase 268 (draft) live-verifies that resolution (see
+[decisions/0269-phase-268-nas-live-verify-phase-267.md](decisions/0269-phase-268-nas-live-verify-phase-267.md)).
 
 ## System context
 

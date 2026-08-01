@@ -7,12 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 266 closed (stored primary tip fallback live-verified).** Next
-(draft): Phase 267 resolve mixed label bar source in evidence-summary (ADR-0268), then
-Phase 268 NAS verify. Prefer closing opaque ``mixed`` label_bar_source over further tip
-scalars / UI modularization. See
-[docs/architecture/decisions/0267-phase-266-nas-live-verify-phase-265.md](docs/architecture/decisions/0267-phase-266-nas-live-verify-phase-265.md),
+**Current phase: Phase 267 closed (mixed label bar source resolved in evidence-summary).**
+Next (draft): Phase 268 NAS live verify under lab TLS (ADR-0269). See
 [docs/architecture/decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md](docs/architecture/decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md),
+[docs/architecture/decisions/0269-phase-268-nas-live-verify-phase-267.md](docs/architecture/decisions/0269-phase-268-nas-live-verify-phase-267.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

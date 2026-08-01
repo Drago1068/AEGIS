@@ -685,6 +685,11 @@ try {
         $labelSrc = if ($null -eq $summary.latest_resolved_label_bar_source) { "null" } else { $summary.latest_resolved_label_bar_source }
         Write-Host "OK  evidence-summary state=research_only assessments=$($summary.assessment_count) label_keys=$labelPart end_date_keys=$endPart component_source=$compSrc label_bar_source=$labelSrc mixed_count=$($summary.mixed_component_source_assessment_count)"
         Write-Host "OK  Phase 60 evidence-summary provenance fields present"
+        # Phase 268: when latest is mixed, label_bar_source should be concrete if resolvable
+        # (ADR-0268); remaining "mixed" is OK only when as-of close cannot resolve.
+        if ($compSrc -eq "mixed") {
+            Write-Host "OK  Phase 268 mixed latest_resolved_label_bar_source=$labelSrc (concrete preferred; mixed OK if unresolved)"
+        }
         if ([int]$summary.mixed_component_source_assessment_count -gt 0 -and $mixedListCount -lt 1) {
             throw "Phase 62: mixed_component_source_assessment_count=$($summary.mixed_component_source_assessment_count) but assessments?component_source=mixed returned 0"
         }

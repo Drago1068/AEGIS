@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, date, datetime
+from decimal import Decimal
 
 from httpx import ASGITransport, AsyncClient
 
@@ -15,11 +16,12 @@ from aegis.api.dependencies import (
 )
 from aegis.api.main import create_app
 from aegis.config.settings import Settings
-from aegis.domain.research_assessment import ResearchAssessmentSnapshotData
+from aegis.domain.research_assessment import ResearchAssessmentSnapshotData, ResearchBarInput
 from aegis.domain.research_outcome_labels import (
     LABEL_METHOD_ID,
     OutcomeLabelData,
     OutcomeLabelReason,
+    resolve_label_bar_source,
 )
 from aegis.domain.research_probability_calibration import (
     CALIBRATION_METHOD_ID,
@@ -45,26 +47,30 @@ def _snapshot(
     snapshot_id: int = 1,
     input_source: str = "alpha_vantage",
     component_source: str | None = None,
+    coverage_sources: list[str] | None = None,
+    as_of: date = date(2024, 1, 26),
 ) -> ResearchAssessmentSnapshotData:
-    components: dict[str, float | str] = {"research_index": 0.46}
+    components: dict[str, float | str | list[str]] = {"research_index": 0.46}
     if component_source is not None:
         components["component_source"] = component_source
+    if coverage_sources is not None:
+        components["coverage_sources"] = coverage_sources
     return ResearchAssessmentSnapshotData(
         id=snapshot_id,
         symbol="AAPL",
         method_id="daily_bar_research_v1",
         method_version=1,
         state="research_only",
-        as_of_trading_date=date(2024, 1, 26),
-        event_time=datetime(2024, 1, 26, 23, 59, 59, tzinfo=UTC),
-        computed_at=datetime(2024, 1, 26, 18, 0, tzinfo=UTC),
+        as_of_trading_date=as_of,
+        event_time=datetime(as_of.year, as_of.month, as_of.day, 23, 59, 59, tzinfo=UTC),
+        computed_at=datetime(as_of.year, as_of.month, as_of.day, 18, 0, tzinfo=UTC),
         coverage_confidence=0.95,
         probability_confidence=None,
         components=components,
         schema_version=1,
         input_source=input_source,
         lookback_start_date=date(2023, 12, 27),
-        lookback_end_date=date(2024, 1, 26),
+        lookback_end_date=as_of,
         bar_count=20,
     )
 
@@ -146,8 +152,10 @@ class _FakeOutcomeLabelService:
         min_horizon_forward_bar_shortfall: int | None = 5,
         min_horizon_required_label_end_date: date | None = date(2024, 2, 2),
         stored_bar_calendar_lag_trading_days: int | None = 2,
+        resolve_bars: list[ResearchBarInput] | None = None,
     ) -> None:
         self._listed = listed or []
+        self._resolve_bars = resolve_bars
         self._label_ready = label_ready
         self._label_block_reason = None if label_ready else label_block_reason
         self._labelable_as_of = labelable_as_of
@@ -178,6 +186,14 @@ class _FakeOutcomeLabelService:
             if row.assessment_snapshot_id == assessment_snapshot_id
         ]
         return matched[:limit]
+
+    async def resolve_label_bar_source_for_assessment(
+        self,
+        symbol: str,
+        snapshot: ResearchAssessmentSnapshotData,
+    ) -> str:
+        _ = symbol
+        return resolve_label_bar_source(snapshot, self._resolve_bars)
 
     async def assessment_ids_with_labels(
         self,
@@ -334,6 +350,7 @@ def _client(
     min_horizon_forward_bar_shortfall: int | None = 5,
     min_horizon_required_label_end_date: date | None = date(2024, 2, 2),
     stored_bar_calendar_lag_trading_days: int | None = 2,
+    resolve_bars: list[ResearchBarInput] | None = None,
 ) -> AsyncClient:
     app = create_app(settings=Settings(environment="test", ingestion_schedule_enabled=False))
     app.dependency_overrides[require_operator] = _operator
@@ -352,6 +369,7 @@ def _client(
         min_horizon_forward_bar_shortfall=min_horizon_forward_bar_shortfall,
         min_horizon_required_label_end_date=min_horizon_required_label_end_date,
         stored_bar_calendar_lag_trading_days=stored_bar_calendar_lag_trading_days,
+        resolve_bars=resolve_bars,
     )
     app.dependency_overrides[get_research_calibration_service] = lambda: _FakeCalibrationService(
         readiness=readiness or _readiness(),
@@ -863,6 +881,75 @@ async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:
     assert body["latest_mixed_label_bar_source"] == "polygon"
 
 
+def _as_of_bar(*, trading_date: date, source: str, close: str = "100") -> ResearchBarInput:
+    value = Decimal(close)
+    return ResearchBarInput(
+        trading_date=trading_date,
+        open=value,
+        high=value,
+        low=value,
+        close=value,
+        volume=1000,
+        data_quality="primary",
+        source=source,
+    )
+
+
+async def test_evidence_summary_resolves_mixed_label_bar_source_with_bars() -> None:
+    """Unlabeled mixed latest assessment resolves concrete source via bars (ADR-0268)."""
+
+    as_of = date(2024, 1, 26)
+    mixed = _snapshot(
+        snapshot_id=3,
+        input_source="mixed",
+        component_source="mixed",
+        coverage_sources=["polygon", "alpha_vantage"],
+        as_of=as_of,
+    )
+    primary = _snapshot(snapshot_id=1, component_source="alpha_vantage")
+    resolve_bars = [
+        _as_of_bar(trading_date=as_of, source="polygon", close="190"),
+        _as_of_bar(trading_date=as_of, source="alpha_vantage", close="189.5"),
+    ]
+    async with _client(
+        assessments=[mixed, primary],
+        labels=[],
+        resolve_bars=resolve_bars,
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["latest_assessment_id"] == 3
+    assert body["latest_component_source"] == "mixed"
+    assert body["latest_input_source"] == "mixed"
+    assert body["latest_outcome_label"] is None
+    assert body["latest_resolved_label_bar_source"] == "polygon"
+
+
+async def test_evidence_summary_keeps_mixed_label_bar_source_without_as_of_bars() -> None:
+    """Without usable as-of closes, unresolved mixed stays mixed (fail closed)."""
+
+    mixed = _snapshot(
+        snapshot_id=2,
+        input_source="mixed",
+        component_source="mixed",
+        coverage_sources=["polygon", "alpha_vantage"],
+    )
+    async with _client(
+        assessments=[mixed],
+        labels=[],
+        resolve_bars=[
+            _as_of_bar(trading_date=date(2024, 1, 25), source="polygon"),
+        ],
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["latest_resolved_label_bar_source"] == "mixed"
+
+
 async def test_evidence_summary_counts_mixed_unlabeled() -> None:
     mixed_unlabeled = _snapshot(
         snapshot_id=3,
@@ -903,6 +990,7 @@ async def test_evidence_summary_counts_mixed_unlabeled() -> None:
     assert body["labeled_assessment_count"] == 1
     assert body["unlabeled_assessment_count"] == 2
     assert body["latest_mixed_label_bar_source"] == "alpha_vantage"
+    assert body["latest_resolved_label_bar_source"] == "mixed"
     assert body["latest_outcome_label"] is None
     assert body["most_recent_labeled_assessment_id"] == 2
     assert body["most_recent_labeled_outcome_label"]["labels"]["forward_return_5"] == 0.04

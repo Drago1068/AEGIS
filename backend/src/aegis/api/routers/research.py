@@ -6,6 +6,8 @@ placement. Assessments are fail-closed: gate failures return HTTP 422 and persis
 
 from __future__ import annotations
 
+from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import JSONResponse
 
@@ -45,7 +47,6 @@ from aegis.domain.research_assessment import (
 from aegis.domain.research_outcome_labels import (
     OutcomeLabelService,
     OutcomeLabelUnavailableError,
-    resolve_label_bar_source,
 )
 from aegis.domain.research_probability_calibration import (
     CalibrationUnavailableError,
@@ -526,7 +527,11 @@ async def _build_research_evidence_summary(
         enriched = await enrich_assessment_with_calibration(snapshot, calibration_repository)
         latest_assessment = ResearchAssessmentResponse.model_validate(enriched)
         latest_component_source = component_source_of(snapshot)
-        latest_resolved_label_bar_source = resolve_label_bar_source(snapshot)
+        latest_resolved_label_bar_source = (
+            await outcome_label_service.resolve_label_bar_source_for_assessment(
+                symbol, snapshot
+            )
+        )
         labels = await outcome_label_service.list_labels_for_assessment(symbol, snapshot.id, 100)
         outcome_label_count = len(labels)
         if labels:

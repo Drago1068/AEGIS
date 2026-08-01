@@ -53,7 +53,9 @@ class ResearchEvidenceSummaryResponse(BaseModel):
         default=None,
         description=(
             "Observation source used (or that would be used) for Phase 13 label closes on "
-            "the latest assessment. Prefers persisted label.bar_source when present."
+            "the latest assessment. Prefers persisted label.bar_source when present; else "
+            "resolves with stored bars (ADR-0066 / ADR-0268) so true-mixed rows get a "
+            "concrete source when as-of closes exist. Remains 'mixed' only when unresolved."
         ),
     )
     mixed_component_source_assessment_count: int = Field(

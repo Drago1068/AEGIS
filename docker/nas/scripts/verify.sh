@@ -626,6 +626,12 @@ if ! grep -q '"mixed_component_source_assessment_count"' "${summary_body}"; then
   exit 1
 fi
 echo "OK  Phase 60 evidence-summary provenance fields present"
+# Phase 268: log resolved label bar source when latest component is mixed (ADR-0268).
+comp_src="$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(d.get('latest_component_source') or 'null')" "${summary_body}" 2>/dev/null || echo "null")"
+label_src="$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(d.get('latest_resolved_label_bar_source') or 'null')" "${summary_body}" 2>/dev/null || echo "null")"
+if [[ "${comp_src}" == "mixed" ]]; then
+  echo "OK  Phase 268 mixed latest_resolved_label_bar_source=${label_src} (concrete preferred; mixed OK if unresolved)"
+fi
 # Phase 62: when mixed assessments exist in the evidence scan, filtered list must be non-empty.
 if grep -qE '"mixed_component_source_assessment_count"[[:space:]]*:[[:space:]]*[1-9]' "${summary_body}"; then
   if [[ "${mixed_list_count}" -lt 1 ]]; then

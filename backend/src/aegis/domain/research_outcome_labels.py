@@ -548,6 +548,20 @@ class OutcomeLabelService:
         )
         return reason is None, reason
 
+    async def resolve_label_bar_source_for_assessment(
+        self,
+        symbol: str,
+        snapshot: ResearchAssessmentSnapshotData,
+    ) -> str:
+        """Resolve label bar source with stored bars (ADR-0066 / ADR-0268).
+
+        Loads bars so true-mixed assessments get a concrete source when as-of closes
+        exist. Returns ``mixed`` only when unresolved. Never invents sources.
+        """
+
+        bars = await self._bar_reader.list_recent_bars(symbol.upper(), self._bar_load_limit)
+        return resolve_label_bar_source(snapshot, bars)
+
     async def scan_label_diagnostics(
         self,
         symbol: str,

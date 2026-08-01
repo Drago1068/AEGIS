@@ -7,10 +7,31 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 310 - NAS Live Verification of Phase 309 (draft)
+### Phase 312 - NAS Live Verification of Phase 311 (draft)
 
-Ops evidence gate after Phase 309 min-horizon / ready-horizons label path. See
+Ops evidence gate after Phase 311 ready-horizons backfill. See
+[docs/architecture/decisions/0313-phase-312-nas-live-verify-phase-311.md](docs/architecture/decisions/0313-phase-312-nas-live-verify-phase-311.md).
+
+### Phase 311 - Ready-Horizons Label Backfill (draft)
+
+Batch research-only ready-horizons labeling for historical assessments while tip waits.
+See
+[docs/architecture/decisions/0312-phase-311-ready-horizons-backfill.md](docs/architecture/decisions/0312-phase-311-ready-horizons-backfill.md).
+
+### Phase 310 - NAS Live Verification of Phase 309
+
+Ops evidence gate after Phase 309 ready-horizons label path. Live verify passed 2026-08-01
+(``b5b6e86``; tip ``POST .../ready-horizons`` → ``422``
+``insufficient_forward_bars``; ``min_horizon_shortfall=5``). See
 [docs/architecture/decisions/0311-phase-310-nas-live-verify-phase-309.md](docs/architecture/decisions/0311-phase-310-nas-live-verify-phase-309.md).
+
+#### Added
+
+- ADR-0311: live ready-horizons auth + fail-closed tip evidence (checklist Phase 310 log).
+
+#### Explicitly out of scope
+
+Inventing bars, orders.
 
 ### Phase 309 - Min-Horizon Label Path When Tip Blocked
 

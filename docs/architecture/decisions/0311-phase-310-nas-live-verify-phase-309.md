@@ -1,34 +1,31 @@
-# ADR-0311: Phase 310 NAS Live Verification of Phase 309 (draft)
+# ADR-0311: Phase 310 NAS Live Verification of Phase 309
 
-- Status: Proposed (pending Phase 309 + live evidence)
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
 
-Phase 309 would add an explicit min-horizon / ready-horizons outcome-label path when the tip
-is still blocked (ADR-0310). Operators need a verified NAS redeploy under lab TLS after that
-lands.
+Phase 309 added an explicit ready-horizons outcome-label path when tip is blocked
+(ADR-0310). Operators needed a verified backend+frontend redeploy under lab TLS.
 
 ## Decisions
 
-### 1. Scope
+### 1. Scope completed
 
-1. Deploy ``HEAD`` TLS; rebuild backend (and frontend if UI changed).
-2. ``verify.ps1`` pass; retain Phase 308 frontier logs; add Phase 310 ready-horizons evidence.
-3. Alembic ``0009`` / ``head`` (or newer if Phase 309 migrates).
+1. Deployed ``HEAD`` ``b5b6e86`` via ``git archive``; preserved ``.env.nas``;
+   rebuilt backend + frontend TLS; waited ``/ready`` via docker-exec urllib.
+2. ``verify.ps1`` passed. Live AAPL ready-horizons:
+   ``POST .../assessments/213/outcome-labels/ready-horizons`` → ``422``
+   ``reason=insufficient_forward_bars`` (tip still blocked;
+   ``min_horizon_shortfall=5``). Unauth → ``401``.
+3. Alembic ``0009`` / ``head``.
 
 ### 2. Upload ≠ verified
 
-Retain live verify stdout.
-
-## Resume
-
-```powershell
-# After Phase 309 on HEAD: git archive → NAS; rebuild backend (+ frontend if needed); then:
-.\docker\nas\scripts\verify.ps1
-```
+Retain live verify stdout as evidence.
 
 ## Related documents
 
 - [0310-phase-309-min-horizon-label-path.md](0310-phase-309-min-horizon-label-path.md)
+- [0312-phase-311-ready-horizons-backfill.md](0312-phase-311-ready-horizons-backfill.md)
 - [../../operations/nas-live-verification.md](../../operations/nas-live-verification.md)

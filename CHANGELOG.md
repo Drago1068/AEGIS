@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 278 - NAS Live Verification of Phase 277 (draft)
+### Phase 280 - NAS Live Verification of Phase 279 (draft)
 
-Ops evidence gate after Phase 277 ingest UI fallback diagnostic. See
+Ops evidence gate after Phase 279 evidence-summary fallback diagnostic. See
+[docs/architecture/decisions/0281-phase-280-nas-live-verify-phase-279.md](docs/architecture/decisions/0281-phase-280-nas-live-verify-phase-279.md).
+
+### Phase 279 - Evidence-Summary Primary Fetch Fallback (draft)
+
+Surface latest stored primary ``aegis_fetch_fallback`` on evidence-summary. See
+[docs/architecture/decisions/0280-phase-279-evidence-summary-primary-fetch-fallback.md](docs/architecture/decisions/0280-phase-279-evidence-summary-primary-fetch-fallback.md).
+
+### Phase 278 - NAS Live Verification of Phase 277
+
+Ops evidence gate after Phase 277 IngestPanel fallback UI. Live verify passed 2026-07-31
+(``99b5032``; ingest still ``primary_fetch_fallback=full_to_compact``). See
 [docs/architecture/decisions/0279-phase-278-nas-live-verify-phase-277.md](docs/architecture/decisions/0279-phase-278-nas-live-verify-phase-277.md).
+
+#### Added
+
+- ADR-0279: live frontend redeploy evidence for ingest fallback UI.
+
+#### Explicitly out of scope
+
+Inventing closes, orders.
 
 ### Phase 277 - Surface Primary Fetch Fallback in Ingest UI
 

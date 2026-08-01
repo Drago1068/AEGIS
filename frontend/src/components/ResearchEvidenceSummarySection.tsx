@@ -47,14 +47,15 @@ export function ResearchEvidenceSummarySection({
         Evidence summary (research-only — not advice)
       </p>
       {showLabelingDiagnostics ? (
-        <section
-          className="mt-3 space-y-2"
-          aria-label="Labeling diagnostics"
+        <details
+          className="mt-3"
+          open
           data-testid="evidence-labeling-diagnostics"
         >
-          <p className="text-xs font-semibold uppercase tracking-wide text-aegis-warn">
+          <summary className="cursor-pointer list-outside text-xs font-semibold uppercase tracking-wide text-aegis-warn">
             Labeling diagnostics (research-only — not advice)
-          </p>
+          </summary>
+          <div className="mt-2 space-y-2" aria-label="Labeling diagnostics details">
           {showLabelReadinessCallout ? (
             <aside
               className="rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
@@ -208,7 +209,8 @@ export function ResearchEvidenceSummarySection({
               </p>
             </aside>
           ) : null}
-        </section>
+          </div>
+        </details>
       ) : null}
       <dl className="mt-2 grid gap-2 sm:grid-cols-2">
         <div>

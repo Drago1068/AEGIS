@@ -716,8 +716,12 @@ see [decisions/0291-phase-290-nas-live-verify-phase-289.md](decisions/0291-phase
 Phase 291 elevates mixed-unlabeled backlog inside labeling diagnostics when
 ``mixed_unlabeled_assessment_count > 0`` (see
 [decisions/0292-phase-291-mixed-unlabeled-backlog-callout.md](decisions/0292-phase-291-mixed-unlabeled-backlog-callout.md)).
-Phase 292 (draft) is the NAS live verify gate (see
+Phase 292 live-verified that callout field bundle (mixed_unlabeled ``7``; see
 [decisions/0293-phase-292-nas-live-verify-phase-291.md](decisions/0293-phase-292-nas-live-verify-phase-291.md)).
+Phase 293 makes labeling diagnostics a collapsible disclosure open by default (see
+[decisions/0294-phase-293-collapsible-labeling-diagnostics.md](decisions/0294-phase-293-collapsible-labeling-diagnostics.md)).
+Phase 294 (draft) is the NAS live verify gate (see
+[decisions/0295-phase-294-nas-live-verify-phase-293.md](decisions/0295-phase-294-nas-live-verify-phase-293.md)).
 
 ## System context
 

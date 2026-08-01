@@ -709,6 +709,7 @@ describe("ResearchAssessmentPanel", () => {
         screen.getByTestId("evidence-latest-label-readiness-callout"),
       ).toBeInTheDocument();
       expect(screen.getByTestId("evidence-labeling-diagnostics")).toBeInTheDocument();
+      expect(screen.getByTestId("evidence-labeling-diagnostics")).toHaveAttribute("open");
       expect(
         screen.getByTestId("evidence-label-readiness-callout-block-reason"),
       ).toHaveTextContent("block_reason=insufficient_forward_bars");

@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 292 - NAS Live Verification of Phase 291 (draft)
+### Phase 294 - NAS Live Verification of Phase 293 (draft)
 
-Ops evidence gate after Phase 291 mixed-unlabeled backlog callout. See
+Ops evidence gate after Phase 293 collapsible labeling diagnostics. See
+[docs/architecture/decisions/0295-phase-294-nas-live-verify-phase-293.md](docs/architecture/decisions/0295-phase-294-nas-live-verify-phase-293.md).
+
+### Phase 293 - Collapsible Labeling Diagnostics
+
+Make the labeling-diagnostics group collapsible without new API scalars. See
+[docs/architecture/decisions/0294-phase-293-collapsible-labeling-diagnostics.md](docs/architecture/decisions/0294-phase-293-collapsible-labeling-diagnostics.md).
+
+#### Added
+
+- ``details``/``summary`` disclosure for labeling diagnostics (open by default); unit
+  tests; ``verify.ps1`` Phase 294 log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing labels/closes, orders.
+
+### Phase 292 - NAS Live Verification of Phase 291
+
+Ops evidence gate after Phase 291 mixed-unlabeled backlog callout. Live verify passed
+2026-08-01 (``bfe3d7c``; mixed_unlabeled ``7`` / mixed_total ``26`` / mixed_labeled
+``19``). See
 [docs/architecture/decisions/0293-phase-292-nas-live-verify-phase-291.md](docs/architecture/decisions/0293-phase-292-nas-live-verify-phase-291.md).
+
+#### Added
+
+- ADR-0293: live mixed-unlabeled backlog callout field-bundle evidence (checklist Phase 292 log).
+
+#### Explicitly out of scope
+
+Inventing closes, orders.
 
 ### Phase 291 - Mixed-Unlabeled Backlog Callout
 

@@ -20,8 +20,8 @@ Elevate existing evidence-summary label-block fields in the research UI. See
 ### Phase 282 - NAS Live Verification of Phase 281
 
 Ops evidence gate after Phase 281 daily-bars fetch fallback. Live verify passed 2026-07-31
-(``58023db``; AAPL tip ``fetch_fallback=full_to_compact``, ``2026-07-31`` /
-``alpha_vantage``). See
+(``58023db``; multi-source tip ``source=polygon`` ``fetch_fallback=null``; primary still
+``full_to_compact`` on ingest/evidence-summary). See
 [docs/architecture/decisions/0283-phase-282-nas-live-verify-phase-281.md](docs/architecture/decisions/0283-phase-282-nas-live-verify-phase-281.md).
 
 #### Added

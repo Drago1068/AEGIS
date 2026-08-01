@@ -691,7 +691,8 @@ Phase 280 live-verified AAPL ``latest_primary_fetch_fallback=full_to_compact`` (
 [decisions/0281-phase-280-nas-live-verify-phase-279.md](decisions/0281-phase-280-nas-live-verify-phase-279.md)).
 Phase 281 surfaces ``fetch_fallback`` on daily-bars responses and the bars table (see
 [decisions/0282-phase-281-daily-bars-fetch-fallback.md](decisions/0282-phase-281-daily-bars-fetch-fallback.md)).
-Phase 282 live-verified AAPL tip ``fetch_fallback=full_to_compact`` (see
+Phase 282 live-verified multi-source tip ``fetch_fallback=null`` (``polygon``) while
+primary compact fallback remains labeled on ingest/evidence-summary (see
 [decisions/0283-phase-282-nas-live-verify-phase-281.md](decisions/0283-phase-282-nas-live-verify-phase-281.md)).
 Phase 283 (draft) proposes elevating latest label-readiness block reason/shortfall in the
 research UI (see

@@ -6,12 +6,12 @@
 ## Context
 
 Phases 275–282 closed compact-fetch fallback diagnostics across ingest, evidence-summary,
-and daily-bars (live AAPL tip ``full_to_compact``). A remaining product gap: the latest
-assessment is often not label-ready (``insufficient_forward_bars``, shortfall ``20``,
-required end date weeks ahead) while labeled corpus freshness lag remains large
-(``scan_labeled_freshness_lag_trading_days≈121``). Operators already have the scalars in
-evidence-summary, but the research panel does not elevate why the tip assessment cannot
-yet be labeled.
+and daily-bars (live primary ``full_to_compact``; multi-source bars tip may be polygon with
+null fallback). A remaining product gap: the latest assessment is often not label-ready
+(``insufficient_forward_bars``, shortfall ``20``, required end date weeks ahead) while
+labeled corpus freshness lag remains large (``scan_labeled_freshness_lag_trading_days≈121``).
+Operators already have the scalars in evidence-summary, but the research panel does not
+elevate why the tip assessment cannot yet be labeled.
 
 Prefer a fail-closed UI callout over more tip/fallback scalars or UI modularization.
 

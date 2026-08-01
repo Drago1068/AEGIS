@@ -14,9 +14,11 @@ Phase 281 surfaced ``fetch_fallback`` on daily-bars responses and the bars table
 
 1. Deployed ``58023db`` TLS; rebuilt backend + frontend.
 2. ``verify.ps1`` passed; alembic ``0009`` / ``head``.
-3. Live AAPL daily-bars tip:
-   ``fetch_fallback=full_to_compact``,
-   ``trading_date=2026-07-31``, ``source=alpha_vantage``.
+3. Live AAPL daily-bars tip (multi-source newest): ``fetch_fallback=null``,
+   ``source=polygon``, ``trading_date=2026-07-31`` (null OK for non-AV tip).
+   Primary path still labeled: evidence-summary
+   ``latest_primary_fetch_fallback=full_to_compact``; ingest
+   ``primary_fetch_fallback=full_to_compact``.
 
 ### 2. Upload ≠ verified
 

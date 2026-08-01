@@ -7,10 +7,12 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 263 shipped (ingest primary tip diagnostic).** Next: Phase 264 NAS
-live verify (ADR-0265). See
-[docs/architecture/decisions/0264-phase-263-ingest-primary-tip-diagnostic.md](docs/architecture/decisions/0264-phase-263-ingest-primary-tip-diagnostic.md),
+**Current phase: Phase 264 closed (primary tip diagnostic live-verified).** Next (draft):
+Phase 265 stored primary tip fallback when fetch fails (ADR-0266), then Phase 266 NAS
+verify. Prefer closing the live ``primary_latest_trading_date=null`` gap over further
+unlock scalars / UI modularization. See
 [docs/architecture/decisions/0265-phase-264-nas-live-verify-phase-263.md](docs/architecture/decisions/0265-phase-264-nas-live-verify-phase-263.md),
+[docs/architecture/decisions/0266-phase-265-stored-primary-tip-fallback.md](docs/architecture/decisions/0266-phase-265-stored-primary-tip-fallback.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

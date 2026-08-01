@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 264 - NAS Live Verification of Phase 263 (draft)
+### Phase 266 - NAS Live Verification of Phase 265 (draft)
 
-Ops evidence gate after Phase 263 ingest primary tip diagnostic. See
+Ops evidence gate after Phase 265 stored primary tip fallback. See
+[docs/architecture/decisions/0267-phase-266-nas-live-verify-phase-265.md](docs/architecture/decisions/0267-phase-266-nas-live-verify-phase-265.md).
+
+### Phase 265 - Stored Primary Tip Fallback (draft)
+
+When primary fetch fails, surface max stored primary tip on ingest results. See
+[docs/architecture/decisions/0266-phase-265-stored-primary-tip-fallback.md](docs/architecture/decisions/0266-phase-265-stored-primary-tip-fallback.md).
+
+### Phase 264 - NAS Live Verification of Phase 263
+
+Ops evidence gate after Phase 263 primary tip diagnostic. Live verify passed 2026-07-31
+(``25adb4f``; AAPL ``primary_latest_trading_date=null`` with winning tip polygon
+``2026-07-30`` — primary fetch failed that run). See
 [docs/architecture/decisions/0265-phase-264-nas-live-verify-phase-263.md](docs/architecture/decisions/0265-phase-264-nas-live-verify-phase-263.md).
+
+#### Added
+
+- ADR-0265: live verify requires ``primary_latest_trading_date`` on ingest (checklist 124).
+
+#### Explicitly out of scope
+
+Inventing closes, default-on calibration, orders.
 
 ### Phase 263 - Ingest Primary Tip Diagnostic
 

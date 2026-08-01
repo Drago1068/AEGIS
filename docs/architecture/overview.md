@@ -652,8 +652,10 @@ Phase 262 live-verified tip advancement (see
 [decisions/0263-phase-262-nas-live-verify-phase-261.md](decisions/0263-phase-262-nas-live-verify-phase-261.md)).
 Phase 263 surfaces ingest ``primary_latest_trading_date`` beside the winning tip (see
 [decisions/0264-phase-263-ingest-primary-tip-diagnostic.md](decisions/0264-phase-263-ingest-primary-tip-diagnostic.md)).
-Phase 264 (draft) NAS-verifies that diagnostic (see
+Phase 264 live-verified that field (see
 [decisions/0265-phase-264-nas-live-verify-phase-263.md](decisions/0265-phase-264-nas-live-verify-phase-263.md)).
+Phase 265 (draft) proposes stored primary tip fallback when fetch fails (see
+[decisions/0266-phase-265-stored-primary-tip-fallback.md](decisions/0266-phase-265-stored-primary-tip-fallback.md)).
 Phase 262 (draft) would live-verify that fix (see
 [decisions/0263-phase-262-nas-live-verify-phase-261.md](decisions/0263-phase-262-nas-live-verify-phase-261.md)).
 

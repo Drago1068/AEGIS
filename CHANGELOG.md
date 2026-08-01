@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 286 - NAS Live Verification of Phase 285 (draft)
+### Phase 288 - NAS Live Verification of Phase 287 (draft)
 
-Ops evidence gate after Phase 285 labeled freshness-lag callout. See
+Ops evidence gate after Phase 287 unlabeled label-ready empty callout. See
+[docs/architecture/decisions/0289-phase-288-nas-live-verify-phase-287.md](docs/architecture/decisions/0289-phase-288-nas-live-verify-phase-287.md).
+
+### Phase 287 - Unlabeled Label-Ready Empty Callout (draft)
+
+Elevate existing evidence-summary unlabeled-ready emptiness in the research UI. See
+[docs/architecture/decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md](docs/architecture/decisions/0288-phase-287-unlabeled-label-ready-empty-callout.md).
+
+### Phase 286 - NAS Live Verification of Phase 285
+
+Ops evidence gate after Phase 285 labeled freshness-lag callout. Live verify passed
+2026-07-31 (``0f7d3c6``; lag ``121`` labeled_as_of ``2026-02-05`` tip_as_of
+``2026-07-31``). See
 [docs/architecture/decisions/0287-phase-286-nas-live-verify-phase-285.md](docs/architecture/decisions/0287-phase-286-nas-live-verify-phase-285.md).
+
+#### Added
+
+- ADR-0287: live labeled freshness-lag callout field-bundle evidence (checklist Phase 286 log).
+
+#### Explicitly out of scope
+
+Inventing closes, orders.
 
 ### Phase 285 - Labeled Corpus Freshness Lag Callout
 

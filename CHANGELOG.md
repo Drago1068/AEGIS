@@ -12,11 +12,20 @@ delivery workflow).
 Ops evidence gate after Phase 315 partial/complete label coverage counts. See
 [docs/architecture/decisions/0317-phase-316-nas-live-verify-phase-315.md](docs/architecture/decisions/0317-phase-316-nas-live-verify-phase-315.md).
 
-### Phase 315 - Partial vs Complete Label Coverage Counts (draft)
+### Phase 315 - Partial vs Complete Label Coverage Counts
 
 Expose scan-window complete vs partial labeled assessment counts on evidence-summary.
 See
 [docs/architecture/decisions/0316-phase-315-partial-complete-label-coverage.md](docs/architecture/decisions/0316-phase-315-partial-complete-label-coverage.md).
+
+#### Added
+
+- ``complete_labeled_assessment_count`` / ``partial_labeled_assessment_count`` on evidence
+  summary (+ export); console rows; API/UI tests; ``verify.ps1`` Phase 316 checks.
+
+#### Explicitly out of scope
+
+Inventing bars, auto upgrade scheduling, orders, changing backfill selection.
 
 ### Phase 314 - NAS Live Verification of Phase 313
 

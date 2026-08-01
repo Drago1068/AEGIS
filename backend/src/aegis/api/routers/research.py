@@ -472,6 +472,13 @@ async def _build_research_evidence_summary(
         if scanned_ids
         else set()
     )
+    complete_labeled_ids = (
+        await outcome_label_service.assessment_ids_with_complete_labels(
+            symbol, scanned_ids
+        )
+        if scanned_ids
+        else set()
+    )
     latest_assessment_is_label_ready: bool | None = None
     latest_assessment_label_block_reason: str | None = None
     most_recent_labelable_as_of_trading_date: date | None = None
@@ -526,6 +533,12 @@ async def _build_research_evidence_summary(
     )
     labeled_assessment_count = sum(1 for row_id in scanned_ids if row_id in labeled_ids)
     unlabeled_assessment_count = max(0, assessment_count - labeled_assessment_count)
+    complete_labeled_assessment_count = sum(
+        1 for row_id in scanned_ids if row_id in complete_labeled_ids
+    )
+    partial_labeled_assessment_count = max(
+        0, labeled_assessment_count - complete_labeled_assessment_count
+    )
     most_recent_unlabeled_assessment_id: int | None = None
     most_recent_unlabeled_as_of_trading_date: date | None = None
     for row in snapshots:
@@ -762,6 +775,8 @@ async def _build_research_evidence_summary(
         assessment_count=assessment_count,
         labeled_assessment_count=labeled_assessment_count,
         unlabeled_assessment_count=unlabeled_assessment_count,
+        complete_labeled_assessment_count=complete_labeled_assessment_count,
+        partial_labeled_assessment_count=partial_labeled_assessment_count,
         outcome_label_count=outcome_label_count,
         calibration_count=calibration_count,
         latest_component_source=latest_component_source,

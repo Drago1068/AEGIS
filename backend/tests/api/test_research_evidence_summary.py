@@ -22,6 +22,7 @@ from aegis.domain.research_outcome_labels import (
     LABEL_METHOD_ID,
     OutcomeLabelData,
     OutcomeLabelReason,
+    label_covers_configured_horizons,
     resolve_label_bar_source,
 )
 from aegis.domain.research_probability_calibration import (
@@ -206,6 +207,25 @@ class _FakeOutcomeLabelService:
         _ = label_method_id
         labeled = {row.assessment_snapshot_id for row in self._listed}
         return {item for item in assessment_ids if item in labeled}
+
+    async def assessment_ids_with_complete_labels(
+        self,
+        symbol: str,
+        assessment_ids: list[int],
+        *,
+        label_method_id: str = LABEL_METHOD_ID,
+    ) -> set[int]:
+        _ = symbol, label_method_id
+        latest_by_id: dict[int, OutcomeLabelData] = {}
+        for row in self._listed:
+            if row.assessment_snapshot_id not in latest_by_id:
+                latest_by_id[row.assessment_snapshot_id] = row
+        return {
+            assessment_id
+            for assessment_id in assessment_ids
+            if assessment_id in latest_by_id
+            and label_covers_configured_horizons(latest_by_id[assessment_id].labels)
+        }
 
     async def is_assessment_label_ready(
         self, symbol: str, snapshot: ResearchAssessmentSnapshotData
@@ -434,6 +454,8 @@ async def test_evidence_summary_empty_symbol() -> None:
     assert body["assessment_count"] == 0
     assert body["labeled_assessment_count"] == 0
     assert body["unlabeled_assessment_count"] == 0
+    assert body["complete_labeled_assessment_count"] == 0
+    assert body["partial_labeled_assessment_count"] == 0
     assert body["outcome_label_count"] == 0
     assert body["calibration_count"] == 0
     assert body["latest_component_source"] is None
@@ -570,6 +592,8 @@ async def test_evidence_summary_with_assessment_and_histories() -> None:
     assert body["assessment_count"] == 1
     assert body["labeled_assessment_count"] == 1
     assert body["unlabeled_assessment_count"] == 0
+    assert body["complete_labeled_assessment_count"] == 0
+    assert body["partial_labeled_assessment_count"] == 1
     assert body["outcome_label_count"] == 1
     assert body["calibration_count"] == 1
     assert body["state"] == "research_only"
@@ -933,6 +957,8 @@ async def test_evidence_summary_surfaces_mixed_component_provenance() -> None:
     assert body["mixed_labeled_assessment_count"] == 1
     assert body["labeled_assessment_count"] == 1
     assert body["unlabeled_assessment_count"] == 1
+    assert body["complete_labeled_assessment_count"] == 0
+    assert body["partial_labeled_assessment_count"] == 1
     assert body["latest_mixed_label_bar_source"] == "polygon"
 
 
@@ -1044,6 +1070,8 @@ async def test_evidence_summary_counts_mixed_unlabeled() -> None:
     assert body["mixed_labeled_assessment_count"] == 1
     assert body["labeled_assessment_count"] == 1
     assert body["unlabeled_assessment_count"] == 2
+    assert body["complete_labeled_assessment_count"] == 0
+    assert body["partial_labeled_assessment_count"] == 1
     assert body["latest_mixed_label_bar_source"] == "alpha_vantage"
     assert body["latest_resolved_label_bar_source"] == "mixed"
     assert body["latest_outcome_label"] is None
@@ -1138,3 +1166,40 @@ async def test_evidence_summary_export_requires_auth() -> None:
     ) as client:
         response = await client.get("/research/AAPL/evidence-summary/export")
     assert response.status_code == 401
+
+async def test_evidence_summary_complete_vs_partial_labeled_counts() -> None:
+    """Phase 315: complete requires all configured horizons; partial is labeled but incomplete."""
+
+    complete_snapshot = _snapshot(snapshot_id=2)
+    partial_snapshot = _snapshot(snapshot_id=1)
+    complete_label = OutcomeLabelData(
+        id=20,
+        assessment_snapshot_id=2,
+        symbol="AAPL",
+        label_method_id=LABEL_METHOD_ID,
+        label_method_version=1,
+        state="research_only",
+        as_of_trading_date=date(2024, 1, 26),
+        computed_at=datetime(2024, 1, 26, 19, 0, tzinfo=UTC),
+        labels={"forward_return_5": 0.05, "forward_return_20": 0.12},
+        label_end_dates={
+            "forward_return_5": "2024-02-02",
+            "forward_return_20": "2024-02-23",
+        },
+        schema_version=1,
+        bar_source="alpha_vantage",
+    )
+    partial_label = _label(assessment_snapshot_id=1)
+    async with _client(
+        assessments=[complete_snapshot, partial_snapshot],
+        labels=[complete_label, partial_label],
+    ) as client:
+        response = await client.get("/research/AAPL/evidence-summary")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["assessment_count"] == 2
+    assert body["labeled_assessment_count"] == 2
+    assert body["unlabeled_assessment_count"] == 0
+    assert body["complete_labeled_assessment_count"] == 1
+    assert body["partial_labeled_assessment_count"] == 1

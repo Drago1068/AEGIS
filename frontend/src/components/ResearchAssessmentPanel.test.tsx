@@ -155,6 +155,8 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 0,
       labeled_assessment_count: 0,
       unlabeled_assessment_count: 0,
+      complete_labeled_assessment_count: 0,
+      partial_labeled_assessment_count: 0,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: null,
@@ -589,6 +591,8 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 2,
       labeled_assessment_count: 1,
       unlabeled_assessment_count: 1,
+      complete_labeled_assessment_count: 0,
+      partial_labeled_assessment_count: 1,
       outcome_label_count: 1,
       calibration_count: 1,
       latest_component_source: "mixed",
@@ -704,6 +708,12 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByText(/assessments \(≤100\)/i)).toBeInTheDocument();
       expect(screen.getByTestId("evidence-labeled-assessment-count")).toHaveTextContent("1");
       expect(screen.getByTestId("evidence-unlabeled-assessment-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("evidence-complete-labeled-assessment-count")).toHaveTextContent(
+        "0",
+      );
+      expect(screen.getByTestId("evidence-partial-labeled-assessment-count")).toHaveTextContent(
+        "1",
+      );
       expect(screen.getByTestId("evidence-latest-coverage-confidence")).toHaveTextContent("0.9500");
       expect(screen.getByTestId("evidence-latest-research-index")).toHaveTextContent("0.4600");
       expect(screen.getByTestId("evidence-latest-as-of-trading-date")).toHaveTextContent("2024-01-26");
@@ -1052,6 +1062,8 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 2,
       labeled_assessment_count: 1,
       unlabeled_assessment_count: 1,
+      complete_labeled_assessment_count: 0,
+      partial_labeled_assessment_count: 0,
       outcome_label_count: 1,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",
@@ -1211,6 +1223,8 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 2,
       labeled_assessment_count: 1,
       unlabeled_assessment_count: 1,
+      complete_labeled_assessment_count: 0,
+      partial_labeled_assessment_count: 0,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",
@@ -1368,6 +1382,8 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 2,
       labeled_assessment_count: 1,
       unlabeled_assessment_count: 1,
+      complete_labeled_assessment_count: 0,
+      partial_labeled_assessment_count: 0,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",
@@ -1539,6 +1555,8 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 2,
       labeled_assessment_count: 1,
       unlabeled_assessment_count: 1,
+      complete_labeled_assessment_count: 0,
+      partial_labeled_assessment_count: 0,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",
@@ -1781,6 +1799,8 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 2,
       labeled_assessment_count: 2,
       unlabeled_assessment_count: 0,
+      complete_labeled_assessment_count: 0,
+      partial_labeled_assessment_count: 0,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: "mixed",
@@ -2025,6 +2045,8 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 2,
       labeled_assessment_count: 1,
       unlabeled_assessment_count: 1,
+      complete_labeled_assessment_count: 0,
+      partial_labeled_assessment_count: 0,
       outcome_label_count: 0,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",
@@ -2228,6 +2250,8 @@ describe("ResearchAssessmentPanel", () => {
       assessment_count: 2,
       labeled_assessment_count: 1,
       unlabeled_assessment_count: 1,
+      complete_labeled_assessment_count: 0,
+      partial_labeled_assessment_count: 0,
       outcome_label_count: 1,
       calibration_count: 0,
       latest_component_source: "alpha_vantage",

@@ -382,6 +382,24 @@ export function ResearchEvidenceSummarySection({
           </dd>
         </div>
         <div>
+          <dt className="text-aegis-muted">Complete labeled (scanned)</dt>
+          <dd className="font-mono" data-testid="evidence-complete-labeled-assessment-count">
+            {evidenceSummary.complete_labeled_assessment_count}
+            <span className="ml-1 font-sans text-xs font-normal text-aegis-muted">
+              of {evidenceSummary.labeled_assessment_count} labeled
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-aegis-muted">Partial labeled (scanned)</dt>
+          <dd className="font-mono" data-testid="evidence-partial-labeled-assessment-count">
+            {evidenceSummary.partial_labeled_assessment_count}
+            <span className="ml-1 font-sans text-xs font-normal text-aegis-muted">
+              upgrade-eligible when max horizon unlocks
+            </span>
+          </dd>
+        </div>
+        <div>
           <dt className="text-aegis-muted">Labels / calibrations (latest id)</dt>
           <dd className="font-mono">
             {evidenceSummary.outcome_label_count} / {evidenceSummary.calibration_count}

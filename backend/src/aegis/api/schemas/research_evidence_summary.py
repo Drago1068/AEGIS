@@ -40,6 +40,23 @@ class ResearchEvidenceSummaryResponse(BaseModel):
             "outcome label. Equals assessment_count minus labeled_assessment_count."
         ),
     )
+    complete_labeled_assessment_count: int = Field(
+        default=0,
+        ge=0,
+        description=(
+            "Count of scanned assessments (≤100 newest) whose latest default-method "
+            "label covers all configured FORWARD_HORIZON_SESSIONS keys (ADR-0316)."
+        ),
+    )
+    partial_labeled_assessment_count: int = Field(
+        default=0,
+        ge=0,
+        description=(
+            "Count of scanned assessments (≤100 newest) with a latest default-method "
+            "label that is missing at least one configured horizon key. Equals "
+            "labeled_assessment_count minus complete_labeled_assessment_count."
+        ),
+    )
     outcome_label_count: int = Field(ge=0)
     calibration_count: int = Field(ge=0)
     latest_component_source: str | None = Field(

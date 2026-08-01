@@ -1015,6 +1015,10 @@ export interface ResearchEvidenceSummary {
   labeled_assessment_count: number;
   /** Scanned ≤100 assessments lacking a default-method outcome label. */
   unlabeled_assessment_count: number;
+  /** Scanned ≤100 assessments whose latest label covers all configured horizons. */
+  complete_labeled_assessment_count: number;
+  /** Scanned ≤100 assessments with a partial (incomplete-horizon) latest label. */
+  partial_labeled_assessment_count: number;
   outcome_label_count: number;
   calibration_count: number;
   /** Component series source for latest assessment; may be "mixed". Null when no assessment. */

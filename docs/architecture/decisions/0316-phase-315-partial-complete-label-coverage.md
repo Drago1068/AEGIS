@@ -1,40 +1,31 @@
-# ADR-0316: Phase 315 Partial vs Complete Label Coverage Counts (draft)
+# ADR-0316: Phase 315 Partial vs Complete Label Coverage Counts
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-01
 
 ## Context
 
 Phase 313–314 keep partial ready-horizons labels upgrade-eligible for full-horizon
-backfill, but evidence-summary still reports a single ``labeled_assessment_count`` that
-treats any default-method label as labeled. Operators cannot see how many scan rows are
-complete (all configured horizons) versus partial (upgrade backlog) without inspecting
-individual label payloads.
+backfill, but evidence-summary still reported a single ``labeled_assessment_count`` that
+treats any default-method label as labeled. Operators could not see how many scan rows are
+complete (all configured horizons) versus partial (upgrade backlog).
 
-## Decisions (proposed)
+## Decisions
 
 ### 1. Evidence-summary coverage split
 
-- Add research-only counts derived from latest default-method labels in the scan window:
-  - ``complete_labeled_assessment_count`` — latest label covers all
-    ``FORWARD_HORIZON_SESSIONS`` keys (``label_covers_configured_horizons``).
-  - ``partial_labeled_assessment_count`` — has a latest label but is not complete.
-- Keep existing ``labeled_assessment_count`` / ``unlabeled_assessment_count`` semantics
-  (any-label) so prior consumers stay stable.
-- Console surfaces the new counts; state remains ``research_only``.
+- ``complete_labeled_assessment_count`` — latest default-method label covers all
+  ``FORWARD_HORIZON_SESSIONS`` keys (``label_covers_configured_horizons`` / ADR-0314).
+- ``partial_labeled_assessment_count`` — has a latest label but is not complete
+  (``labeled − complete``).
+- Existing ``labeled_assessment_count`` / ``unlabeled_assessment_count`` keep any-label
+  semantics.
+- Console surfaces both counts; state remains ``research_only``.
 
 ### 2. Out of scope
 
 Inventing bars, auto full-horizon upgrade scheduling, orders, changing backfill
 selection, actionable promotion.
-
-## Resume
-
-```powershell
-# Implement Phase 315 evidence-summary partial/complete counts; tests; commit+push; then:
-# git archive HEAD → NAS; rebuild backend (+ frontend if UI); then:
-.\docker\nas\scripts\verify.ps1
-```
 
 ## Related documents
 

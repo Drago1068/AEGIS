@@ -1,6 +1,6 @@
 # ADR-0286: Phase 285 Labeled Corpus Freshness Lag Callout
 
-- Status: Proposed (Phase 284 closed; ready to implement)
+- Status: Accepted
 - Date: 2026-07-31
 
 ## Context
@@ -8,7 +8,7 @@
 Phase 283–284 elevated tip label-readiness (``insufficient_forward_bars``, shortfall
 ``20``). Live verify also shows ``scan_labeled_freshness_lag_trading_days=121`` with
 most recent labeled ``as_of`` ``2026-02-05`` while tip ``as_of`` is ``2026-07-31``.
-Operators already have the scalars in evidence-summary, but the research panel does not
+Operators already have the scalars in evidence-summary, but the research panel did not
 elevate how stale the labeled corpus is relative to the tip.
 
 Prefer a fail-closed UI callout over new tip/fallback scalars.

@@ -21,6 +21,9 @@ export function ResearchEvidenceSummarySection({
 }: ResearchEvidenceSummarySectionProps) {
   const [expandedHorizonKey, setExpandedHorizonKey] = useState<string | null>(null);
   const showLabelReadinessCallout = evidenceSummary.latest_assessment_is_label_ready === false;
+  const freshnessLag = evidenceSummary.scan_labeled_freshness_lag_trading_days;
+  const showLabeledFreshnessLagCallout =
+    typeof freshnessLag === "number" && Number.isFinite(freshnessLag) && freshnessLag > 0;
 
   return (
     <div
@@ -66,6 +69,42 @@ export function ResearchEvidenceSummarySection({
           </ul>
           <p className="mt-1 text-xs text-aegis-muted">
             Fail-closed: no invented closes; not a signal or recommendation.
+          </p>
+        </aside>
+      ) : null}
+      {showLabeledFreshnessLagCallout ? (
+        <aside
+          className="mt-3 rounded border border-aegis-warn/40 bg-aegis-warn/10 px-3 py-2 text-sm text-aegis-ink"
+          role="status"
+          data-testid="evidence-labeled-freshness-lag-callout"
+        >
+          <p className="font-semibold text-aegis-warn">
+            Labeled corpus freshness lag (research-only)
+          </p>
+          <ul className="mt-1 list-inside list-disc space-y-0.5 font-mono text-xs">
+            <li data-testid="evidence-freshness-lag-callout-days">
+              scan_labeled_freshness_lag_trading_days={freshnessLag}
+            </li>
+            {evidenceSummary.most_recent_labeled_outcome_label_as_of_trading_date != null ? (
+              <li data-testid="evidence-freshness-lag-callout-most-recent-labeled-as-of">
+                most_recent_labeled_as_of=
+                {evidenceSummary.most_recent_labeled_outcome_label_as_of_trading_date}
+              </li>
+            ) : null}
+            {evidenceSummary.most_recent_labelable_as_of_trading_date != null ? (
+              <li data-testid="evidence-freshness-lag-callout-most-recent-labelable">
+                most_recent_labelable_as_of=
+                {evidenceSummary.most_recent_labelable_as_of_trading_date}
+              </li>
+            ) : null}
+            {evidenceSummary.latest_as_of_trading_date != null ? (
+              <li data-testid="evidence-freshness-lag-callout-latest-as-of">
+                tip_as_of={evidenceSummary.latest_as_of_trading_date}
+              </li>
+            ) : null}
+          </ul>
+          <p className="mt-1 text-xs text-aegis-muted">
+            Fail-closed: lag is diagnostic only; not a signal or recommendation.
           </p>
         </aside>
       ) : null}

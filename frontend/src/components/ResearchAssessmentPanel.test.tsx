@@ -214,7 +214,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.getByRole("button", { name: /compute calibration/i })).toBeDisabled();
   });
 
-  it("hides label-readiness callout when latest_assessment_is_label_ready is null", async () => {
+  it("hides label-readiness and freshness-lag callouts when fields are null or non-positive", async () => {
     render(<ResearchAssessmentPanel symbol="AAPL" initialLatest={null} />);
     fireEvent.click(screen.getByRole("button", { name: /refresh evidence summary/i }));
 
@@ -222,6 +222,7 @@ describe("ResearchAssessmentPanel", () => {
       expect(screen.getByTestId("evidence-summary-section")).toBeInTheDocument();
     });
     expect(screen.queryByTestId("evidence-latest-label-readiness-callout")).toBeNull();
+    expect(screen.queryByTestId("evidence-labeled-freshness-lag-callout")).toBeNull();
   });
 
   it("renders an initial latest assessment from the API payload", () => {
@@ -561,7 +562,7 @@ describe("ResearchAssessmentPanel", () => {
       most_recent_labeled_outcome_label_bar_source: "alpha_vantage",
       most_recent_labeled_outcome_label_computed_at: "2024-01-26T19:00:00Z",
       most_recent_labeled_outcome_label_as_of_trading_date: "2024-01-26",
-      scan_labeled_freshness_lag_trading_days: 0,
+      scan_labeled_freshness_lag_trading_days: 121,
       latest_assessment_is_label_ready: false,
       latest_assessment_label_block_reason: "insufficient_forward_bars",
       most_recent_labelable_as_of_trading_date: "2024-01-26",
@@ -697,7 +698,7 @@ describe("ResearchAssessmentPanel", () => {
       ).toHaveTextContent("2024-01-26");
       expect(
         screen.getByTestId("evidence-scan-labeled-freshness-lag-trading-days"),
-      ).toHaveTextContent("0");
+      ).toHaveTextContent("121");
       expect(screen.getByTestId("evidence-latest-assessment-is-label-ready")).toHaveTextContent(
         "false",
       );
@@ -719,6 +720,21 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-label-readiness-callout-most-recent-labelable"),
       ).toHaveTextContent("most_recent_labelable_as_of=2024-01-26");
+      expect(
+        screen.getByTestId("evidence-labeled-freshness-lag-callout"),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId("evidence-freshness-lag-callout-days")).toHaveTextContent(
+        "scan_labeled_freshness_lag_trading_days=121",
+      );
+      expect(
+        screen.getByTestId("evidence-freshness-lag-callout-most-recent-labeled-as-of"),
+      ).toHaveTextContent("most_recent_labeled_as_of=2024-01-26");
+      expect(
+        screen.getByTestId("evidence-freshness-lag-callout-most-recent-labelable"),
+      ).toHaveTextContent("most_recent_labelable_as_of=2024-01-26");
+      expect(screen.getByTestId("evidence-freshness-lag-callout-latest-as-of")).toHaveTextContent(
+        "tip_as_of=2024-01-26",
+      );
       expect(
         screen.getByTestId("evidence-latest-assessment-label-block-reason"),
       ).toHaveTextContent("insufficient_forward_bars");

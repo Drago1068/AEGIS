@@ -7,10 +7,29 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 318 - NAS Live Verification of Phase 317 (draft)
+### Phase 320 - NAS Live Verification of Phase 319 (draft)
 
-Ops evidence gate after Phase 317 partial-label upgrade backlog callout. See
+Ops evidence gate after Phase 319 outcome-label horizon coverage badge. See
+[docs/architecture/decisions/0321-phase-320-nas-live-verify-phase-319.md](docs/architecture/decisions/0321-phase-320-nas-live-verify-phase-319.md).
+
+### Phase 319 - Outcome-Label Horizon Coverage Badge (draft)
+
+Per-row complete/partial badge on outcome-label history from existing ``labels`` keys. See
+[docs/architecture/decisions/0320-phase-319-outcome-label-horizon-coverage-badge.md](docs/architecture/decisions/0320-phase-319-outcome-label-horizon-coverage-badge.md).
+
+### Phase 318 - NAS Live Verification of Phase 317
+
+Ops evidence gate after Phase 317 partial-label upgrade backlog callout. Live verify passed
+2026-08-01 (``1f4b719``; ``partial=0`` ``complete=66``; callout elevates when count>0). See
 [docs/architecture/decisions/0319-phase-318-nas-live-verify-phase-317.md](docs/architecture/decisions/0319-phase-318-nas-live-verify-phase-317.md).
+
+#### Added
+
+- ADR-0319: live partial-label callout field-bundle evidence (checklist Phase 318 log).
+
+#### Explicitly out of scope
+
+Inventing bars, orders.
 
 ### Phase 317 - Partial-Label Upgrade Backlog Callout
 

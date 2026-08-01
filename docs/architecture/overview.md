@@ -778,8 +778,12 @@ Phase 316 live-verified those counts (``complete=67`` ``partial=0``; see
 Phase 317 elevates a labeling-diagnostics callout when partial labeled count is greater
 than zero (see
 [decisions/0318-phase-317-partial-label-upgrade-callout.md](decisions/0318-phase-317-partial-label-upgrade-callout.md)).
-Phase 318 (draft) is the NAS live-verify gate for that callout (see
+Phase 318 live-verified that callout path (see
 [decisions/0319-phase-318-nas-live-verify-phase-317.md](decisions/0319-phase-318-nas-live-verify-phase-317.md)).
+Phase 319 (draft) would add a complete/partial badge on outcome-label history rows (see
+[decisions/0320-phase-319-outcome-label-horizon-coverage-badge.md](decisions/0320-phase-319-outcome-label-horizon-coverage-badge.md)).
+Phase 320 (draft) is the NAS live-verify gate for that badge (see
+[decisions/0321-phase-320-nas-live-verify-phase-319.md](decisions/0321-phase-320-nas-live-verify-phase-319.md)).
 
 ## System context
 

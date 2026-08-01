@@ -28,3 +28,4 @@ expanding the ≤100 scan window, new API scalars.
 - [0316-phase-315-partial-complete-label-coverage.md](0316-phase-315-partial-complete-label-coverage.md)
 - [0317-phase-316-nas-live-verify-phase-315.md](0317-phase-316-nas-live-verify-phase-315.md)
 - [0319-phase-318-nas-live-verify-phase-317.md](0319-phase-318-nas-live-verify-phase-317.md)
+- [0320-phase-319-outcome-label-horizon-coverage-badge.md](0320-phase-319-outcome-label-horizon-coverage-badge.md)

@@ -7,10 +7,30 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 266 - NAS Live Verification of Phase 265 (draft)
+### Phase 268 - NAS Live Verification of Phase 267 (draft)
 
-Ops evidence gate after Phase 265 stored primary tip fallback. See
+Ops evidence gate after Phase 267 mixed label bar source resolution. See
+[docs/architecture/decisions/0269-phase-268-nas-live-verify-phase-267.md](docs/architecture/decisions/0269-phase-268-nas-live-verify-phase-267.md).
+
+### Phase 267 - Resolve Mixed Label Bar Source in Evidence Summary (draft)
+
+Resolve ``latest_resolved_label_bar_source`` with bars for mixed assessments. See
+[docs/architecture/decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md](docs/architecture/decisions/0268-phase-267-resolve-mixed-label-bar-source-evidence.md).
+
+### Phase 266 - NAS Live Verification of Phase 265
+
+Ops evidence gate after Phase 265 stored primary tip fallback. Live verify passed
+2026-07-31 (``7b71a87``; AAPL ``primary_latest_trading_date=2026-07-29`` beside winning
+polygon ``2026-07-30``). See
 [docs/architecture/decisions/0267-phase-266-nas-live-verify-phase-265.md](docs/architecture/decisions/0267-phase-266-nas-live-verify-phase-265.md).
+
+#### Added
+
+- ADR-0267: live primary tip store-fallback evidence (checklist 124).
+
+#### Explicitly out of scope
+
+Inventing closes, default-on calibration, orders.
 
 ### Phase 265 - Stored Primary Tip Fallback
 

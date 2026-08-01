@@ -12,10 +12,19 @@ delivery workflow).
 Ops evidence gate after Phase 297 labeling diagnostics summary count. See
 [docs/architecture/decisions/0299-phase-298-nas-live-verify-phase-297.md](docs/architecture/decisions/0299-phase-298-nas-live-verify-phase-297.md).
 
-### Phase 297 - Labeling Diagnostics Summary Count (draft)
+### Phase 297 - Labeling Diagnostics Summary Count
 
 Show active callout count on the labeling-diagnostics summary control. See
 [docs/architecture/decisions/0298-phase-297-labeling-diagnostics-summary-count.md](docs/architecture/decisions/0298-phase-297-labeling-diagnostics-summary-count.md).
+
+#### Added
+
+- ``evidence-labeling-diagnostics-active-count`` on the disclosure summary (1–4 from
+  existing callout booleans); unit tests; ``verify.ps1`` Phase 298 active-count log.
+
+#### Explicitly out of scope
+
+New API scalars, inventing labels/closes, orders.
 
 ### Phase 296 - NAS Live Verification of Phase 295
 

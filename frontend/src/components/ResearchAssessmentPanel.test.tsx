@@ -227,6 +227,7 @@ describe("ResearchAssessmentPanel", () => {
     expect(screen.queryByTestId("evidence-mixed-unlabeled-backlog-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-primary-fetch-fallback-callout")).toBeNull();
     expect(screen.queryByTestId("evidence-labeling-diagnostics")).toBeNull();
+    expect(screen.queryByTestId("evidence-labeling-diagnostics-active-count")).toBeNull();
   });
 
   it("renders an initial latest assessment from the API payload", () => {
@@ -711,6 +712,9 @@ describe("ResearchAssessmentPanel", () => {
       ).toBeInTheDocument();
       expect(screen.getByTestId("evidence-labeling-diagnostics")).toBeInTheDocument();
       expect(screen.getByTestId("evidence-labeling-diagnostics")).toHaveAttribute("open");
+      expect(
+        screen.getByTestId("evidence-labeling-diagnostics-active-count"),
+      ).toHaveTextContent("· 4 active");
       expect(
         screen.getByTestId("evidence-label-readiness-callout-block-reason"),
       ).toHaveTextContent("block_reason=insufficient_forward_bars");

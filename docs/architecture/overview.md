@@ -727,9 +727,11 @@ non-empty (see
 [decisions/0296-phase-295-primary-fetch-fallback-callout.md](decisions/0296-phase-295-primary-fetch-fallback-callout.md)).
 Phase 296 live-verified that callout (``full_to_compact``; see
 [decisions/0297-phase-296-nas-live-verify-phase-295.md](decisions/0297-phase-296-nas-live-verify-phase-295.md)).
-Phase 297 (draft) proposes an active-count badge on the labeling-diagnostics summary
-(see
+Phase 297 appends an active-count badge on the labeling-diagnostics summary from the
+same callout booleans (see
 [decisions/0298-phase-297-labeling-diagnostics-summary-count.md](decisions/0298-phase-297-labeling-diagnostics-summary-count.md)).
+Phase 298 (draft) live-verifies that count on the NAS (see
+[decisions/0299-phase-298-nas-live-verify-phase-297.md](decisions/0299-phase-298-nas-live-verify-phase-297.md)).
 
 ## System context
 

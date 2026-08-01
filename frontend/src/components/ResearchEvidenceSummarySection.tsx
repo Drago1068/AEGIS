@@ -32,11 +32,12 @@ export function ResearchEvidenceSummarySection({
     typeof mixedUnlabeledCount === "number" &&
     Number.isFinite(mixedUnlabeledCount) &&
     mixedUnlabeledCount > 0;
-  const showLabelingDiagnostics =
-    showLabelReadinessCallout ||
-    showLabeledFreshnessLagCallout ||
-    showUnlabeledLabelReadyEmptyCallout ||
-    showMixedUnlabeledBacklogCallout;
+  const labelingActiveCalloutCount =
+    Number(showLabelReadinessCallout) +
+    Number(showLabeledFreshnessLagCallout) +
+    Number(showUnlabeledLabelReadyEmptyCallout) +
+    Number(showMixedUnlabeledBacklogCallout);
+  const showLabelingDiagnostics = labelingActiveCalloutCount > 0;
   const primaryFetchFallback = evidenceSummary.latest_primary_fetch_fallback;
   const showPrimaryFetchFallbackCallout =
     typeof primaryFetchFallback === "string" && primaryFetchFallback.trim().length > 0;
@@ -57,6 +58,12 @@ export function ResearchEvidenceSummarySection({
         >
           <summary className="cursor-pointer list-outside text-xs font-semibold uppercase tracking-wide text-aegis-warn">
             Labeling diagnostics (research-only — not advice)
+            <span
+              className="ml-1 font-mono normal-case tracking-normal"
+              data-testid="evidence-labeling-diagnostics-active-count"
+            >
+              · {labelingActiveCalloutCount} active
+            </span>
           </summary>
           <div className="mt-2 space-y-2" aria-label="Labeling diagnostics details">
           {showLabelReadinessCallout ? (

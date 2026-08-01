@@ -985,6 +985,9 @@ describe("ResearchAssessmentPanel", () => {
       expect(
         screen.getByTestId("evidence-unlabeled-ready-empty-callout-required-end"),
       ).toHaveTextContent("tip_required_label_end_date=2024-02-28");
+      expect(screen.getByTestId("evidence-unlabeled-ready-empty-callout-cta")).toHaveTextContent(
+        "use_toolbar=Backfill ready-horizon labels",
+      );
       expect(
         screen.getByTestId("evidence-mixed-unlabeled-backlog-callout"),
       ).toBeInTheDocument();

@@ -7,10 +7,39 @@ delivery workflow).
 
 ## [Unreleased]
 
-### Phase 330 - NAS Live Verification of Phase 329 (draft)
+### Phase 332 - NAS Live Verification of Phase 331 (draft)
 
-Ops evidence gate after Phase 329 primary fetch-fallback ingest CTA. See
+Ops evidence gate after Phase 331 unlabeled-empty ready-horizon CTA. See
+[docs/architecture/decisions/0333-phase-332-nas-live-verify-phase-331.md](docs/architecture/decisions/0333-phase-332-nas-live-verify-phase-331.md).
+
+### Phase 331 - Unlabeled-Empty Ready-Horizon CTA
+
+Elevate ready-horizon backfill CTA on the unlabeled-empty callout. See
+[docs/architecture/decisions/0332-phase-331-unlabeled-empty-cta.md](docs/architecture/decisions/0332-phase-331-unlabeled-empty-cta.md).
+
+#### Added
+
+- ADR-0332: unlabeled-empty callout CTA pointing at ``Backfill ready-horizon labels``
+  (no auto-run; existing fields only).
+- ``evidence-unlabeled-ready-empty-callout-cta`` UI + vitest; ``verify.ps1`` Phase 332 log.
+
+#### Explicitly out of scope
+
+Auto-backfill, inventing bars, orders.
+
+### Phase 330 - NAS Live Verification of Phase 329
+
+Ops evidence gate after Phase 329 primary fetch-fallback ingest CTA. Live verify passed
+2026-08-01 (``786d28b``; ``fallback=full_to_compact`` elevates CTA). See
 [docs/architecture/decisions/0331-phase-330-nas-live-verify-phase-329.md](docs/architecture/decisions/0331-phase-330-nas-live-verify-phase-329.md).
+
+#### Added
+
+- ADR-0331: live primary fetch-fallback ingest CTA evidence (checklist Phase 330 log).
+
+#### Explicitly out of scope
+
+Auto-ingest, inventing bars, orders.
 
 ### Phase 329 - Primary Fetch-Fallback Ingest CTA
 

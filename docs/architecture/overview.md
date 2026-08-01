@@ -805,8 +805,12 @@ Phase 328 live-verified that CTA (see
 [decisions/0329-phase-328-nas-live-verify-phase-327.md](decisions/0329-phase-328-nas-live-verify-phase-327.md)).
 Phase 329 elevates a primary fetch-fallback CTA pointing at ``Run ingest`` (see
 [decisions/0330-phase-329-primary-fetch-fallback-cta.md](decisions/0330-phase-329-primary-fetch-fallback-cta.md)).
-Phase 330 (draft) is the NAS live-verify gate for that CTA (see
+Phase 330 live-verified that CTA (see
 [decisions/0331-phase-330-nas-live-verify-phase-329.md](decisions/0331-phase-330-nas-live-verify-phase-329.md)).
+Phase 331 elevates an unlabeled-empty CTA pointing at ready-horizon backfill (see
+[decisions/0332-phase-331-unlabeled-empty-cta.md](decisions/0332-phase-331-unlabeled-empty-cta.md)).
+Phase 332 (draft) is the NAS live-verify gate for that CTA (see
+[decisions/0333-phase-332-nas-live-verify-phase-331.md](decisions/0333-phase-332-nas-live-verify-phase-331.md)).
 
 ## System context
 

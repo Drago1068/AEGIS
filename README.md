@@ -7,10 +7,10 @@ software only: it never places or transmits live orders (see [CLAUDE.md](CLAUDE.
 Development starts locally in this repository. Deployment to the UGREEN NAS is performed only
 after the current phase passes its documented local acceptance gate.
 
-**Current phase: Phase 329 closed (primary fetch-fallback ingest CTA).**
-Next: Phase 330 NAS live verify (ADR-0331). See
-[docs/architecture/decisions/0330-phase-329-primary-fetch-fallback-cta.md](docs/architecture/decisions/0330-phase-329-primary-fetch-fallback-cta.md),
-[docs/architecture/decisions/0331-phase-330-nas-live-verify-phase-329.md](docs/architecture/decisions/0331-phase-330-nas-live-verify-phase-329.md),
+**Current phase: Phase 331 closed (unlabeled-empty ready-horizon CTA).**
+Next: Phase 332 NAS live verify (ADR-0333). See
+[docs/architecture/decisions/0332-phase-331-unlabeled-empty-cta.md](docs/architecture/decisions/0332-phase-331-unlabeled-empty-cta.md),
+[docs/architecture/decisions/0333-phase-332-nas-live-verify-phase-331.md](docs/architecture/decisions/0333-phase-332-nas-live-verify-phase-331.md),
 and [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

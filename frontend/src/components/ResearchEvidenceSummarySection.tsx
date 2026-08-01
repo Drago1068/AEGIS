@@ -247,9 +247,13 @@ export function ResearchEvidenceSummarySection({
                     </li>
                   </>
                 ) : null}
+                <li data-testid="evidence-unlabeled-ready-empty-callout-cta">
+                  use_toolbar=Backfill ready-horizon labels
+                </li>
               </ul>
               <p className="mt-1 text-xs text-aegis-muted">
-                Fail-closed: no invented labels; not a signal or recommendation.
+                Opt-in only via existing toolbar action; not auto-run; no invented labels;
+                not a signal or recommendation.
               </p>
             </aside>
           ) : null}

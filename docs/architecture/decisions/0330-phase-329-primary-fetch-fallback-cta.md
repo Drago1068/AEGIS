@@ -30,3 +30,4 @@ Auto-ingest, inventing bars, orders, changing fallback detection, changing label
 - [0329-phase-328-nas-live-verify-phase-327.md](0329-phase-328-nas-live-verify-phase-327.md)
 - [0296-phase-295-primary-fetch-fallback-callout.md](0296-phase-295-primary-fetch-fallback-callout.md)
 - [0331-phase-330-nas-live-verify-phase-329.md](0331-phase-330-nas-live-verify-phase-329.md)
+- [0332-phase-331-unlabeled-empty-cta.md](0332-phase-331-unlabeled-empty-cta.md)
